@@ -1,0 +1,28 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - echo "Installing dependencies..."
+        - npm ci
+    build:
+      # https://docs.aws.amazon.com/amplify/latest/userguide/ssr-environment-variables.html#:~:text=Amplify%20Hosting%20supports%20adding%20environment,in%20the%20build%20commands%20section.
+      commands:
+        - echo "Building the application..."
+        - rm -f .env.production
+        - export NEXT_PUBLIC_SERVER_URL="${NEXT_PUBLIC_SERVER_URL:-https://${AWS_BRANCH}.${AWS_APP_ID}.amplifyapp.com}"
+        - echo "Using NEXT_PUBLIC_SERVER_URL=$NEXT_PUBLIC_SERVER_URL"
+        - env | grep -e '^NEXT_PUBLIC_' >> .env.production || true
+        - env | grep -e '^DATABASE_URL=' -e '^PAYLOAD_SECRET=' -e '^CRON_SECRET=' -e '^PREVIEW_SECRET=' -e '^S3_BUCKET=' -e '^S3_REGION=' -e '^S3_ACCESS_KEY_ID=' -e '^S3_SECRET_ACCESS_KEY=' >> .env.production || true
+        - npm run build
+    postBuild:
+      commands:
+        - echo "Post build complete"
+  artifacts:
+    baseDirectory: .next
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - .next/cache/**/*
+      - node_modules/**/*
