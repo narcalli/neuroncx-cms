@@ -1,5 +1,13 @@
-import { PreviewSearchParams } from '@/app/(frontend)/next/preview/route'
 import { PayloadRequest, CollectionSlug } from 'payload'
+
+// Previously imported from the frontend preview route. Declared here so the
+// CMS builds on its own — the website owns the route that consumes these.
+export type PreviewSearchParams = {
+  slug: string
+  collection: string
+  path: string
+  previewSecret: string
+}
 
 const collectionPrefixMap: Partial<Record<CollectionSlug, string>> = {
   posts: '/posts',
@@ -13,19 +21,23 @@ type Props = {
 }
 
 export const generatePreviewPath = ({ collection, slug }: Props) => {
-  if (slug === undefined || slug === null) {
-    return null
+  const path = `${collectionPrefixMap[collection]}/${slug}`
+
+  const params: PreviewSearchParams = {
+    slug,
+    collection,
+    path,
+    previewSecret: process.env.PREVIEW_SECRET || '',
   }
 
-  // Encode to support slugs with special characters
-  const encodedSlug = encodeURIComponent(slug)
+  const encodedParams = new URLSearchParams()
 
-  const encodedParams = new URLSearchParams({
-    path: `${collectionPrefixMap[collection]}/${encodedSlug}`,
-    previewSecret: process.env.PREVIEW_SECRET || '',
-  } satisfies PreviewSearchParams)
+  Object.entries(params).forEach(([key, value]) => {
+    encodedParams.append(key, value)
+  })
 
-  const url = `/next/preview?${encodedParams.toString()}`
+  // Preview opens on the website, which is a separate app after the split.
+  const base = process.env.NEXT_PUBLIC_SITE_URL || ''
 
-  return url
+  return `${base}/next/preview?${encodedParams.toString()}`
 }
