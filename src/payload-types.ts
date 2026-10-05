@@ -232,6 +232,7 @@ export interface Page {
     | SolutionGridBlock
     | ProductSuiteBlock
     | ProductSuite2Block
+    | ProductInActionBlock
     | BentoGridBlock
     | DetailedProductSuiteBlock
     | AgenticFlowDemoBlock
@@ -447,6 +448,30 @@ export interface Media {
       filename?: string | null;
     };
     hero?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    stack768?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    stack1200?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    stack1600?: {
       url?: string | null;
       width?: number | null;
       height?: number | null;
@@ -1445,6 +1470,139 @@ export interface ProductSuite2Block {
   id?: string | null;
   blockName?: string | null;
   blockType: 'productSuite2';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ProductInActionBlock".
+ */
+export interface ProductInActionBlock {
+  eyebrow?: string | null;
+  heading: string;
+  intro?: string | null;
+  /**
+   * Stacked makes the cards pile up on scroll. Plain is a normal vertical list.
+   */
+  layout?: ('stacked' | 'plain') | null;
+  /**
+   * Flips the image to the other side on every second card
+   */
+  alternateSides?: boolean | null;
+  theme?: ('light' | 'tinted') | null;
+  /**
+   * Optional. Lets a link such as #product-in-action jump to this block.
+   */
+  anchorId?: string | null;
+  cards: {
+    icon?:
+      | (
+          | 'message'
+          | 'chat'
+          | 'check'
+          | 'calendar'
+          | 'card'
+          | 'document'
+          | 'refresh'
+          | 'bolt'
+          | 'layers'
+          | 'gauge'
+          | 'plug'
+          | 'shield'
+          | 'shieldCheck'
+          | 'lock'
+          | 'globe'
+          | 'server'
+          | 'eye'
+          | 'users'
+          | 'user'
+          | 'phone'
+          | 'smartphone'
+          | 'mail'
+          | 'messageCircle'
+          | 'send'
+          | 'inbox'
+          | 'headphones'
+          | 'mic'
+          | 'video'
+          | 'bell'
+          | 'handshake'
+          | 'stethoscope'
+          | 'heartPulse'
+          | 'hospital'
+          | 'activity'
+          | 'flask'
+          | 'pill'
+          | 'graduationCap'
+          | 'building'
+          | 'mapPin'
+          | 'database'
+          | 'cloud'
+          | 'workflow'
+          | 'bot'
+          | 'sparkles'
+          | 'search'
+          | 'chart'
+          | 'trendingUp'
+          | 'target'
+          | 'rocket'
+          | 'key'
+          | 'fileText'
+          | 'clipboardList'
+          | 'link'
+          | 'settings'
+          | 'puzzle'
+          | 'timer'
+          | 'clock'
+          | 'badgeCheck'
+          | 'star'
+          | 'briefcase'
+        )
+      | null;
+    title: string;
+    /**
+     * One or two sentences
+     */
+    description: string;
+    bullets?:
+      | {
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Use screenshots from the demo tenant only. No real patient names, phone numbers, call recordings or client branding. This page is public.
+     */
+    image: string | Media;
+    /**
+     * Describe what the screen shows. This is read by search engines and screen readers.
+     */
+    imageAlt: string;
+    imageCaption?: string | null;
+    /**
+     * Optional. Leave the address empty to show the card with no link.
+     */
+    link?: {
+      label?: string | null;
+      url?: string | null;
+      newTab?: boolean | null;
+    };
+    id?: string | null;
+  }[];
+  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'productInAction';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -3583,6 +3741,7 @@ export interface PagesSelect<T extends boolean = true> {
         solutionGrid?: T | SolutionGridBlockSelect<T>;
         productSuite?: T | ProductSuiteBlockSelect<T>;
         productSuite2?: T | ProductSuite2BlockSelect<T>;
+        productInAction?: T | ProductInActionBlockSelect<T>;
         bentoGrid?: T | BentoGridBlockSelect<T>;
         detailedProductSuite?: T | DetailedProductSuiteBlockSelect<T>;
         agenticFlowDemo?: T | AgenticFlowDemoBlockSelect<T>;
@@ -3992,6 +4151,52 @@ export interface ProductSuite2BlockSelect<T extends boolean = true> {
               id?: T;
             };
         listStyle?: T;
+        link?:
+          | T
+          | {
+              label?: T;
+              url?: T;
+              newTab?: T;
+            };
+        id?: T;
+      };
+  background?: T;
+  width?: T;
+  spacingTop?: T;
+  spacingBottom?: T;
+  align?: T;
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ProductInActionBlock_select".
+ */
+export interface ProductInActionBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  intro?: T;
+  layout?: T;
+  alternateSides?: T;
+  theme?: T;
+  anchorId?: T;
+  cards?:
+    | T
+    | {
+        icon?: T;
+        title?: T;
+        description?: T;
+        bullets?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        image?: T;
+        imageAlt?: T;
+        imageCaption?: T;
         link?:
           | T
           | {
@@ -5015,6 +5220,36 @@ export interface MediaSelect<T extends boolean = true> {
               filename?: T;
             };
         hero?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        stack768?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        stack1200?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        stack1600?:
           | T
           | {
               url?: T;

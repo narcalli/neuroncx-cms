@@ -168,6 +168,24 @@ export const Media: CollectionConfig = {
         width: 2560,
         formatOptions: webp,
       },
+      // Screenshot sizes for Product in Action. Payload gives each size one
+      // output format, so these are WebP. Only new uploads (and re-uploads)
+      // get these sizes.
+      {
+        name: 'stack768',
+        width: 768,
+        formatOptions: webp,
+      },
+      {
+        name: 'stack1200',
+        width: 1200,
+        formatOptions: webp,
+      },
+      {
+        name: 'stack1600',
+        width: 1600,
+        formatOptions: webp,
+      },
     ],
   },
 }

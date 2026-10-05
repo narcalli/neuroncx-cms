@@ -10,6 +10,7 @@ import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { LinkFeatureClient as LinkFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { IconPickerField as IconPickerField_031fc23d82831855ad4b7922e70d91d1 } from '@/fields/IconPicker/Component'
+import { ProductInActionRowLabel as ProductInActionRowLabel_d7dd69772f9ce4c0396e91f9fe9045f3 } from '@/blocks/ProductInAction/RowLabel'
 import { BentoGridRowLabel as BentoGridRowLabel_9034f91f9a14222ac73beb8c9248a9e3 } from '@/blocks/BentoGrid/RowLabel'
 import { DetailedProductSuiteHighlightRowLabel as DetailedProductSuiteHighlightRowLabel_3a3e2c9b76634a20e9fc275d09b6cc82 } from '@/blocks/DetailedProductSuite/RowLabel'
 import { DetailedProductSuiteRowLabel as DetailedProductSuiteRowLabel_3a3e2c9b76634a20e9fc275d09b6cc82 } from '@/blocks/DetailedProductSuite/RowLabel'
@@ -46,6 +47,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#LinkFeatureClient": LinkFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@/fields/IconPicker/Component#IconPickerField": IconPickerField_031fc23d82831855ad4b7922e70d91d1,
+  "@/blocks/ProductInAction/RowLabel#ProductInActionRowLabel": ProductInActionRowLabel_d7dd69772f9ce4c0396e91f9fe9045f3,
   "@/blocks/BentoGrid/RowLabel#BentoGridRowLabel": BentoGridRowLabel_9034f91f9a14222ac73beb8c9248a9e3,
   "@/blocks/DetailedProductSuite/RowLabel#DetailedProductSuiteHighlightRowLabel": DetailedProductSuiteHighlightRowLabel_3a3e2c9b76634a20e9fc275d09b6cc82,
   "@/blocks/DetailedProductSuite/RowLabel#DetailedProductSuiteRowLabel": DetailedProductSuiteRowLabel_3a3e2c9b76634a20e9fc275d09b6cc82,
