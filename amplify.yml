@@ -6,7 +6,6 @@ frontend:
         - echo "Installing dependencies..."
         - npm ci
     build:
-      # https://docs.aws.amazon.com/amplify/latest/userguide/ssr-environment-variables.html#:~:text=Amplify%20Hosting%20supports%20adding%20environment,in%20the%20build%20commands%20section.
       commands:
         - echo "Building the application..."
         - rm -f .env.production
@@ -17,6 +16,7 @@ frontend:
         - npm run build
     postBuild:
       commands:
+        - rm -rf .next/cache
         - echo "Post build complete"
   artifacts:
     baseDirectory: .next
@@ -24,5 +24,4 @@ frontend:
       - '**/*'
   cache:
     paths:
-      - .next/cache/**/*
       - node_modules/**/*
