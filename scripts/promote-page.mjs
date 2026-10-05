@@ -40,13 +40,28 @@ const env = Object.fromEntries(
 const LIVE = (env.PROMOTE_URL || '').replace(/\/$/, '')
 const KEY = env.PROMOTE_API_KEY
 const LOCAL = (process.env.LOCAL_URL || 'http://localhost:3001').replace(/\/$/, '')
-if (!LIVE || !KEY) {
-  console.error('PROMOTE_URL or PROMOTE_API_KEY is empty in .env.promote.')
+if (!LIVE) {
+  console.error('PROMOTE_URL is empty in .env.promote.')
   process.exit(1)
 }
 
-const liveHeaders = { Authorization: `users API-Key ${KEY}` }
+// Set in main(): a JWT from email and password login, or the API key as a fallback.
+let liveHeaders = {}
 const log = (...m) => console.log(...m)
+
+async function liveLogin() {
+  const email = env.PROMOTE_EMAIL
+  const password = env.PROMOTE_PASSWORD
+  if (!email || !password) return null
+  const res = await fetch(`${LIVE}/api/users/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  })
+  const data = await json(res, 'live login')
+  if (!data.token) throw new Error('Live login returned no token. Check PROMOTE_EMAIL and PROMOTE_PASSWORD.')
+  return { Authorization: `JWT ${data.token}` }
+}
 
 async function json(res, what) {
   const text = await res.text()
@@ -135,6 +150,14 @@ async function toLiveBody(node, key) {
 }
 
 async function main() {
+  const loginHeaders = await liveLogin()
+  if (loginHeaders) {
+    liveHeaders = loginHeaders
+  } else if (KEY) {
+    liveHeaders = { Authorization: `users API-Key ${KEY}` }
+  } else {
+    throw new Error('Set PROMOTE_EMAIL and PROMOTE_PASSWORD, or PROMOTE_API_KEY, in .env.promote.')
+  }
   log(`Promoting "${slug}" from ${LOCAL} to ${LIVE}`)
   log(WRITE ? (PUBLISH ? 'Mode: WRITE and PUBLISH' : 'Mode: WRITE (draft)') : 'Mode: DRY RUN (no changes)')
 

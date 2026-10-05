@@ -15,7 +15,11 @@ export const Users: CollectionConfig = {
     defaultColumns: ['name', 'email'],
     useAsTitle: 'name',
   },
-  auth: true,
+  auth: {
+    // Lets an admin create a REST API key for a user (used by scripts such as
+    // scripts/promote-page.mjs). The MCP keys are a separate collection.
+    useAPIKey: true,
+  },
   fields: [
     {
       name: 'name',
