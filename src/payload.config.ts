@@ -61,6 +61,9 @@ export default buildConfig({
   globals: [Header, Footer],
   plugins: [
     s3Storage({
+      // Without S3 keys (for example on a local machine) uploads are kept in
+      // public/media on this computer instead of failing.
+      enabled: Boolean(process.env.S3_ACCESS_KEY_ID && process.env.S3_SECRET_ACCESS_KEY),
       collections: {
         media: true,
       },

@@ -1,4 +1,5 @@
 import type { Block } from 'payload'
+import { iconField } from '@/fields/icons'
 
 export const JourneyEngine: Block = {
   slug: 'journeyEngine',
@@ -21,20 +22,7 @@ export const JourneyEngine: Block = {
       },
       fields: [
         { name: 'label', type: 'text', required: true, admin: { description: 'e.g. Enquiry' } },
-        {
-          name: 'icon',
-          type: 'select',
-          defaultValue: 'message',
-          options: [
-            { label: 'Message — enquiry', value: 'message' },
-            { label: 'Check — qualify', value: 'check' },
-            { label: 'Calendar — book, order', value: 'calendar' },
-            { label: 'Card — pay', value: 'card' },
-            { label: 'Document — fulfil', value: 'document' },
-            { label: 'Chat — follow-up', value: 'chat' },
-            { label: 'Refresh — recover', value: 'refresh' },
-          ],
-        },
+        iconField('message'),
       ],
     },
     {

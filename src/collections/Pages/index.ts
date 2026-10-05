@@ -8,6 +8,9 @@ import { Archive } from '../../blocks/ArchiveBlock/config'
 import { CallToAction } from '../../blocks/CallToAction/config'
 import { Content } from '../../blocks/Content/config'
 import { ConversationHero } from '../../blocks/ConversationHero/config'
+import { HeroFullBackground } from '../../blocks/HeroFullBackground/config'
+import { HeroRightPlacement } from '../../blocks/HeroRightPlacement/config'
+import { HeroWorkforceGrid } from '../../blocks/HeroWorkforceGrid/config'
 import { MediaBlock } from '../../blocks/MediaBlock/config'
 import { hero } from '@/heros/config'
 import { slugField } from 'payload'
@@ -21,17 +24,31 @@ import { StatHero } from '../../blocks/StatHero/config'
 import { Benefits } from '../../blocks/Benefits/config'
 import { Integrations } from '../../blocks/Integrations/config'
 import { ProductSuite } from '../../blocks/ProductSuite/config'
+import { ProductSuite2 } from '../../blocks/ProductSuite2/config'
+import { BentoGrid } from '../../blocks/BentoGrid/config'
+import { DetailedProductSuite } from '../../blocks/DetailedProductSuite/config'
+import { IntegrationsMarquee } from '../../blocks/IntegrationsMarquee/config'
+import { FAQ } from '../../blocks/FAQ/config'
+import { AgenticHero } from '../../blocks/AgenticHero/config'
+import { AgenticFlowDemo } from '../../blocks/AgenticFlowDemo/config'
+import { AgenticStats } from '../../blocks/AgenticStats/config'
+import { AgenticCartsDemo } from '../../blocks/AgenticCartsDemo/config'
+import { AgenticOrbit } from '../../blocks/AgenticOrbit/config'
+import { AgenticEpisode } from '../../blocks/AgenticEpisode/config'
+import { AgenticCases } from '../../blocks/AgenticCases/config'
+import { AgenticClosing } from '../../blocks/AgenticClosing/config'
 import { UseCases } from '../../blocks/UseCases/config'
 import { ContactForm } from '../../blocks/ContactForm/config'
 import { PartnerStrip } from '../../blocks/PartnerStrip/config'
 import { ProblemStatement } from '../../blocks/ProblemStatement/config'
 import { PlatformLayers } from '../../blocks/PlatformLayers/config'
+import { PlatformLayersTwo } from '../../blocks/PlatformLayersTwo/config'
 import { JourneyEngine } from '../../blocks/JourneyEngine/config'
 import { ContextEngine } from '../../blocks/ContextEngine/config'
 import { SolutionGrid } from '../../blocks/SolutionGrid/config'
 import { TrustPanel } from '../../blocks/TrustPanel/config'
 import { StatBand } from '../../blocks/StatBand/config'
-import { withPresentation } from '@/fields/presentation'
+import { withPresentation, withMinimalPresentation } from '@/fields/presentation'
 
 import {
   MetaDescriptionField,
@@ -93,31 +110,57 @@ export const Pages: CollectionConfig<'pages'> = {
               name: 'layout',
               type: 'blocks',
               blocks: [
-                ConversationHero,
-                PartnerStrip,
-                StatHero,
-                LogoWall,
-                ProblemStatement,
-                PlatformLayers,
-                JourneyEngine,
-                ContextEngine,
-                SolutionGrid,
-                ProductSuite,
-                UseCases,
-                Benefits,
-                Integrations,
-                TrustPanel,
-                StatBand,
-                ContactForm,
-                HowItWorks,
-                ClosingCTA,
-                FeatureThread,
-                ArticleGrid,
-                CallToAction,
-                Content,
-                MediaBlock,
-                Archive,
-              ].map(withPresentation),
+                ...[
+                  ConversationHero,
+                  PartnerStrip,
+                  StatHero,
+                  LogoWall,
+                  ProblemStatement,
+                  PlatformLayers,
+                  JourneyEngine,
+                  ContextEngine,
+                  SolutionGrid,
+                  ProductSuite,
+                  ProductSuite2,
+                  BentoGrid,
+                  DetailedProductSuite,
+                  AgenticFlowDemo,
+                  AgenticStats,
+                  AgenticCartsDemo,
+                  AgenticOrbit,
+                  AgenticEpisode,
+                  AgenticCases,
+                  AgenticClosing,
+                  IntegrationsMarquee,
+                  UseCases,
+                  Benefits,
+                  Integrations,
+                  TrustPanel,
+                  StatBand,
+                  ContactForm,
+                  HowItWorks,
+                  ClosingCTA,
+                  FeatureThread,
+                  ArticleGrid,
+                  CallToAction,
+                  Content,
+                  MediaBlock,
+                  Archive,
+                ].map(withPresentation),
+                // Full-bleed blocks control their own look end to end, so they get
+                // just "hide" and the anchor ID rather than the full Appearance set.
+                withMinimalPresentation(HeroFullBackground),
+                withMinimalPresentation(HeroRightPlacement),
+                withMinimalPresentation(HeroWorkforceGrid),
+                withMinimalPresentation(AgenticHero),
+                // Self-contained: its own background and anchor fields already
+                // cover what withPresentation/withMinimalPresentation would add,
+                // so it isn't wrapped with either. See blocks/FAQ/config.ts.
+                FAQ,
+                // Has its own theme and anchorId fields, so it is not wrapped with
+                // withPresentation either. Same reason as FAQ above.
+                PlatformLayersTwo,
+              ],
               required: true,
               admin: {
                 initCollapsed: true,

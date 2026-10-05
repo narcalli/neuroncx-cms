@@ -9,6 +9,14 @@ import { UnderlineFeatureClient as UnderlineFeatureClient_e70f5e05f09f93e00b997e
 import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { LinkFeatureClient as LinkFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
+import { IconPickerField as IconPickerField_031fc23d82831855ad4b7922e70d91d1 } from '@/fields/IconPicker/Component'
+import { BentoGridRowLabel as BentoGridRowLabel_9034f91f9a14222ac73beb8c9248a9e3 } from '@/blocks/BentoGrid/RowLabel'
+import { DetailedProductSuiteHighlightRowLabel as DetailedProductSuiteHighlightRowLabel_3a3e2c9b76634a20e9fc275d09b6cc82 } from '@/blocks/DetailedProductSuite/RowLabel'
+import { DetailedProductSuiteRowLabel as DetailedProductSuiteRowLabel_3a3e2c9b76634a20e9fc275d09b6cc82 } from '@/blocks/DetailedProductSuite/RowLabel'
+import { IntegrationsMarqueeRowLabel as IntegrationsMarqueeRowLabel_e40e127a1e15772294aa68668bfab915 } from '@/blocks/IntegrationsMarquee/RowLabel'
+import { UnorderedListFeatureClient as UnorderedListFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
+import { FAQRowLabel as FAQRowLabel_7a0a1ede3caede510531ae1d1981b8cd } from '@/blocks/FAQ/RowLabel'
+import { PlatformLayersTwoRowLabel as PlatformLayersTwoRowLabel_19120e38fe7d436094c242d081cf8d0b } from '@/blocks/PlatformLayersTwo/RowLabel'
 import { OverviewComponent as OverviewComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { MetaTitleComponent as MetaTitleComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { MetaImageComponent as MetaImageComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
@@ -37,6 +45,14 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#BoldFeatureClient": BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#LinkFeatureClient": LinkFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
+  "@/fields/IconPicker/Component#IconPickerField": IconPickerField_031fc23d82831855ad4b7922e70d91d1,
+  "@/blocks/BentoGrid/RowLabel#BentoGridRowLabel": BentoGridRowLabel_9034f91f9a14222ac73beb8c9248a9e3,
+  "@/blocks/DetailedProductSuite/RowLabel#DetailedProductSuiteHighlightRowLabel": DetailedProductSuiteHighlightRowLabel_3a3e2c9b76634a20e9fc275d09b6cc82,
+  "@/blocks/DetailedProductSuite/RowLabel#DetailedProductSuiteRowLabel": DetailedProductSuiteRowLabel_3a3e2c9b76634a20e9fc275d09b6cc82,
+  "@/blocks/IntegrationsMarquee/RowLabel#IntegrationsMarqueeRowLabel": IntegrationsMarqueeRowLabel_e40e127a1e15772294aa68668bfab915,
+  "@payloadcms/richtext-lexical/client#UnorderedListFeatureClient": UnorderedListFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
+  "@/blocks/FAQ/RowLabel#FAQRowLabel": FAQRowLabel_7a0a1ede3caede510531ae1d1981b8cd,
+  "@/blocks/PlatformLayersTwo/RowLabel#PlatformLayersTwoRowLabel": PlatformLayersTwoRowLabel_19120e38fe7d436094c242d081cf8d0b,
   "@payloadcms/plugin-seo/client#OverviewComponent": OverviewComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@payloadcms/plugin-seo/client#MetaTitleComponent": MetaTitleComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@payloadcms/plugin-seo/client#MetaImageComponent": MetaImageComponent_a8a977ebc872c5d5ea7ee689724c0860,

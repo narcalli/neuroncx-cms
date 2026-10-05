@@ -1,9 +1,10 @@
 import type { Block } from 'payload'
+import { iconField } from '@/fields/icons'
 
 export const PlatformLayers: Block = {
   slug: 'platformLayers',
   interfaceName: 'PlatformLayersBlock',
-  labels: { singular: 'Platform Layers', plural: 'Platform Layers' },
+  labels: { singular: 'Platform Layers (Sticky Stage)', plural: 'Platform Layers (Sticky Stage)' },
   fields: [
     { name: 'eyebrow', type: 'text', label: 'Small label', admin: { description: 'e.g. The platform' } },
     { name: 'heading', type: 'text', required: true, label: 'Heading' },
@@ -32,18 +33,7 @@ export const PlatformLayers: Block = {
           label: 'Tag pill',
           admin: { description: 'Optional, e.g. Core or Adjacent.' },
         },
-        {
-          name: 'icon',
-          type: 'select',
-          defaultValue: 'message',
-          options: [
-            { label: 'Message — conversational', value: 'message' },
-            { label: 'Bolt — workflows, automation', value: 'bolt' },
-            { label: 'Layers — context, knowledge', value: 'layers' },
-            { label: 'Gauge — quality, analytics', value: 'gauge' },
-            { label: 'Plug — integrations', value: 'plug' },
-          ],
-        },
+        iconField('message'),
       ],
     },
   ],

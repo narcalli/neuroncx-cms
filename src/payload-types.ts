@@ -64,6 +64,7 @@ export type SupportedTimezones =
 export interface Config {
   auth: {
     users: UserAuthOperations;
+    'payload-mcp-api-keys': PayloadMcpApiKeyAuthOperations;
   };
   blocks: {};
   collections: {
@@ -75,6 +76,7 @@ export interface Config {
     users: User;
     enquiries: Enquiry;
     redirects: Redirect;
+    'payload-mcp-api-keys': PayloadMcpApiKey;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-folders': FolderInterface;
@@ -96,6 +98,7 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     enquiries: EnquiriesSelect<false> | EnquiriesSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
+    'payload-mcp-api-keys': PayloadMcpApiKeysSelect<false> | PayloadMcpApiKeysSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-folders': PayloadFoldersSelect<false> | PayloadFoldersSelect<true>;
@@ -119,7 +122,7 @@ export interface Config {
   widgets: {
     collections: CollectionsWidget;
   };
-  user: User;
+  user: User | PayloadMcpApiKey;
   jobs: {
     tasks: {
       schedulePublish: TaskSchedulePublish;
@@ -132,6 +135,24 @@ export interface Config {
   };
 }
 export interface UserAuthOperations {
+  forgotPassword: {
+    email: string;
+    password: string;
+  };
+  login: {
+    email: string;
+    password: string;
+  };
+  registerFirstUser: {
+    email: string;
+    password: string;
+  };
+  unlock: {
+    email: string;
+    password: string;
+  };
+}
+export interface PayloadMcpApiKeyAuthOperations {
   forgotPassword: {
     email: string;
     password: string;
@@ -210,6 +231,17 @@ export interface Page {
     | ContextEngineBlock
     | SolutionGridBlock
     | ProductSuiteBlock
+    | ProductSuite2Block
+    | BentoGridBlock
+    | DetailedProductSuiteBlock
+    | AgenticFlowDemoBlock
+    | AgenticStatsBlock
+    | AgenticCartsDemoBlock
+    | AgenticOrbitBlock
+    | AgenticEpisodeBlock
+    | AgenticCasesBlock
+    | AgenticClosingBlock
+    | IntegrationsMarqueeBlock
     | UseCasesBlock
     | BenefitsBlock
     | IntegrationsBlock
@@ -224,6 +256,12 @@ export interface Page {
     | ContentBlock
     | MediaBlock
     | ArchiveBlock
+    | HeroFullBackgroundBlock
+    | HeroRightPlacementBlock
+    | HeroWorkforceGridBlock
+    | AgenticHeroBlock
+    | FAQBlock
+    | PlatformLayersTwoBlock
   )[];
   meta?: {
     title?: string | null;
@@ -384,6 +422,38 @@ export interface Media {
       filesize?: number | null;
       filename?: string | null;
     };
+    card?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    wide?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    tall?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    hero?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
   };
 }
 /**
@@ -497,7 +567,70 @@ export interface ConversationHeroBlock {
   workflowSteps?:
     | {
         label: string;
-        icon?: ('calendar' | 'card' | 'document' | 'message' | 'check') | null;
+        icon?:
+          | (
+              | 'message'
+              | 'chat'
+              | 'check'
+              | 'calendar'
+              | 'card'
+              | 'document'
+              | 'refresh'
+              | 'bolt'
+              | 'layers'
+              | 'gauge'
+              | 'plug'
+              | 'shield'
+              | 'shieldCheck'
+              | 'lock'
+              | 'globe'
+              | 'server'
+              | 'eye'
+              | 'users'
+              | 'user'
+              | 'phone'
+              | 'smartphone'
+              | 'mail'
+              | 'messageCircle'
+              | 'send'
+              | 'inbox'
+              | 'headphones'
+              | 'mic'
+              | 'video'
+              | 'bell'
+              | 'handshake'
+              | 'stethoscope'
+              | 'heartPulse'
+              | 'hospital'
+              | 'activity'
+              | 'flask'
+              | 'pill'
+              | 'graduationCap'
+              | 'building'
+              | 'mapPin'
+              | 'database'
+              | 'cloud'
+              | 'workflow'
+              | 'bot'
+              | 'sparkles'
+              | 'search'
+              | 'chart'
+              | 'trendingUp'
+              | 'target'
+              | 'rocket'
+              | 'key'
+              | 'fileText'
+              | 'clipboardList'
+              | 'link'
+              | 'settings'
+              | 'puzzle'
+              | 'timer'
+              | 'clock'
+              | 'badgeCheck'
+              | 'star'
+              | 'briefcase'
+            )
+          | null;
         id?: string | null;
       }[]
     | null;
@@ -526,6 +659,10 @@ export interface ConversationHeroBlock {
    * Keeps the block and its content but removes it from the page.
    */
   hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'conversationHero';
@@ -573,6 +710,10 @@ export interface PartnerStripBlock {
    * Keeps the block and its content but removes it from the page.
    */
   hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'partnerStrip';
@@ -626,6 +767,10 @@ export interface StatHeroBlock {
    * Keeps the block and its content but removes it from the page.
    */
   hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'statHero';
@@ -677,6 +822,10 @@ export interface LogoWallBlock {
    * Keeps the block and its content but removes it from the page.
    */
   hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'logoWall';
@@ -743,6 +892,10 @@ export interface ProblemStatementBlock {
    * Keeps the block and its content but removes it from the page.
    */
   hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'problemStatement';
@@ -772,7 +925,70 @@ export interface PlatformLayersBlock {
          * Optional, e.g. Core or Adjacent.
          */
         tag?: string | null;
-        icon?: ('message' | 'bolt' | 'layers' | 'gauge' | 'plug') | null;
+        icon?:
+          | (
+              | 'message'
+              | 'chat'
+              | 'check'
+              | 'calendar'
+              | 'card'
+              | 'document'
+              | 'refresh'
+              | 'bolt'
+              | 'layers'
+              | 'gauge'
+              | 'plug'
+              | 'shield'
+              | 'shieldCheck'
+              | 'lock'
+              | 'globe'
+              | 'server'
+              | 'eye'
+              | 'users'
+              | 'user'
+              | 'phone'
+              | 'smartphone'
+              | 'mail'
+              | 'messageCircle'
+              | 'send'
+              | 'inbox'
+              | 'headphones'
+              | 'mic'
+              | 'video'
+              | 'bell'
+              | 'handshake'
+              | 'stethoscope'
+              | 'heartPulse'
+              | 'hospital'
+              | 'activity'
+              | 'flask'
+              | 'pill'
+              | 'graduationCap'
+              | 'building'
+              | 'mapPin'
+              | 'database'
+              | 'cloud'
+              | 'workflow'
+              | 'bot'
+              | 'sparkles'
+              | 'search'
+              | 'chart'
+              | 'trendingUp'
+              | 'target'
+              | 'rocket'
+              | 'key'
+              | 'fileText'
+              | 'clipboardList'
+              | 'link'
+              | 'settings'
+              | 'puzzle'
+              | 'timer'
+              | 'clock'
+              | 'badgeCheck'
+              | 'star'
+              | 'briefcase'
+            )
+          | null;
         id?: string | null;
       }[]
     | null;
@@ -785,6 +1001,10 @@ export interface PlatformLayersBlock {
    * Keeps the block and its content but removes it from the page.
    */
   hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'platformLayers';
@@ -809,7 +1029,70 @@ export interface JourneyEngineBlock {
          * e.g. Enquiry
          */
         label: string;
-        icon?: ('message' | 'check' | 'calendar' | 'card' | 'document' | 'chat' | 'refresh') | null;
+        icon?:
+          | (
+              | 'message'
+              | 'chat'
+              | 'check'
+              | 'calendar'
+              | 'card'
+              | 'document'
+              | 'refresh'
+              | 'bolt'
+              | 'layers'
+              | 'gauge'
+              | 'plug'
+              | 'shield'
+              | 'shieldCheck'
+              | 'lock'
+              | 'globe'
+              | 'server'
+              | 'eye'
+              | 'users'
+              | 'user'
+              | 'phone'
+              | 'smartphone'
+              | 'mail'
+              | 'messageCircle'
+              | 'send'
+              | 'inbox'
+              | 'headphones'
+              | 'mic'
+              | 'video'
+              | 'bell'
+              | 'handshake'
+              | 'stethoscope'
+              | 'heartPulse'
+              | 'hospital'
+              | 'activity'
+              | 'flask'
+              | 'pill'
+              | 'graduationCap'
+              | 'building'
+              | 'mapPin'
+              | 'database'
+              | 'cloud'
+              | 'workflow'
+              | 'bot'
+              | 'sparkles'
+              | 'search'
+              | 'chart'
+              | 'trendingUp'
+              | 'target'
+              | 'rocket'
+              | 'key'
+              | 'fileText'
+              | 'clipboardList'
+              | 'link'
+              | 'settings'
+              | 'puzzle'
+              | 'timer'
+              | 'clock'
+              | 'badgeCheck'
+              | 'star'
+              | 'briefcase'
+            )
+          | null;
         id?: string | null;
       }[]
     | null;
@@ -844,6 +1127,10 @@ export interface JourneyEngineBlock {
    * Keeps the block and its content but removes it from the page.
    */
   hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'journeyEngine';
@@ -896,6 +1183,10 @@ export interface ContextEngineBlock {
    * Keeps the block and its content but removes it from the page.
    */
   hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'contextEngine';
@@ -942,6 +1233,10 @@ export interface SolutionGridBlock {
    * Keeps the block and its content but removes it from the page.
    */
   hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'solutionGrid';
@@ -961,15 +1256,36 @@ export interface ProductSuiteBlock {
     | {
         name: string;
         /**
+         * Use Steps when the card explains a process. Use Tags for short labels.
+         */
+        cardStyle?: ('tags' | 'steps') | null;
+        /**
          * One or two plain sentences. Say what it does, not why it is good.
          */
         summary?: string | null;
+        /**
+         * Tags style: short labels. Steps style: 3 to 5 steps, one line each, about 80 characters.
+         */
         points?:
           | {
               text: string;
               id?: string | null;
             }[]
           | null;
+        /**
+         * Optional. Without an image the card shows text only.
+         */
+        image?: (string | null) | Media;
+        /**
+         * Only for the Tags style. It is ignored on small screens.
+         */
+        size?: ('standard' | 'wide' | 'tall') | null;
+        tint?: ('none' | 'violet' | 'cyan' | 'rose' | 'grey') | null;
+        /**
+         * Shown in a small box under the steps.
+         */
+        teamControls?: string | null;
+        note?: string | null;
         linkLabel?: string | null;
         /**
          * For example /omnichannel-cx
@@ -987,9 +1303,792 @@ export interface ProductSuiteBlock {
    * Keeps the block and its content but removes it from the page.
    */
   hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'productSuite';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ProductSuite2Block".
+ */
+export interface ProductSuite2Block {
+  /**
+   * Optional. Short, e.g. "Reports and prescriptions".
+   */
+  eyebrow?: string | null;
+  heading?: string | null;
+  intro?: string | null;
+  cards?:
+    | {
+        cardColor?: ('grey' | 'lavender' | 'white') | null;
+        border?: ('none' | 'solid' | 'gradient') | null;
+        borderColor?: ('blue' | 'violet' | 'crimson' | 'navy') | null;
+        /**
+         * A thin rule under the content, matches the border color.
+         */
+        accentLine?: boolean | null;
+        icon?:
+          | (
+              | 'message'
+              | 'chat'
+              | 'check'
+              | 'calendar'
+              | 'card'
+              | 'document'
+              | 'refresh'
+              | 'bolt'
+              | 'layers'
+              | 'gauge'
+              | 'plug'
+              | 'shield'
+              | 'shieldCheck'
+              | 'lock'
+              | 'globe'
+              | 'server'
+              | 'eye'
+              | 'users'
+              | 'user'
+              | 'phone'
+              | 'smartphone'
+              | 'mail'
+              | 'messageCircle'
+              | 'send'
+              | 'inbox'
+              | 'headphones'
+              | 'mic'
+              | 'video'
+              | 'bell'
+              | 'handshake'
+              | 'stethoscope'
+              | 'heartPulse'
+              | 'hospital'
+              | 'activity'
+              | 'flask'
+              | 'pill'
+              | 'graduationCap'
+              | 'building'
+              | 'mapPin'
+              | 'database'
+              | 'cloud'
+              | 'workflow'
+              | 'bot'
+              | 'sparkles'
+              | 'search'
+              | 'chart'
+              | 'trendingUp'
+              | 'target'
+              | 'rocket'
+              | 'key'
+              | 'fileText'
+              | 'clipboardList'
+              | 'link'
+              | 'settings'
+              | 'puzzle'
+              | 'timer'
+              | 'clock'
+              | 'badgeCheck'
+              | 'star'
+              | 'briefcase'
+            )
+          | null;
+        showNumber?: boolean | null;
+        showEyebrow?: boolean | null;
+        showPoints?: boolean | null;
+        /**
+         * Leave empty to count automatically (01, 02, ...) across the cards that show a number. Fill in to show your own, e.g. "A" or "Step 1"; that card is then skipped in the count.
+         */
+        numberText?: string | null;
+        /**
+         * Small pill label above the title, e.g. "Tier 1 core".
+         */
+        tag?: string | null;
+        title: string;
+        description?: string | null;
+        /**
+         * Short lines shown under the text, as pills or as a bulleted list.
+         */
+        points?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        listStyle?: ('pills' | 'bullets') | null;
+        /**
+         * Optional. Leave the address empty to show the card with no link.
+         */
+        link?: {
+          label?: string | null;
+          url?: string | null;
+          newTab?: boolean | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'productSuite2';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BentoGridBlock".
+ */
+export interface BentoGridBlock {
+  gap?: ('small' | 'medium' | 'large') | null;
+  /**
+   * The height of one grid row on desktop.
+   */
+  rowHeight?: number | null;
+  /**
+   * Lets smaller cards move up into gaps. Visual order may differ from the list order.
+   */
+  dense?: boolean | null;
+  framed?: boolean | null;
+  eyebrow?: string | null;
+  title?: string | null;
+  description?: string | null;
+  cards?:
+    | {
+        colSpan?: ('3' | '4' | '6' | '8' | '9' | '12') | null;
+        rowSpan?: ('1' | '2' | '3') | null;
+        /**
+         * Auto uses half width for cards up to 1/2, full width otherwise.
+         */
+        tabletColSpan?: ('auto' | '6' | '12') | null;
+        cardColor?: ('grey' | 'lavender' | 'white' | 'red') | null;
+        border?: ('none' | 'solid' | 'gradient') | null;
+        borderColor?: ('blue' | 'violet' | 'crimson' | 'navy') | null;
+        /**
+         * A thin rule under the content, matches the border color.
+         */
+        accentLine?: boolean | null;
+        icon?:
+          | (
+              | 'message'
+              | 'chat'
+              | 'check'
+              | 'calendar'
+              | 'card'
+              | 'document'
+              | 'refresh'
+              | 'bolt'
+              | 'layers'
+              | 'gauge'
+              | 'plug'
+              | 'shield'
+              | 'shieldCheck'
+              | 'lock'
+              | 'globe'
+              | 'server'
+              | 'eye'
+              | 'users'
+              | 'user'
+              | 'phone'
+              | 'smartphone'
+              | 'mail'
+              | 'messageCircle'
+              | 'send'
+              | 'inbox'
+              | 'headphones'
+              | 'mic'
+              | 'video'
+              | 'bell'
+              | 'handshake'
+              | 'stethoscope'
+              | 'heartPulse'
+              | 'hospital'
+              | 'activity'
+              | 'flask'
+              | 'pill'
+              | 'graduationCap'
+              | 'building'
+              | 'mapPin'
+              | 'database'
+              | 'cloud'
+              | 'workflow'
+              | 'bot'
+              | 'sparkles'
+              | 'search'
+              | 'chart'
+              | 'trendingUp'
+              | 'target'
+              | 'rocket'
+              | 'key'
+              | 'fileText'
+              | 'clipboardList'
+              | 'link'
+              | 'settings'
+              | 'puzzle'
+              | 'timer'
+              | 'clock'
+              | 'badgeCheck'
+              | 'star'
+              | 'briefcase'
+            )
+          | null;
+        showNumber?: boolean | null;
+        showEyebrow?: boolean | null;
+        showPoints?: boolean | null;
+        /**
+         * Leave empty to count automatically (01, 02, ...) across the cards that show a number. Fill in to show your own, e.g. "A" or "Step 1"; that card is then skipped in the count.
+         */
+        numberText?: string | null;
+        /**
+         * Small pill label above the title, e.g. "Tier 1 core".
+         */
+        tag?: string | null;
+        title: string;
+        titleSize?: ('large' | 'regular') | null;
+        body?: string | null;
+        /**
+         * Short lines shown under the text, as pills or as a bulleted list.
+         */
+        points?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        listStyle?: ('pills' | 'bullets') | null;
+        image?: (string | null) | Media;
+        imagePosition?: ('middle' | 'top' | 'bottom' | 'background') | null;
+        link?: {
+          label?: string | null;
+          url?: string | null;
+          newTab?: boolean | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'bentoGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "DetailedProductSuiteBlock".
+ */
+export interface DetailedProductSuiteBlock {
+  eyebrow?: string | null;
+  title?: string | null;
+  description?: string | null;
+  columns?: ('2' | '1') | null;
+  /**
+   * This format does not scale past 4 cards on a page.
+   */
+  cards?:
+    | {
+        /**
+         * Short, e.g. "Ready to deploy".
+         */
+        eyebrow?: string | null;
+        title: string;
+        /**
+         * The bold one-liner under the title, distinct from the description below.
+         */
+        tagline?: string | null;
+        description?: string | null;
+        /**
+         * The large icon that floats above the card, drawn from the shared icon library.
+         */
+        watermarkIcon?:
+          | (
+              | 'message'
+              | 'chat'
+              | 'check'
+              | 'calendar'
+              | 'card'
+              | 'document'
+              | 'refresh'
+              | 'bolt'
+              | 'layers'
+              | 'gauge'
+              | 'plug'
+              | 'shield'
+              | 'shieldCheck'
+              | 'lock'
+              | 'globe'
+              | 'server'
+              | 'eye'
+              | 'users'
+              | 'user'
+              | 'phone'
+              | 'smartphone'
+              | 'mail'
+              | 'messageCircle'
+              | 'send'
+              | 'inbox'
+              | 'headphones'
+              | 'mic'
+              | 'video'
+              | 'bell'
+              | 'handshake'
+              | 'stethoscope'
+              | 'heartPulse'
+              | 'hospital'
+              | 'activity'
+              | 'flask'
+              | 'pill'
+              | 'graduationCap'
+              | 'building'
+              | 'mapPin'
+              | 'database'
+              | 'cloud'
+              | 'workflow'
+              | 'bot'
+              | 'sparkles'
+              | 'search'
+              | 'chart'
+              | 'trendingUp'
+              | 'target'
+              | 'rocket'
+              | 'key'
+              | 'fileText'
+              | 'clipboardList'
+              | 'link'
+              | 'settings'
+              | 'puzzle'
+              | 'timer'
+              | 'clock'
+              | 'badgeCheck'
+              | 'star'
+              | 'briefcase'
+            )
+          | null;
+        /**
+         * Drives the card's gradient tint, icon colors, and CTA button color together.
+         */
+        accentColor?: ('crimson' | 'navy') | null;
+        /**
+         * First 4 show as icon tiles in a grid. Anything beyond that renders as a plain list below the grid instead. Order matters — your strongest points go first.
+         */
+        highlights?:
+          | {
+              icon?:
+                | (
+                    | 'message'
+                    | 'chat'
+                    | 'check'
+                    | 'calendar'
+                    | 'card'
+                    | 'document'
+                    | 'refresh'
+                    | 'bolt'
+                    | 'layers'
+                    | 'gauge'
+                    | 'plug'
+                    | 'shield'
+                    | 'shieldCheck'
+                    | 'lock'
+                    | 'globe'
+                    | 'server'
+                    | 'eye'
+                    | 'users'
+                    | 'user'
+                    | 'phone'
+                    | 'smartphone'
+                    | 'mail'
+                    | 'messageCircle'
+                    | 'send'
+                    | 'inbox'
+                    | 'headphones'
+                    | 'mic'
+                    | 'video'
+                    | 'bell'
+                    | 'handshake'
+                    | 'stethoscope'
+                    | 'heartPulse'
+                    | 'hospital'
+                    | 'activity'
+                    | 'flask'
+                    | 'pill'
+                    | 'graduationCap'
+                    | 'building'
+                    | 'mapPin'
+                    | 'database'
+                    | 'cloud'
+                    | 'workflow'
+                    | 'bot'
+                    | 'sparkles'
+                    | 'search'
+                    | 'chart'
+                    | 'trendingUp'
+                    | 'target'
+                    | 'rocket'
+                    | 'key'
+                    | 'fileText'
+                    | 'clipboardList'
+                    | 'link'
+                    | 'settings'
+                    | 'puzzle'
+                    | 'timer'
+                    | 'clock'
+                    | 'badgeCheck'
+                    | 'star'
+                    | 'briefcase'
+                  )
+                | null;
+              label: string;
+              id?: string | null;
+            }[]
+          | null;
+        cta?: {
+          label?: string | null;
+          url?: string | null;
+          newTab?: boolean | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'detailedProductSuite';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AgenticFlowDemoBlock".
+ */
+export interface AgenticFlowDemoBlock {
+  heading: string;
+  intro?: string | null;
+  /**
+   * Each event is one button a visitor can pick. The first one is shown on load.
+   */
+  events?:
+    | {
+        label: string;
+        triggerTitle: string;
+        triggerText: string;
+        routeText: string;
+        handlers?: ('agent' | 'human')[] | null;
+        resolveTitle: string;
+        resolveText: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Three cards below the demo: trigger, route, resolve.
+   */
+  steps?:
+    | {
+        title: string;
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  footnote?: string | null;
+  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'agenticFlowDemo';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AgenticStatsBlock".
+ */
+export interface AgenticStatsBlock {
+  eyebrow?: string | null;
+  heading?: string | null;
+  stats?:
+    | {
+        /**
+         * The number, without a % or + sign.
+         */
+        value?: number | null;
+        /**
+         * For example %, +, k or x.
+         */
+        suffix?: string | null;
+        label: string;
+        pending?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'agenticStats';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AgenticCartsDemoBlock".
+ */
+export interface AgenticCartsDemoBlock {
+  heading: string;
+  intro?: string | null;
+  modelALabel?: string | null;
+  modelBLabel?: string | null;
+  /**
+   * The carts shown on load, in order. Visitors can add more up to six.
+   */
+  carts?:
+    | {
+        name: string;
+        historyCount?: number | null;
+        id?: string | null;
+      }[]
+    | null;
+  addLabel?: string | null;
+  noteB?: string | null;
+  noteA?: string | null;
+  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'agenticCartsDemo';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AgenticOrbitBlock".
+ */
+export interface AgenticOrbitBlock {
+  heading: string;
+  intro?: string | null;
+  centreLabel?: string | null;
+  /**
+   * Each role orbits the centre. Hover or tap one to read its caption.
+   */
+  roles?:
+    | {
+        label: string;
+        subLabel?: string | null;
+        caption: string;
+        id?: string | null;
+      }[]
+    | null;
+  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'agenticOrbit';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AgenticEpisodeBlock".
+ */
+export interface AgenticEpisodeBlock {
+  heading: string;
+  intro?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  startLabel?: string | null;
+  endLabel?: string | null;
+  /**
+   * Evenly spaced from start to end, in the order entered.
+   */
+  points?:
+    | {
+        label: string;
+        caption: string;
+        id?: string | null;
+      }[]
+    | null;
+  closing?: string | null;
+  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'agenticEpisode';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AgenticCasesBlock".
+ */
+export interface AgenticCasesBlock {
+  heading: string;
+  hoverGlow?: boolean | null;
+  cases?:
+    | {
+        title: string;
+        text: string;
+        linkLabel?: string | null;
+        linkUrl?: string | null;
+        clientPending?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'agenticCases';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AgenticClosingBlock".
+ */
+export interface AgenticClosingBlock {
+  heading: string;
+  ctaLabel: string;
+  ctaUrl: string;
+  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'agenticClosing';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IntegrationsMarqueeBlock".
+ */
+export interface IntegrationsMarqueeBlock {
+  eyebrow?: string | null;
+  title?: string | null;
+  description?: string | null;
+  /**
+   * Order matters. Roughly the first half renders in the top row scrolling one direction, the rest in the bottom row scrolling the other direction.
+   */
+  logos?:
+    | {
+        /**
+         * If left empty, a plain colored monogram using the first letter of the name is shown instead — useful while real logos are still being collected.
+         */
+        logo?: (string | null) | Media;
+        name: string;
+        id?: string | null;
+      }[]
+    | null;
+  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'integrationsMarquee';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1026,6 +2125,10 @@ export interface UseCasesBlock {
    * Keeps the block and its content but removes it from the page.
    */
   hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'useCases';
@@ -1056,6 +2159,10 @@ export interface BenefitsBlock {
    * Keeps the block and its content but removes it from the page.
    */
   hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'benefits';
@@ -1095,6 +2202,10 @@ export interface IntegrationsBlock {
    * Keeps the block and its content but removes it from the page.
    */
   hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'integrations';
@@ -1119,7 +2230,70 @@ export interface TrustPanelBlock {
     | {
         title: string;
         description: string;
-        icon?: ('shield' | 'lock' | 'globe' | 'shieldCheck' | 'server' | 'eye') | null;
+        icon?:
+          | (
+              | 'message'
+              | 'chat'
+              | 'check'
+              | 'calendar'
+              | 'card'
+              | 'document'
+              | 'refresh'
+              | 'bolt'
+              | 'layers'
+              | 'gauge'
+              | 'plug'
+              | 'shield'
+              | 'shieldCheck'
+              | 'lock'
+              | 'globe'
+              | 'server'
+              | 'eye'
+              | 'users'
+              | 'user'
+              | 'phone'
+              | 'smartphone'
+              | 'mail'
+              | 'messageCircle'
+              | 'send'
+              | 'inbox'
+              | 'headphones'
+              | 'mic'
+              | 'video'
+              | 'bell'
+              | 'handshake'
+              | 'stethoscope'
+              | 'heartPulse'
+              | 'hospital'
+              | 'activity'
+              | 'flask'
+              | 'pill'
+              | 'graduationCap'
+              | 'building'
+              | 'mapPin'
+              | 'database'
+              | 'cloud'
+              | 'workflow'
+              | 'bot'
+              | 'sparkles'
+              | 'search'
+              | 'chart'
+              | 'trendingUp'
+              | 'target'
+              | 'rocket'
+              | 'key'
+              | 'fileText'
+              | 'clipboardList'
+              | 'link'
+              | 'settings'
+              | 'puzzle'
+              | 'timer'
+              | 'clock'
+              | 'badgeCheck'
+              | 'star'
+              | 'briefcase'
+            )
+          | null;
         id?: string | null;
       }[]
     | null;
@@ -1132,6 +2306,10 @@ export interface TrustPanelBlock {
    * Keeps the block and its content but removes it from the page.
    */
   hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'trustPanel';
@@ -1170,6 +2348,10 @@ export interface StatBandBlock {
    * Keeps the block and its content but removes it from the page.
    */
   hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'statBand';
@@ -1194,6 +2376,10 @@ export interface ContactFormBlock {
    * Keeps the block and its content but removes it from the page.
    */
   hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'contactForm';
@@ -1236,6 +2422,10 @@ export interface HowItWorksBlock {
    * Keeps the block and its content but removes it from the page.
    */
   hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'howItWorks';
@@ -1267,6 +2457,10 @@ export interface ClosingCTABlock {
    * Keeps the block and its content but removes it from the page.
    */
   hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'closingCta';
@@ -1301,6 +2495,10 @@ export interface FeatureThreadBlock {
    * Keeps the block and its content but removes it from the page.
    */
   hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'featureThread';
@@ -1331,6 +2529,10 @@ export interface ArticleGridBlock {
    * Keeps the block and its content but removes it from the page.
    */
   hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'articleGrid';
@@ -1388,6 +2590,10 @@ export interface CallToActionBlock {
    * Keeps the block and its content but removes it from the page.
    */
   hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'cta';
@@ -1447,6 +2653,10 @@ export interface ContentBlock {
    * Keeps the block and its content but removes it from the page.
    */
   hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'content';
@@ -1500,9 +2710,475 @@ export interface ArchiveBlock {
    * Keeps the block and its content but removes it from the page.
    */
   hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'archive';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroFullBackgroundBlock".
+ */
+export interface HeroFullBackgroundBlock {
+  /**
+   * Optional. Short, e.g. "AI automation for patient journeys".
+   */
+  eyebrow?: string | null;
+  /**
+   * This becomes the page’s main heading (the H1), so use it only once per page — set the page hero above to "None" when this block is on the page.
+   */
+  headline: string;
+  /**
+   * One or two sentences under the headline. Optional.
+   */
+  subhead?: string | null;
+  /**
+   * Optional. Leave the label empty to hide this button.
+   */
+  primaryCta?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: string | Post;
+        } | null);
+    url?: string | null;
+    label?: string | null;
+  };
+  /**
+   * Optional. Leave the label empty to hide this button.
+   */
+  secondaryCta?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: string | Post;
+        } | null);
+    url?: string | null;
+    label?: string | null;
+  };
+  /**
+   * Optional. Up to three short lines, e.g. "New guide every two weeks". Shown with a small dot between them.
+   */
+  metaItems?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Works best with photos, textures or abstract images that have a calm area on the left for the text. For diagrams or screenshots with their own text, set Media placement to Right. Use MP4 or WebM for moving backgrounds — GIFs work but load much slower and are best kept short and small.
+   */
+  media: string | Media;
+  /**
+   * Right suits a diagram, screenshot or infographic that already has its own text or busy detail.
+   */
+  mediaPlacement?: ('fullBleed' | 'right') | null;
+  /**
+   * Right placement only. Contain suits a diagram; Cover suits a photo.
+   */
+  mediaFit?: ('contain' | 'cover') | null;
+  /**
+   * Leave empty for a purely decorative background — that is the usual choice for a full-bleed hero. Fill this in only when the picture itself carries meaning a screen reader user needs to know.
+   */
+  mediaAlt?: string | null;
+  /**
+   * Only used when the background is a video. Shown while the video loads and when motion is off.
+   */
+  videoPoster?: (string | null) | Media;
+  /**
+   * Replaces the background above on phones and small tablets. Leave empty to use the same file on every screen size. Has no effect when Media placement is set to Right — that layout already changes to a stacked image on phones.
+   */
+  mobileMedia?: (string | null) | Media;
+  /**
+   * Which part of the picture to keep in view when it gets cropped.
+   */
+  focalPoint?: ('center' | 'left' | 'right' | 'top' | 'bottom') | null;
+  /**
+   * Darkens the picture so the text stays readable. Strong is the safest default for a full-bleed photo.
+   */
+  overlayStrength?: ('light' | 'medium' | 'strong') | null;
+  /**
+   * How the text and background enter. Always off for a visitor whose device asks for reduced motion.
+   */
+  animation?: ('off' | 'subtle' | 'lively') | null;
+  /**
+   * On a phone the hero always fits its content.
+   */
+  height?: ('tall' | 'medium') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'heroFullBackground';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroRightPlacementBlock".
+ */
+export interface HeroRightPlacementBlock {
+  /**
+   * Optional. Short, e.g. "Bot swarm".
+   */
+  eyebrow?: string | null;
+  /**
+   * This becomes the page’s main heading (the H1), so use it only once per page — set the page hero above to "None" when this block is on the page.
+   */
+  headline: string;
+  /**
+   * One or two sentences under the headline. Optional.
+   */
+  subhead?: string | null;
+  /**
+   * Optional. Leave the label empty to hide this button.
+   */
+  primaryCta?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: string | Post;
+        } | null);
+    url?: string | null;
+    label?: string | null;
+  };
+  /**
+   * Optional. Leave the label empty to hide this button.
+   */
+  secondaryCta?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: string | Post;
+        } | null);
+    url?: string | null;
+    label?: string | null;
+  };
+  /**
+   * Shown in full on the right — nothing gets cropped, so a diagram, screenshot or product shot stays readable. Use MP4 or WebM for moving media — GIFs work but load much slower and are best kept short and small.
+   */
+  media: string | Media;
+  /**
+   * Leave empty when the picture is purely illustrative. Fill this in when it carries meaning a screen reader user needs to know.
+   */
+  mediaAlt?: string | null;
+  /**
+   * Only used when the media above is a video. Shown while the video loads and when motion is off.
+   */
+  videoPoster?: (string | null) | Media;
+  /**
+   * The headline words fade in and the image slowly breathes. Always off for a visitor whose device asks for reduced motion.
+   */
+  animation?: ('on' | 'off') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'heroRightPlacement';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroWorkforceGridBlock".
+ */
+export interface HeroWorkforceGridBlock {
+  /**
+   * Optional. Short, e.g. "The workforce".
+   */
+  eyebrow?: string | null;
+  /**
+   * This becomes the page’s main heading (the H1), so use it only once per page — set the page hero above to "None" when this block is on the page.
+   */
+  headline: string;
+  /**
+   * One or two sentences under the headline. Optional.
+   */
+  subhead?: string | null;
+  cta: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: string | Post;
+        } | null);
+    url?: string | null;
+    label: string;
+  };
+  theme: 'dark' | 'red' | 'white';
+  /**
+   * Applies to every column.
+   */
+  speed?: ('slow' | 'medium' | 'fast') | null;
+  columns?: ('2' | '3' | '4') | null;
+  /**
+   * Distributed evenly across columns in the order you add them. Add at least 2 per column so the loop doesn’t feel short — 9 to 12 cards works well.
+   */
+  cards?:
+    | {
+        icon?:
+          | (
+              | 'message'
+              | 'chat'
+              | 'check'
+              | 'calendar'
+              | 'card'
+              | 'document'
+              | 'refresh'
+              | 'bolt'
+              | 'layers'
+              | 'gauge'
+              | 'plug'
+              | 'shield'
+              | 'shieldCheck'
+              | 'lock'
+              | 'globe'
+              | 'server'
+              | 'eye'
+              | 'users'
+              | 'user'
+              | 'phone'
+              | 'smartphone'
+              | 'mail'
+              | 'messageCircle'
+              | 'send'
+              | 'inbox'
+              | 'headphones'
+              | 'mic'
+              | 'video'
+              | 'bell'
+              | 'handshake'
+              | 'stethoscope'
+              | 'heartPulse'
+              | 'hospital'
+              | 'activity'
+              | 'flask'
+              | 'pill'
+              | 'graduationCap'
+              | 'building'
+              | 'mapPin'
+              | 'database'
+              | 'cloud'
+              | 'workflow'
+              | 'bot'
+              | 'sparkles'
+              | 'search'
+              | 'chart'
+              | 'trendingUp'
+              | 'target'
+              | 'rocket'
+              | 'key'
+              | 'fileText'
+              | 'clipboardList'
+              | 'link'
+              | 'settings'
+              | 'puzzle'
+              | 'timer'
+              | 'clock'
+              | 'badgeCheck'
+              | 'star'
+              | 'briefcase'
+            )
+          | null;
+        /**
+         * Short, e.g. "AI agent".
+         */
+        label?: string | null;
+        title: string;
+        /**
+         * One or two short lines.
+         */
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'heroWorkforceGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AgenticHeroBlock".
+ */
+export interface AgenticHeroBlock {
+  /**
+   * Shown large across the top of the hero.
+   */
+  headline: string;
+  /**
+   * Comma-separated words from the headline to underline in the accent colour, e.g. "agentic, workflows".
+   */
+  accentWords?: string | null;
+  intro?: string | null;
+  ctaLabel?: string | null;
+  ctaUrl?: string | null;
+  /**
+   * Up to six nodes around the diagram. Leave empty to hide the diagram.
+   */
+  nodes?:
+    | {
+        label: string;
+        kind?: ('agent' | 'human' | 'system') | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'agenticHero';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FAQBlock".
+ */
+export interface FAQBlock {
+  heading: string;
+  /**
+   * Optional. One short paragraph above the list.
+   */
+  intro?: string | null;
+  /**
+   * Keep answers short — roughly 40 to 60 words each. If one needs to run long, it should be the exception, not the pattern.
+   */
+  items: {
+    question: string;
+    answer: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    };
+    defaultOpen?: boolean | null;
+    id?: string | null;
+  }[];
+  background?: ('white' | 'cloud') | null;
+  /**
+   * Optional id for deep linking, e.g. faq
+   */
+  anchorId?: string | null;
+  emitSchema?: boolean | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'faq';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PlatformLayersTwoBlock".
+ */
+export interface PlatformLayersTwoBlock {
+  /**
+   * Short uppercase label above the heading. Optional.
+   */
+  eyebrow?: string | null;
+  heading: string;
+  intro?: string | null;
+  /**
+   * Navy inverts the heading and body text. Cards stay light.
+   */
+  theme?: ('light' | 'navy') | null;
+  /**
+   * Shows the numbered list in the sticky left column on large screens
+   */
+  showIndicators?: boolean | null;
+  /**
+   * Optional. Lets a link such as #platform-stack jump to this block.
+   */
+  anchorId?: string | null;
+  /**
+   * Numbered in the order listed. Three to six layers.
+   */
+  layers: {
+    title: string;
+    /**
+     * Short pill label such as "Unified Ingestion". Optional.
+     */
+    tag?: string | null;
+    /**
+     * One or two sentences, roughly 20 to 35 words
+     */
+    description: string;
+    /**
+     * Small line with a tick icon under the description. Optional.
+     */
+    footnote?: string | null;
+    /**
+     * Optional link shown in the card foot.
+     */
+    link?: {
+      label?: string | null;
+      type?: ('internal' | 'external') | null;
+      page?: (string | null) | Page;
+      url?: string | null;
+    };
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'platformLayersTwo';
 }
 /**
  * Short product capability descriptions. These appear in the sections on the home page and on the platform pages.
@@ -1605,6 +3281,57 @@ export interface Redirect {
   };
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * API keys control which collections, resources, tools, and prompts MCP clients can access
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-mcp-api-keys".
+ */
+export interface PayloadMcpApiKey {
+  id: string;
+  /**
+   * The user that the API key is associated with.
+   */
+  user: string | User;
+  /**
+   * A useful label for the API key.
+   */
+  label?: string | null;
+  /**
+   * The purpose of the API key.
+   */
+  description?: string | null;
+  pages?: {
+    /**
+     * Allow clients to find pages.
+     */
+    find?: boolean | null;
+  };
+  media?: {
+    /**
+     * Allow clients to find media.
+     */
+    find?: boolean | null;
+  };
+  header?: {
+    /**
+     * Allow clients to find header global.
+     */
+    find?: boolean | null;
+  };
+  footer?: {
+    /**
+     * Allow clients to find footer global.
+     */
+    find?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  enableAPIKey?: boolean | null;
+  apiKey?: string | null;
+  apiKeyIndex?: string | null;
+  collection: 'payload-mcp-api-keys';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1755,14 +3482,23 @@ export interface PayloadLockedDocument {
         value: string | Redirect;
       } | null)
     | ({
+        relationTo: 'payload-mcp-api-keys';
+        value: string | PayloadMcpApiKey;
+      } | null)
+    | ({
         relationTo: 'payload-folders';
         value: string | FolderInterface;
       } | null);
   globalSlug?: string | null;
-  user: {
-    relationTo: 'users';
-    value: string | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: string | User;
+      }
+    | {
+        relationTo: 'payload-mcp-api-keys';
+        value: string | PayloadMcpApiKey;
+      };
   updatedAt: string;
   createdAt: string;
 }
@@ -1772,10 +3508,15 @@ export interface PayloadLockedDocument {
  */
 export interface PayloadPreference {
   id: string;
-  user: {
-    relationTo: 'users';
-    value: string | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: string | User;
+      }
+    | {
+        relationTo: 'payload-mcp-api-keys';
+        value: string | PayloadMcpApiKey;
+      };
   key?: string | null;
   value?:
     | {
@@ -1841,6 +3582,17 @@ export interface PagesSelect<T extends boolean = true> {
         contextEngine?: T | ContextEngineBlockSelect<T>;
         solutionGrid?: T | SolutionGridBlockSelect<T>;
         productSuite?: T | ProductSuiteBlockSelect<T>;
+        productSuite2?: T | ProductSuite2BlockSelect<T>;
+        bentoGrid?: T | BentoGridBlockSelect<T>;
+        detailedProductSuite?: T | DetailedProductSuiteBlockSelect<T>;
+        agenticFlowDemo?: T | AgenticFlowDemoBlockSelect<T>;
+        agenticStats?: T | AgenticStatsBlockSelect<T>;
+        agenticCartsDemo?: T | AgenticCartsDemoBlockSelect<T>;
+        agenticOrbit?: T | AgenticOrbitBlockSelect<T>;
+        agenticEpisode?: T | AgenticEpisodeBlockSelect<T>;
+        agenticCases?: T | AgenticCasesBlockSelect<T>;
+        agenticClosing?: T | AgenticClosingBlockSelect<T>;
+        integrationsMarquee?: T | IntegrationsMarqueeBlockSelect<T>;
         useCases?: T | UseCasesBlockSelect<T>;
         benefits?: T | BenefitsBlockSelect<T>;
         integrations?: T | IntegrationsBlockSelect<T>;
@@ -1855,6 +3607,12 @@ export interface PagesSelect<T extends boolean = true> {
         content?: T | ContentBlockSelect<T>;
         mediaBlock?: T | MediaBlockSelect<T>;
         archive?: T | ArchiveBlockSelect<T>;
+        heroFullBackground?: T | HeroFullBackgroundBlockSelect<T>;
+        heroRightPlacement?: T | HeroRightPlacementBlockSelect<T>;
+        heroWorkforceGrid?: T | HeroWorkforceGridBlockSelect<T>;
+        agenticHero?: T | AgenticHeroBlockSelect<T>;
+        faq?: T | FAQBlockSelect<T>;
+        platformLayersTwo?: T | PlatformLayersTwoBlockSelect<T>;
       };
   meta?:
     | T
@@ -1910,6 +3668,7 @@ export interface ConversationHeroBlockSelect<T extends boolean = true> {
   spacingBottom?: T;
   align?: T;
   hidden?: T;
+  htmlId?: T;
   id?: T;
   blockName?: T;
 }
@@ -1938,6 +3697,7 @@ export interface PartnerStripBlockSelect<T extends boolean = true> {
   spacingBottom?: T;
   align?: T;
   hidden?: T;
+  htmlId?: T;
   id?: T;
   blockName?: T;
 }
@@ -1966,6 +3726,7 @@ export interface StatHeroBlockSelect<T extends boolean = true> {
   spacingBottom?: T;
   align?: T;
   hidden?: T;
+  htmlId?: T;
   id?: T;
   blockName?: T;
 }
@@ -1992,6 +3753,7 @@ export interface LogoWallBlockSelect<T extends boolean = true> {
   spacingBottom?: T;
   align?: T;
   hidden?: T;
+  htmlId?: T;
   id?: T;
   blockName?: T;
 }
@@ -2027,6 +3789,7 @@ export interface ProblemStatementBlockSelect<T extends boolean = true> {
   spacingBottom?: T;
   align?: T;
   hidden?: T;
+  htmlId?: T;
   id?: T;
   blockName?: T;
 }
@@ -2053,6 +3816,7 @@ export interface PlatformLayersBlockSelect<T extends boolean = true> {
   spacingBottom?: T;
   align?: T;
   hidden?: T;
+  htmlId?: T;
   id?: T;
   blockName?: T;
 }
@@ -2090,6 +3854,7 @@ export interface JourneyEngineBlockSelect<T extends boolean = true> {
   spacingBottom?: T;
   align?: T;
   hidden?: T;
+  htmlId?: T;
   id?: T;
   blockName?: T;
 }
@@ -2123,6 +3888,7 @@ export interface ContextEngineBlockSelect<T extends boolean = true> {
   spacingBottom?: T;
   align?: T;
   hidden?: T;
+  htmlId?: T;
   id?: T;
   blockName?: T;
 }
@@ -2153,6 +3919,7 @@ export interface SolutionGridBlockSelect<T extends boolean = true> {
   spacingBottom?: T;
   align?: T;
   hidden?: T;
+  htmlId?: T;
   id?: T;
   blockName?: T;
 }
@@ -2168,6 +3935,7 @@ export interface ProductSuiteBlockSelect<T extends boolean = true> {
     | T
     | {
         name?: T;
+        cardStyle?: T;
         summary?: T;
         points?:
           | T
@@ -2175,6 +3943,11 @@ export interface ProductSuiteBlockSelect<T extends boolean = true> {
               text?: T;
               id?: T;
             };
+        image?: T;
+        size?: T;
+        tint?: T;
+        teamControls?: T;
+        note?: T;
         linkLabel?: T;
         linkHref?: T;
         id?: T;
@@ -2185,6 +3958,379 @@ export interface ProductSuiteBlockSelect<T extends boolean = true> {
   spacingBottom?: T;
   align?: T;
   hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ProductSuite2Block_select".
+ */
+export interface ProductSuite2BlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  intro?: T;
+  cards?:
+    | T
+    | {
+        cardColor?: T;
+        border?: T;
+        borderColor?: T;
+        accentLine?: T;
+        icon?: T;
+        showNumber?: T;
+        showEyebrow?: T;
+        showPoints?: T;
+        numberText?: T;
+        tag?: T;
+        title?: T;
+        description?: T;
+        points?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        listStyle?: T;
+        link?:
+          | T
+          | {
+              label?: T;
+              url?: T;
+              newTab?: T;
+            };
+        id?: T;
+      };
+  background?: T;
+  width?: T;
+  spacingTop?: T;
+  spacingBottom?: T;
+  align?: T;
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BentoGridBlock_select".
+ */
+export interface BentoGridBlockSelect<T extends boolean = true> {
+  gap?: T;
+  rowHeight?: T;
+  dense?: T;
+  framed?: T;
+  eyebrow?: T;
+  title?: T;
+  description?: T;
+  cards?:
+    | T
+    | {
+        colSpan?: T;
+        rowSpan?: T;
+        tabletColSpan?: T;
+        cardColor?: T;
+        border?: T;
+        borderColor?: T;
+        accentLine?: T;
+        icon?: T;
+        showNumber?: T;
+        showEyebrow?: T;
+        showPoints?: T;
+        numberText?: T;
+        tag?: T;
+        title?: T;
+        titleSize?: T;
+        body?: T;
+        points?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        listStyle?: T;
+        image?: T;
+        imagePosition?: T;
+        link?:
+          | T
+          | {
+              label?: T;
+              url?: T;
+              newTab?: T;
+            };
+        id?: T;
+      };
+  background?: T;
+  width?: T;
+  spacingTop?: T;
+  spacingBottom?: T;
+  align?: T;
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "DetailedProductSuiteBlock_select".
+ */
+export interface DetailedProductSuiteBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  title?: T;
+  description?: T;
+  columns?: T;
+  cards?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        tagline?: T;
+        description?: T;
+        watermarkIcon?: T;
+        accentColor?: T;
+        highlights?:
+          | T
+          | {
+              icon?: T;
+              label?: T;
+              id?: T;
+            };
+        cta?:
+          | T
+          | {
+              label?: T;
+              url?: T;
+              newTab?: T;
+            };
+        id?: T;
+      };
+  background?: T;
+  width?: T;
+  spacingTop?: T;
+  spacingBottom?: T;
+  align?: T;
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AgenticFlowDemoBlock_select".
+ */
+export interface AgenticFlowDemoBlockSelect<T extends boolean = true> {
+  heading?: T;
+  intro?: T;
+  events?:
+    | T
+    | {
+        label?: T;
+        triggerTitle?: T;
+        triggerText?: T;
+        routeText?: T;
+        handlers?: T;
+        resolveTitle?: T;
+        resolveText?: T;
+        id?: T;
+      };
+  steps?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        id?: T;
+      };
+  footnote?: T;
+  background?: T;
+  width?: T;
+  spacingTop?: T;
+  spacingBottom?: T;
+  align?: T;
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AgenticStatsBlock_select".
+ */
+export interface AgenticStatsBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  stats?:
+    | T
+    | {
+        value?: T;
+        suffix?: T;
+        label?: T;
+        pending?: T;
+        id?: T;
+      };
+  background?: T;
+  width?: T;
+  spacingTop?: T;
+  spacingBottom?: T;
+  align?: T;
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AgenticCartsDemoBlock_select".
+ */
+export interface AgenticCartsDemoBlockSelect<T extends boolean = true> {
+  heading?: T;
+  intro?: T;
+  modelALabel?: T;
+  modelBLabel?: T;
+  carts?:
+    | T
+    | {
+        name?: T;
+        historyCount?: T;
+        id?: T;
+      };
+  addLabel?: T;
+  noteB?: T;
+  noteA?: T;
+  background?: T;
+  width?: T;
+  spacingTop?: T;
+  spacingBottom?: T;
+  align?: T;
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AgenticOrbitBlock_select".
+ */
+export interface AgenticOrbitBlockSelect<T extends boolean = true> {
+  heading?: T;
+  intro?: T;
+  centreLabel?: T;
+  roles?:
+    | T
+    | {
+        label?: T;
+        subLabel?: T;
+        caption?: T;
+        id?: T;
+      };
+  background?: T;
+  width?: T;
+  spacingTop?: T;
+  spacingBottom?: T;
+  align?: T;
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AgenticEpisodeBlock_select".
+ */
+export interface AgenticEpisodeBlockSelect<T extends boolean = true> {
+  heading?: T;
+  intro?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  startLabel?: T;
+  endLabel?: T;
+  points?:
+    | T
+    | {
+        label?: T;
+        caption?: T;
+        id?: T;
+      };
+  closing?: T;
+  background?: T;
+  width?: T;
+  spacingTop?: T;
+  spacingBottom?: T;
+  align?: T;
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AgenticCasesBlock_select".
+ */
+export interface AgenticCasesBlockSelect<T extends boolean = true> {
+  heading?: T;
+  hoverGlow?: T;
+  cases?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        linkLabel?: T;
+        linkUrl?: T;
+        clientPending?: T;
+        id?: T;
+      };
+  background?: T;
+  width?: T;
+  spacingTop?: T;
+  spacingBottom?: T;
+  align?: T;
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AgenticClosingBlock_select".
+ */
+export interface AgenticClosingBlockSelect<T extends boolean = true> {
+  heading?: T;
+  ctaLabel?: T;
+  ctaUrl?: T;
+  background?: T;
+  width?: T;
+  spacingTop?: T;
+  spacingBottom?: T;
+  align?: T;
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IntegrationsMarqueeBlock_select".
+ */
+export interface IntegrationsMarqueeBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  title?: T;
+  description?: T;
+  logos?:
+    | T
+    | {
+        logo?: T;
+        name?: T;
+        id?: T;
+      };
+  background?: T;
+  width?: T;
+  spacingTop?: T;
+  spacingBottom?: T;
+  align?: T;
+  hidden?: T;
+  htmlId?: T;
   id?: T;
   blockName?: T;
 }
@@ -2211,6 +4357,7 @@ export interface UseCasesBlockSelect<T extends boolean = true> {
   spacingBottom?: T;
   align?: T;
   hidden?: T;
+  htmlId?: T;
   id?: T;
   blockName?: T;
 }
@@ -2234,6 +4381,7 @@ export interface BenefitsBlockSelect<T extends boolean = true> {
   spacingBottom?: T;
   align?: T;
   hidden?: T;
+  htmlId?: T;
   id?: T;
   blockName?: T;
 }
@@ -2260,6 +4408,7 @@ export interface IntegrationsBlockSelect<T extends boolean = true> {
   spacingBottom?: T;
   align?: T;
   hidden?: T;
+  htmlId?: T;
   id?: T;
   blockName?: T;
 }
@@ -2287,6 +4436,7 @@ export interface TrustPanelBlockSelect<T extends boolean = true> {
   spacingBottom?: T;
   align?: T;
   hidden?: T;
+  htmlId?: T;
   id?: T;
   blockName?: T;
 }
@@ -2309,6 +4459,7 @@ export interface StatBandBlockSelect<T extends boolean = true> {
   spacingBottom?: T;
   align?: T;
   hidden?: T;
+  htmlId?: T;
   id?: T;
   blockName?: T;
 }
@@ -2329,6 +4480,7 @@ export interface ContactFormBlockSelect<T extends boolean = true> {
   spacingBottom?: T;
   align?: T;
   hidden?: T;
+  htmlId?: T;
   id?: T;
   blockName?: T;
 }
@@ -2355,6 +4507,7 @@ export interface HowItWorksBlockSelect<T extends boolean = true> {
   spacingBottom?: T;
   align?: T;
   hidden?: T;
+  htmlId?: T;
   id?: T;
   blockName?: T;
 }
@@ -2376,6 +4529,7 @@ export interface ClosingCTABlockSelect<T extends boolean = true> {
   spacingBottom?: T;
   align?: T;
   hidden?: T;
+  htmlId?: T;
   id?: T;
   blockName?: T;
 }
@@ -2394,6 +4548,7 @@ export interface FeatureThreadBlockSelect<T extends boolean = true> {
   spacingBottom?: T;
   align?: T;
   hidden?: T;
+  htmlId?: T;
   id?: T;
   blockName?: T;
 }
@@ -2411,6 +4566,7 @@ export interface ArticleGridBlockSelect<T extends boolean = true> {
   spacingBottom?: T;
   align?: T;
   hidden?: T;
+  htmlId?: T;
   id?: T;
   blockName?: T;
 }
@@ -2441,6 +4597,7 @@ export interface CallToActionBlockSelect<T extends boolean = true> {
   spacingBottom?: T;
   align?: T;
   hidden?: T;
+  htmlId?: T;
   id?: T;
   blockName?: T;
 }
@@ -2473,6 +4630,7 @@ export interface ContentBlockSelect<T extends boolean = true> {
   spacingBottom?: T;
   align?: T;
   hidden?: T;
+  htmlId?: T;
   id?: T;
   blockName?: T;
 }
@@ -2488,6 +4646,7 @@ export interface MediaBlockSelect<T extends boolean = true> {
   spacingBottom?: T;
   align?: T;
   hidden?: T;
+  htmlId?: T;
   id?: T;
   blockName?: T;
 }
@@ -2508,6 +4667,197 @@ export interface ArchiveBlockSelect<T extends boolean = true> {
   spacingBottom?: T;
   align?: T;
   hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroFullBackgroundBlock_select".
+ */
+export interface HeroFullBackgroundBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  headline?: T;
+  subhead?: T;
+  primaryCta?:
+    | T
+    | {
+        type?: T;
+        newTab?: T;
+        reference?: T;
+        url?: T;
+        label?: T;
+      };
+  secondaryCta?:
+    | T
+    | {
+        type?: T;
+        newTab?: T;
+        reference?: T;
+        url?: T;
+        label?: T;
+      };
+  metaItems?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  media?: T;
+  mediaPlacement?: T;
+  mediaFit?: T;
+  mediaAlt?: T;
+  videoPoster?: T;
+  mobileMedia?: T;
+  focalPoint?: T;
+  overlayStrength?: T;
+  animation?: T;
+  height?: T;
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroRightPlacementBlock_select".
+ */
+export interface HeroRightPlacementBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  headline?: T;
+  subhead?: T;
+  primaryCta?:
+    | T
+    | {
+        type?: T;
+        newTab?: T;
+        reference?: T;
+        url?: T;
+        label?: T;
+      };
+  secondaryCta?:
+    | T
+    | {
+        type?: T;
+        newTab?: T;
+        reference?: T;
+        url?: T;
+        label?: T;
+      };
+  media?: T;
+  mediaAlt?: T;
+  videoPoster?: T;
+  animation?: T;
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroWorkforceGridBlock_select".
+ */
+export interface HeroWorkforceGridBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  headline?: T;
+  subhead?: T;
+  cta?:
+    | T
+    | {
+        type?: T;
+        newTab?: T;
+        reference?: T;
+        url?: T;
+        label?: T;
+      };
+  theme?: T;
+  speed?: T;
+  columns?: T;
+  cards?:
+    | T
+    | {
+        icon?: T;
+        label?: T;
+        title?: T;
+        description?: T;
+        id?: T;
+      };
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AgenticHeroBlock_select".
+ */
+export interface AgenticHeroBlockSelect<T extends boolean = true> {
+  headline?: T;
+  accentWords?: T;
+  intro?: T;
+  ctaLabel?: T;
+  ctaUrl?: T;
+  nodes?:
+    | T
+    | {
+        label?: T;
+        kind?: T;
+        id?: T;
+      };
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FAQBlock_select".
+ */
+export interface FAQBlockSelect<T extends boolean = true> {
+  heading?: T;
+  intro?: T;
+  items?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        defaultOpen?: T;
+        id?: T;
+      };
+  background?: T;
+  anchorId?: T;
+  emitSchema?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PlatformLayersTwoBlock_select".
+ */
+export interface PlatformLayersTwoBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  intro?: T;
+  theme?: T;
+  showIndicators?: T;
+  anchorId?: T;
+  layers?:
+    | T
+    | {
+        title?: T;
+        tag?: T;
+        description?: T;
+        footnote?: T;
+        link?:
+          | T
+          | {
+              label?: T;
+              type?: T;
+              page?: T;
+              url?: T;
+            };
+        id?: T;
+      };
   id?: T;
   blockName?: T;
 }
@@ -2634,6 +4984,46 @@ export interface MediaSelect<T extends boolean = true> {
               filesize?: T;
               filename?: T;
             };
+        card?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        wide?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        tall?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        hero?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
       };
 }
 /**
@@ -2717,6 +5107,40 @@ export interface RedirectsSelect<T extends boolean = true> {
       };
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-mcp-api-keys_select".
+ */
+export interface PayloadMcpApiKeysSelect<T extends boolean = true> {
+  user?: T;
+  label?: T;
+  description?: T;
+  pages?:
+    | T
+    | {
+        find?: T;
+      };
+  media?:
+    | T
+    | {
+        find?: T;
+      };
+  header?:
+    | T
+    | {
+        find?: T;
+      };
+  footer?:
+    | T
+    | {
+        find?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  enableAPIKey?: T;
+  apiKey?: T;
+  apiKeyIndex?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2808,6 +5232,10 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface Header {
   id: string;
   /**
+   * Shown in the header. Leave empty to use the default NeuronCx logo.
+   */
+  logo?: (string | null) | Media;
+  /**
    * Each item is either a plain link, or a dropdown if you add columns to it. Only add links to pages that exist — a menu full of dead links is worse than a short menu.
    */
   navItems?:
@@ -2853,6 +5281,10 @@ export interface Header {
  */
 export interface Footer {
   id: string;
+  /**
+   * Shown in the footer. Leave empty to use the default NeuronCx logo.
+   */
+  logo?: (string | null) | Media;
   /**
    * One or two sentences under the logo describing what NeuronCx does.
    */
@@ -2928,6 +5360,7 @@ export interface Footer {
  * via the `definition` "header_select".
  */
 export interface HeaderSelect<T extends boolean = true> {
+  logo?: T;
   navItems?:
     | T
     | {
@@ -2962,6 +5395,7 @@ export interface HeaderSelect<T extends boolean = true> {
  * via the `definition` "footer_select".
  */
 export interface FooterSelect<T extends boolean = true> {
+  logo?: T;
   tagline?: T;
   columns?:
     | T

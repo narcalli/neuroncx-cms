@@ -96,6 +96,15 @@ export const presentationFields: Field[] = [
           description: 'Keeps the block and its content but removes it from the page.',
         },
       },
+      {
+        name: 'htmlId',
+        type: 'text',
+        label: 'Anchor ID (advanced)',
+        admin: {
+          description:
+            'Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.',
+        },
+      },
     ],
   },
 ]
@@ -109,4 +118,43 @@ export const presentationFields: Field[] = [
 export const withPresentation = (block: Block): Block => ({
   ...block,
   fields: [...(block.fields || []), ...presentationFields],
+})
+
+/**
+ * Just "hide this block" and the anchor ID, with no background, width or
+ * spacing choices. For a full-bleed block that already controls its own
+ * look end to end (for example a full-background hero), those options
+ * would only let an editor break it.
+ */
+export const minimalPresentationFields: Field[] = [
+  {
+    type: 'collapsible',
+    label: 'Appearance',
+    admin: { initCollapsed: true, description: 'Optional.' },
+    fields: [
+      {
+        name: 'hidden',
+        type: 'checkbox',
+        label: 'Hide this block',
+        defaultValue: false,
+        admin: {
+          description: 'Keeps the block and its content but removes it from the page.',
+        },
+      },
+      {
+        name: 'htmlId',
+        type: 'text',
+        label: 'Anchor ID (advanced)',
+        admin: {
+          description:
+            'Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.',
+        },
+      },
+    ],
+  },
+]
+
+export const withMinimalPresentation = (block: Block): Block => ({
+  ...block,
+  fields: [...(block.fields || []), ...minimalPresentationFields],
 })

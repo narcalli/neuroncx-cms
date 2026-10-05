@@ -9,6 +9,15 @@ export const Footer: GlobalConfig = {
   },
   fields: [
     {
+      name: 'logo',
+      type: 'upload',
+      relationTo: 'media',
+      label: 'Logo',
+      admin: {
+        description: 'Shown in the footer. Leave empty to use the default NeuronCx logo.',
+      },
+    },
+    {
       name: 'tagline',
       type: 'textarea',
       maxLength: 200,

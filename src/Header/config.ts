@@ -10,6 +10,15 @@ export const Header: GlobalConfig = {
   },
   fields: [
     {
+      name: 'logo',
+      type: 'upload',
+      relationTo: 'media',
+      label: 'Logo',
+      admin: {
+        description: 'Shown in the header. Leave empty to use the default NeuronCx logo.',
+      },
+    },
+    {
       name: 'navItems',
       type: 'array',
       label: 'Menu',

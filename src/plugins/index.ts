@@ -1,5 +1,6 @@
 import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { seoPlugin } from '@payloadcms/plugin-seo'
+import { mcpPlugin } from '@payloadcms/plugin-mcp'
 import { Plugin } from 'payload'
 import { revalidateRedirects } from '@/hooks/revalidateRedirects'
 import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
@@ -43,5 +44,29 @@ export const plugins: Plugin[] = [
   seoPlugin({
     generateTitle,
     generateURL,
+  }),
+  // Claude access over MCP. Read-only to start: each key must also be allowed
+  // these capabilities in the admin, and writes stay off until enabled here.
+  mcpPlugin({
+    collections: {
+      pages: {
+        description: 'Website pages and their layout blocks.',
+        enabled: { find: true, create: false, update: false, delete: false },
+      },
+      media: {
+        description: 'Uploaded images and files.',
+        enabled: { find: true, create: false, update: false, delete: false },
+      },
+    },
+    globals: {
+      header: {
+        description: 'Site header: logo and menu.',
+        enabled: { find: true, update: false },
+      },
+      footer: {
+        description: 'Site footer: logo, tagline and link columns.',
+        enabled: { find: true, update: false },
+      },
+    },
   }),
 ]

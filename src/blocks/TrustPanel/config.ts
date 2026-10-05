@@ -1,4 +1,5 @@
 import type { Block } from 'payload'
+import { iconField } from '@/fields/icons'
 
 export const TrustPanel: Block = {
   slug: 'trustPanel',
@@ -24,19 +25,7 @@ export const TrustPanel: Block = {
       fields: [
         { name: 'title', type: 'text', required: true },
         { name: 'description', type: 'textarea', required: true },
-        {
-          name: 'icon',
-          type: 'select',
-          defaultValue: 'shield',
-          options: [
-            { label: 'Shield — private cloud, isolation', value: 'shield' },
-            { label: 'Lock — data ownership', value: 'lock' },
-            { label: 'Globe — standards, interoperability', value: 'globe' },
-            { label: 'Shield check — governance, oversight', value: 'shieldCheck' },
-            { label: 'Server — infrastructure, hosting', value: 'server' },
-            { label: 'Eye — audit, observability', value: 'eye' },
-          ],
-        },
+        iconField('shield'),
       ],
     },
   ],

@@ -1,4 +1,5 @@
 import type { Block } from 'payload'
+import { iconField } from '@/fields/icons'
 
 export const ConversationHero: Block = {
   slug: 'conversationHero',
@@ -66,19 +67,7 @@ export const ConversationHero: Block = {
       },
       fields: [
         { name: 'label', type: 'text', required: true },
-        {
-          name: 'icon',
-          type: 'select',
-          label: 'Icon',
-          defaultValue: 'calendar',
-          options: [
-            { label: 'Calendar — booking, scheduling', value: 'calendar' },
-            { label: 'Card — payment, transaction', value: 'card' },
-            { label: 'Document — record, report, fulfilment', value: 'document' },
-            { label: 'Message — follow-up, notification', value: 'message' },
-            { label: 'Check — confirmation', value: 'check' },
-          ],
-        },
+        iconField('calendar'),
       ],
     },
     {
