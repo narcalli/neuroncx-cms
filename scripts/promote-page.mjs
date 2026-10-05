@@ -37,7 +37,8 @@ const env = Object.fromEntries(
       return [l.slice(0, i).trim(), l.slice(i + 1).trim()]
     }),
 )
-const LIVE = (env.PROMOTE_URL || '').replace(/\/$/, '')
+// Accepts the site root or the admin address, with or without a trailing slash.
+const LIVE = (env.PROMOTE_URL || '').replace(/\/admin\/?$/, '').replace(/\/$/, '')
 const KEY = env.PROMOTE_API_KEY
 const LOCAL = (process.env.LOCAL_URL || 'http://localhost:3001').replace(/\/$/, '')
 if (!LIVE) {
@@ -150,13 +151,15 @@ async function toLiveBody(node, key) {
 }
 
 async function main() {
-  const loginHeaders = await liveLogin()
-  if (loginHeaders) {
-    liveHeaders = loginHeaders
-  } else if (KEY) {
+  // The REST API key is preferred. Email and password login is the fallback.
+  if (KEY) {
     liveHeaders = { Authorization: `users API-Key ${KEY}` }
   } else {
-    throw new Error('Set PROMOTE_EMAIL and PROMOTE_PASSWORD, or PROMOTE_API_KEY, in .env.promote.')
+    const loginHeaders = await liveLogin()
+    if (!loginHeaders) {
+      throw new Error('Set PROMOTE_API_KEY, or PROMOTE_EMAIL and PROMOTE_PASSWORD, in .env.promote.')
+    }
+    liveHeaders = loginHeaders
   }
   log(`Promoting "${slug}" from ${LOCAL} to ${LIVE}`)
   log(WRITE ? (PUBLISH ? 'Mode: WRITE and PUBLISH' : 'Mode: WRITE (draft)') : 'Mode: DRY RUN (no changes)')

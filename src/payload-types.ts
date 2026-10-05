@@ -113,10 +113,12 @@ export interface Config {
   globals: {
     header: Header;
     footer: Footer;
+    siteSettings: SiteSetting;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
+    siteSettings: SiteSettingsSelect<false> | SiteSettingsSelect<true>;
   };
   locale: null;
   widgets: {
@@ -5598,6 +5600,77 @@ export interface Footer {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "siteSettings".
+ */
+export interface SiteSetting {
+  id: string;
+  /**
+   * Main tab icon for modern browsers. Use a simple SVG with a square viewBox.
+   */
+  faviconSvg?: (string | null) | Media;
+  /**
+   * For older browsers and Windows shortcuts. 32×32 or 48×48.
+   */
+  faviconIco?: (string | null) | Media;
+  /**
+   * PNG alternative for browsers that support it.
+   */
+  favicon32?: (string | null) | Media;
+  /**
+   * Used when someone adds the site to an iPhone or iPad home screen.
+   */
+  appleTouchIcon?: (string | null) | Media;
+  /**
+   * Used by the web app manifest on Android home screens.
+   */
+  androidIcon?: (string | null) | Media;
+  /**
+   * High-resolution icon for the web app manifest and splash screens.
+   */
+  largeIcon?: (string | null) | Media;
+  /**
+   * Keep the logo inside the centre 80%. Android crops this icon to different shapes, so the edges can be cut off.
+   */
+  maskableIcon?: (string | null) | Media;
+  /**
+   * Hex colour, e.g. #1A2035. Sets the browser toolbar colour on phones.
+   */
+  themeColor?: string | null;
+  /**
+   * For example NeuronCx. Used in the web app manifest.
+   */
+  siteName?: string | null;
+  /**
+   * Used when a page has no SEO title of its own. Replaces the "Blog" title.
+   */
+  defaultTitle?: string | null;
+  /**
+   * Added to the end of every page title, e.g. " | NeuronCx".
+   */
+  titleSuffix?: string | null;
+  /**
+   * Used when a page has no meta description of its own. Keep it under 160 characters.
+   */
+  defaultDescription?: string | null;
+  /**
+   * Shown when a link is shared on LinkedIn, WhatsApp and similar. 1200×630 works best.
+   */
+  defaultShareImage?: (string | null) | Media;
+  twitterCardType?: ('summary_large_image' | 'summary') | null;
+  /**
+   * Up to 12 characters, shown under the home screen icon.
+   */
+  manifestShortName?: string | null;
+  manifestDisplay?: ('browser' | 'standalone') | null;
+  /**
+   * Hex colour, e.g. #FFFFFF.
+   */
+  manifestBackground?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header_select".
  */
 export interface HeaderSelect<T extends boolean = true> {
@@ -5674,6 +5747,32 @@ export interface FooterSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "siteSettings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  faviconSvg?: T;
+  faviconIco?: T;
+  favicon32?: T;
+  appleTouchIcon?: T;
+  androidIcon?: T;
+  largeIcon?: T;
+  maskableIcon?: T;
+  themeColor?: T;
+  siteName?: T;
+  defaultTitle?: T;
+  titleSuffix?: T;
+  defaultDescription?: T;
+  defaultShareImage?: T;
+  twitterCardType?: T;
+  manifestShortName?: T;
+  manifestDisplay?: T;
+  manifestBackground?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
