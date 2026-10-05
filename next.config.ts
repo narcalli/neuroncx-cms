@@ -42,6 +42,20 @@ const nextConfig: NextConfig = {
         : []),
     ],
   },
+  // Amplify caps the deployed server bundle at 220 MB. Amplify's servers run
+  // standard Linux (glibc), so the Alpine/musl copies of native binaries are
+  // never used. Build-only tools (compilers, TypeScript) are not needed by the
+  // running site either. Leaving these out keeps the bundle under the limit.
+  outputFileTracingExcludes: {
+    '*': [
+      'node_modules/@img/sharp-linuxmusl-*/**',
+      'node_modules/@img/sharp-libvips-linuxmusl-*/**',
+      'node_modules/@next/swc-*-musl/**',
+      'node_modules/@esbuild/**',
+      'node_modules/esbuild/**',
+      'node_modules/typescript/**',
+    ],
+  },
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {
       '.cjs': ['.cts', '.cjs'],
