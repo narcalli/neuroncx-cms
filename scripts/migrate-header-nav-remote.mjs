@@ -41,16 +41,14 @@ const auth = { Authorization: `users API-Key ${KEY}`, 'Content-Type': 'applicati
 const usable = (l) => Boolean(l?.label && l?.href)
 const external = (href) => /^https?:\/\//.test(String(href || ''))
 
+// Asks the same API the write goes through, rather than GraphQL: a build on the
+// new schema serialises `items` and `type` on every nav row, even empty ones.
 const schemaIsNew = async () => {
-  const res = await fetch(`${BASE}/api/graphql`, {
-    method: 'POST',
-    headers: auth,
-    body: JSON.stringify({ query: '{ __type(name: "Header") { fields { name } } }' }),
-  })
+  const res = await fetch(`${BASE}/api/globals/header?depth=0`, { headers: auth })
   if (!res.ok) return false
   const body = await res.json()
-  const fields = (body?.data?.__type?.fields || []).map((f) => f.name)
-  return fields.includes('announcement')
+  const rows = body?.navItems || []
+  return rows.length > 0 && rows.every((r) => 'items' in r && 'type' in r)
 }
 
 const run = async () => {
