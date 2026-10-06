@@ -26,6 +26,9 @@ import { Integrations } from '../../blocks/Integrations/config'
 import { ProductSuite } from '../../blocks/ProductSuite/config'
 import { ProductSuite2 } from '../../blocks/ProductSuite2/config'
 import { ProductInAction } from '../../blocks/ProductInAction/config'
+import { Testimonial } from '../../blocks/Testimonial/config'
+import { CaseStudyGrid } from '../../blocks/CaseStudyGrid/config'
+import { CustomerDirectory } from '../../blocks/CustomerDirectory/config'
 import { BentoGrid } from '../../blocks/BentoGrid/config'
 import { DetailedProductSuite } from '../../blocks/DetailedProductSuite/config'
 import { IntegrationsMarquee } from '../../blocks/IntegrationsMarquee/config'
@@ -124,6 +127,9 @@ export const Pages: CollectionConfig<'pages'> = {
                   ProductSuite,
                   ProductSuite2,
                   ProductInAction,
+                  Testimonial,
+                  CaseStudyGrid,
+                  CustomerDirectory,
                   BentoGrid,
                   DetailedProductSuite,
                   AgenticFlowDemo,
