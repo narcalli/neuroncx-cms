@@ -75,6 +75,8 @@ export interface Config {
     features: Feature;
     users: User;
     enquiries: Enquiry;
+    sectors: Sector;
+    caseStudies: CaseStudy;
     redirects: Redirect;
     'payload-mcp-api-keys': PayloadMcpApiKey;
     'payload-kv': PayloadKv;
@@ -97,6 +99,8 @@ export interface Config {
     features: FeaturesSelect<false> | FeaturesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     enquiries: EnquiriesSelect<false> | EnquiriesSelect<true>;
+    sectors: SectorsSelect<false> | SectorsSelect<true>;
+    caseStudies: CaseStudiesSelect<false> | CaseStudiesSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     'payload-mcp-api-keys': PayloadMcpApiKeysSelect<false> | PayloadMcpApiKeysSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -235,6 +239,9 @@ export interface Page {
     | ProductSuiteBlock
     | ProductSuite2Block
     | ProductInActionBlock
+    | TestimonialBlock
+    | CaseStudyGridBlock
+    | CustomerDirectoryBlock
     | BentoGridBlock
     | DetailedProductSuiteBlock
     | AgenticFlowDemoBlock
@@ -1608,6 +1615,181 @@ export interface ProductInActionBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'productInAction';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TestimonialBlock".
+ */
+export interface TestimonialBlock {
+  eyebrow?: string | null;
+  heading?: string | null;
+  layout?: ('single' | 'carousel') | null;
+  quotes: {
+    quote: string;
+    attributionName: string;
+    attributionRole?: string | null;
+    organisation: string;
+    /**
+     * Leave empty to show initials.
+     */
+    photo?: (string | null) | Media;
+    logo?: (string | null) | Media;
+    linkedStory?: (string | null) | CaseStudy;
+    id?: string | null;
+  }[];
+  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'testimonial';
+}
+/**
+ * Case studies for the customer pages. Leave "Client name still to confirm" ticked until the client has approved their name.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "caseStudies".
+ */
+export interface CaseStudy {
+  id: string;
+  title: string;
+  /**
+   * Used in the address, e.g. ovum for /customers/ovum. Lowercase, dashes only.
+   */
+  slug: string;
+  clientName: string;
+  /**
+   * Ticked hides this case study from the public site until it is cleared.
+   */
+  clientPending?: boolean | null;
+  logo?: (string | null) | Media;
+  sectors?: (string | Sector)[] | null;
+  /**
+   * One line shown on the card.
+   */
+  summary: string;
+  /**
+   * The outcome-style card title. No invented figures. Falls back to the title if empty.
+   */
+  outcomeHeadline?: string | null;
+  /**
+   * Only real, confirmed figures.
+   */
+  metrics?:
+    | {
+        value: string;
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Shown on the case study page.
+   */
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  featured?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sectors".
+ */
+export interface Sector {
+  id: string;
+  name: string;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CaseStudyGridBlock".
+ */
+export interface CaseStudyGridBlock {
+  eyebrow?: string | null;
+  heading?: string | null;
+  intro?: string | null;
+  populateBy?: ('collection' | 'selection') | null;
+  /**
+   * Leave empty to show all sectors.
+   */
+  sectors?: (string | Sector)[] | null;
+  limit?: number | null;
+  selectedDocs?: (string | CaseStudy)[] | null;
+  cardStyle?: ('tilt' | 'plain') | null;
+  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'caseStudyGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CustomerDirectoryBlock".
+ */
+export interface CustomerDirectoryBlock {
+  eyebrow?: string | null;
+  heading?: string | null;
+  intro?: string | null;
+  /**
+   * Leave empty to show every sector.
+   */
+  sectors?: (string | Sector)[] | null;
+  showFilters?: boolean | null;
+  layout?: ('list' | 'grid') | null;
+  emptyStateText?: string | null;
+  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'customerDirectory';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -3641,6 +3823,14 @@ export interface PayloadLockedDocument {
         value: string | Enquiry;
       } | null)
     | ({
+        relationTo: 'sectors';
+        value: string | Sector;
+      } | null)
+    | ({
+        relationTo: 'caseStudies';
+        value: string | CaseStudy;
+      } | null)
+    | ({
         relationTo: 'redirects';
         value: string | Redirect;
       } | null)
@@ -3747,6 +3937,9 @@ export interface PagesSelect<T extends boolean = true> {
         productSuite?: T | ProductSuiteBlockSelect<T>;
         productSuite2?: T | ProductSuite2BlockSelect<T>;
         productInAction?: T | ProductInActionBlockSelect<T>;
+        testimonial?: T | TestimonialBlockSelect<T>;
+        caseStudyGrid?: T | CaseStudyGridBlockSelect<T>;
+        customerDirectory?: T | CustomerDirectoryBlockSelect<T>;
         bentoGrid?: T | BentoGridBlockSelect<T>;
         detailedProductSuite?: T | DetailedProductSuiteBlockSelect<T>;
         agenticFlowDemo?: T | AgenticFlowDemoBlockSelect<T>;
@@ -4211,6 +4404,81 @@ export interface ProductInActionBlockSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  background?: T;
+  width?: T;
+  spacingTop?: T;
+  spacingBottom?: T;
+  align?: T;
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TestimonialBlock_select".
+ */
+export interface TestimonialBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  layout?: T;
+  quotes?:
+    | T
+    | {
+        quote?: T;
+        attributionName?: T;
+        attributionRole?: T;
+        organisation?: T;
+        photo?: T;
+        logo?: T;
+        linkedStory?: T;
+        id?: T;
+      };
+  background?: T;
+  width?: T;
+  spacingTop?: T;
+  spacingBottom?: T;
+  align?: T;
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CaseStudyGridBlock_select".
+ */
+export interface CaseStudyGridBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  intro?: T;
+  populateBy?: T;
+  sectors?: T;
+  limit?: T;
+  selectedDocs?: T;
+  cardStyle?: T;
+  background?: T;
+  width?: T;
+  spacingTop?: T;
+  spacingBottom?: T;
+  align?: T;
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CustomerDirectoryBlock_select".
+ */
+export interface CustomerDirectoryBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  intro?: T;
+  sectors?: T;
+  showFilters?: T;
+  layout?: T;
+  emptyStateText?: T;
   background?: T;
   width?: T;
   spacingTop?: T;
@@ -5337,6 +5605,42 @@ export interface EnquiriesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sectors_select".
+ */
+export interface SectorsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "caseStudies_select".
+ */
+export interface CaseStudiesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  clientName?: T;
+  clientPending?: T;
+  logo?: T;
+  sectors?: T;
+  summary?: T;
+  outcomeHeadline?: T;
+  metrics?:
+    | T
+    | {
+        value?: T;
+        label?: T;
+        id?: T;
+      };
+  body?: T;
+  featured?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects_select".
  */
 export interface RedirectsSelect<T extends boolean = true> {
@@ -5479,17 +5783,46 @@ export interface Header {
    */
   logo?: (string | null) | Media;
   /**
-   * Each item is either a plain link, or a dropdown if you add columns to it. Only add links to pages that exist — a menu full of dead links is worse than a short menu.
+   * A thin strip above the header. A visitor who dismisses it will not see it again until they open a new browser session.
+   */
+  announcement?: {
+    enabled?: boolean | null;
+    text?: string | null;
+    ctaLabel?: string | null;
+    ctaHref?: string | null;
+  };
+  /**
+   * Each item is either a plain link or a mega menu. Only add links to pages that exist — a menu full of dead links is worse than a short menu.
    */
   navItems?:
     | {
         label: string;
+        type?: ('link' | 'dropdown') | null;
         /**
-         * Where this goes when clicked, e.g. /integrations. Leave empty if it only opens a dropdown.
+         * Where this goes when clicked, e.g. /integrations.
          */
         href?: string | null;
         /**
-         * Leave empty for a plain link. Add one to four columns to turn this into a dropdown.
+         * One flat list, top to bottom. Use a group heading to start a new section part-way down.
+         */
+        items?:
+          | {
+              label: string;
+              href: string;
+              /**
+               * A short word such as NEW or API. Leave empty for no badge.
+               */
+              badge?: string | null;
+              /**
+               * Starts a new group above this link. Leave empty to continue the group above.
+               */
+              groupHeading?: string | null;
+              newTab?: boolean | null;
+              id?: string | null;
+            }[]
+          | null;
+        /**
+         * Kept so the old menu still works. Move these links up into the mega menu cards above, then clear this and it will disappear.
          */
         columns?:
           | {
@@ -5675,11 +6008,30 @@ export interface SiteSetting {
  */
 export interface HeaderSelect<T extends boolean = true> {
   logo?: T;
+  announcement?:
+    | T
+    | {
+        enabled?: T;
+        text?: T;
+        ctaLabel?: T;
+        ctaHref?: T;
+      };
   navItems?:
     | T
     | {
         label?: T;
+        type?: T;
         href?: T;
+        items?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+              badge?: T;
+              groupHeading?: T;
+              newTab?: T;
+              id?: T;
+            };
         columns?:
           | T
           | {
@@ -5807,6 +6159,10 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'features';
           value: string | Feature;
+        } | null)
+      | ({
+          relationTo: 'caseStudies';
+          value: string | CaseStudy;
         } | null);
     global?: string | null;
     user?: (string | null) | User;

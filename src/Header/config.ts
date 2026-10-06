@@ -1,7 +1,17 @@
 import type { GlobalConfig } from 'payload'
 
-import { link } from '@/fields/link'
 import { revalidateHeader } from './hooks/revalidateHeader'
+
+// Old-style dropdown columns stay visible only while a row still has them, so
+// existing menus keep working but nobody builds a new one the old way.
+const hasLegacyColumns = (_: unknown, siblingData: { columns?: unknown[] } | undefined) =>
+  Boolean(siblingData?.columns?.length)
+
+const isDropdown = (_: unknown, siblingData: { type?: string } | undefined) =>
+  siblingData?.type === 'dropdown'
+
+const announcementOn = (_: unknown, siblingData: { enabled?: boolean } | undefined) =>
+  Boolean(siblingData?.enabled)
 
 export const Header: GlobalConfig = {
   slug: 'header',
@@ -19,6 +29,41 @@ export const Header: GlobalConfig = {
       },
     },
     {
+      name: 'announcement',
+      type: 'group',
+      label: 'Announcement bar',
+      admin: {
+        description:
+          'A thin strip above the header. A visitor who dismisses it will not see it again until they open a new browser session.',
+      },
+      fields: [
+        {
+          name: 'enabled',
+          type: 'checkbox',
+          label: 'Show the announcement bar',
+          defaultValue: false,
+        },
+        {
+          name: 'text',
+          type: 'text',
+          label: 'Message',
+          admin: { condition: announcementOn },
+        },
+        {
+          name: 'ctaLabel',
+          type: 'text',
+          label: 'Link text (optional)',
+          admin: { condition: announcementOn },
+        },
+        {
+          name: 'ctaHref',
+          type: 'text',
+          label: 'Link address (optional)',
+          admin: { condition: announcementOn },
+        },
+      ],
+    },
+    {
       name: 'navItems',
       type: 'array',
       label: 'Menu',
@@ -26,7 +71,7 @@ export const Header: GlobalConfig = {
       admin: {
         initCollapsed: true,
         description:
-          'Each item is either a plain link, or a dropdown if you add columns to it. Only add links to pages that exist — a menu full of dead links is worse than a short menu.',
+          'Each item is either a plain link or a dropdown. Only add links to pages that exist — a menu full of dead links is worse than a short menu.',
         components: {
           RowLabel: '@/Header/RowLabel#RowLabel',
         },
@@ -39,23 +84,67 @@ export const Header: GlobalConfig = {
           label: 'Menu label',
         },
         {
+          name: 'type',
+          type: 'radio',
+          label: 'What this item does',
+          defaultValue: 'link',
+          options: [
+            { label: 'Goes straight to a page', value: 'link' },
+            { label: 'Opens a dropdown', value: 'dropdown' },
+          ],
+          admin: { layout: 'horizontal' },
+        },
+        {
           name: 'href',
           type: 'text',
           label: 'Link address',
           admin: {
-            description:
-              'Where this goes when clicked, e.g. /integrations. Leave empty if it only opens a dropdown.',
+            description: 'Where this goes when clicked, e.g. /integrations.',
+            condition: (_, siblingData) => siblingData?.type !== 'dropdown',
           },
+        },
+        {
+          name: 'items',
+          type: 'array',
+          label: 'Dropdown links',
+          maxRows: 12,
+          admin: {
+            initCollapsed: true,
+            condition: isDropdown,
+            description:
+              'One flat list, top to bottom. Use a group heading to start a new section part-way down.',
+          },
+          fields: [
+            { name: 'label', type: 'text', required: true },
+            { name: 'href', type: 'text', required: true, label: 'Link address' },
+            {
+              name: 'badge',
+              type: 'text',
+              label: 'Badge (optional)',
+              admin: { description: 'A short word such as NEW or API. Leave empty for no badge.' },
+            },
+            {
+              name: 'groupHeading',
+              type: 'text',
+              label: 'Group heading (optional)',
+              admin: {
+                description:
+                  'Starts a new group above this link. Leave empty to continue the group above.',
+              },
+            },
+            { name: 'newTab', type: 'checkbox', label: 'Open in a new tab', defaultValue: false },
+          ],
         },
         {
           name: 'columns',
           type: 'array',
-          label: 'Dropdown columns',
+          label: 'Dropdown columns (old style)',
           maxRows: 4,
           admin: {
             initCollapsed: true,
+            condition: hasLegacyColumns,
             description:
-              'Leave empty for a plain link. Add one to four columns to turn this into a dropdown.',
+              'Kept so the old menu still works. Move these links up into the dropdown links above, then clear this and it will disappear.',
           },
           fields: [
             {
