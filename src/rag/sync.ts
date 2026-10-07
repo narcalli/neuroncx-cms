@@ -1,4 +1,5 @@
 // src/rag/sync.ts  -- stub. No Redis, no embeddings, nothing to go wrong.
+import { recordSync, recordPurge } from './debug/record'
 import type { BasePayload } from 'payload'
 import { ragSources } from './sources'
 
