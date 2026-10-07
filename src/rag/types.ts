@@ -7,6 +7,7 @@ export type RagSection = {
   body: string
   /** block anchorId, so a chunk can cite /platform/crm#context-engine */
   anchor?: string
+  raw?: unknown
 }
 
 export type RagSource = {
