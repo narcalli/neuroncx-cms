@@ -2,47 +2,57 @@
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'payload'
 import { isRagSource, ragSources } from './sources'
 
-const DEBOUNCE_MS = 60_000
+/** Edits settle before we spend embedding calls on them. */
+const SETTLE_MS = 30_000
 
-export const ragAfterChange: CollectionAfterChangeHook = async ({ doc, collection, req }) => {
-  const slug = collection.slug
-  if (req.context?.skipRag) return doc
+type Status = 'published' | 'draft' | undefined
 
-  if (isRagSource(slug)) {
-    await req.payload.jobs.queue({
-      task: 'ragSyncDoc',
-      input: { collection: slug, id: String(doc.id), locale: req.locale ?? 'en' },
-      queue: 'rag-realtime',
-      // autosave fires this constantly; let edits settle before embedding
-      waitUntil: new Date(Date.now() + DEBOUNCE_MS),
-    })
-  }
+const queueSync = async (
+  req: any,
+  collection: string,
+  id: string,
+  queue: 'rag-realtime' | 'rag-bulk',
+) =>
+  req.payload.jobs.queue({
+    task: 'ragSyncDoc',
+    input: { collection, id, locale: req.locale ?? 'en' },
+    queue,
+    waitUntil: new Date(Date.now() + SETTLE_MS),
+  })
 
-  // fan out to collections that embed this one
-  for (const [targetSlug, source] of Object.entries(ragSources)) {
-    for (const dep of source.dependsOn ?? []) {
-      if (dep.collection !== slug) continue
-      const ids = await dep.findAffected(req.payload, String(doc.id))
-      for (const id of ids) {
-        await req.payload.jobs.queue({
-          task: 'ragSyncDoc',
-          input: { collection: targetSlug, id, locale: req.locale ?? 'en' },
-          queue: 'rag-bulk',
-          waitUntil: new Date(Date.now() + DEBOUNCE_MS),
-        })
-      }
-    }
-  }
-
-  return doc
-}
-
-export const ragAfterDelete: CollectionAfterDeleteHook = async ({ doc, id, collection, req }) => {
-  if (!isRagSource(collection.slug)) return doc
-  await req.payload.jobs.queue({
+const queuePurge = async (req: any, collection: string, id: string) =>
+  req.payload.jobs.queue({
     task: 'ragPurgeDoc',
-    input: { collection: collection.slug, id: String(id) },
+    input: { collection, id },
     queue: 'rag-realtime',
   })
-  return doc
+
+/** Collections that embed content from `changedSlug`, resolved to doc ids. */
+const fanOut = async (req: any, changedSlug: string, changedId: string) => {
+  for (const [targetSlug, source] of Object.entries(ragSources)) {
+    for (const dep of source.dependsOn ?? []) {
+      if (dep.collection !== changedSlug) continue
+      const ids = await dep.findAffected(req.payload, changedId)
+      for (const id of ids) await queueSync(req, targetSlug, id, 'rag-bulk')
+    }
+  }
 }
+
+export const ragAfterChange: CollectionAfterChangeHook = async ({
+  doc,
+  previousDoc,
+  collection,
+  req,
+}) => {
+  // our own reindex script writes through the Local API; don't re-queue what it just did
+  if (req.context?.skipRag) return doc
+
+  const slug = collection.slug
+  const now: Status = doc?._status
+  const before: Status = previousDoc?._status
+
+  // Autosave on a draft. This is the overwhelming majority of calls
+  // (interval is 100ms on pages and posts). Bail before doing any work.
+  if (now !== 'published' && before !== 'published') return doc
+
+  if (isRagSource(slug)) {
