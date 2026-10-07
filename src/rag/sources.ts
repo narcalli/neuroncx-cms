@@ -1,52 +1,37 @@
-// src/rag/sources.ts
 import type { RagSource } from './types'
-import { richTextToMarkdown } from './normalize'
+
+const TENANT = 'ncx'
 
 export const ragSources: Record<string, RagSource> = {
-  doctors: {
-    collection: 'doctors',
-    shouldIndex: (d) => d._status === 'published' && d.tenant != null,
-    tenantOf: (d) => (typeof d.tenant === 'object' ? d.tenant.slug : d.tenant),
+  pages: {
+    collection: 'pages',
+    shouldIndex: (d) => d._status === 'published' && Boolean(d.slug),
+    tenantOf: () => TENANT,
     visibility: () => 'public',
-    urlOf: (d) => `/doctors/${d.slug}`,
+    urlOf: (d) => (d.slug === 'home' ? '/' : `/${d.slug}`),
+    // placeholder. Real block serializers land after the wiring is proven.
     project: (d) => ({
-      title: d.name,
-      sections: [
-        { heading: 'Profile',       body: richTextToMarkdown(d.bio) },
-        { heading: 'Specialities',  body: (d.specialities ?? []).map((s: any) => s.title).join(', ') },
-        { heading: 'Consultation',  body: richTextToMarkdown(d.consultationNotes) },
-      ].filter((s) => s.body?.trim()),
+      title: d.title,
+      sections: [{ heading: 'Summary', body: d.meta?.description ?? '' }],
     }),
   },
 
-  services: {
-    collection: 'services',
-    shouldIndex: (d) => d._status === 'published',
-    tenantOf: (d) => (typeof d.tenant === 'object' ? d.tenant.slug : d.tenant),
-    visibility: (d) => (d.internalOnly ? 'internal' : 'public'),
-    urlOf: (d) => `/services/${d.slug}`,
+  posts: {
+    collection: 'posts',
+    shouldIndex: (d) => d._status === 'published' && Boolean(d.slug),
+    tenantOf: () => TENANT,
+    visibility: () => 'public',
+    urlOf: (d) => `/posts/${d.slug}`,
     project: (d) => ({
       title: d.title,
-      sections: (d.layout ?? []).map((block: any) => ({
-        heading: block.heading ?? block.blockType,
-        body: blockToText(block),
-      })),
+      sections: [{ heading: 'Summary', body: d.meta?.description ?? '' }],
     }),
-    dependsOn: [
-      {
-        collection: 'doctors',
-        findAffected: async (payload, changedId) => {
-          const res = await payload.find({
-            collection: 'services',
-            where: { doctors: { contains: changedId } },
-            limit: 500,
-            depth: 0,
-            pagination: false,
-          })
-          return res.docs.map((d) => String(d.id))
-        },
-      },
-    ],
+    metadataOf: (d) => ({
+      categories: (d.categories ?? []).map((c: any) =>
+        typeof c === 'object' ? (c.slug ?? c.title) : String(c),
+      ),
+      publishedAt: d.publishedAt ? new Date(d.publishedAt).getTime() : undefined,
+    }),
   },
 }
 
