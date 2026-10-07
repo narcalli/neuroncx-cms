@@ -20,6 +20,24 @@ import { SiteSettings } from './SiteSettings/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
+import { withRag } from './rag/with-rag'
+import { ragSyncDocTask } from './rag/tasks/sync-doc'
+import { ragPurgeDocTask } from './rag/tasks/purge-doc'
+import { Doctors } from './collections/Doctors'
+import { Services } from './collections/Services'
+
+export default buildConfig({
+  collections: [
+    withRag(Doctors),
+    withRag(Services),
+    Media,
+    Users,
+  ],
+  jobs: {
+    tasks: [ragSyncDocTask, ragPurgeDocTask],
+  },
+  // ...rest
+})
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
