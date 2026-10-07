@@ -79,8 +79,10 @@ export const ProductSuite: Block = {
           defaultValue: 'none',
           options: [
             { label: 'None', value: 'none' },
-            { label: 'Violet', value: 'violet' },
-            { label: 'Cyan', value: 'cyan' },
+            // Values kept so existing pages keep rendering; the labels describe
+            // what they now draw, which is a weight rather than a hue.
+            { label: 'Cool (lightest)', value: 'violet' },
+            { label: 'Teal', value: 'cyan' },
             { label: 'Rose', value: 'rose' },
             { label: 'Grey', value: 'grey' },
           ],

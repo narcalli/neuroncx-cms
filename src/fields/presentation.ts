@@ -25,10 +25,13 @@ export const presentationFields: Field[] = [
               { label: 'Default (as designed)', value: 'default' },
               { label: 'White', value: 'white' },
               { label: 'Pale grey', value: 'cloud' },
-              { label: 'Navy', value: 'navy' },
-              { label: 'Crimson', value: 'crimson' },
+              { label: 'Highlight (navy)', value: 'navy' },
             ],
-            admin: { width: '50%' },
+            admin: {
+              width: '50%',
+              description:
+                'Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.',
+            },
           },
           {
             name: 'width',
@@ -125,6 +128,25 @@ export const withPresentation = (block: Block): Block => ({
  * spacing choices. For a full-bleed block that already controls its own
  * look end to end (for example a full-background hero), those options
  * would only let an editor break it.
+ */
+/**
+ * Which side a block belongs on.
+ *
+ * A block gets the MINIMAL set if either test holds:
+ *
+ *  1. It paints its own opaque background edge to edge over the wrapper, so
+ *     Highlight (navy) is a visual no-op. The editor sets it, nothing moves,
+ *     and the page's single highlight has been spent. StatBand is this case.
+ *
+ *  2. It is already dark or saturated by its own design, so Highlight reduces
+ *     its internal hierarchy instead of raising it. TrustPanel is this case:
+ *     its navy steps to navy-tint and lands on the same tone as its cards.
+ *
+ * A light band built from --ncx-* tokens does not fail test 1. The highlight
+ * remaps those surfaces, so the block still responds. Only a background the
+ * highlight cannot reach — a hardcoded colour, a gradient, an image — counts.
+ *
+ * Everything else gets the full set from presentationFields above.
  */
 export const minimalPresentationFields: Field[] = [
   {

@@ -46,19 +46,6 @@ export const HeroWorkforceGrid: Block = {
       type: 'row',
       fields: [
         {
-          name: 'theme',
-          type: 'select',
-          label: 'Colour theme',
-          required: true,
-          defaultValue: 'dark',
-          options: [
-            { label: 'Dark blue', value: 'dark' },
-            { label: 'Red', value: 'red' },
-            { label: 'White', value: 'white' },
-          ],
-          admin: { width: '34%' },
-        },
-        {
           name: 'speed',
           type: 'select',
           label: 'Scroll speed',

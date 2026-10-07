@@ -17,6 +17,7 @@ import { slugField } from 'payload'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
 import { generatePreviewPath } from '../../utilities/generatePreviewPath'
 import { revalidateDelete, revalidatePage } from './hooks/revalidatePage'
+import { validateHighlight } from './hooks/validateHighlight'
 import { ClosingCTA } from '../../blocks/ClosingCTA/config'
 import { HowItWorks } from '../../blocks/HowItWorks/config'
 import { LogoWall } from '../../blocks/LogoWall/config'
@@ -27,6 +28,7 @@ import { ProductSuite } from '../../blocks/ProductSuite/config'
 import { ProductSuite2 } from '../../blocks/ProductSuite2/config'
 import { ProductInAction } from '../../blocks/ProductInAction/config'
 import { Testimonial } from '../../blocks/Testimonial/config'
+import { WhatsappWidget } from '../../blocks/WhatsappWidget/config'
 import { CaseStudyGrid } from '../../blocks/CaseStudyGrid/config'
 import { CustomerDirectory } from '../../blocks/CustomerDirectory/config'
 import { BentoGrid } from '../../blocks/BentoGrid/config'
@@ -115,12 +117,10 @@ export const Pages: CollectionConfig<'pages'> = {
               type: 'blocks',
               blocks: [
                 ...[
-                  ConversationHero,
                   PartnerStrip,
                   StatHero,
                   LogoWall,
                   ProblemStatement,
-                  PlatformLayers,
                   JourneyEngine,
                   ContextEngine,
                   SolutionGrid,
@@ -138,13 +138,14 @@ export const Pages: CollectionConfig<'pages'> = {
                   AgenticOrbit,
                   AgenticEpisode,
                   AgenticCases,
+                  // Was on the minimal set while it painted its own opaque
+                  // gradient. Wave 6 put that gradient on --ncx-cloud, which the
+                  // highlight remaps, so it no longer fails test 1.
                   AgenticClosing,
                   IntegrationsMarquee,
                   UseCases,
                   Benefits,
                   Integrations,
-                  TrustPanel,
-                  StatBand,
                   ContactForm,
                   HowItWorks,
                   ClosingCTA,
@@ -155,12 +156,33 @@ export const Pages: CollectionConfig<'pages'> = {
                   MediaBlock,
                   Archive,
                 ].map(withPresentation),
-                // Full-bleed blocks control their own look end to end, so they get
-                // just "hide" and the anchor ID rather than the full Appearance set.
+                // Two tests decide which side a block belongs on. A block gets the
+                // minimal set if EITHER holds:
+                //   1. It paints its own opaque background edge to edge over the
+                //      wrapper, so Highlight (navy) is a visual no-op — the editor
+                //      sets it, nothing changes, and the page's one highlight is
+                //      spent. StatBand is this case: crimson covers the band
+                //      completely.
+                //   2. It is already dark or saturated by its own design, so
+                //      Highlight reduces its internal hierarchy instead of raising
+                //      it. TrustPanel is this case: its navy steps to navy-tint and
+                //      lands on the same tone as its own cards.
+                // A light band built from --ncx-* tokens does NOT fail test 1: the
+                // highlight remaps those surfaces, so the block still works. Only
+                // a background the highlight cannot reach counts.
                 withMinimalPresentation(HeroFullBackground),
                 withMinimalPresentation(HeroRightPlacement),
                 withMinimalPresentation(HeroWorkforceGrid),
                 withMinimalPresentation(AgenticHero),
+                withMinimalPresentation(ConversationHero), // test 2: navy hero
+                withMinimalPresentation(PlatformLayers), // test 2: navy stage
+                withMinimalPresentation(TrustPanel), // test 2: navy by design
+                withMinimalPresentation(StatBand), // test 1: crimson, edge to edge
+                // Neither test, but a third case: a fixed overlay. It never
+                // occupies the band, so Highlight cannot reach its ground —
+                // it only remaps the pill's own surfaces, leaving a white-on-
+                // white ghost floating over a light page. Worse than a no-op.
+                withMinimalPresentation(WhatsappWidget),
                 // Self-contained: its own background and anchor fields already
                 // cover what withPresentation/withMinimalPresentation would add,
                 // so it isn't wrapped with either. See blocks/FAQ/config.ts.
@@ -217,6 +239,7 @@ export const Pages: CollectionConfig<'pages'> = {
   ],
   hooks: {
     afterChange: [revalidatePage],
+    beforeValidate: [validateHighlight],
     beforeChange: [populatePublishedAt],
     afterDelete: [revalidateDelete],
   },

@@ -227,12 +227,10 @@ export interface Page {
     media?: (string | null) | Media;
   };
   layout: (
-    | ConversationHeroBlock
     | PartnerStripBlock
     | StatHeroBlock
     | LogoWallBlock
     | ProblemStatementBlock
-    | PlatformLayersBlock
     | JourneyEngineBlock
     | ContextEngineBlock
     | SolutionGridBlock
@@ -255,8 +253,6 @@ export interface Page {
     | UseCasesBlock
     | BenefitsBlock
     | IntegrationsBlock
-    | TrustPanelBlock
-    | StatBandBlock
     | ContactFormBlock
     | HowItWorksBlock
     | ClosingCTABlock
@@ -270,6 +266,11 @@ export interface Page {
     | HeroRightPlacementBlock
     | HeroWorkforceGridBlock
     | AgenticHeroBlock
+    | ConversationHeroBlock
+    | PlatformLayersBlock
+    | TrustPanelBlock
+    | StatBandBlock
+    | WhatsappWidgetBlock
     | FAQBlock
     | PlatformLayersTwoBlock
   )[];
@@ -562,150 +563,6 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ConversationHeroBlock".
- */
-export interface ConversationHeroBlock {
-  /**
-   * Optional. Short, e.g. "Omnichannel automation and reasoning".
-   */
-  eyebrow?: string | null;
-  /**
-   * Short and direct works best — around six to eight words.
-   */
-  headline: string;
-  /**
-   * One or two sentences explaining what the product does, in plain language.
-   */
-  subhead: string;
-  primaryButtonLabel?: string | null;
-  primaryButtonLink?: string | null;
-  secondaryButtonLabel?: string | null;
-  secondaryButtonLink?: string | null;
-  /**
-   * Short capability labels, e.g. "WhatsApp · Voice · Web". Two or three works best.
-   */
-  chips?:
-    | {
-        label: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * For example "WhatsApp · Ayurvaid Hospitals · 11:42".
-   */
-  conversationLabel?: string | null;
-  /**
-   * One message per line. Start a line with "them:" for the customer, "us:" for the agent, and "tag:" for a system note at the end.
-   */
-  conversation?: string | null;
-  /**
-   * Optional. What fires behind the scenes, e.g. Booked, Paid, Reminder sent.
-   */
-  workflowSteps?:
-    | {
-        label: string;
-        icon?:
-          | (
-              | 'message'
-              | 'chat'
-              | 'check'
-              | 'calendar'
-              | 'card'
-              | 'document'
-              | 'refresh'
-              | 'bolt'
-              | 'layers'
-              | 'gauge'
-              | 'plug'
-              | 'shield'
-              | 'shieldCheck'
-              | 'lock'
-              | 'globe'
-              | 'server'
-              | 'eye'
-              | 'users'
-              | 'user'
-              | 'phone'
-              | 'smartphone'
-              | 'mail'
-              | 'messageCircle'
-              | 'send'
-              | 'inbox'
-              | 'headphones'
-              | 'mic'
-              | 'video'
-              | 'bell'
-              | 'handshake'
-              | 'stethoscope'
-              | 'heartPulse'
-              | 'hospital'
-              | 'activity'
-              | 'flask'
-              | 'pill'
-              | 'graduationCap'
-              | 'building'
-              | 'mapPin'
-              | 'database'
-              | 'cloud'
-              | 'workflow'
-              | 'bot'
-              | 'sparkles'
-              | 'search'
-              | 'chart'
-              | 'trendingUp'
-              | 'target'
-              | 'rocket'
-              | 'key'
-              | 'fileText'
-              | 'clipboardList'
-              | 'link'
-              | 'settings'
-              | 'puzzle'
-              | 'timer'
-              | 'clock'
-              | 'badgeCheck'
-              | 'star'
-              | 'briefcase'
-            )
-          | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Optional. Real, defensible figures only — these sit directly under the hero.
-   */
-  stats?:
-    | {
-        /**
-         * e.g. 40%, 2.5x, 14+
-         */
-        value: string;
-        /**
-         * What the number means, in three or four words.
-         */
-        label: string;
-        id?: string | null;
-      }[]
-    | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'conversationHero';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "PartnerStripBlock".
  */
 export interface PartnerStripBlock {
@@ -738,7 +595,10 @@ export interface PartnerStripBlock {
         id?: string | null;
       }[]
     | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -795,7 +655,10 @@ export interface StatHeroBlock {
         id?: string | null;
       }[]
     | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -850,7 +713,10 @@ export interface LogoWallBlock {
         id?: string | null;
       }[]
     | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -920,7 +786,10 @@ export interface ProblemStatementBlock {
    * Shown in green, e.g. one customer context
    */
   resolutionHighlight?: string | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -936,115 +805,6 @@ export interface ProblemStatementBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'problemStatement';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "PlatformLayersBlock".
- */
-export interface PlatformLayersBlock {
-  /**
-   * e.g. The platform
-   */
-  eyebrow?: string | null;
-  heading: string;
-  /**
-   * e.g. Scroll to move through the stack — each layer builds on the one before it.
-   */
-  intro?: string | null;
-  /**
-   * Each one takes a screen as the visitor scrolls, so keep the list short.
-   */
-  layers?:
-    | {
-        title: string;
-        description: string;
-        /**
-         * Optional, e.g. Core or Adjacent.
-         */
-        tag?: string | null;
-        icon?:
-          | (
-              | 'message'
-              | 'chat'
-              | 'check'
-              | 'calendar'
-              | 'card'
-              | 'document'
-              | 'refresh'
-              | 'bolt'
-              | 'layers'
-              | 'gauge'
-              | 'plug'
-              | 'shield'
-              | 'shieldCheck'
-              | 'lock'
-              | 'globe'
-              | 'server'
-              | 'eye'
-              | 'users'
-              | 'user'
-              | 'phone'
-              | 'smartphone'
-              | 'mail'
-              | 'messageCircle'
-              | 'send'
-              | 'inbox'
-              | 'headphones'
-              | 'mic'
-              | 'video'
-              | 'bell'
-              | 'handshake'
-              | 'stethoscope'
-              | 'heartPulse'
-              | 'hospital'
-              | 'activity'
-              | 'flask'
-              | 'pill'
-              | 'graduationCap'
-              | 'building'
-              | 'mapPin'
-              | 'database'
-              | 'cloud'
-              | 'workflow'
-              | 'bot'
-              | 'sparkles'
-              | 'search'
-              | 'chart'
-              | 'trendingUp'
-              | 'target'
-              | 'rocket'
-              | 'key'
-              | 'fileText'
-              | 'clipboardList'
-              | 'link'
-              | 'settings'
-              | 'puzzle'
-              | 'timer'
-              | 'clock'
-              | 'badgeCheck'
-              | 'star'
-              | 'briefcase'
-            )
-          | null;
-        id?: string | null;
-      }[]
-    | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'platformLayers';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1155,7 +915,10 @@ export interface JourneyEngineBlock {
         id?: string | null;
       }[]
     | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -1211,7 +974,10 @@ export interface ContextEngineBlock {
         id?: string | null;
       }[]
     | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -1261,7 +1027,10 @@ export interface SolutionGridBlock {
         id?: string | null;
       }[]
     | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -1331,7 +1100,10 @@ export interface ProductSuiteBlock {
         id?: string | null;
       }[]
     | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -1466,7 +1238,10 @@ export interface ProductSuite2Block {
         id?: string | null;
       }[]
     | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -1599,7 +1374,10 @@ export interface ProductInActionBlock {
     };
     id?: string | null;
   }[];
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -1637,7 +1415,10 @@ export interface TestimonialBlock {
     linkedStory?: (string | null) | CaseStudy;
     id?: string | null;
   }[];
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -1742,7 +1523,10 @@ export interface CaseStudyGridBlock {
   limit?: number | null;
   selectedDocs?: (string | CaseStudy)[] | null;
   cardStyle?: ('tilt' | 'plain') | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -1774,7 +1558,10 @@ export interface CustomerDirectoryBlock {
   showFilters?: boolean | null;
   layout?: ('list' | 'grid') | null;
   emptyStateText?: string | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -1922,7 +1709,10 @@ export interface BentoGridBlock {
         id?: string | null;
       }[]
     | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -2115,7 +1905,10 @@ export interface DetailedProductSuiteBlock {
         id?: string | null;
       }[]
     | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -2165,7 +1958,10 @@ export interface AgenticFlowDemoBlock {
       }[]
     | null;
   footnote?: string | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -2204,7 +2000,10 @@ export interface AgenticStatsBlock {
         id?: string | null;
       }[]
     | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -2243,7 +2042,10 @@ export interface AgenticCartsDemoBlock {
   addLabel?: string | null;
   noteB?: string | null;
   noteA?: string | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -2279,7 +2081,10 @@ export interface AgenticOrbitBlock {
         id?: string | null;
       }[]
     | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -2321,7 +2126,10 @@ export interface AgenticEpisodeBlock {
       }[]
     | null;
   closing?: string | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -2355,7 +2163,10 @@ export interface AgenticCasesBlock {
         id?: string | null;
       }[]
     | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -2380,7 +2191,10 @@ export interface AgenticClosingBlock {
   heading: string;
   ctaLabel: string;
   ctaUrl: string;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -2418,7 +2232,10 @@ export interface IntegrationsMarqueeBlock {
         id?: string | null;
       }[]
     | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -2461,7 +2278,10 @@ export interface UseCasesBlock {
         id?: string | null;
       }[]
     | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -2495,7 +2315,10 @@ export interface BenefitsBlock {
         id?: string | null;
       }[]
     | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -2538,7 +2361,10 @@ export interface IntegrationsBlock {
    * For example: anything else connects over our REST API and webhooks.
    */
   footnote?: string | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -2557,152 +2383,6 @@ export interface IntegrationsBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "TrustPanelBlock".
- */
-export interface TrustPanelBlock {
-  /**
-   * e.g. Deployment & trust
-   */
-  eyebrow?: string | null;
-  heading: string;
-  intro?: string | null;
-  buttonLabel?: string | null;
-  buttonHref?: string | null;
-  /**
-   * Claims here are read closely during procurement — only state what you can evidence.
-   */
-  cards?:
-    | {
-        title: string;
-        description: string;
-        icon?:
-          | (
-              | 'message'
-              | 'chat'
-              | 'check'
-              | 'calendar'
-              | 'card'
-              | 'document'
-              | 'refresh'
-              | 'bolt'
-              | 'layers'
-              | 'gauge'
-              | 'plug'
-              | 'shield'
-              | 'shieldCheck'
-              | 'lock'
-              | 'globe'
-              | 'server'
-              | 'eye'
-              | 'users'
-              | 'user'
-              | 'phone'
-              | 'smartphone'
-              | 'mail'
-              | 'messageCircle'
-              | 'send'
-              | 'inbox'
-              | 'headphones'
-              | 'mic'
-              | 'video'
-              | 'bell'
-              | 'handshake'
-              | 'stethoscope'
-              | 'heartPulse'
-              | 'hospital'
-              | 'activity'
-              | 'flask'
-              | 'pill'
-              | 'graduationCap'
-              | 'building'
-              | 'mapPin'
-              | 'database'
-              | 'cloud'
-              | 'workflow'
-              | 'bot'
-              | 'sparkles'
-              | 'search'
-              | 'chart'
-              | 'trendingUp'
-              | 'target'
-              | 'rocket'
-              | 'key'
-              | 'fileText'
-              | 'clipboardList'
-              | 'link'
-              | 'settings'
-              | 'puzzle'
-              | 'timer'
-              | 'clock'
-              | 'badgeCheck'
-              | 'star'
-              | 'briefcase'
-            )
-          | null;
-        id?: string | null;
-      }[]
-    | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'trustPanel';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "StatBandBlock".
- */
-export interface StatBandBlock {
-  /**
-   * Use figures you could defend if a prospect asked how you measured them. Three or four works best.
-   */
-  stats?:
-    | {
-        /**
-         * e.g. 4 industries, 1,300+
-         */
-        value: string;
-        /**
-         * What the number means.
-         */
-        label: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Optional. Use it to say how the figures are measured or over what period — not to disclaim them.
-   */
-  note?: string | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'statBand';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "ContactFormBlock".
  */
 export interface ContactFormBlock {
@@ -2712,7 +2392,10 @@ export interface ContactFormBlock {
   buttonLabel?: string | null;
   successMessage?: string | null;
   showMessageField?: boolean | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -2758,7 +2441,10 @@ export interface HowItWorksBlock {
    */
   ctaLabel?: string | null;
   ctaLink?: string | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -2793,7 +2479,10 @@ export interface ClosingCTABlock {
    * Optional, shown in italics. Short — a line, not a sentence.
    */
   tagline?: string | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -2831,7 +2520,10 @@ export interface FeatureThreadBlock {
    * Tick this when the block is on the category page it would link to — otherwise every entry links back to the page the visitor is already reading.
    */
   hideCategoryLinks?: boolean | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -2865,7 +2557,10 @@ export interface ArticleGridBlock {
    * How many articles to show. The most recently published appear first.
    */
   limit?: number | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -2926,7 +2621,10 @@ export interface CallToActionBlock {
         id?: string | null;
       }[]
     | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -2989,7 +2687,10 @@ export interface ContentBlock {
         id?: string | null;
       }[]
     | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -3046,7 +2747,10 @@ export interface ArchiveBlock {
         value: string | Post;
       }[]
     | null;
-  background?: ('default' | 'white' | 'cloud' | 'navy' | 'crimson') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
   spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
   spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
@@ -3290,7 +2994,6 @@ export interface HeroWorkforceGridBlock {
     url?: string | null;
     label: string;
   };
-  theme: 'dark' | 'red' | 'white';
   /**
    * Applies to every column.
    */
@@ -3426,6 +3129,420 @@ export interface AgenticHeroBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'agenticHero';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ConversationHeroBlock".
+ */
+export interface ConversationHeroBlock {
+  /**
+   * Optional. Short, e.g. "Omnichannel automation and reasoning".
+   */
+  eyebrow?: string | null;
+  /**
+   * Short and direct works best — around six to eight words.
+   */
+  headline: string;
+  /**
+   * One or two sentences explaining what the product does, in plain language.
+   */
+  subhead: string;
+  primaryButtonLabel?: string | null;
+  primaryButtonLink?: string | null;
+  secondaryButtonLabel?: string | null;
+  secondaryButtonLink?: string | null;
+  /**
+   * Short capability labels, e.g. "WhatsApp · Voice · Web". Two or three works best.
+   */
+  chips?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * For example "WhatsApp · Ayurvaid Hospitals · 11:42".
+   */
+  conversationLabel?: string | null;
+  /**
+   * One message per line. Start a line with "them:" for the customer, "us:" for the agent, and "tag:" for a system note at the end.
+   */
+  conversation?: string | null;
+  /**
+   * Optional. What fires behind the scenes, e.g. Booked, Paid, Reminder sent.
+   */
+  workflowSteps?:
+    | {
+        label: string;
+        icon?:
+          | (
+              | 'message'
+              | 'chat'
+              | 'check'
+              | 'calendar'
+              | 'card'
+              | 'document'
+              | 'refresh'
+              | 'bolt'
+              | 'layers'
+              | 'gauge'
+              | 'plug'
+              | 'shield'
+              | 'shieldCheck'
+              | 'lock'
+              | 'globe'
+              | 'server'
+              | 'eye'
+              | 'users'
+              | 'user'
+              | 'phone'
+              | 'smartphone'
+              | 'mail'
+              | 'messageCircle'
+              | 'send'
+              | 'inbox'
+              | 'headphones'
+              | 'mic'
+              | 'video'
+              | 'bell'
+              | 'handshake'
+              | 'stethoscope'
+              | 'heartPulse'
+              | 'hospital'
+              | 'activity'
+              | 'flask'
+              | 'pill'
+              | 'graduationCap'
+              | 'building'
+              | 'mapPin'
+              | 'database'
+              | 'cloud'
+              | 'workflow'
+              | 'bot'
+              | 'sparkles'
+              | 'search'
+              | 'chart'
+              | 'trendingUp'
+              | 'target'
+              | 'rocket'
+              | 'key'
+              | 'fileText'
+              | 'clipboardList'
+              | 'link'
+              | 'settings'
+              | 'puzzle'
+              | 'timer'
+              | 'clock'
+              | 'badgeCheck'
+              | 'star'
+              | 'briefcase'
+            )
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Optional. Real, defensible figures only — these sit directly under the hero.
+   */
+  stats?:
+    | {
+        /**
+         * e.g. 40%, 2.5x, 14+
+         */
+        value: string;
+        /**
+         * What the number means, in three or four words.
+         */
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'conversationHero';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PlatformLayersBlock".
+ */
+export interface PlatformLayersBlock {
+  /**
+   * e.g. The platform
+   */
+  eyebrow?: string | null;
+  heading: string;
+  /**
+   * e.g. Scroll to move through the stack — each layer builds on the one before it.
+   */
+  intro?: string | null;
+  /**
+   * Each one takes a screen as the visitor scrolls, so keep the list short.
+   */
+  layers?:
+    | {
+        title: string;
+        description: string;
+        /**
+         * Optional, e.g. Core or Adjacent.
+         */
+        tag?: string | null;
+        icon?:
+          | (
+              | 'message'
+              | 'chat'
+              | 'check'
+              | 'calendar'
+              | 'card'
+              | 'document'
+              | 'refresh'
+              | 'bolt'
+              | 'layers'
+              | 'gauge'
+              | 'plug'
+              | 'shield'
+              | 'shieldCheck'
+              | 'lock'
+              | 'globe'
+              | 'server'
+              | 'eye'
+              | 'users'
+              | 'user'
+              | 'phone'
+              | 'smartphone'
+              | 'mail'
+              | 'messageCircle'
+              | 'send'
+              | 'inbox'
+              | 'headphones'
+              | 'mic'
+              | 'video'
+              | 'bell'
+              | 'handshake'
+              | 'stethoscope'
+              | 'heartPulse'
+              | 'hospital'
+              | 'activity'
+              | 'flask'
+              | 'pill'
+              | 'graduationCap'
+              | 'building'
+              | 'mapPin'
+              | 'database'
+              | 'cloud'
+              | 'workflow'
+              | 'bot'
+              | 'sparkles'
+              | 'search'
+              | 'chart'
+              | 'trendingUp'
+              | 'target'
+              | 'rocket'
+              | 'key'
+              | 'fileText'
+              | 'clipboardList'
+              | 'link'
+              | 'settings'
+              | 'puzzle'
+              | 'timer'
+              | 'clock'
+              | 'badgeCheck'
+              | 'star'
+              | 'briefcase'
+            )
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'platformLayers';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TrustPanelBlock".
+ */
+export interface TrustPanelBlock {
+  /**
+   * e.g. Deployment & trust
+   */
+  eyebrow?: string | null;
+  heading: string;
+  intro?: string | null;
+  buttonLabel?: string | null;
+  buttonHref?: string | null;
+  /**
+   * Claims here are read closely during procurement — only state what you can evidence.
+   */
+  cards?:
+    | {
+        title: string;
+        description: string;
+        icon?:
+          | (
+              | 'message'
+              | 'chat'
+              | 'check'
+              | 'calendar'
+              | 'card'
+              | 'document'
+              | 'refresh'
+              | 'bolt'
+              | 'layers'
+              | 'gauge'
+              | 'plug'
+              | 'shield'
+              | 'shieldCheck'
+              | 'lock'
+              | 'globe'
+              | 'server'
+              | 'eye'
+              | 'users'
+              | 'user'
+              | 'phone'
+              | 'smartphone'
+              | 'mail'
+              | 'messageCircle'
+              | 'send'
+              | 'inbox'
+              | 'headphones'
+              | 'mic'
+              | 'video'
+              | 'bell'
+              | 'handshake'
+              | 'stethoscope'
+              | 'heartPulse'
+              | 'hospital'
+              | 'activity'
+              | 'flask'
+              | 'pill'
+              | 'graduationCap'
+              | 'building'
+              | 'mapPin'
+              | 'database'
+              | 'cloud'
+              | 'workflow'
+              | 'bot'
+              | 'sparkles'
+              | 'search'
+              | 'chart'
+              | 'trendingUp'
+              | 'target'
+              | 'rocket'
+              | 'key'
+              | 'fileText'
+              | 'clipboardList'
+              | 'link'
+              | 'settings'
+              | 'puzzle'
+              | 'timer'
+              | 'clock'
+              | 'badgeCheck'
+              | 'star'
+              | 'briefcase'
+            )
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'trustPanel';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StatBandBlock".
+ */
+export interface StatBandBlock {
+  /**
+   * Use figures you could defend if a prospect asked how you measured them. Three or four works best.
+   */
+  stats?:
+    | {
+        /**
+         * e.g. 4 industries, 1,300+
+         */
+        value: string;
+        /**
+         * What the number means.
+         */
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Optional. Use it to say how the figures are measured or over what period — not to disclaim them.
+   */
+  note?: string | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'statBand';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "WhatsappWidgetBlock".
+ */
+export interface WhatsappWidgetBlock {
+  enabled?: boolean | null;
+  /**
+   * In E.164 form, e.g. +919876543210. Shown as plain text as well as linked.
+   */
+  phone?: string | null;
+  label?: string | null;
+  /**
+   * What the visitor sends. The page reference is appended to it.
+   */
+  prefill?: string | null;
+  /**
+   * Appends [ref: page-slug] so the enquiry arrives already routed.
+   */
+  includeRef?: boolean | null;
+  /**
+   * For example "Mon–Sat, 9am–7pm IST". Not shown yet; reserved for a panel.
+   */
+  hoursNote?: string | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'whatsappWidget';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -3925,12 +4042,10 @@ export interface PagesSelect<T extends boolean = true> {
   layout?:
     | T
     | {
-        conversationHero?: T | ConversationHeroBlockSelect<T>;
         partnerStrip?: T | PartnerStripBlockSelect<T>;
         statHero?: T | StatHeroBlockSelect<T>;
         logoWall?: T | LogoWallBlockSelect<T>;
         problemStatement?: T | ProblemStatementBlockSelect<T>;
-        platformLayers?: T | PlatformLayersBlockSelect<T>;
         journeyEngine?: T | JourneyEngineBlockSelect<T>;
         contextEngine?: T | ContextEngineBlockSelect<T>;
         solutionGrid?: T | SolutionGridBlockSelect<T>;
@@ -3953,8 +4068,6 @@ export interface PagesSelect<T extends boolean = true> {
         useCases?: T | UseCasesBlockSelect<T>;
         benefits?: T | BenefitsBlockSelect<T>;
         integrations?: T | IntegrationsBlockSelect<T>;
-        trustPanel?: T | TrustPanelBlockSelect<T>;
-        statBand?: T | StatBandBlockSelect<T>;
         contactForm?: T | ContactFormBlockSelect<T>;
         howItWorks?: T | HowItWorksBlockSelect<T>;
         closingCta?: T | ClosingCTABlockSelect<T>;
@@ -3968,6 +4081,11 @@ export interface PagesSelect<T extends boolean = true> {
         heroRightPlacement?: T | HeroRightPlacementBlockSelect<T>;
         heroWorkforceGrid?: T | HeroWorkforceGridBlockSelect<T>;
         agenticHero?: T | AgenticHeroBlockSelect<T>;
+        conversationHero?: T | ConversationHeroBlockSelect<T>;
+        platformLayers?: T | PlatformLayersBlockSelect<T>;
+        trustPanel?: T | TrustPanelBlockSelect<T>;
+        statBand?: T | StatBandBlockSelect<T>;
+        whatsappWidget?: T | WhatsappWidgetBlockSelect<T>;
         faq?: T | FAQBlockSelect<T>;
         platformLayersTwo?: T | PlatformLayersTwoBlockSelect<T>;
       };
@@ -3984,50 +4102,6 @@ export interface PagesSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ConversationHeroBlock_select".
- */
-export interface ConversationHeroBlockSelect<T extends boolean = true> {
-  eyebrow?: T;
-  headline?: T;
-  subhead?: T;
-  primaryButtonLabel?: T;
-  primaryButtonLink?: T;
-  secondaryButtonLabel?: T;
-  secondaryButtonLink?: T;
-  chips?:
-    | T
-    | {
-        label?: T;
-        id?: T;
-      };
-  conversationLabel?: T;
-  conversation?: T;
-  workflowSteps?:
-    | T
-    | {
-        label?: T;
-        icon?: T;
-        id?: T;
-      };
-  stats?:
-    | T
-    | {
-        value?: T;
-        label?: T;
-        id?: T;
-      };
-  background?: T;
-  width?: T;
-  spacingTop?: T;
-  spacingBottom?: T;
-  align?: T;
-  hidden?: T;
-  htmlId?: T;
-  id?: T;
-  blockName?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -4140,33 +4214,6 @@ export interface ProblemStatementBlockSelect<T extends boolean = true> {
   gapLine?: T;
   resolutionLine?: T;
   resolutionHighlight?: T;
-  background?: T;
-  width?: T;
-  spacingTop?: T;
-  spacingBottom?: T;
-  align?: T;
-  hidden?: T;
-  htmlId?: T;
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "PlatformLayersBlock_select".
- */
-export interface PlatformLayersBlockSelect<T extends boolean = true> {
-  eyebrow?: T;
-  heading?: T;
-  intro?: T;
-  layers?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        tag?: T;
-        icon?: T;
-        id?: T;
-      };
   background?: T;
   width?: T;
   spacingTop?: T;
@@ -4892,57 +4939,6 @@ export interface IntegrationsBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "TrustPanelBlock_select".
- */
-export interface TrustPanelBlockSelect<T extends boolean = true> {
-  eyebrow?: T;
-  heading?: T;
-  intro?: T;
-  buttonLabel?: T;
-  buttonHref?: T;
-  cards?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        icon?: T;
-        id?: T;
-      };
-  background?: T;
-  width?: T;
-  spacingTop?: T;
-  spacingBottom?: T;
-  align?: T;
-  hidden?: T;
-  htmlId?: T;
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "StatBandBlock_select".
- */
-export interface StatBandBlockSelect<T extends boolean = true> {
-  stats?:
-    | T
-    | {
-        value?: T;
-        label?: T;
-        id?: T;
-      };
-  note?: T;
-  background?: T;
-  width?: T;
-  spacingTop?: T;
-  spacingBottom?: T;
-  align?: T;
-  hidden?: T;
-  htmlId?: T;
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "ContactFormBlock_select".
  */
 export interface ContactFormBlockSelect<T extends boolean = true> {
@@ -5248,7 +5244,6 @@ export interface HeroWorkforceGridBlockSelect<T extends boolean = true> {
         url?: T;
         label?: T;
       };
-  theme?: T;
   speed?: T;
   columns?: T;
   cards?:
@@ -5282,6 +5277,124 @@ export interface AgenticHeroBlockSelect<T extends boolean = true> {
         kind?: T;
         id?: T;
       };
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ConversationHeroBlock_select".
+ */
+export interface ConversationHeroBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  headline?: T;
+  subhead?: T;
+  primaryButtonLabel?: T;
+  primaryButtonLink?: T;
+  secondaryButtonLabel?: T;
+  secondaryButtonLink?: T;
+  chips?:
+    | T
+    | {
+        label?: T;
+        id?: T;
+      };
+  conversationLabel?: T;
+  conversation?: T;
+  workflowSteps?:
+    | T
+    | {
+        label?: T;
+        icon?: T;
+        id?: T;
+      };
+  stats?:
+    | T
+    | {
+        value?: T;
+        label?: T;
+        id?: T;
+      };
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PlatformLayersBlock_select".
+ */
+export interface PlatformLayersBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  intro?: T;
+  layers?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        tag?: T;
+        icon?: T;
+        id?: T;
+      };
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TrustPanelBlock_select".
+ */
+export interface TrustPanelBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  intro?: T;
+  buttonLabel?: T;
+  buttonHref?: T;
+  cards?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        icon?: T;
+        id?: T;
+      };
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StatBandBlock_select".
+ */
+export interface StatBandBlockSelect<T extends boolean = true> {
+  stats?:
+    | T
+    | {
+        value?: T;
+        label?: T;
+        id?: T;
+      };
+  note?: T;
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "WhatsappWidgetBlock_select".
+ */
+export interface WhatsappWidgetBlockSelect<T extends boolean = true> {
+  enabled?: T;
+  phone?: T;
+  label?: T;
+  prefill?: T;
+  includeRef?: T;
+  hoursNote?: T;
   hidden?: T;
   htmlId?: T;
   id?: T;
@@ -5792,7 +5905,7 @@ export interface Header {
     ctaHref?: string | null;
   };
   /**
-   * Each item is either a plain link or a mega menu. Only add links to pages that exist — a menu full of dead links is worse than a short menu.
+   * Each item is either a plain link or a dropdown. Only add links to pages that exist — a menu full of dead links is worse than a short menu.
    */
   navItems?:
     | {
@@ -5822,7 +5935,7 @@ export interface Header {
             }[]
           | null;
         /**
-         * Kept so the old menu still works. Move these links up into the mega menu cards above, then clear this and it will disappear.
+         * Kept so the old menu still works. Move these links up into the dropdown links above, then clear this and it will disappear.
          */
         columns?:
           | {
@@ -5844,6 +5957,14 @@ export interface Header {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Sits to the left of the sign in link. Leave either field empty to hide it.
+   */
+  supportLabel?: string | null;
+  /**
+   * For example /contact, or a help centre address.
+   */
+  supportHref?: string | null;
   signInLabel?: string | null;
   signInHref?: string | null;
   ctaLabel?: string | null;
@@ -6048,6 +6169,8 @@ export interface HeaderSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  supportLabel?: T;
+  supportHref?: T;
   signInLabel?: T;
   signInHref?: T;
   ctaLabel?: T;

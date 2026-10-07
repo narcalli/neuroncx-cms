@@ -177,6 +177,21 @@ export const Header: GlobalConfig = {
       ],
     },
     {
+      name: 'supportLabel',
+      type: 'text',
+      label: 'Support link text',
+      defaultValue: 'Support',
+      admin: {
+        description: 'Sits to the left of the sign in link. Leave either field empty to hide it.',
+      },
+    },
+    {
+      name: 'supportHref',
+      type: 'text',
+      label: 'Support address',
+      admin: { description: 'For example /contact, or a help centre address.' },
+    },
+    {
       name: 'signInLabel',
       type: 'text',
       label: 'Sign in link text',
