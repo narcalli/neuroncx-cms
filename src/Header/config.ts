@@ -71,7 +71,7 @@ export const Header: GlobalConfig = {
       admin: {
         initCollapsed: true,
         description:
-          'Each item is either a plain link or a dropdown. Only add links to pages that exist — a menu full of dead links is worse than a short menu.',
+          'Each item is either a plain link or a dropdown. Only add links to pages that exist. A menu full of dead links is worse than a short menu.',
         components: {
           RowLabel: '@/Header/RowLabel#RowLabel',
         },

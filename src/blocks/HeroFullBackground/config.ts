@@ -5,7 +5,7 @@ import { optionalCta } from '@/fields/optionalCta'
 export const HeroFullBackground: Block = {
   slug: 'heroFullBackground',
   interfaceName: 'HeroFullBackgroundBlock',
-  labels: { singular: 'Hero — Full Background', plural: 'Heroes — Full Background' },
+  labels: { singular: 'Hero (Full Background)', plural: 'Heroes (Full Background)' },
   fields: [
     {
       name: 'eyebrow',
@@ -20,7 +20,7 @@ export const HeroFullBackground: Block = {
       label: 'Headline',
       admin: {
         description:
-          'This becomes the page’s main heading (the H1), so use it only once per page — set the page hero above to "None" when this block is on the page.',
+          'This becomes the page’s main heading (the H1), so use it only once per page. Set the page hero above to "None" when this block is on the page.',
       },
     },
     {
@@ -51,7 +51,7 @@ export const HeroFullBackground: Block = {
       label: 'Background image or video',
       admin: {
         description:
-          'Works best with photos, textures or abstract images that have a calm area on the left for the text. For diagrams or screenshots with their own text, set Media placement to Right. Use MP4 or WebM for moving backgrounds — GIFs work but load much slower and are best kept short and small.',
+          'Works best with photos, textures or abstract images that have a calm area on the left for the text. For diagrams or screenshots with their own text, set Media placement to Right. Use MP4 or WebM for moving backgrounds. GIFs work but load much slower, so keep them short and small.',
       },
     },
     {
@@ -63,8 +63,8 @@ export const HeroFullBackground: Block = {
           label: 'Media placement',
           defaultValue: 'fullBleed',
           options: [
-            { label: 'Full bleed — fills the hero', value: 'fullBleed' },
-            { label: 'Right — image on the right, text on plain navy', value: 'right' },
+            { label: 'Full bleed (fills the hero)', value: 'fullBleed' },
+            { label: 'Right (image on the right, text on plain navy)', value: 'right' },
           ],
           admin: {
             width: '50%',
@@ -78,8 +78,8 @@ export const HeroFullBackground: Block = {
           label: 'Media fit',
           defaultValue: 'contain',
           options: [
-            { label: 'Contain — shows the whole image', value: 'contain' },
-            { label: 'Cover — fills the space, may crop', value: 'cover' },
+            { label: 'Contain (shows the whole image)', value: 'contain' },
+            { label: 'Cover (fills the space, may crop)', value: 'cover' },
           ],
           admin: {
             width: '50%',
@@ -95,7 +95,7 @@ export const HeroFullBackground: Block = {
       label: 'What the picture shows (optional)',
       admin: {
         description:
-          'Leave empty for a purely decorative background — that is the usual choice for a full-bleed hero. Fill this in only when the picture itself carries meaning a screen reader user needs to know.',
+          'Leave empty for a purely decorative background, the usual choice for a full-bleed hero. Fill this in only when the picture itself carries meaning a screen reader user needs to know.',
       },
     },
     {
@@ -116,7 +116,7 @@ export const HeroFullBackground: Block = {
       label: 'Background for small screens (optional)',
       admin: {
         description:
-          'Replaces the background above on phones and small tablets. Leave empty to use the same file on every screen size. Has no effect when Media placement is set to Right — that layout already changes to a stacked image on phones.',
+          'Replaces the background above on phones and small tablets. Leave empty to use the same file on every screen size. Has no effect when Media placement is set to Right, because that layout already changes to a stacked image on phones.',
       },
     },
     {

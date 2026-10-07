@@ -30,7 +30,7 @@ export const presentationFields: Field[] = [
             admin: {
               width: '50%',
               description:
-                'Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.',
+                'Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.',
             },
           },
           {
@@ -40,7 +40,7 @@ export const presentationFields: Field[] = [
             defaultValue: 'default',
             options: [
               { label: 'Default', value: 'default' },
-              { label: 'Narrow — long text', value: 'narrow' },
+              { label: 'Narrow (long text)', value: 'narrow' },
               { label: 'Wide', value: 'wide' },
               { label: 'Full bleed', value: 'full' },
             ],

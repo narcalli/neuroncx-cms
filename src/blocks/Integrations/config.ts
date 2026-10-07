@@ -36,7 +36,7 @@ export const Integrations: Block = {
       name: 'footnote',
       type: 'text',
       label: 'Footnote',
-      admin: { description: 'For example: anything else connects over our REST API and webhooks.' },
+      admin: { description: 'For example: anything else connects over the NeuronCx REST API and webhooks.' },
     },
   ],
 }

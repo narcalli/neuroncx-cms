@@ -17,7 +17,7 @@ export const ConversationHero: Block = {
       type: 'text',
       required: true,
       label: 'Headline',
-      admin: { description: 'Short and direct works best — around six to eight words.' },
+      admin: { description: 'Short and direct works best: around six to eight words.' },
     },
     {
       name: 'subhead',
@@ -77,7 +77,7 @@ export const ConversationHero: Block = {
       maxRows: 4,
       admin: {
         initCollapsed: true,
-        description: 'Optional. Real, defensible figures only — these sit directly under the hero.',
+        description: 'Optional. These sit directly under the hero, so use real, defensible figures only.',
       },
       fields: [
         { name: 'value', type: 'text', required: true, admin: { description: 'e.g. 40%, 2.5x, 14+' } },

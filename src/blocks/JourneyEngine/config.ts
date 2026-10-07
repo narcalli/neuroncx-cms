@@ -34,7 +34,7 @@ export const JourneyEngine: Block = {
       admin: {
         initCollapsed: true,
         description:
-          'One tab per industry. Add one detail per stage, in the same order as the stages above — the first detail belongs to the first stage.',
+          'One tab per industry. Add one detail per stage, in the same order as the stages above: the first detail belongs to the first stage.',
       },
       fields: [
         { name: 'name', type: 'text', required: true, admin: { description: 'Tab label, e.g. Diagnostics' } },

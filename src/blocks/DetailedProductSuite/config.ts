@@ -96,7 +96,7 @@ export const DetailedProductSuite: Block = {
           admin: {
             initCollapsed: true,
             description:
-              'First 4 show as icon tiles in a grid. Anything beyond that renders as a plain list below the grid instead. Order matters — your strongest points go first.',
+              'First 4 show as icon tiles in a grid. Anything beyond that renders as a plain list below the grid instead. Order matters: put your strongest points first.',
             components: {
               RowLabel: '@/blocks/DetailedProductSuite/RowLabel#DetailedProductSuiteHighlightRowLabel',
             },

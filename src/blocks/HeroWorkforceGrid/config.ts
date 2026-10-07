@@ -11,7 +11,7 @@ import { iconField } from '@/fields/icons'
 export const HeroWorkforceGrid: Block = {
   slug: 'heroWorkforceGrid',
   interfaceName: 'HeroWorkforceGridBlock',
-  labels: { singular: 'Hero — Workforce Grid', plural: 'Heroes — Workforce Grid' },
+  labels: { singular: 'Hero (Workforce Grid)', plural: 'Heroes (Workforce Grid)' },
   fields: [
     {
       name: 'eyebrow',
@@ -26,7 +26,7 @@ export const HeroWorkforceGrid: Block = {
       label: 'Headline',
       admin: {
         description:
-          'This becomes the page’s main heading (the H1), so use it only once per page — set the page hero above to "None" when this block is on the page.',
+          'This becomes the page’s main heading (the H1), so use it only once per page. Set the page hero above to "None" when this block is on the page.',
       },
     },
     {
@@ -79,7 +79,7 @@ export const HeroWorkforceGrid: Block = {
       admin: {
         initCollapsed: true,
         description:
-          'Distributed evenly across columns in the order you add them. Add at least 2 per column so the loop doesn’t feel short — 9 to 12 cards works well.',
+          'Distributed evenly across columns in the order you add them. Add at least 2 per column so the loop doesn’t feel short. Between 9 and 12 cards works well.',
       },
       fields: [
         iconField('bot'),

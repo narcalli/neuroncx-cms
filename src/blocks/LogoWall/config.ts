@@ -63,7 +63,7 @@ export const LogoWall: Block = {
           label: 'Client name',
           admin: {
             description:
-              'Shown as text in wordmark mode, and used as the image alt text in logo mode. Keep it short — long names crowd the row.',
+              'Shown as text in wordmark mode, and used as the image alt text in logo mode. Keep it short; long names crowd the row.',
           },
         },
         {

@@ -45,7 +45,7 @@ export const FeatureThread: Block = {
       defaultValue: false,
       admin: {
         description:
-          'Tick this when the block is on the category page it would link to — otherwise every entry links back to the page the visitor is already reading.',
+          'Tick this when the block is on the category page it would link to. Otherwise every entry links back to the page the visitor is already reading.',
       },
     },
   ],

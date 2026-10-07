@@ -45,7 +45,7 @@ export const IntegrationsMarquee: Block = {
           label: 'Logo',
           admin: {
             description:
-              'If left empty, a plain colored monogram using the first letter of the name is shown instead — useful while real logos are still being collected.',
+              'If left empty, a plain colored monogram using the first letter of the name is shown instead, which is useful while real logos are still being collected.',
           },
         },
         { name: 'name', type: 'text', label: 'Name', required: true, maxLength: 40 },

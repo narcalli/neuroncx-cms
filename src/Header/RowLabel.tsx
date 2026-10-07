@@ -11,7 +11,7 @@ export const RowLabel: React.FC = () => {
   // The kind is shown too, so a collapsed menu says which rows open a panel.
   const kind = data?.data?.type === 'dropdown' ? 'dropdown' : 'link'
   const label = data?.data?.label
-    ? `Nav item ${data.rowNumber !== undefined ? data.rowNumber + 1 : ''}: ${data.data.label} — ${kind}`
+    ? `Nav item ${data.rowNumber !== undefined ? data.rowNumber + 1 : ''}: ${data.data.label} (${kind})`
     : 'Row'
 
   return <div>{label}</div>

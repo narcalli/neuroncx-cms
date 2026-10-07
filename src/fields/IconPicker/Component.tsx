@@ -127,7 +127,7 @@ export const IconPickerField: React.FC<Props> = ({ field, path, readOnly, allowC
                   maxWidth: '100%',
                 }}
               >
-                {opt.label.split('—')[0].trim()}
+                {opt.label.replace(/\s*\(.*\)\s*$/, '')}
               </span>
             </button>
           )

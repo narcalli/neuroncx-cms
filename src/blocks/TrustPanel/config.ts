@@ -20,7 +20,7 @@ export const TrustPanel: Block = {
       admin: {
         initCollapsed: true,
         description:
-          'Claims here are read closely during procurement — only state what you can evidence.',
+          'Claims here are read closely during procurement, so only state what you can evidence.',
       },
       fields: [
         { name: 'title', type: 'text', required: true },

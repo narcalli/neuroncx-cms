@@ -12,7 +12,7 @@ export const PlatformLayers: Block = {
       name: 'intro',
       type: 'text',
       label: 'Intro line',
-      admin: { description: 'e.g. Scroll to move through the stack — each layer builds on the one before it.' },
+      admin: { description: 'e.g. Scroll to move through the stack. Each layer builds on the one before it.' },
     },
     {
       name: 'layers',

@@ -16,7 +16,7 @@ import { optionalCta } from '@/fields/optionalCta'
 export const HeroRightPlacement: Block = {
   slug: 'heroRightPlacement',
   interfaceName: 'HeroRightPlacementBlock',
-  labels: { singular: 'Hero — Right Placement', plural: 'Heroes — Right Placement' },
+  labels: { singular: 'Hero (Right Placement)', plural: 'Heroes (Right Placement)' },
   fields: [
     {
       name: 'eyebrow',
@@ -31,7 +31,7 @@ export const HeroRightPlacement: Block = {
       label: 'Headline',
       admin: {
         description:
-          'This becomes the page’s main heading (the H1), so use it only once per page — set the page hero above to "None" when this block is on the page.',
+          'This becomes the page’s main heading (the H1), so use it only once per page. Set the page hero above to "None" when this block is on the page.',
       },
     },
     {
@@ -50,7 +50,7 @@ export const HeroRightPlacement: Block = {
       label: 'Image or video',
       admin: {
         description:
-          'Shown in full on the right — nothing gets cropped, so a diagram, screenshot or product shot stays readable. Use MP4 or WebM for moving media — GIFs work but load much slower and are best kept short and small.',
+          'Aim for 16:10. 2560 x 1600 is ideal. Nothing is ever cropped: the picture is fitted whole and pinned to the right, so a diagram or screenshot stays readable. But its left edge and its top and bottom edges fade out into the page, so keep labels and text clear of the left quarter and of the top and bottom tenth. Upload at least 2304 px wide so it stays sharp on a 2x screen; anything wider than 2560 px is scaled down to that width. WebP or PNG for diagrams and screenshots. For moving media use MP4 or WebM. A GIF is served at its original size with no resizing, so it looks soft when stretched across the panel and loads slowly.',
       },
     },
     {

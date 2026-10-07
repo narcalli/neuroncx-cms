@@ -51,7 +51,7 @@ export const FAQ: Block = {
       admin: {
         initCollapsed: true,
         description:
-          'Keep answers short — roughly 40 to 60 words each. If one needs to run long, it should be the exception, not the pattern.',
+          'Keep answers short, roughly 40 to 60 words each. If one needs to run long, it should be the exception, not the pattern.',
         components: {
           RowLabel: '@/blocks/FAQ/RowLabel#FAQRowLabel',
         },

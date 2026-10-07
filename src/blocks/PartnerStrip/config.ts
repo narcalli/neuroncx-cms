@@ -18,7 +18,7 @@ export const PartnerStrip: Block = {
       maxRows: 8,
       admin: {
         description:
-          'Systems you connect to, set as text rather than logos — DocPulse, LeadSquared, WhatsApp Business API. This is not the client logo wall.',
+          'Systems you connect to, such as DocPulse, LeadSquared and WhatsApp Business API, set as text rather than logos. This is not the client logo wall.',
       },
       fields: [{ name: 'name', type: 'text', required: true }],
     },
@@ -29,7 +29,7 @@ export const PartnerStrip: Block = {
       maxRows: 4,
       admin: {
         initCollapsed: true,
-        description: 'Only claim a standard you actually meet — these are read closely by hospital IT.',
+        description: 'Only claim a standard you actually meet. Hospital IT teams read these closely.',
       },
       fields: [
         { name: 'name', type: 'text', required: true, admin: { description: 'e.g. ABDM' } },

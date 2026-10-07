@@ -27,7 +27,7 @@ export const StatBand: Block = {
       label: 'Footnote',
       admin: {
         description:
-          'Optional. Use it to say how the figures are measured or over what period — not to disclaim them.',
+          'Optional. Use it to say how the figures are measured or over what period, not to disclaim them.',
       },
     },
   ],

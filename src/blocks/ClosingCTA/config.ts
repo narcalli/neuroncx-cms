@@ -21,7 +21,7 @@ export const ClosingCTA: Block = {
       name: 'tagline',
       type: 'text',
       label: 'Tagline under the buttons',
-      admin: { description: 'Optional, shown in italics. Short — a line, not a sentence.' },
+      admin: { description: 'Optional, shown in italics. Keep it to a line, not a sentence.' },
     },
   ],
 }

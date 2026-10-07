@@ -34,7 +34,7 @@ export const SolutionGrid: Block = {
               label: 'Link address',
               admin: {
                 description:
-                  'Optional. Leave empty and the card is plain text rather than a link — better than linking to a page that does not exist yet.',
+                  'Optional. Leave empty and the card is plain text rather than a link, which is better than linking to a page that does not exist yet.',
               },
             },
           ],

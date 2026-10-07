@@ -571,7 +571,7 @@ export interface PartnerStripBlock {
    */
   intro?: string | null;
   /**
-   * Systems you connect to, set as text rather than logos — DocPulse, LeadSquared, WhatsApp Business API. This is not the client logo wall.
+   * Systems you connect to, such as DocPulse, LeadSquared and WhatsApp Business API, set as text rather than logos. This is not the client logo wall.
    */
   partners?:
     | {
@@ -580,7 +580,7 @@ export interface PartnerStripBlock {
       }[]
     | null;
   /**
-   * Only claim a standard you actually meet — these are read closely by hospital IT.
+   * Only claim a standard you actually meet. Hospital IT teams read these closely.
    */
   badges?:
     | {
@@ -596,7 +596,7 @@ export interface PartnerStripBlock {
       }[]
     | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -656,7 +656,7 @@ export interface StatHeroBlock {
       }[]
     | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -699,7 +699,7 @@ export interface LogoWallBlock {
   logos?:
     | {
         /**
-         * Shown as text in wordmark mode, and used as the image alt text in logo mode. Keep it short — long names crowd the row.
+         * Shown as text in wordmark mode, and used as the image alt text in logo mode. Keep it short; long names crowd the row.
          */
         name: string;
         /**
@@ -714,7 +714,7 @@ export interface LogoWallBlock {
       }[]
     | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -787,7 +787,7 @@ export interface ProblemStatementBlock {
    */
   resolutionHighlight?: string | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -894,7 +894,7 @@ export interface JourneyEngineBlock {
       }[]
     | null;
   /**
-   * One tab per industry. Add one detail per stage, in the same order as the stages above — the first detail belongs to the first stage.
+   * One tab per industry. Add one detail per stage, in the same order as the stages above: the first detail belongs to the first stage.
    */
   industries?:
     | {
@@ -916,7 +916,7 @@ export interface JourneyEngineBlock {
       }[]
     | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -975,7 +975,7 @@ export interface ContextEngineBlock {
       }[]
     | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -1018,7 +1018,7 @@ export interface SolutionGridBlock {
           | {
               label: string;
               /**
-               * Optional. Leave empty and the card is plain text rather than a link — better than linking to a page that does not exist yet.
+               * Optional. Leave empty and the card is plain text rather than a link, which is better than linking to a page that does not exist yet.
                */
               href?: string | null;
               id?: string | null;
@@ -1028,7 +1028,7 @@ export interface SolutionGridBlock {
       }[]
     | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -1101,7 +1101,7 @@ export interface ProductSuiteBlock {
       }[]
     | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -1239,7 +1239,7 @@ export interface ProductSuite2Block {
       }[]
     | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -1375,7 +1375,7 @@ export interface ProductInActionBlock {
     id?: string | null;
   }[];
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -1416,7 +1416,7 @@ export interface TestimonialBlock {
     id?: string | null;
   }[];
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -1524,7 +1524,7 @@ export interface CaseStudyGridBlock {
   selectedDocs?: (string | CaseStudy)[] | null;
   cardStyle?: ('tilt' | 'plain') | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -1559,7 +1559,7 @@ export interface CustomerDirectoryBlock {
   layout?: ('list' | 'grid') | null;
   emptyStateText?: string | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -1710,7 +1710,7 @@ export interface BentoGridBlock {
       }[]
     | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -1825,7 +1825,7 @@ export interface DetailedProductSuiteBlock {
          */
         accentColor?: ('crimson' | 'navy') | null;
         /**
-         * First 4 show as icon tiles in a grid. Anything beyond that renders as a plain list below the grid instead. Order matters — your strongest points go first.
+         * First 4 show as icon tiles in a grid. Anything beyond that renders as a plain list below the grid instead. Order matters: put your strongest points first.
          */
         highlights?:
           | {
@@ -1906,7 +1906,7 @@ export interface DetailedProductSuiteBlock {
       }[]
     | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -1959,7 +1959,7 @@ export interface AgenticFlowDemoBlock {
     | null;
   footnote?: string | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -2001,7 +2001,7 @@ export interface AgenticStatsBlock {
       }[]
     | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -2043,7 +2043,7 @@ export interface AgenticCartsDemoBlock {
   noteB?: string | null;
   noteA?: string | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -2082,7 +2082,7 @@ export interface AgenticOrbitBlock {
       }[]
     | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -2127,7 +2127,7 @@ export interface AgenticEpisodeBlock {
     | null;
   closing?: string | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -2164,7 +2164,7 @@ export interface AgenticCasesBlock {
       }[]
     | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -2192,7 +2192,7 @@ export interface AgenticClosingBlock {
   ctaLabel: string;
   ctaUrl: string;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -2225,7 +2225,7 @@ export interface IntegrationsMarqueeBlock {
   logos?:
     | {
         /**
-         * If left empty, a plain colored monogram using the first letter of the name is shown instead — useful while real logos are still being collected.
+         * If left empty, a plain colored monogram using the first letter of the name is shown instead, which is useful while real logos are still being collected.
          */
         logo?: (string | null) | Media;
         name: string;
@@ -2233,7 +2233,7 @@ export interface IntegrationsMarqueeBlock {
       }[]
     | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -2279,7 +2279,7 @@ export interface UseCasesBlock {
       }[]
     | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -2316,7 +2316,7 @@ export interface BenefitsBlock {
       }[]
     | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -2358,11 +2358,11 @@ export interface IntegrationsBlock {
       }[]
     | null;
   /**
-   * For example: anything else connects over our REST API and webhooks.
+   * For example: anything else connects over the NeuronCx REST API and webhooks.
    */
   footnote?: string | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -2393,7 +2393,7 @@ export interface ContactFormBlock {
   successMessage?: string | null;
   showMessageField?: boolean | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -2442,7 +2442,7 @@ export interface HowItWorksBlock {
   ctaLabel?: string | null;
   ctaLink?: string | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -2476,11 +2476,11 @@ export interface ClosingCTABlock {
   secondaryLabel?: string | null;
   secondaryLink?: string | null;
   /**
-   * Optional, shown in italics. Short — a line, not a sentence.
+   * Optional, shown in italics. Keep it to a line, not a sentence.
    */
   tagline?: string | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -2517,11 +2517,11 @@ export interface FeatureThreadBlock {
    */
   limitPerCategory?: number | null;
   /**
-   * Tick this when the block is on the category page it would link to — otherwise every entry links back to the page the visitor is already reading.
+   * Tick this when the block is on the category page it would link to. Otherwise every entry links back to the page the visitor is already reading.
    */
   hideCategoryLinks?: boolean | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -2558,7 +2558,7 @@ export interface ArticleGridBlock {
    */
   limit?: number | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -2622,7 +2622,7 @@ export interface CallToActionBlock {
       }[]
     | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -2688,7 +2688,7 @@ export interface ContentBlock {
       }[]
     | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -2748,7 +2748,7 @@ export interface ArchiveBlock {
       }[]
     | null;
   /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it — a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
   width?: ('default' | 'narrow' | 'wide' | 'full') | null;
@@ -2777,7 +2777,7 @@ export interface HeroFullBackgroundBlock {
    */
   eyebrow?: string | null;
   /**
-   * This becomes the page’s main heading (the H1), so use it only once per page — set the page hero above to "None" when this block is on the page.
+   * This becomes the page’s main heading (the H1), so use it only once per page. Set the page hero above to "None" when this block is on the page.
    */
   headline: string;
   /**
@@ -2830,7 +2830,7 @@ export interface HeroFullBackgroundBlock {
       }[]
     | null;
   /**
-   * Works best with photos, textures or abstract images that have a calm area on the left for the text. For diagrams or screenshots with their own text, set Media placement to Right. Use MP4 or WebM for moving backgrounds — GIFs work but load much slower and are best kept short and small.
+   * Works best with photos, textures or abstract images that have a calm area on the left for the text. For diagrams or screenshots with their own text, set Media placement to Right. Use MP4 or WebM for moving backgrounds. GIFs work but load much slower, so keep them short and small.
    */
   media: string | Media;
   /**
@@ -2842,7 +2842,7 @@ export interface HeroFullBackgroundBlock {
    */
   mediaFit?: ('contain' | 'cover') | null;
   /**
-   * Leave empty for a purely decorative background — that is the usual choice for a full-bleed hero. Fill this in only when the picture itself carries meaning a screen reader user needs to know.
+   * Leave empty for a purely decorative background, the usual choice for a full-bleed hero. Fill this in only when the picture itself carries meaning a screen reader user needs to know.
    */
   mediaAlt?: string | null;
   /**
@@ -2850,7 +2850,7 @@ export interface HeroFullBackgroundBlock {
    */
   videoPoster?: (string | null) | Media;
   /**
-   * Replaces the background above on phones and small tablets. Leave empty to use the same file on every screen size. Has no effect when Media placement is set to Right — that layout already changes to a stacked image on phones.
+   * Replaces the background above on phones and small tablets. Leave empty to use the same file on every screen size. Has no effect when Media placement is set to Right, because that layout already changes to a stacked image on phones.
    */
   mobileMedia?: (string | null) | Media;
   /**
@@ -2891,7 +2891,7 @@ export interface HeroRightPlacementBlock {
    */
   eyebrow?: string | null;
   /**
-   * This becomes the page’s main heading (the H1), so use it only once per page — set the page hero above to "None" when this block is on the page.
+   * This becomes the page’s main heading (the H1), so use it only once per page. Set the page hero above to "None" when this block is on the page.
    */
   headline: string;
   /**
@@ -2935,7 +2935,7 @@ export interface HeroRightPlacementBlock {
     label?: string | null;
   };
   /**
-   * Shown in full on the right — nothing gets cropped, so a diagram, screenshot or product shot stays readable. Use MP4 or WebM for moving media — GIFs work but load much slower and are best kept short and small.
+   * Aim for 16:10. 2560 x 1600 is ideal. Nothing is ever cropped: the picture is fitted whole and pinned to the right, so a diagram or screenshot stays readable. But its left edge and its top and bottom edges fade out into the page, so keep labels and text clear of the left quarter and of the top and bottom tenth. Upload at least 2304 px wide so it stays sharp on a 2x screen; anything wider than 2560 px is scaled down to that width. WebP or PNG for diagrams and screenshots. For moving media use MP4 or WebM. A GIF is served at its original size with no resizing, so it looks soft when stretched across the panel and loads slowly.
    */
   media: string | Media;
   /**
@@ -2972,7 +2972,7 @@ export interface HeroWorkforceGridBlock {
    */
   eyebrow?: string | null;
   /**
-   * This becomes the page’s main heading (the H1), so use it only once per page — set the page hero above to "None" when this block is on the page.
+   * This becomes the page’s main heading (the H1), so use it only once per page. Set the page hero above to "None" when this block is on the page.
    */
   headline: string;
   /**
@@ -3000,7 +3000,7 @@ export interface HeroWorkforceGridBlock {
   speed?: ('slow' | 'medium' | 'fast') | null;
   columns?: ('2' | '3' | '4') | null;
   /**
-   * Distributed evenly across columns in the order you add them. Add at least 2 per column so the loop doesn’t feel short — 9 to 12 cards works well.
+   * Distributed evenly across columns in the order you add them. Add at least 2 per column so the loop doesn’t feel short. Between 9 and 12 cards works well.
    */
   cards?:
     | {
@@ -3140,7 +3140,7 @@ export interface ConversationHeroBlock {
    */
   eyebrow?: string | null;
   /**
-   * Short and direct works best — around six to eight words.
+   * Short and direct works best: around six to eight words.
    */
   headline: string;
   /**
@@ -3242,7 +3242,7 @@ export interface ConversationHeroBlock {
       }[]
     | null;
   /**
-   * Optional. Real, defensible figures only — these sit directly under the hero.
+   * Optional. These sit directly under the hero, so use real, defensible figures only.
    */
   stats?:
     | {
@@ -3280,7 +3280,7 @@ export interface PlatformLayersBlock {
   eyebrow?: string | null;
   heading: string;
   /**
-   * e.g. Scroll to move through the stack — each layer builds on the one before it.
+   * e.g. Scroll to move through the stack. Each layer builds on the one before it.
    */
   intro?: string | null;
   /**
@@ -3387,7 +3387,7 @@ export interface TrustPanelBlock {
   buttonLabel?: string | null;
   buttonHref?: string | null;
   /**
-   * Claims here are read closely during procurement — only state what you can evidence.
+   * Claims here are read closely during procurement, so only state what you can evidence.
    */
   cards?:
     | {
@@ -3494,7 +3494,7 @@ export interface StatBandBlock {
       }[]
     | null;
   /**
-   * Optional. Use it to say how the figures are measured or over what period — not to disclaim them.
+   * Optional. Use it to say how the figures are measured or over what period, not to disclaim them.
    */
   note?: string | null;
   /**
@@ -3516,7 +3516,7 @@ export interface StatBandBlock {
 export interface WhatsappWidgetBlock {
   enabled?: boolean | null;
   /**
-   * In E.164 form, e.g. +919876543210. Shown as plain text as well as linked.
+   * In E.164 form, e.g. +919876543210. Used to build the chat link; the number itself is not shown on the page.
    */
   phone?: string | null;
   label?: string | null;
@@ -3555,7 +3555,7 @@ export interface FAQBlock {
    */
   intro?: string | null;
   /**
-   * Keep answers short — roughly 40 to 60 words each. If one needs to run long, it should be the exception, not the pattern.
+   * Keep answers short, roughly 40 to 60 words each. If one needs to run long, it should be the exception, not the pattern.
    */
   items: {
     question: string;
@@ -5905,7 +5905,7 @@ export interface Header {
     ctaHref?: string | null;
   };
   /**
-   * Each item is either a plain link or a dropdown. Only add links to pages that exist — a menu full of dead links is worse than a short menu.
+   * Each item is either a plain link or a dropdown. Only add links to pages that exist. A menu full of dead links is worse than a short menu.
    */
   navItems?:
     | {
@@ -5978,10 +5978,6 @@ export interface Header {
  */
 export interface Footer {
   id: string;
-  /**
-   * Shown in the footer. Leave empty to use the default NeuronCx logo.
-   */
-  logo?: (string | null) | Media;
   /**
    * One or two sentences under the logo describing what NeuronCx does.
    */
@@ -6184,7 +6180,6 @@ export interface HeaderSelect<T extends boolean = true> {
  * via the `definition` "footer_select".
  */
 export interface FooterSelect<T extends boolean = true> {
-  logo?: T;
   tagline?: T;
   columns?:
     | T

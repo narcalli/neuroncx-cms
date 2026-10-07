@@ -22,13 +22,13 @@ export const ContextEngine: Block = {
     {
       name: 'calloutTerm',
       type: 'text',
-      label: 'Callout — the term',
+      label: 'Callout term',
       admin: { description: 'e.g. Customer 360' },
     },
     {
       name: 'calloutText',
       type: 'text',
-      label: 'Callout — what it means',
+      label: 'Callout definition',
       admin: { description: 'e.g. is the shared memory every agent and channel reads from.' },
     },
     {
