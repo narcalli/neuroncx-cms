@@ -131,6 +131,8 @@ export interface Config {
   user: User | PayloadMcpApiKey;
   jobs: {
     tasks: {
+      ragSyncDoc: TaskRagSyncDoc;
+      ragPurgeDoc: TaskRagPurgeDoc;
       schedulePublish: TaskSchedulePublish;
       inline: {
         input: unknown;
@@ -1133,7 +1135,7 @@ export interface ProductSuite2Block {
   intro?: string | null;
   cards?:
     | {
-        cardColor?: ('grey' | 'lavender' | 'white') | null;
+        cardColor?: ('grey' | 'lavender' | 'white' | 'hairline') | null;
         border?: ('none' | 'solid' | 'gradient') | null;
         borderColor?: ('blue' | 'violet' | 'crimson' | 'navy') | null;
         /**
@@ -1604,7 +1606,7 @@ export interface BentoGridBlock {
          * Auto uses half width for cards up to 1/2, full width otherwise.
          */
         tabletColSpan?: ('auto' | '6' | '12') | null;
-        cardColor?: ('grey' | 'lavender' | 'white' | 'red') | null;
+        cardColor?: ('grey' | 'lavender' | 'white' | 'hairline' | 'red') | null;
         border?: ('none' | 'solid' | 'gradient') | null;
         borderColor?: ('blue' | 'violet' | 'crimson' | 'navy') | null;
         /**
@@ -3147,6 +3149,10 @@ export interface ConversationHeroBlock {
    * One or two sentences explaining what the product does, in plain language.
    */
   subhead: string;
+  /**
+   * Sets the hero heading's font size in pixels. Keep it under about 48px for longer headlines so they don't wrap awkwardly.
+   */
+  headingSize?: number | null;
   primaryButtonLabel?: string | null;
   primaryButtonLink?: string | null;
   secondaryButtonLabel?: string | null;
@@ -3864,7 +3870,7 @@ export interface PayloadJob {
     | {
         executedAt: string;
         completedAt: string;
-        taskSlug: 'inline' | 'schedulePublish';
+        taskSlug: 'inline' | 'ragSyncDoc' | 'ragPurgeDoc' | 'schedulePublish';
         taskID: string;
         input?:
           | {
@@ -3897,7 +3903,7 @@ export interface PayloadJob {
         id?: string | null;
       }[]
     | null;
-  taskSlug?: ('inline' | 'schedulePublish') | null;
+  taskSlug?: ('inline' | 'ragSyncDoc' | 'ragPurgeDoc' | 'schedulePublish') | null;
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
@@ -5290,6 +5296,7 @@ export interface ConversationHeroBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   headline?: T;
   subhead?: T;
+  headingSize?: T;
   primaryButtonLabel?: T;
   primaryButtonLink?: T;
   secondaryButtonLabel?: T;
@@ -6256,6 +6263,34 @@ export interface CollectionsWidget {
     [k: string]: unknown;
   };
   width: 'full';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskRagSyncDoc".
+ */
+export interface TaskRagSyncDoc {
+  input: {
+    collection: string;
+    id: string;
+    locale?: string | null;
+  };
+  output: {
+    chunksEmbedded?: number | null;
+    chunksDeleted?: number | null;
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskRagPurgeDoc".
+ */
+export interface TaskRagPurgeDoc {
+  input: {
+    collection: string;
+    id: string;
+  };
+  output: {
+    chunksDeleted?: number | null;
+  };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

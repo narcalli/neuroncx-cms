@@ -26,6 +26,19 @@ export const ConversationHero: Block = {
       label: 'Subhead',
       admin: { description: 'One or two sentences explaining what the product does, in plain language.' },
     },
+    {
+      name: 'headingSize',
+      type: 'number',
+      label: 'Heading size (px)',
+      defaultValue: 44,
+      min: 24,
+      max: 64,
+      admin: {
+        step: 1,
+        description:
+          "Sets the hero heading's font size in pixels. Keep it under about 48px for longer headlines so they don't wrap awkwardly.",
+      },
+    },
     { name: 'primaryButtonLabel', type: 'text', label: 'Primary button text' },
     { name: 'primaryButtonLink', type: 'text', label: 'Primary button address' },
     { name: 'secondaryButtonLabel', type: 'text', label: 'Secondary button text' },
