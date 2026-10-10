@@ -269,6 +269,7 @@ export interface Page {
     | HeroWorkforceGridBlock
     | AgenticHeroBlock
     | ConversationHeroBlock
+    | HeroStackBlock
     | PlatformLayersBlock
     | TrustPanelBlock
     | StatBandBlock
@@ -3277,6 +3278,59 @@ export interface ConversationHeroBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroStackBlock".
+ */
+export interface HeroStackBlock {
+  /**
+   * Optional. For example "Acquire · Engage · Retain".
+   */
+  eyebrow?: string | null;
+  heading: string;
+  /**
+   * Optional. One or two sentences under the heading. Hidden on phones to keep the hero short.
+   */
+  intro?: string | null;
+  primaryCta?: {
+    label?: string | null;
+    /**
+     * A full address, a page path such as /contact, or #section-id for a section on this page.
+     */
+    href?: string | null;
+  };
+  secondaryCta?: {
+    label?: string | null;
+    /**
+     * A full address, a page path such as /contact, or #section-id for a section on this page.
+     */
+    href?: string | null;
+  };
+  /**
+   * Each product is one screenshot card in the stack. The first one sits on top; scrolling deals them away in this order.
+   */
+  products: {
+    label: string;
+    caption?: string | null;
+    /**
+     * Shown in a 16:10 card. Upload at 1600 x 1000 (16:10) so nothing is trimmed. A taller image is trimmed at the bottom, a wider one at the right.
+     */
+    screenshot: string | Media;
+    id?: string | null;
+  }[];
+  showFrame?: boolean | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'heroStack';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "PlatformLayersBlock".
  */
 export interface PlatformLayersBlock {
@@ -4088,6 +4142,7 @@ export interface PagesSelect<T extends boolean = true> {
         heroWorkforceGrid?: T | HeroWorkforceGridBlockSelect<T>;
         agenticHero?: T | AgenticHeroBlockSelect<T>;
         conversationHero?: T | ConversationHeroBlockSelect<T>;
+        heroStack?: T | HeroStackBlockSelect<T>;
         platformLayers?: T | PlatformLayersBlockSelect<T>;
         trustPanel?: T | TrustPanelBlockSelect<T>;
         statBand?: T | StatBandBlockSelect<T>;
@@ -5323,6 +5378,40 @@ export interface ConversationHeroBlockSelect<T extends boolean = true> {
         label?: T;
         id?: T;
       };
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroStackBlock_select".
+ */
+export interface HeroStackBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  intro?: T;
+  primaryCta?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+      };
+  secondaryCta?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+      };
+  products?:
+    | T
+    | {
+        label?: T;
+        caption?: T;
+        screenshot?: T;
+        id?: T;
+      };
+  showFrame?: T;
   hidden?: T;
   htmlId?: T;
   id?: T;

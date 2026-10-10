@@ -8,6 +8,7 @@ import { Archive } from '../../blocks/ArchiveBlock/config'
 import { CallToAction } from '../../blocks/CallToAction/config'
 import { Content } from '../../blocks/Content/config'
 import { ConversationHero } from '../../blocks/ConversationHero/config'
+import { HeroStack } from '../../blocks/HeroStack/config'
 import { HeroFullBackground } from '../../blocks/HeroFullBackground/config'
 import { HeroRightPlacement } from '../../blocks/HeroRightPlacement/config'
 import { HeroWorkforceGrid } from '../../blocks/HeroWorkforceGrid/config'
@@ -175,6 +176,7 @@ export const Pages: CollectionConfig<'pages'> = {
                 withMinimalPresentation(HeroWorkforceGrid),
                 withMinimalPresentation(AgenticHero),
                 withMinimalPresentation(ConversationHero), // test 2: navy hero
+                withMinimalPresentation(HeroStack), // test 1: its own light ground, edge to edge
                 withMinimalPresentation(PlatformLayers), // test 2: navy stage
                 withMinimalPresentation(TrustPanel), // test 2: navy by design
                 withMinimalPresentation(StatBand), // test 1: crimson, edge to edge
