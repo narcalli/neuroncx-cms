@@ -21,7 +21,7 @@
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts",
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
     "rag:sheet": "tsx scripts/build-rag-sheet.ts",
-  "rag:sheet:reset": "node -e \"require('fs').rmSync('rag-debug',{recursive:true,force:true})\""
+    "rag:sheet:reset": "node -e \"require('fs').rmSync('rag-debug',{recursive:true,force:true})\""
   },
   "dependencies": {
     "@aws-sdk/client-sesv2": "^3.1133.0",
@@ -70,6 +70,7 @@
     "autoprefixer": "^10.4.19",
     "eslint": "^9.16.0",
     "eslint-config-next": "16.2.6",
+    "exceljs": "^4.4.0",
     "jsdom": "28.0.0",
     "postcss": "^8.4.38",
     "prettier": "^3.4.2",
