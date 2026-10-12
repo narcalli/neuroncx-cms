@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url'
 import { Categories } from './collections/Categories'
 import { CaseStudies } from './collections/CaseStudies'
 import { Integrations } from './collections/Integrations'
+import { ConnectionTypes, IntegrationCategories, Products } from './collections/IntegrationTaxonomies'
 import { Sectors } from './collections/Sectors'
 import { Enquiries } from './collections/Enquiries'
 import { Features } from './collections/Features'
@@ -58,6 +59,9 @@ export default buildConfig({
     Sectors,
     CaseStudies,
     Integrations,
+    IntegrationCategories,
+    ConnectionTypes,
+    Products,
   ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer, SiteSettings],

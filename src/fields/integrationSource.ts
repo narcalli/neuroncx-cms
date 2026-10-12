@@ -1,7 +1,5 @@
 import type { Field, FieldHook } from 'payload'
 
-import { integrationCategoryOptions, integrationProductOptions } from '../collections/Integrations'
-
 /**
  * The "Show" switch shared by every block that lists integrations
  * (Integrations, Integrations Marquee, Partner Strip). It reads entries from
@@ -69,21 +67,23 @@ export const integrationSourceFields = (limit: { min: number; max: number }): Fi
       { label: 'Manual list, old style', value: 'manual' },
     ],
   },
+  // Links to the editable lists, so a category or product added in the
+  // admin is available here straight away.
   {
     name: 'categories',
-    type: 'select',
+    type: 'relationship',
+    relationTo: 'integrationCategories',
     hasMany: true,
     label: 'Categories',
-    options: integrationCategoryOptions,
-    admin: { condition: (_, siblingData) => sourceMode(siblingData) === 'filter' },
+    admin: { sortOptions: 'order', condition: (_, siblingData) => sourceMode(siblingData) === 'filter' },
   },
   {
     name: 'products',
-    type: 'select',
+    type: 'relationship',
+    relationTo: 'products',
     hasMany: true,
     label: 'Products',
-    options: integrationProductOptions,
-    admin: { condition: (_, siblingData) => sourceMode(siblingData) === 'filter' },
+    admin: { sortOptions: 'order', condition: (_, siblingData) => sourceMode(siblingData) === 'filter' },
   },
   {
     name: 'featuredOnly',

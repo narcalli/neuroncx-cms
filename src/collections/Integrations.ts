@@ -2,25 +2,6 @@ import type { Access, CollectionConfig, Where } from 'payload'
 
 import { authenticated } from '../access/authenticated'
 
-// Shared with the Integrations block, so its filters always match these options.
-export const integrationCategoryOptions = [
-  { label: 'Messaging channels', value: 'messaging' },
-  { label: 'Telephony and dialers', value: 'telephony' },
-  { label: 'CRM and marketing', value: 'crm-marketing' },
-  { label: 'Hospital systems', value: 'hospital-systems' },
-  { label: 'Payments', value: 'payments' },
-  { label: 'Data and BI', value: 'data-bi' },
-]
-
-export const integrationProductOptions = [
-  { label: 'CRM', value: 'crm' },
-  { label: 'Campaigns', value: 'campaigns' },
-  { label: 'Call quality', value: 'call-quality' },
-  { label: 'Bots', value: 'bots' },
-  { label: 'Knowledge base', value: 'knowledge-base' },
-  { label: 'Workflows', value: 'workflows' },
-]
-
 // Visitors only ever get entries that are both published and Live. Drafts,
 // Pilot and Planned stay visible to logged-in editors only. Relationships
 // obey this too, so a hand-picked entry that is not live is not populated.
@@ -39,6 +20,9 @@ const liveOrAuthenticated: Access = ({ req: { user } }) => {
  * Drafts are on: an entry can be prepared and saved without appearing on
  * the site until it is published. Visitors also never see an entry whose
  * status is not Live; see liveOrAuthenticated above.
+ *
+ * Category, connection and products link to their own collections
+ * (IntegrationTaxonomies.ts), so editors manage those lists in the admin.
  */
 export const Integrations: CollectionConfig = {
   slug: 'integrations',
@@ -56,6 +40,7 @@ export const Integrations: CollectionConfig = {
     useAsTitle: 'name',
     defaultColumns: ['name', 'category', 'status', 'featured'],
     description: 'The systems NeuronCx connects to. Each entry is written once and shown wherever integrations are listed.',
+    group: 'Integrations',
   },
   defaultSort: 'order',
   versions: {
@@ -86,18 +71,16 @@ export const Integrations: CollectionConfig = {
     },
     {
       name: 'category',
-      type: 'select',
+      type: 'relationship',
+      relationTo: 'integrationCategories',
       required: true,
-      options: integrationCategoryOptions,
+      admin: { sortOptions: 'order' },
     },
     {
       name: 'connection',
-      type: 'select',
-      options: [
-        { label: 'Native connector', value: 'native' },
-        { label: 'API and webhooks', value: 'api-webhooks' },
-        { label: 'File import', value: 'file-import' },
-      ],
+      type: 'relationship',
+      relationTo: 'connectionTypes',
+      admin: { sortOptions: 'order' },
     },
     {
       name: 'status',
@@ -115,9 +98,10 @@ export const Integrations: CollectionConfig = {
     },
     {
       name: 'products',
-      type: 'select',
+      type: 'relationship',
+      relationTo: 'products',
       hasMany: true,
-      options: integrationProductOptions,
+      admin: { sortOptions: 'order' },
     },
     {
       name: 'featured',

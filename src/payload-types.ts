@@ -78,6 +78,9 @@ export interface Config {
     sectors: Sector;
     caseStudies: CaseStudy;
     integrations: Integration;
+    integrationCategories: IntegrationCategory;
+    connectionTypes: ConnectionType;
+    products: Product;
     redirects: Redirect;
     'payload-mcp-api-keys': PayloadMcpApiKey;
     'payload-kv': PayloadKv;
@@ -103,6 +106,9 @@ export interface Config {
     sectors: SectorsSelect<false> | SectorsSelect<true>;
     caseStudies: CaseStudiesSelect<false> | CaseStudiesSelect<true>;
     integrations: IntegrationsSelect<false> | IntegrationsSelect<true>;
+    integrationCategories: IntegrationCategoriesSelect<false> | IntegrationCategoriesSelect<true>;
+    connectionTypes: ConnectionTypesSelect<false> | ConnectionTypesSelect<true>;
+    products: ProductsSelect<false> | ProductsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     'payload-mcp-api-keys': PayloadMcpApiKeysSelect<false> | PayloadMcpApiKeysSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -576,8 +582,8 @@ export interface PartnerStripBlock {
    */
   intro?: string | null;
   populateBy?: ('all' | 'filter' | 'selection' | 'manual') | null;
-  categories?: ('messaging' | 'telephony' | 'crm-marketing' | 'hospital-systems' | 'payments' | 'data-bi')[] | null;
-  products?: ('crm' | 'campaigns' | 'call-quality' | 'bots' | 'knowledge-base' | 'workflows')[] | null;
+  categories?: (string | IntegrationCategory)[] | null;
+  products?: (string | Product)[] | null;
   featuredOnly?: boolean | null;
   selectedDocs?: (string | Integration)[] | null;
   limit?: number | null;
@@ -627,6 +633,115 @@ export interface PartnerStripBlock {
   blockType: 'partnerStrip';
 }
 /**
+ * Groups for integrations. Used in each integration's Category field and in the blocks' Categories filter.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "integrationCategories".
+ */
+export interface IntegrationCategory {
+  id: string;
+  name: string;
+  /**
+   * A short fixed code for addresses and filters. Filled in from the name if left empty. Lowercase, dashes only.
+   */
+  slug: string;
+  /**
+   * Lower numbers come first in dropdowns and lists.
+   */
+  order?: number | null;
+  /**
+   * Optional. For example an intro line if the integrations page groups entries by category.
+   */
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * NeuronCx products. Integrations tag the products they work with; other parts of the site can use the same list later.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: string;
+  name: string;
+  /**
+   * A short fixed code for addresses and filters. Filled in from the name if left empty. Lowercase, dashes only.
+   */
+  slug: string;
+  /**
+   * Lower numbers come first in dropdowns and lists.
+   */
+  order?: number | null;
+  shortDescription?: string | null;
+  icon?:
+    | (
+        | 'message'
+        | 'chat'
+        | 'check'
+        | 'calendar'
+        | 'card'
+        | 'document'
+        | 'refresh'
+        | 'bolt'
+        | 'layers'
+        | 'gauge'
+        | 'plug'
+        | 'shield'
+        | 'shieldCheck'
+        | 'lock'
+        | 'globe'
+        | 'server'
+        | 'eye'
+        | 'users'
+        | 'user'
+        | 'phone'
+        | 'smartphone'
+        | 'mail'
+        | 'messageCircle'
+        | 'send'
+        | 'inbox'
+        | 'headphones'
+        | 'mic'
+        | 'video'
+        | 'bell'
+        | 'handshake'
+        | 'stethoscope'
+        | 'heartPulse'
+        | 'hospital'
+        | 'activity'
+        | 'flask'
+        | 'pill'
+        | 'graduationCap'
+        | 'building'
+        | 'mapPin'
+        | 'database'
+        | 'cloud'
+        | 'workflow'
+        | 'bot'
+        | 'sparkles'
+        | 'search'
+        | 'chart'
+        | 'trendingUp'
+        | 'target'
+        | 'rocket'
+        | 'key'
+        | 'fileText'
+        | 'clipboardList'
+        | 'link'
+        | 'settings'
+        | 'puzzle'
+        | 'timer'
+        | 'clock'
+        | 'badgeCheck'
+        | 'star'
+        | 'briefcase'
+      )
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * The systems NeuronCx connects to. Each entry is written once and shown wherever integrations are listed.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -643,13 +758,13 @@ export interface Integration {
    * What flows between the two systems, in plain words.
    */
   summary?: string | null;
-  category: 'messaging' | 'telephony' | 'crm-marketing' | 'hospital-systems' | 'payments' | 'data-bi';
-  connection?: ('native' | 'api-webhooks' | 'file-import') | null;
+  category: string | IntegrationCategory;
+  connection?: (string | null) | ConnectionType;
   /**
    * Only Live integrations show on the public site.
    */
   status: 'live' | 'pilot' | 'planned';
-  products?: ('crm' | 'campaigns' | 'call-quality' | 'bots' | 'knowledge-base' | 'workflows')[] | null;
+  products?: (string | Product)[] | null;
   /**
    * Tick to include in the short list on the home page.
    */
@@ -665,6 +780,30 @@ export interface Integration {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * How NeuronCx connects to an integration. Used in each integration's Connection field.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "connectionTypes".
+ */
+export interface ConnectionType {
+  id: string;
+  name: string;
+  /**
+   * A short fixed code for addresses and filters. Filled in from the name if left empty. Lowercase, dashes only.
+   */
+  slug: string;
+  /**
+   * Lower numbers come first in dropdowns and lists.
+   */
+  order?: number | null;
+  /**
+   * Optional. One line, for example: Built-in connector, no setup on your side.
+   */
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2271,8 +2410,8 @@ export interface IntegrationsMarqueeBlock {
   title?: string | null;
   description?: string | null;
   populateBy?: ('all' | 'filter' | 'selection' | 'manual') | null;
-  categories?: ('messaging' | 'telephony' | 'crm-marketing' | 'hospital-systems' | 'payments' | 'data-bi')[] | null;
-  products?: ('crm' | 'campaigns' | 'call-quality' | 'bots' | 'knowledge-base' | 'workflows')[] | null;
+  categories?: (string | IntegrationCategory)[] | null;
+  products?: (string | Product)[] | null;
   featuredOnly?: boolean | null;
   selectedDocs?: (string | Integration)[] | null;
   limit?: number | null;
@@ -2401,8 +2540,8 @@ export interface IntegrationsBlock {
   heading?: string | null;
   intro?: string | null;
   populateBy?: ('all' | 'filter' | 'selection' | 'manual') | null;
-  categories?: ('messaging' | 'telephony' | 'crm-marketing' | 'hospital-systems' | 'payments' | 'data-bi')[] | null;
-  products?: ('crm' | 'campaigns' | 'call-quality' | 'bots' | 'knowledge-base' | 'workflows')[] | null;
+  categories?: (string | IntegrationCategory)[] | null;
+  products?: (string | Product)[] | null;
   featuredOnly?: boolean | null;
   selectedDocs?: (string | Integration)[] | null;
   limit?: number | null;
@@ -4070,6 +4209,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'integrations';
         value: string | Integration;
+      } | null)
+    | ({
+        relationTo: 'integrationCategories';
+        value: string | IntegrationCategory;
+      } | null)
+    | ({
+        relationTo: 'connectionTypes';
+        value: string | ConnectionType;
+      } | null)
+    | ({
+        relationTo: 'products';
+        value: string | Product;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -5948,6 +6099,43 @@ export interface IntegrationsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "integrationCategories_select".
+ */
+export interface IntegrationCategoriesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  order?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "connectionTypes_select".
+ */
+export interface ConnectionTypesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  order?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products_select".
+ */
+export interface ProductsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  order?: T;
+  shortDescription?: T;
+  icon?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
