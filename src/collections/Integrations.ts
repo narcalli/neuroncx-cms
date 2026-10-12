@@ -1,15 +1,44 @@
-import type { CollectionConfig } from 'payload'
+import type { Access, CollectionConfig, Where } from 'payload'
 
 import { authenticated } from '../access/authenticated'
-import { authenticatedOrPublished } from '../access/authenticatedOrPublished'
+
+// Shared with the Integrations block, so its filters always match these options.
+export const integrationCategoryOptions = [
+  { label: 'Messaging channels', value: 'messaging' },
+  { label: 'Telephony and dialers', value: 'telephony' },
+  { label: 'CRM and marketing', value: 'crm-marketing' },
+  { label: 'Hospital systems', value: 'hospital-systems' },
+  { label: 'Payments', value: 'payments' },
+  { label: 'Data and BI', value: 'data-bi' },
+]
+
+export const integrationProductOptions = [
+  { label: 'CRM', value: 'crm' },
+  { label: 'Campaigns', value: 'campaigns' },
+  { label: 'Call quality', value: 'call-quality' },
+  { label: 'Bots', value: 'bots' },
+  { label: 'Knowledge base', value: 'knowledge-base' },
+  { label: 'Workflows', value: 'workflows' },
+]
+
+// Visitors only ever get entries that are both published and Live. Drafts,
+// Pilot and Planned stay visible to logged-in editors only. Relationships
+// obey this too, so a hand-picked entry that is not live is not populated.
+const liveOrAuthenticated: Access = ({ req: { user } }) => {
+  if (user) return true
+  const publishedAndLive: Where = {
+    and: [{ _status: { equals: 'published' } }, { status: { equals: 'live' } }],
+  }
+  return publishedAndLive
+}
 
 /**
  * The systems NeuronCx connects to, kept in one place so every page that
  * lists integrations reads the same entries instead of its own copy.
  *
  * Drafts are on: an entry can be prepared and saved without appearing on
- * the site until it is published. Separately, the site shows only entries
- * whose status is Live.
+ * the site until it is published. Visitors also never see an entry whose
+ * status is not Live; see liveOrAuthenticated above.
  */
 export const Integrations: CollectionConfig = {
   slug: 'integrations',
@@ -20,7 +49,7 @@ export const Integrations: CollectionConfig = {
   access: {
     create: authenticated,
     delete: authenticated,
-    read: authenticatedOrPublished,
+    read: liveOrAuthenticated,
     update: authenticated,
   },
   admin: {
@@ -59,14 +88,7 @@ export const Integrations: CollectionConfig = {
       name: 'category',
       type: 'select',
       required: true,
-      options: [
-        { label: 'Messaging channels', value: 'messaging' },
-        { label: 'Telephony and dialers', value: 'telephony' },
-        { label: 'CRM and marketing', value: 'crm-marketing' },
-        { label: 'Hospital systems', value: 'hospital-systems' },
-        { label: 'Payments', value: 'payments' },
-        { label: 'Data and BI', value: 'data-bi' },
-      ],
+      options: integrationCategoryOptions,
     },
     {
       name: 'connection',
@@ -95,14 +117,7 @@ export const Integrations: CollectionConfig = {
       name: 'products',
       type: 'select',
       hasMany: true,
-      options: [
-        { label: 'CRM', value: 'crm' },
-        { label: 'Campaigns', value: 'campaigns' },
-        { label: 'Call quality', value: 'call-quality' },
-        { label: 'Bots', value: 'bots' },
-        { label: 'Knowledge base', value: 'knowledge-base' },
-        { label: 'Workflows', value: 'workflows' },
-      ],
+      options: integrationProductOptions,
     },
     {
       name: 'featured',
