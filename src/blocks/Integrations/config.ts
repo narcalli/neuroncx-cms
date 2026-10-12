@@ -20,8 +20,13 @@ const idOf = (v: unknown): string | null =>
 // Visitors never get a hand-picked entry that is unpublished or not Live: it
 // is dropped from the list, not shown. Logged-in editors see the list as
 // saved, so they can spot and fix an entry that has gone out of date.
+//
+// Only requests over the REST or GraphQL API are filtered. Server-side code
+// using the Local API (scripts, jobs) gets the list as saved: a script that
+// reads a page and writes it back would otherwise drop the hidden entries
+// for good.
 const onlyLiveForVisitors: FieldHook = async ({ value, req }) => {
-  if (req.user || !Array.isArray(value) || value.length === 0) return value
+  if (req.user || req.payloadAPI === 'local' || !Array.isArray(value) || value.length === 0) return value
   const ids = value.map(idOf).filter((id): id is string => Boolean(id))
   const live = await req.payload.find({
     collection: 'integrations',
