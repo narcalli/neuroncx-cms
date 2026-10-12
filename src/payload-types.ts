@@ -575,6 +575,12 @@ export interface PartnerStripBlock {
    * For example: Powering conversational commerce across industries.
    */
   intro?: string | null;
+  populateBy?: ('all' | 'filter' | 'selection' | 'manual') | null;
+  categories?: ('messaging' | 'telephony' | 'crm-marketing' | 'hospital-systems' | 'payments' | 'data-bi')[] | null;
+  products?: ('crm' | 'campaigns' | 'call-quality' | 'bots' | 'knowledge-base' | 'workflows')[] | null;
+  featuredOnly?: boolean | null;
+  selectedDocs?: (string | Integration)[] | null;
+  limit?: number | null;
   /**
    * Systems you connect to, such as DocPulse, LeadSquared and WhatsApp Business API, set as text rather than logos. This is not the client logo wall.
    */
@@ -619,6 +625,46 @@ export interface PartnerStripBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'partnerStrip';
+}
+/**
+ * The systems NeuronCx connects to. Each entry is written once and shown wherever integrations are listed.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "integrations".
+ */
+export interface Integration {
+  id: string;
+  name: string;
+  /**
+   * Transparent PNG or SVG. Leave empty to show the name only.
+   */
+  logo?: (string | null) | Media;
+  /**
+   * What flows between the two systems, in plain words.
+   */
+  summary?: string | null;
+  category: 'messaging' | 'telephony' | 'crm-marketing' | 'hospital-systems' | 'payments' | 'data-bi';
+  connection?: ('native' | 'api-webhooks' | 'file-import') | null;
+  /**
+   * Only Live integrations show on the public site.
+   */
+  status: 'live' | 'pilot' | 'planned';
+  products?: ('crm' | 'campaigns' | 'call-quality' | 'bots' | 'knowledge-base' | 'workflows')[] | null;
+  /**
+   * Tick to include in the short list on the home page.
+   */
+  featured?: boolean | null;
+  /**
+   * Lower numbers show first.
+   */
+  order?: number | null;
+  /**
+   * Only needed if this integration gets its own page later.
+   */
+  slug?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2224,6 +2270,12 @@ export interface IntegrationsMarqueeBlock {
   eyebrow?: string | null;
   title?: string | null;
   description?: string | null;
+  populateBy?: ('all' | 'filter' | 'selection' | 'manual') | null;
+  categories?: ('messaging' | 'telephony' | 'crm-marketing' | 'hospital-systems' | 'payments' | 'data-bi')[] | null;
+  products?: ('crm' | 'campaigns' | 'call-quality' | 'bots' | 'knowledge-base' | 'workflows')[] | null;
+  featuredOnly?: boolean | null;
+  selectedDocs?: (string | Integration)[] | null;
+  limit?: number | null;
   /**
    * Order matters. Roughly the first half renders in the top row scrolling one direction, the rest in the bottom row scrolling the other direction.
    */
@@ -2391,46 +2443,6 @@ export interface IntegrationsBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'integrations';
-}
-/**
- * The systems NeuronCx connects to. Each entry is written once and shown wherever integrations are listed.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "integrations".
- */
-export interface Integration {
-  id: string;
-  name: string;
-  /**
-   * Transparent PNG or SVG. Leave empty to show the name only.
-   */
-  logo?: (string | null) | Media;
-  /**
-   * What flows between the two systems, in plain words.
-   */
-  summary?: string | null;
-  category: 'messaging' | 'telephony' | 'crm-marketing' | 'hospital-systems' | 'payments' | 'data-bi';
-  connection?: ('native' | 'api-webhooks' | 'file-import') | null;
-  /**
-   * Only Live integrations show on the public site.
-   */
-  status: 'live' | 'pilot' | 'planned';
-  products?: ('crm' | 'campaigns' | 'call-quality' | 'bots' | 'knowledge-base' | 'workflows')[] | null;
-  /**
-   * Tick to include in the short list on the home page.
-   */
-  featured?: boolean | null;
-  /**
-   * Lower numbers show first.
-   */
-  order?: number | null;
-  /**
-   * Only needed if this integration gets its own page later.
-   */
-  slug?: string | null;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -4222,6 +4234,12 @@ export interface PagesSelect<T extends boolean = true> {
  */
 export interface PartnerStripBlockSelect<T extends boolean = true> {
   intro?: T;
+  populateBy?: T;
+  categories?: T;
+  products?: T;
+  featuredOnly?: T;
+  selectedDocs?: T;
+  limit?: T;
   partners?:
     | T
     | {
@@ -4955,6 +4973,12 @@ export interface IntegrationsMarqueeBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   title?: T;
   description?: T;
+  populateBy?: T;
+  categories?: T;
+  products?: T;
+  featuredOnly?: T;
+  selectedDocs?: T;
+  limit?: T;
   logos?:
     | T
     | {

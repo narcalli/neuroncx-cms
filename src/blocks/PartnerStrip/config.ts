@@ -1,5 +1,9 @@
 import type { Block } from 'payload'
 
+import { integrationSourceFields, showWhenManual } from '../../fields/integrationSource'
+
+// The "Show" switch applies to the platforms list only; badges stay per block.
+// Collection entries show by name, as text. See fields/integrationSource.ts.
 export const PartnerStrip: Block = {
   slug: 'partnerStrip',
   interfaceName: 'PartnerStripBlock',
@@ -11,12 +15,14 @@ export const PartnerStrip: Block = {
       label: 'Opening line',
       admin: { description: 'For example: Powering conversational commerce across industries.' },
     },
+    ...integrationSourceFields({ min: 1, max: 8 }),
     {
       name: 'partners',
       type: 'array',
       label: 'Platforms',
       maxRows: 8,
       admin: {
+        condition: showWhenManual,
         description:
           'Systems you connect to, such as DocPulse, LeadSquared and WhatsApp Business API, set as text rather than logos. This is not the client logo wall.',
       },

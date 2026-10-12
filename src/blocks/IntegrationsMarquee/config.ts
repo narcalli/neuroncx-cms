@@ -1,9 +1,15 @@
 import type { Block } from 'payload'
 
+import { integrationSourceFields, showWhenManual } from '../../fields/integrationSource'
+
 /**
  * A compact trust strip: integration logos scrolling continuously in two
  * opposite-direction rows, pausing on hover. For the top or bottom of a
  * page, e.g. "Works with the tools you already pay for".
+ *
+ * The "Show" switch picks logos from the Integrations collection or the list
+ * typed into the block; see fields/integrationSource.ts. Either way it needs
+ * 4 to 40 logos: the website renders nothing with fewer than 4.
  */
 export const IntegrationsMarquee: Block = {
   slug: 'integrationsMarquee',
@@ -23,6 +29,7 @@ export const IntegrationsMarquee: Block = {
         { name: 'description', type: 'textarea', label: 'Description', maxLength: 300 },
       ],
     },
+    ...integrationSourceFields({ min: 4, max: 40 }),
     {
       name: 'logos',
       type: 'array',
@@ -31,6 +38,7 @@ export const IntegrationsMarquee: Block = {
       maxRows: 40,
       admin: {
         initCollapsed: true,
+        condition: showWhenManual,
         description:
           'Order matters. Roughly the first half renders in the top row scrolling one direction, the rest in the bottom row scrolling the other direction.',
         components: {
