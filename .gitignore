@@ -22,3 +22,8 @@ node_modules/
 /playwright/.cache/
 
 .env.promote
+.env.prod-db
+/db-backups/
+
+# TypeScript incremental build cache
+tsconfig.tsbuildinfo

@@ -1323,7 +1323,7 @@ export interface ProductSuite2Block {
   intro?: string | null;
   cards?:
     | {
-        cardColor?: ('grey' | 'lavender' | 'white') | null;
+        cardColor?: ('grey' | 'lavender' | 'white' | 'hairline') | null;
         border?: ('none' | 'solid' | 'gradient') | null;
         borderColor?: ('blue' | 'violet' | 'crimson' | 'navy') | null;
         /**
@@ -1881,7 +1881,7 @@ export interface BentoGridBlock {
          * Auto uses half width for cards up to 1/2, full width otherwise.
          */
         tabletColSpan?: ('auto' | '6' | '12') | null;
-        cardColor?: ('grey' | 'lavender' | 'white' | 'red') | null;
+        cardColor?: ('grey' | 'lavender' | 'white' | 'hairline' | 'red') | null;
         border?: ('none' | 'solid' | 'gradient') | null;
         borderColor?: ('blue' | 'violet' | 'crimson' | 'navy') | null;
         /**

@@ -13,7 +13,7 @@ import type { Condition, Field } from 'payload'
  * Each export is a function so every block gets its own copy of the field.
  */
 
-type CardColor = 'grey' | 'lavender' | 'white'
+type CardColor = 'grey' | 'lavender' | 'white' | 'hairline'
 
 const numberOn: Condition = (_data, siblingData) => Boolean(siblingData?.showNumber)
 // Cards saved before this checkbox existed have no value and show their eyebrow.
@@ -44,6 +44,7 @@ export const cardLookFields = (
             { label: 'Grey', value: 'grey' },
             { label: 'Lavender', value: 'lavender' },
             { label: 'White with shadow', value: 'white' },
+            { label: 'White with hairline', value: 'hairline' },
             ...extraColors,
           ],
           admin: { width: '33%' },
