@@ -18,6 +18,7 @@ const lines = (
 ): ArrayField => ({
   name,
   type: 'array',
+  label: labels.plural,
   labels,
   admin: { description },
   fields: [{ name: item, type: 'text', required: true, maxLength, validate: plainText }],

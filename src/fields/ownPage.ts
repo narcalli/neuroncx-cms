@@ -29,12 +29,14 @@ const heroHeadingRule: Validate = (value, options) => {
 // A list of short items: a title and one line each.
 const titleAndLine = (
   name: string,
+  label: string,
   labels: { singular: string; plural: string },
   rows: { minRows?: number; maxRows: number },
   description: string,
 ): ArrayField => ({
   name,
   type: 'array',
+  label,
   labels,
   ...rows,
   admin: { description, initCollapsed: true },
@@ -61,25 +63,29 @@ export const ownPage = (collection: CollectionSlug): { sidebar: CheckboxField; t
     {
       name: 'heroHeading',
       type: 'text',
+      label: 'Hero heading',
       maxLength: 70,
       validate: heroHeadingRule,
       admin: { description: 'The page heading. Needed to publish with Own page on.' },
     },
-    { name: 'heroSubheading', type: 'textarea', maxLength: 200 },
+    { name: 'heroSubheading', type: 'textarea', label: 'Hero subheading', maxLength: 200 },
     titleAndLine(
       'benefits',
+      'Benefits',
       { singular: 'Benefit', plural: 'Benefits' },
       { minRows: 3, maxRows: 6 },
       '3 to 6 outcomes, each with a short line.',
     ),
     titleAndLine(
       'howItWorks',
+      'How it works',
       { singular: 'Step', plural: 'Steps' },
       { minRows: 3, maxRows: 5 },
       '3 to 5 steps, in order.',
     ),
     titleAndLine(
       'useCases',
+      'Use cases',
       { singular: 'Use case', plural: 'Use cases' },
       { maxRows: 4 },
       'Up to 4, one per vertical where possible.',

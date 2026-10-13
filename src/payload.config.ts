@@ -6,6 +6,7 @@ import { buildConfig, PayloadRequest } from 'payload'
 import { fileURLToPath } from 'url'
 
 import { Categories } from './collections/Categories'
+import { CrmFeatures } from './collections/CrmFeatures'
 import { Customers } from './collections/Customers'
 import { Integrations } from './collections/Integrations'
 import { Lists } from './collections/Lists'
@@ -65,6 +66,7 @@ export default buildConfig({
     ConnectionTypes,
     Products,
     Lists,
+    CrmFeatures,
   ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer, SiteSettings, WhatsappLists],
