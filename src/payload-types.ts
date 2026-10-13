@@ -81,6 +81,7 @@ export interface Config {
     integrationCategories: IntegrationCategory;
     connectionTypes: ConnectionType;
     products: Product;
+    lists: List;
     redirects: Redirect;
     'payload-mcp-api-keys': PayloadMcpApiKey;
     'payload-kv': PayloadKv;
@@ -109,6 +110,7 @@ export interface Config {
     integrationCategories: IntegrationCategoriesSelect<false> | IntegrationCategoriesSelect<true>;
     connectionTypes: ConnectionTypesSelect<false> | ConnectionTypesSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
+    lists: ListsSelect<false> | ListsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     'payload-mcp-api-keys': PayloadMcpApiKeysSelect<false> | PayloadMcpApiKeysSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -4065,6 +4067,43 @@ export interface Enquiry {
   createdAt: string;
 }
 /**
+ * Short lists other collections group their entries by, such as CRM areas and agent families.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lists".
+ */
+export interface List {
+  id: string;
+  name: string;
+  /**
+   * Which list this entry belongs to.
+   */
+  type: 'crmArea' | 'agentFamily';
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  /**
+   * Lower shows first, on hub pages and in WhatsApp menus.
+   */
+  order?: number | null;
+  /**
+   * One line shown above the area's features on the CRM hub page.
+   */
+  intro?: string | null;
+  /**
+   * The problem the family solves, in the team's words.
+   */
+  painLine?: string | null;
+  /**
+   * How the agents in the family work together.
+   */
+  summary?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
@@ -4308,6 +4347,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'products';
         value: string | Product;
+      } | null)
+    | ({
+        relationTo: 'lists';
+        value: string | List;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -6254,6 +6297,22 @@ export interface ProductsSelect<T extends boolean = true> {
   order?: T;
   shortDescription?: T;
   icon?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lists_select".
+ */
+export interface ListsSelect<T extends boolean = true> {
+  name?: T;
+  type?: T;
+  generateSlug?: T;
+  slug?: T;
+  order?: T;
+  intro?: T;
+  painLine?: T;
+  summary?: T;
   updatedAt?: T;
   createdAt?: T;
 }

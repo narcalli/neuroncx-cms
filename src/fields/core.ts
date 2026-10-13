@@ -9,14 +9,14 @@ import { text as validateText } from 'payload/shared'
  */
 
 // Lowercase words joined by single dashes: "Customer 360" becomes customer-360.
-const toSlug = (value: string) =>
+export const toSlug = (value: string) =>
   value
     .trim()
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
 
-const slugRule: Validate = (value, options) => {
+export const slugRule: Validate = (value, options) => {
   const builtIn = validateText(value, options as any)
   if (builtIn !== true) return builtIn
   return typeof value === 'string' && /^[a-z0-9]+(-[a-z0-9]+)*$/.test(value)
