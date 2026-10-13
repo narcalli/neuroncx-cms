@@ -164,6 +164,7 @@ export const Products = taxonomy({
   description: 'NeuronCx products. Integrations tag the products they work with; other parts of the site can use the same list later.',
   usedBy: { integrationField: 'products', blockField: 'products' },
   noun: 'product',
+  group: 'Integrations',
   fields: [
     { name: 'shortDescription', type: 'text', maxLength: 160, label: 'Short description (one line)' },
     iconField(undefined, { label: 'Icon (optional)' }),

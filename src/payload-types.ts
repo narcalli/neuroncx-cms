@@ -128,11 +128,13 @@ export interface Config {
     header: Header;
     footer: Footer;
     siteSettings: SiteSetting;
+    whatsappLists: WhatsappList;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
     siteSettings: SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    whatsappLists: WhatsappListsSelect<false> | WhatsappListsSelect<true>;
   };
   locale: null;
   widgets: {
@@ -6684,6 +6686,34 @@ export interface SiteSetting {
   createdAt?: string | null;
 }
 /**
+ * The list button and section title the WhatsApp assistant uses for each collection.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "whatsappLists".
+ */
+export interface WhatsappList {
+  id: string;
+  /**
+   * One row per collection.
+   */
+  lists?:
+    | {
+        collection: 'crmFeatures' | 'microApps' | 'omnichannelCx';
+        /**
+         * The button that opens the list in WhatsApp.
+         */
+        waListButton?: string | null;
+        /**
+         * The heading above the rows in the list.
+         */
+        waSectionTitle?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header_select".
  */
@@ -6807,6 +6837,23 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   manifestShortName?: T;
   manifestDisplay?: T;
   manifestBackground?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "whatsappLists_select".
+ */
+export interface WhatsappListsSelect<T extends boolean = true> {
+  lists?:
+    | T
+    | {
+        collection?: T;
+        waListButton?: T;
+        waSectionTitle?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
