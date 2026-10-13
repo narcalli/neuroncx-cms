@@ -74,8 +74,8 @@ export const Testimonial: Block = {
         {
           name: 'linkedStory',
           type: 'relationship',
-          relationTo: 'caseStudies',
-          label: 'Linked case study (optional)',
+          relationTo: 'customers',
+          label: 'Linked customer (optional)',
         },
       ],
     },

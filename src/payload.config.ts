@@ -6,7 +6,7 @@ import { buildConfig, PayloadRequest } from 'payload'
 import { fileURLToPath } from 'url'
 
 import { Categories } from './collections/Categories'
-import { CaseStudies } from './collections/CaseStudies'
+import { Customers } from './collections/Customers'
 import { Integrations } from './collections/Integrations'
 import { ConnectionTypes, IntegrationCategories, Products } from './collections/IntegrationTaxonomies'
 import { Sectors } from './collections/Sectors'
@@ -57,7 +57,7 @@ export default buildConfig({
     Users,
     Enquiries,
     Sectors,
-    CaseStudies,
+    Customers,
     Integrations,
     IntegrationCategories,
     ConnectionTypes,

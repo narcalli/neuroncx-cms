@@ -76,7 +76,7 @@ export interface Config {
     users: User;
     enquiries: Enquiry;
     sectors: Sector;
-    caseStudies: CaseStudy;
+    customers: Customer;
     integrations: Integration;
     integrationCategories: IntegrationCategory;
     connectionTypes: ConnectionType;
@@ -104,7 +104,7 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     enquiries: EnquiriesSelect<false> | EnquiriesSelect<true>;
     sectors: SectorsSelect<false> | SectorsSelect<true>;
-    caseStudies: CaseStudiesSelect<false> | CaseStudiesSelect<true>;
+    customers: CustomersSelect<false> | CustomersSelect<true>;
     integrations: IntegrationsSelect<false> | IntegrationsSelect<true>;
     integrationCategories: IntegrationCategoriesSelect<false> | IntegrationCategoriesSelect<true>;
     connectionTypes: ConnectionTypesSelect<false> | ConnectionTypesSelect<true>;
@@ -1602,7 +1602,7 @@ export interface TestimonialBlock {
      */
     photo?: (string | null) | Media;
     logo?: (string | null) | Media;
-    linkedStory?: (string | null) | CaseStudy;
+    linkedStory?: (string | null) | Customer;
     id?: string | null;
   }[];
   /**
@@ -1626,47 +1626,43 @@ export interface TestimonialBlock {
   blockType: 'testimonial';
 }
 /**
- * Case studies for the customer pages. Leave "Client name still to confirm" ticked until the client has approved their name.
+ * Customers and their case studies. A customer's real name, logo, quotes and figures only reach the public site once cleared on the Clearance tab.
  *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "caseStudies".
+ * via the `definition` "customers".
  */
-export interface CaseStudy {
+export interface Customer {
   id: string;
-  title: string;
   /**
-   * Used in the address, e.g. ovum for /customers/ovum. Lowercase, dashes only.
+   * Used in the address, e.g. ovum for /customers/ovum.
    */
   slug: string;
-  clientName: string;
-  /**
-   * Ticked hides this case study from the public site until it is cleared.
-   */
-  clientPending?: boolean | null;
-  logo?: (string | null) | Media;
+  status: 'active' | 'pilot' | 'past';
   sectors?: (string | Sector)[] | null;
+  featured?: boolean | null;
   /**
-   * One line shown on the card.
+   * Lower shows first.
+   */
+  order?: number | null;
+  /**
+   * Gives this customer its own page. Only allowed when the name is cleared.
+   */
+  hasOwnPage?: boolean | null;
+  /**
+   * The client's real name.
+   */
+  name: string;
+  tagline?: string | null;
+  /**
+   * One line on what changed for them. Aim for 120 characters.
    */
   summary: string;
   /**
-   * The outcome-style card title. No invented figures. Falls back to the title if empty.
+   * Transparent PNG or SVG.
    */
-  outcomeHeadline?: string | null;
-  /**
-   * Only real, confirmed figures.
-   */
-  metrics?:
-    | {
-        value: string;
-        label: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Shown on the case study page.
-   */
-  body?: {
+  image?: (string | null) | Media;
+  logoScale?: number | null;
+  description?: {
     root: {
       type: string;
       children: {
@@ -1681,7 +1677,104 @@ export interface CaseStudy {
     };
     [k: string]: unknown;
   } | null;
-  featured?: boolean | null;
+  city?: string | null;
+  /**
+   * Number of sites. Hidden unless figures are cleared.
+   */
+  locations?: number | null;
+  since?: string | null;
+  products?: (string | Product)[] | null;
+  integrations?: (string | Integration)[] | null;
+  /**
+   * Shown wherever the name is not cleared. Describe type and scale, not identity, for example: A multi-specialty hospital chain in South India.
+   */
+  anonymisedName: string;
+  clearance: {
+    name: 'cleared' | 'pending' | 'notAllowed';
+    logo: 'cleared' | 'pending' | 'notAllowed';
+    quotes: 'cleared' | 'pending' | 'notAllowed';
+    figures: 'cleared' | 'pending' | 'notAllowed';
+    approvedBy?: string | null;
+    approvedOn?: string | null;
+    /**
+     * Where the approval is kept, for example: Email from Ovum marketing, 2 Oct 2026. Never paste the email.
+     */
+    evidence?: string | null;
+  };
+  heroHeading?: string | null;
+  heroSubheading?: string | null;
+  challenge?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  approach?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  results?:
+    | {
+        metric: string;
+        value: string;
+        baseline?: string | null;
+        period?: string | null;
+        source?: string | null;
+        verified?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  storySections?:
+    | {
+        product?: (string | null) | Product;
+        heading?: string | null;
+        body?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        id?: string | null;
+      }[]
+    | null;
+  quotes?:
+    | {
+        quote: string;
+        person: string;
+        role?: string | null;
+        cleared?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -1694,6 +1787,10 @@ export interface Sector {
   id: string;
   name: string;
   slug: string;
+  /**
+   * Lower numbers come first.
+   */
+  order?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1711,7 +1808,7 @@ export interface CaseStudyGridBlock {
    */
   sectors?: (string | Sector)[] | null;
   limit?: number | null;
-  selectedDocs?: (string | CaseStudy)[] | null;
+  selectedDocs?: (string | Customer)[] | null;
   cardStyle?: ('tilt' | 'plain') | null;
   /**
    * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
@@ -4203,8 +4300,8 @@ export interface PayloadLockedDocument {
         value: string | Sector;
       } | null)
     | ({
-        relationTo: 'caseStudies';
-        value: string | CaseStudy;
+        relationTo: 'customers';
+        value: string | Customer;
       } | null)
     | ({
         relationTo: 'integrations';
@@ -6052,31 +6149,76 @@ export interface EnquiriesSelect<T extends boolean = true> {
 export interface SectorsSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
+  order?: T;
   updatedAt?: T;
   createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "caseStudies_select".
+ * via the `definition` "customers_select".
  */
-export interface CaseStudiesSelect<T extends boolean = true> {
-  title?: T;
+export interface CustomersSelect<T extends boolean = true> {
   slug?: T;
-  clientName?: T;
-  clientPending?: T;
-  logo?: T;
+  status?: T;
   sectors?: T;
+  featured?: T;
+  order?: T;
+  hasOwnPage?: T;
+  name?: T;
+  tagline?: T;
   summary?: T;
-  outcomeHeadline?: T;
-  metrics?:
+  image?: T;
+  logoScale?: T;
+  description?: T;
+  city?: T;
+  locations?: T;
+  since?: T;
+  products?: T;
+  integrations?: T;
+  anonymisedName?: T;
+  clearance?:
     | T
     | {
+        name?: T;
+        logo?: T;
+        quotes?: T;
+        figures?: T;
+        approvedBy?: T;
+        approvedOn?: T;
+        evidence?: T;
+      };
+  heroHeading?: T;
+  heroSubheading?: T;
+  challenge?: T;
+  approach?: T;
+  results?:
+    | T
+    | {
+        metric?: T;
         value?: T;
-        label?: T;
+        baseline?: T;
+        period?: T;
+        source?: T;
+        verified?: T;
         id?: T;
       };
-  body?: T;
-  featured?: T;
+  storySections?:
+    | T
+    | {
+        product?: T;
+        heading?: T;
+        body?: T;
+        id?: T;
+      };
+  quotes?:
+    | T
+    | {
+        quote?: T;
+        person?: T;
+        role?: T;
+        cleared?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -6692,8 +6834,8 @@ export interface TaskSchedulePublish {
           value: string | Feature;
         } | null)
       | ({
-          relationTo: 'caseStudies';
-          value: string | CaseStudy;
+          relationTo: 'customers';
+          value: string | Customer;
         } | null);
     global?: string | null;
     user?: (string | null) | User;

@@ -1,14 +1,15 @@
 import type { Block } from 'payload'
 
 /**
- * A row of case study cards. Pulls the newest cases, filtered by sector, or a
- * hand-picked selection. Cases marked "client name still to confirm" are never
- * shown on the public site.
+ * A row of customer cards. Pulls the newest customers, filtered by sector, or
+ * a hand-picked selection. The block slug stays caseStudyGrid so existing
+ * page data is untouched. Uncleared names arrive already anonymised from the
+ * CMS (see collections/Customers).
  */
 export const CaseStudyGrid: Block = {
   slug: 'caseStudyGrid',
   interfaceName: 'CaseStudyGridBlock',
-  labels: { singular: 'Case Study Grid', plural: 'Case Study Grids' },
+  labels: { singular: 'Customer grid', plural: 'Customer grids' },
   fields: [
     { name: 'eyebrow', type: 'text', label: 'Eyebrow', maxLength: 60 },
     { name: 'heading', type: 'text', label: 'Heading', maxLength: 100 },
@@ -19,8 +20,8 @@ export const CaseStudyGrid: Block = {
       label: 'Show',
       defaultValue: 'collection',
       options: [
-        { label: 'Latest case studies (optionally by sector)', value: 'collection' },
-        { label: 'Hand-picked case studies', value: 'selection' },
+        { label: 'Latest customers (optionally by sector)', value: 'collection' },
+        { label: 'Hand-picked customers', value: 'selection' },
       ],
     },
     {
@@ -48,9 +49,9 @@ export const CaseStudyGrid: Block = {
     {
       name: 'selectedDocs',
       type: 'relationship',
-      relationTo: 'caseStudies',
+      relationTo: 'customers',
       hasMany: true,
-      label: 'Case studies',
+      label: 'Customers',
       admin: {
         condition: (_, siblingData) => siblingData?.populateBy === 'selection',
       },

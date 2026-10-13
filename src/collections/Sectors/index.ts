@@ -4,7 +4,7 @@ import { anyone } from '../../access/anyone'
 import { authenticated } from '../../access/authenticated'
 
 /**
- * Industry sectors used to tag case studies. A plain collection rather than a
+ * Industry sectors used to tag customers. A plain collection rather than a
  * fixed select, so new sectors can be added without a redeploy.
  */
 export const Sectors: CollectionConfig = {
@@ -16,11 +16,19 @@ export const Sectors: CollectionConfig = {
     update: authenticated,
   },
   admin: {
-    defaultColumns: ['name', 'slug'],
+    defaultColumns: ['name', 'slug', 'order'],
     useAsTitle: 'name',
+    group: 'Customers',
   },
+  defaultSort: 'order',
   fields: [
-    { name: 'name', type: 'text', required: true },
+    { name: 'name', type: 'text', required: true, unique: true },
     { name: 'slug', type: 'text', required: true, unique: true },
+    {
+      name: 'order',
+      type: 'number',
+      defaultValue: 100,
+      admin: { description: 'Lower numbers come first.' },
+    },
   ],
 }
