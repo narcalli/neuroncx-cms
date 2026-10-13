@@ -1,8 +1,9 @@
 /**
- * Checks that clearance is enforced by the CMS itself. Creates test
+ * Checks that "Show real name" is enforced by the CMS itself. Creates test
  * customers through the Local API, then reads them the way a visitor would,
- * over the public REST and GraphQL APIs of a running CMS, and checks what
- * comes back. Deletes everything it created at the end.
+ * over the public REST and GraphQL APIs of a running CMS and through a page
+ * block and a testimonial link, and checks what comes back. Deletes
+ * everything it created at the end.
  *
  * Usage (from neuroncx-cms, with the CMS running on CMS_URL, default
  * http://localhost:3001):
@@ -37,14 +38,16 @@ const rich = (t: string) => ({
 const sector = (await payload.find({ collection: 'sectors', limit: 1, overrideAccess: true })).docs[0]
 const product = (await payload.find({ collection: 'products', limit: 1, overrideAccess: true })).docs[0]
 const media = (await payload.find({ collection: 'media', limit: 1, overrideAccess: true })).docs[0]
-const today = new Date().toISOString()
+
+// Fields a visitor must never get for a customer with Show real name off.
+const HIDDEN = ['image', 'quotes', 'results', 'locations', 'city', 'description', 'heroHeading', 'heroSubheading', 'challenge', 'approach', 'storySections']
+const present = (v: unknown) => v != null && !(Array.isArray(v) && v.length === 0)
 
 const base = (n: string) => ({
   name: `ZT ${n}`,
   slug: `zt-${n.toLowerCase()}`,
   anonymisedName: `A test organisation (${n})`,
   summary: 'What changed for them, in one line.',
-  tagline: 'Test tagline',
   sectors: sector ? [sector.id] : [],
   products: product ? [product.id] : [],
   image: media?.id,
@@ -52,12 +55,12 @@ const base = (n: string) => ({
   locations: 12,
   description: rich('About the organisation.'),
   quotes: [
-    { quote: 'A cleared quote.', person: 'Asha', role: 'Director', cleared: true },
-    { quote: 'An uncleared quote.', person: 'Ravi', cleared: false },
+    { quote: 'First quote.', person: 'Asha', role: 'Director' },
+    { quote: 'Second quote.', person: 'Ravi' },
   ],
   results: [
-    { metric: 'No-shows', value: '-30%', baseline: '18%', period: 'Q2 2026', source: 'Their CRM', verified: true },
-    { metric: 'Unverified claim', value: '+99%', verified: false },
+    { metric: 'No-shows', value: '-30%', baseline: '18%', period: 'Q2 2026', source: 'Their CRM' },
+    { metric: 'Bookings', value: '+20%' },
   ],
   heroHeading: 'How they cut no-shows',
   heroSubheading: 'A subheading.',
@@ -71,106 +74,93 @@ const make = async (data: any, draft = false) => {
   created.push({ collection: 'customers', id: String(doc.id) })
   return doc
 }
+const noSwitchFields = (d: any) => d && !('anonymisedName' in d && d.anonymisedName != null) && !('showName' in d && d.showName != null)
 
 try {
-  // The test customers.
-  await make({ ...base('Cleared'), hasOwnPage: true, status: 'active', clearance: { name: 'cleared', logo: 'cleared', quotes: 'cleared', figures: 'cleared', approvedBy: 'Test approver', approvedOn: today, evidence: 'Test record' } })
-  await make({ ...base('Pending'), hasOwnPage: false, status: 'active', clearance: { name: 'pending', logo: 'cleared', quotes: 'cleared', figures: 'cleared', approvedBy: 'Test approver', approvedOn: today } })
-  await make({ ...base('LogoOnly'), hasOwnPage: true, status: 'active', clearance: { name: 'cleared', logo: 'notAllowed', quotes: 'pending', figures: 'pending', approvedBy: 'Test approver', approvedOn: today } })
-  await make({ ...base('Past'), status: 'past', clearance: { name: 'cleared', logo: 'cleared', quotes: 'cleared', figures: 'cleared', approvedBy: 'Test approver', approvedOn: today } })
-  await make({ ...base('Draft'), status: 'active', clearance: { name: 'cleared', logo: 'cleared', quotes: 'cleared', figures: 'cleared', approvedBy: 'Test approver', approvedOn: today } }, true)
+  const named = await make({ ...base('Named'), showName: true, hasOwnPage: true, status: 'active' })
+  const anon = await make({ ...base('Anon'), showName: false, hasOwnPage: false, status: 'active' })
+  await make({ ...base('Past'), showName: true, status: 'past' })
+  await make({ ...base('Draft'), showName: true, status: 'active' }, true)
 
   out.push('Validation (publishing through the Local API):')
-  const refused = async (data: any, expect: string, what: string) => {
+  const refused = async (data: any, what: string) => {
     try {
       await make({ ...base(what.replace(/\W/g, '')), ...data })
       check(false, `${what}: was accepted`)
     } catch (e: any) {
       const msg = JSON.stringify(e?.data?.errors || e.message)
-      check(msg.includes(expect), `${what}: refused with "${expect.slice(0, 70)}..."`)
+      check(msg.includes('Turn on Show real name and add a hero heading'), `${what}: refused with "Turn on Show real name and add a hero heading..."`)
     }
   }
-  await refused({ hasOwnPage: true, clearance: { name: 'pending' } }, "Clear the client's name and add a hero heading", 'own page with the name pending')
-  await refused({ hasOwnPage: true, heroHeading: '', clearance: { name: 'cleared', approvedBy: 'X', approvedOn: today } }, "Clear the client's name and add a hero heading", 'own page without a hero heading')
-  await refused({ clearance: { name: 'cleared', logo: 'pending', quotes: 'pending', figures: 'pending' } }, 'Add who approved this', 'something cleared without approvedBy')
-  await refused({ clearance: { name: 'cleared', approvedBy: 'X' } }, 'Add the approval date', 'something cleared without approvedOn')
+  await refused({ hasOwnPage: true, showName: false }, 'own page with Show real name off')
+  await refused({ hasOwnPage: true, showName: true, heroHeading: '' }, 'own page without a hero heading')
 
-  // Public REST, as a visitor.
-  // The local copy of production has no customers, so every entry listed here is a test one.
+  // Public REST, as a visitor. The local copy of production has no customers,
+  // so every entry listed here is a test one.
   const rest = await (await fetch(`${CMS}/api/customers?limit=50&depth=1`)).json()
-  const byName = (prefix: string) => rest.docs.find((d: any) => String(d.name).includes(prefix) || String(d.name).includes(`(${prefix})`))
+  const find = (id: string) => rest.docs.find((d: any) => d.id === id)
   out.push(`Public REST /api/customers (visitor): ${rest.totalDocs} returned: ${rest.docs.map((d: any) => d.name).join(' | ')}`)
-  check(!byName('Past'), 'past customer is not returned')
-  check(!byName('Draft'), 'draft-only customer is not returned')
-  for (const d of rest.docs) check(!('clearance' in d) && !('anonymisedName' in d), `"${d.name}": no clearance group and no anonymisedName`)
+  check(rest.totalDocs === 2, 'past and draft customers not returned (2 of 4)')
+  for (const d of rest.docs) check(noSwitchFields(d), `"${d.name}": no anonymisedName and no showName`)
 
-  const c = byName('Cleared')
-  check(c?.name === 'ZT Cleared' && c?.slug === 'zt-cleared' && c?.hasOwnPage === true, 'cleared: real name, slug and own page kept')
-  check(Boolean(c?.image) && c?.city === 'Testpur' && c?.locations === 12, 'cleared: logo, city and locations kept')
-  check(c?.quotes?.length === 1 && c.quotes[0].cleared === true, 'cleared: only the cleared quote kept (1 of 2)')
-  check(c?.results?.length === 1 && c.results[0].verified === true, 'cleared: only the verified result kept (1 of 2)')
-  check(Boolean(c?.heroHeading && c?.challenge && c?.approach && c?.storySections?.length && c?.description), 'cleared: story and description kept')
+  const n = find(String(named.id))
+  check(n?.name === 'ZT Named' && n?.slug === 'zt-named' && n?.hasOwnPage === true, 'Show real name on: real name, slug and own page')
+  check(present(n?.image) && n?.quotes?.length === 2 && n?.results?.length === 2, 'Show real name on: logo, both quotes and both results')
+  check(n?.city === 'Testpur' && n?.locations === 12 && present(n?.description) && present(n?.challenge) && present(n?.storySections), 'Show real name on: city, locations, description and story')
 
-  const p = byName('Pending')
-  check(p?.name === 'A test organisation (Pending)', `pending: name replaced by anonymisedName ("${p?.name}")`)
-  check(p?.slug == null && p?.hasOwnPage === false, 'pending: slug cleared, own page false')
-  const leaked = ['image', 'quotes', 'results', 'locations', 'city', 'description', 'heroHeading', 'heroSubheading', 'challenge', 'approach', 'storySections'].filter((k) => p && p[k] != null && !(Array.isArray(p[k]) && !p[k].length))
-  check(leaked.length === 0, `pending: no logo, quotes, figures, city, description or story${leaked.length ? ` (leaked: ${leaked.join(', ')})` : ''}`)
-  check(p?.summary === 'What changed for them, in one line.', 'pending: summary still shown (it must be written anonymously)')
-
-  const l = byName('LogoOnly')
-  check(l?.name === 'ZT LogoOnly' && !l?.image, 'logo not allowed: name kept, logo removed')
-  check(!l?.quotes?.length && !l?.results?.length && l?.locations == null, 'quotes and figures pending: quotes, results and locations removed')
+  const a = find(String(anon.id))
+  check(a?.name === 'A test organisation (Anon)', `Show real name off: anonymised name ("${a?.name}")`)
+  check(a?.slug == null && a?.hasOwnPage === false, 'Show real name off: no slug, no own page')
+  const leaked = HIDDEN.filter((k) => present(a?.[k]))
+  check(leaked.length === 0, `Show real name off: none of the hidden fields${leaked.length ? ` (leaked: ${leaked.join(', ')})` : ''}`)
 
   // Searching or sorting by a hidden field must not reveal anything.
   const count = async (q: string) => (await (await fetch(`${CMS}/api/customers?${q}`)).json()).totalDocs
-  check((await count('where[name][like]=ZT Pending')) === 0, 'searching a pending customer by real name finds nothing')
-  check((await count('where[slug][equals]=zt-pending')) === 0, 'looking up a pending customer by slug finds nothing')
-  check((await count('where[city][equals]=Testpur')) === 2, 'searching a hidden field only matches cleared names (2 of 3)')
-  check((await count('where[name][equals]=ZT Cleared')) === 1, 'searching a cleared customer by name still works')
+  check((await count('where[name][like]=ZT Anon')) === 0, 'searching a Show-real-name-off customer by real name finds nothing')
+  check((await count('where[slug][equals]=zt-anon')) === 0, 'looking up a Show-real-name-off customer by slug finds nothing')
+  check((await count('where[name][equals]=ZT Named')) === 1, 'searching a named customer by name still works')
   const sorted = await (await fetch(`${CMS}/api/customers?sort=-name`)).json()
-  check(Array.isArray(sorted.docs) && sorted.docs.length === 3, 'sorting by a hidden field is ignored, not an error')
+  check(sorted.docs?.length === 2, 'sorting by a hidden field is ignored, not an error')
 
   // Public GraphQL, as a visitor.
   const gql = await (
     await fetch(`${CMS}/api/graphql`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query: '{ Customers(limit: 50) { docs { name slug hasOwnPage city locations anonymisedName clearance { name approvedBy } image { id } quotes { quote cleared } results { metric verified } heroHeading } } }' }),
+      body: JSON.stringify({ query: '{ Customers(limit: 50) { docs { id name slug hasOwnPage anonymisedName showName city locations image { id } quotes { quote } results { metric } heroHeading challenge description storySections { heading } } } }' }),
     })
   ).json()
-  const gdocs = gql?.data?.Customers?.docs || []
-  out.push(`Public GraphQL Customers (visitor): ${gdocs.length} returned: ${gdocs.map((d: any) => d.name).join(' | ')}${gql.errors ? ` | errors: ${JSON.stringify(gql.errors).slice(0, 200)}` : ''}`)
-  const gp = gdocs.find((d: any) => d.name === 'A test organisation (Pending)')
-  const gc = gdocs.find((d: any) => d.name === 'ZT Cleared')
-  check(Boolean(gp) && gp.slug == null && gp.city == null && gp.image == null && !gp.quotes?.length && gp.heroHeading == null, 'GraphQL pending: anonymised, nothing uncleared')
-  // GraphQL always answers a group with an object, so "removed" shows up as
-  // every value being null rather than the group being missing.
-  check(
-    gdocs.every((d: any) => d.anonymisedName == null && (d.clearance == null || Object.values(d.clearance).every((v) => v == null))),
-    'GraphQL: no clearance values and no anonymisedName on any entry',
-  )
-  check(gc?.quotes?.length === 1 && gc?.results?.length === 1, 'GraphQL cleared: uncleared quote and unverified result removed')
-  check(!gdocs.some((d: any) => /Past|Draft/.test(d.name)), 'GraphQL: past and draft customers not returned')
+  const g = gql?.data?.Customers?.docs || []
+  out.push(`Public GraphQL Customers (visitor): ${g.length} returned: ${g.map((d: any) => d.name).join(' | ')}${gql.errors ? ` | errors: ${JSON.stringify(gql.errors).slice(0, 200)}` : ''}`)
+  const gn = g.find((d: any) => d.id === String(named.id))
+  const ga = g.find((d: any) => d.id === String(anon.id))
+  check(g.length === 2, 'GraphQL: past and draft customers not returned')
+  check(g.every(noSwitchFields), 'GraphQL: anonymisedName and showName null on every entry')
+  check(gn?.name === 'ZT Named' && gn?.slug === 'zt-named' && present(gn?.image) && gn?.quotes?.length === 2 && gn?.results?.length === 2, 'GraphQL Show real name on: real name, slug, logo, quotes and results')
+  check(ga?.name === 'A test organisation (Anon)' && ga?.slug == null && ga?.hasOwnPage === false && HIDDEN.every((k) => !present(ga?.[k])), 'GraphQL Show real name off: anonymised, none of the hidden fields')
 
-  // A customer pulled into a page through a block, as a visitor.
-  const pending = (await payload.find({ collection: 'customers', where: { slug: { equals: 'zt-pending' } }, overrideAccess: true })).docs[0]
+  // Customers pulled into a page through a block and a testimonial link.
   const page = await payload.create({ collection: 'pages', overrideAccess: true, context: ctx, data: { title: 'ZT clearance page', slug: 'zt-clearance-page', _status: 'published', hero: { type: 'none' }, layout: [
-    { blockType: 'caseStudyGrid', populateBy: 'selection', selectedDocs: [pending.id] },
-    { blockType: 'testimonial', layout: 'single', quotes: [{ quote: 'Typed quote', attributionName: 'Someone', organisation: 'Typed organisation', linkedStory: pending.id }] },
+    { blockType: 'caseStudyGrid', populateBy: 'selection', selectedDocs: [anon.id, named.id] },
+    { blockType: 'testimonial', layout: 'carousel', quotes: [
+      { quote: 'Typed quote one', attributionName: 'Someone', organisation: 'Org', linkedStory: anon.id },
+      { quote: 'Typed quote two', attributionName: 'Someone else', organisation: 'Org', linkedStory: named.id },
+    ] },
   ] } as any })
   created.push({ collection: 'pages', id: String(page.id) })
   const pr = await (await fetch(`${CMS}/api/pages?where[slug][equals]=zt-clearance-page&depth=2`)).json()
   const lay = pr.docs?.[0]?.layout || []
-  const viaGrid = lay[0]?.selectedDocs?.[0]
-  const viaQuote = lay[1]?.quotes?.[0]?.linkedStory
-  out.push(`Pending customer pulled into a page (visitor, REST depth 2): grid sees "${viaGrid?.name}", testimonial sees "${viaQuote?.name}"`)
-  check(viaGrid?.name === 'A test organisation (Pending)' && viaGrid?.slug == null && !viaGrid?.image && !('clearance' in (viaGrid || {})), 'through a page block: anonymised and stripped')
-  check(viaQuote?.name === 'A test organisation (Pending)' && viaQuote?.hasOwnPage === false, 'through a testimonial link: anonymised, no own page')
+  const [gridAnon, gridNamed] = lay[0]?.selectedDocs || []
+  const [linkAnon, linkNamed] = (lay[1]?.quotes || []).map((q: any) => q.linkedStory)
+  out.push(`Through a page (visitor, REST depth 2): grid sees "${gridAnon?.name}" and "${gridNamed?.name}"; testimonial links see "${linkAnon?.name}" and "${linkNamed?.name}"`)
+  check(gridAnon?.name === 'A test organisation (Anon)' && gridAnon?.slug == null && HIDDEN.every((k) => !present(gridAnon?.[k])) && noSwitchFields(gridAnon), 'page block, Show real name off: anonymised and stripped')
+  check(gridNamed?.name === 'ZT Named' && gridNamed?.quotes?.length === 2 && noSwitchFields(gridNamed), 'page block, Show real name on: everything, minus the switch fields')
+  check(linkAnon?.name === 'A test organisation (Anon)' && linkAnon?.hasOwnPage === false && noSwitchFields(linkAnon), 'testimonial link, Show real name off: anonymised, no own page')
+  check(linkNamed?.name === 'ZT Named' && linkNamed?.hasOwnPage === true && noSwitchFields(linkNamed), 'testimonial link, Show real name on: real name, own page')
 
-  // Editors still see everything.
-  const raw = (await payload.find({ collection: 'customers', where: { slug: { equals: 'zt-pending' } }, overrideAccess: true })).docs[0] as any
-  check(raw?.name === 'ZT Pending' && raw?.clearance?.name === 'pending', 'Local API (scripts, admin): the record as saved')
+  // Server-side code still gets the record as saved.
+  const raw = (await payload.find({ collection: 'customers', where: { slug: { equals: 'zt-anon' } }, overrideAccess: true })).docs[0] as any
+  check(raw?.name === 'ZT Anon' && raw?.showName === false && raw?.anonymisedName, 'Local API (scripts, admin): the record as saved')
 } finally {
   for (const r of created.reverse()) await payload.delete({ collection: r.collection, id: r.id, overrideAccess: true, context: ctx }).catch(() => {})
   out.push(`Cleanup: deleted ${created.length} test records`)

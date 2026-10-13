@@ -1323,7 +1323,7 @@ export interface ProductSuite2Block {
   intro?: string | null;
   cards?:
     | {
-        cardColor?: ('grey' | 'lavender' | 'white' | 'hairline') | null;
+        cardColor?: ('grey' | 'lavender' | 'white') | null;
         border?: ('none' | 'solid' | 'gradient') | null;
         borderColor?: ('blue' | 'violet' | 'crimson' | 'navy') | null;
         /**
@@ -1626,7 +1626,7 @@ export interface TestimonialBlock {
   blockType: 'testimonial';
 }
 /**
- * Customers and their case studies. A customer's real name, logo, quotes and figures only reach the public site once cleared on the Clearance tab.
+ * Customers and their case studies. A customer's real name, logo, quotes and figures only reach the public site when Show real name is on.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "customers".
@@ -1638,6 +1638,10 @@ export interface Customer {
    */
   slug: string;
   status: 'active' | 'pilot' | 'past';
+  /**
+   * Turn on only when the client has agreed to be named.
+   */
+  showName?: boolean | null;
   sectors?: (string | Sector)[] | null;
   featured?: boolean | null;
   /**
@@ -1645,13 +1649,17 @@ export interface Customer {
    */
   order?: number | null;
   /**
-   * Gives this customer its own page. Only allowed when the name is cleared.
+   * Gives this customer its own page. Only allowed when Show real name is on.
    */
   hasOwnPage?: boolean | null;
   /**
    * The client's real name.
    */
   name: string;
+  /**
+   * Shown wherever the name is not cleared. Describe type and scale, not identity, for example: A multi-specialty hospital chain in South India.
+   */
+  anonymisedName: string;
   tagline?: string | null;
   /**
    * One line on what changed for them. Aim for 120 characters.
@@ -1679,28 +1687,12 @@ export interface Customer {
   } | null;
   city?: string | null;
   /**
-   * Number of sites. Hidden unless figures are cleared.
+   * Number of sites. Hidden when Show real name is off.
    */
   locations?: number | null;
   since?: string | null;
   products?: (string | Product)[] | null;
   integrations?: (string | Integration)[] | null;
-  /**
-   * Shown wherever the name is not cleared. Describe type and scale, not identity, for example: A multi-specialty hospital chain in South India.
-   */
-  anonymisedName: string;
-  clearance: {
-    name: 'cleared' | 'pending' | 'notAllowed';
-    logo: 'cleared' | 'pending' | 'notAllowed';
-    quotes: 'cleared' | 'pending' | 'notAllowed';
-    figures: 'cleared' | 'pending' | 'notAllowed';
-    approvedBy?: string | null;
-    approvedOn?: string | null;
-    /**
-     * Where the approval is kept, for example: Email from Ovum marketing, 2 Oct 2026. Never paste the email.
-     */
-    evidence?: string | null;
-  };
   heroHeading?: string | null;
   heroSubheading?: string | null;
   challenge?: {
@@ -1740,7 +1732,6 @@ export interface Customer {
         baseline?: string | null;
         period?: string | null;
         source?: string | null;
-        verified?: boolean | null;
         id?: string | null;
       }[]
     | null;
@@ -1771,7 +1762,6 @@ export interface Customer {
         quote: string;
         person: string;
         role?: string | null;
-        cleared?: boolean | null;
         id?: string | null;
       }[]
     | null;
@@ -1891,7 +1881,7 @@ export interface BentoGridBlock {
          * Auto uses half width for cards up to 1/2, full width otherwise.
          */
         tabletColSpan?: ('auto' | '6' | '12') | null;
-        cardColor?: ('grey' | 'lavender' | 'white' | 'hairline' | 'red') | null;
+        cardColor?: ('grey' | 'lavender' | 'white' | 'red') | null;
         border?: ('none' | 'solid' | 'gradient') | null;
         borderColor?: ('blue' | 'violet' | 'crimson' | 'navy') | null;
         /**
@@ -6160,11 +6150,13 @@ export interface SectorsSelect<T extends boolean = true> {
 export interface CustomersSelect<T extends boolean = true> {
   slug?: T;
   status?: T;
+  showName?: T;
   sectors?: T;
   featured?: T;
   order?: T;
   hasOwnPage?: T;
   name?: T;
+  anonymisedName?: T;
   tagline?: T;
   summary?: T;
   image?: T;
@@ -6175,18 +6167,6 @@ export interface CustomersSelect<T extends boolean = true> {
   since?: T;
   products?: T;
   integrations?: T;
-  anonymisedName?: T;
-  clearance?:
-    | T
-    | {
-        name?: T;
-        logo?: T;
-        quotes?: T;
-        figures?: T;
-        approvedBy?: T;
-        approvedOn?: T;
-        evidence?: T;
-      };
   heroHeading?: T;
   heroSubheading?: T;
   challenge?: T;
@@ -6199,7 +6179,6 @@ export interface CustomersSelect<T extends boolean = true> {
         baseline?: T;
         period?: T;
         source?: T;
-        verified?: T;
         id?: T;
       };
   storySections?:
@@ -6216,7 +6195,6 @@ export interface CustomersSelect<T extends boolean = true> {
         quote?: T;
         person?: T;
         role?: T;
-        cleared?: T;
         id?: T;
       };
   updatedAt?: T;

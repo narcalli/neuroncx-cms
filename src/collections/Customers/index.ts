@@ -3,58 +3,30 @@ import type {
   CollectionAfterReadHook,
   CollectionBeforeOperationHook,
   CollectionConfig,
-  Field,
   Validate,
   Where,
 } from 'payload'
-import { checkbox as validateCheckbox, date as validateDate, text as validateText } from 'payload/shared'
+import { checkbox as validateCheckbox, text as validateText } from 'payload/shared'
 
 import { authenticated } from '../../access/authenticated'
+import { storyLexical } from '../../fields/storyLexical'
 
 /**
  * Customers, with an optional case study page of their own at
  * /customers/[slug]. Replaces the old caseStudies collection.
  *
- * Clearance is enforced here, not only on the website: a visitor (or anyone
- * reading the public REST or GraphQL API) never receives a name, logo,
- * quote or figure that has not been cleared. See stripForVisitors below.
+ * One switch, "Show real name", decides what the public sees. It is enforced
+ * here, not only on the website: with it off, a visitor (or anyone reading
+ * the public REST or GraphQL API) gets the anonymised name and none of the
+ * identifying details. See stripForVisitors below.
  */
-
-const clearanceOptions = [
-  { label: 'Cleared', value: 'cleared' },
-  { label: 'Pending', value: 'pending' },
-  { label: 'Not allowed', value: 'notAllowed' },
-]
-
-const clearanceSelect = (name: string, label: string): Field => ({
-  name,
-  type: 'select',
-  label,
-  required: true,
-  defaultValue: 'pending',
-  options: clearanceOptions,
-})
-
-type Clearance = { name?: string; logo?: string; quotes?: string; figures?: string }
-const anyCleared = (c?: Clearance | null) =>
-  Boolean(c) && ['name', 'logo', 'quotes', 'figures'].some((k) => c?.[k as keyof Clearance] === 'cleared')
-
-// approvedBy and approvedOn are required once anything is cleared. The
-// built-in check still runs first, so maxLength and date format still apply.
-const requiredWhenCleared =
-  (base: Validate, message: string): Validate =>
-  (value, options) => {
-    const builtIn = base(value, options)
-    if (builtIn !== true) return builtIn
-    return anyCleared(options.siblingData as Clearance) && !value ? message : true
-  }
 
 const ownPageRule: Validate = (value, options) => {
   const builtIn = validateCheckbox(value, options as any)
   if (builtIn !== true) return builtIn
-  const data = options.data as { clearance?: Clearance; heroHeading?: string } | undefined
-  if (value && (data?.clearance?.name !== 'cleared' || !data?.heroHeading)) {
-    return "Clear the client's name and add a hero heading before giving this customer its own page."
+  const data = options.data as { showName?: boolean; heroHeading?: string } | undefined
+  if (value && (!data?.showName || !data?.heroHeading)) {
+    return 'Turn on Show real name and add a hero heading before giving this customer its own page.'
   }
   return true
 }
@@ -89,10 +61,9 @@ const publishedAndCurrent: Access = ({ req: { user } }) => {
  */
 export const stripForVisitors = (input: Record<string, any>) => {
   const doc: Record<string, any> = { ...input }
-  const c: Clearance = doc.clearance || {}
   const drop = (...keys: string[]) => keys.forEach((k) => delete doc[k])
 
-  if (c.name !== 'cleared') {
+  if (!doc.showName) {
     doc.name = doc.anonymisedName
     doc.slug = null
     doc.hasOwnPage = false
@@ -100,17 +71,12 @@ export const stripForVisitors = (input: Record<string, any>) => {
     // the organisation even with the name hidden.
     drop('image', 'quotes', 'results', 'locations', 'city', 'description', 'heroHeading', 'heroSubheading', 'challenge', 'approach', 'storySections')
   }
-  if (c.logo !== 'cleared') drop('image')
-  if (c.quotes !== 'cleared') drop('quotes')
-  else if (Array.isArray(doc.quotes)) doc.quotes = doc.quotes.filter((q: any) => q?.cleared)
-  if (c.figures !== 'cleared') drop('results', 'locations')
-  else if (Array.isArray(doc.results)) doc.results = doc.results.filter((r: any) => r?.verified)
 
-  drop('clearance', 'anonymisedName')
+  drop('anonymisedName', 'showName')
   return doc
 }
 
-const clearanceForVisitors: CollectionAfterReadHook = ({ doc, req }) => {
+const realNameForVisitors: CollectionAfterReadHook = ({ doc, req }) => {
   if (req.user || req.payloadAPI === 'local') return doc
   return stripForVisitors(doc)
 }
@@ -119,7 +85,7 @@ const clearanceForVisitors: CollectionAfterReadHook = ({ doc, req }) => {
 // this, /api/customers?where[name][like]=Ovum would return the anonymised
 // entry and so confirm that a client called Ovum exists.
 const PROTECTED = new Set([
-  'name', 'slug', 'anonymisedName', 'clearance', 'city', 'locations', 'description', 'image',
+  'name', 'slug', 'anonymisedName', 'showName', 'city', 'locations', 'description', 'image',
   'quotes', 'results', 'heroHeading', 'heroSubheading', 'challenge', 'approach', 'storySections',
 ])
 const touchesProtected = (where: unknown): boolean => {
@@ -131,14 +97,14 @@ const touchesProtected = (where: unknown): boolean => {
   )
 }
 
-// For visitors: a search on a hidden field only matches customers whose name
-// is cleared, and sorting by a hidden field is ignored.
+// For visitors: a search on a hidden field only matches customers with Show
+// real name on, and sorting by a hidden field is ignored.
 const noInferenceForVisitors: CollectionBeforeOperationHook = ({ args, operation, req }) => {
   if (req.user || req.payloadAPI === 'local' || (operation !== 'read' && operation !== 'count')) return args
   // A lookup by id has neither where nor sort; a list or count may have both.
   const a = args as { where?: Where; sort?: string | string[] }
   if (a.where && touchesProtected(a.where)) {
-    a.where = { and: [a.where, { 'clearance.name': { equals: 'cleared' } }] }
+    a.where = { and: [a.where, { showName: { equals: true } }] }
   }
   if (a.sort) {
     const keys = (Array.isArray(a.sort) ? a.sort : String(a.sort).split(','))
@@ -160,13 +126,13 @@ export const Customers: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'status', 'featured', 'updatedAt'],
+    defaultColumns: ['name', 'status', 'showName', 'featured', 'updatedAt'],
     group: 'Customers',
     description:
-      "Customers and their case studies. A customer's real name, logo, quotes and figures only reach the public site once cleared on the Clearance tab.",
+      "Customers and their case studies. A customer's real name, logo, quotes and figures only reach the public site when Show real name is on.",
   },
   defaultSort: 'order',
-  hooks: { beforeOperation: [noInferenceForVisitors], afterRead: [clearanceForVisitors] },
+  hooks: { beforeOperation: [noInferenceForVisitors], afterRead: [realNameForVisitors] },
   versions: {
     drafts: {
       schedulePublish: true,
@@ -196,6 +162,13 @@ export const Customers: CollectionConfig = {
       admin: { position: 'sidebar' },
     },
     {
+      name: 'showName',
+      type: 'checkbox',
+      label: 'Show real name',
+      defaultValue: false,
+      admin: { position: 'sidebar', description: 'Turn on only when the client has agreed to be named.' },
+    },
+    {
       name: 'sectors',
       type: 'relationship',
       relationTo: 'sectors',
@@ -217,7 +190,7 @@ export const Customers: CollectionConfig = {
       validate: ownPageRule,
       admin: {
         position: 'sidebar',
-        description: 'Gives this customer its own page. Only allowed when the name is cleared.',
+        description: 'Gives this customer its own page. Only allowed when Show real name is on.',
       },
     },
     {
@@ -233,6 +206,16 @@ export const Customers: CollectionConfig = {
               unique: true,
               maxLength: 120,
               admin: { description: "The client's real name." },
+            },
+            {
+              name: 'anonymisedName',
+              type: 'text',
+              required: true,
+              maxLength: 80,
+              admin: {
+                description:
+                  'Shown wherever the name is not cleared. Describe type and scale, not identity, for example: A multi-specialty hospital chain in South India.',
+              },
             },
             { name: 'tagline', type: 'text', maxLength: 60 },
             {
@@ -255,61 +238,16 @@ export const Customers: CollectionConfig = {
         {
           label: 'Profile',
           fields: [
-            { name: 'description', type: 'richText', label: 'About the organisation' },
+            { name: 'description', type: 'richText', label: 'About the organisation', editor: storyLexical },
             { name: 'city', type: 'text', maxLength: 60 },
             {
               name: 'locations',
               type: 'number',
-              admin: { description: 'Number of sites. Hidden unless figures are cleared.' },
+              admin: { description: 'Number of sites. Hidden when Show real name is off.' },
             },
             { name: 'since', type: 'date' },
             { name: 'products', type: 'relationship', relationTo: 'products', hasMany: true, admin: { sortOptions: 'order' } },
             { name: 'integrations', type: 'relationship', relationTo: 'integrations', hasMany: true, admin: { sortOptions: 'order' } },
-          ],
-        },
-        {
-          label: 'Clearance',
-          fields: [
-            {
-              name: 'anonymisedName',
-              type: 'text',
-              required: true,
-              maxLength: 80,
-              admin: {
-                description:
-                  'Shown wherever the name is not cleared. Describe type and scale, not identity, for example: A multi-specialty hospital chain in South India.',
-              },
-            },
-            {
-              name: 'clearance',
-              type: 'group',
-              fields: [
-                clearanceSelect('name', 'Name'),
-                clearanceSelect('logo', 'Logo'),
-                clearanceSelect('quotes', 'Quotes'),
-                clearanceSelect('figures', 'Figures'),
-                {
-                  name: 'approvedBy',
-                  type: 'text',
-                  maxLength: 80,
-                  validate: requiredWhenCleared(validateText as Validate, 'Add who approved this. Required once anything is cleared.'),
-                },
-                {
-                  name: 'approvedOn',
-                  type: 'date',
-                  validate: requiredWhenCleared(validateDate as Validate, 'Add the approval date. Required once anything is cleared.'),
-                },
-                {
-                  name: 'evidence',
-                  type: 'text',
-                  maxLength: 200,
-                  admin: {
-                    description:
-                      'Where the approval is kept, for example: Email from Ovum marketing, 2 Oct 2026. Never paste the email.',
-                  },
-                },
-              ],
-            },
           ],
         },
         {
@@ -318,8 +256,8 @@ export const Customers: CollectionConfig = {
           fields: [
             { name: 'heroHeading', type: 'text', maxLength: 70, admin: whenOwnPage },
             { name: 'heroSubheading', type: 'textarea', maxLength: 200, admin: whenOwnPage },
-            { name: 'challenge', type: 'richText', admin: whenOwnPage },
-            { name: 'approach', type: 'richText', admin: whenOwnPage },
+            { name: 'challenge', type: 'richText', editor: storyLexical, admin: whenOwnPage },
+            { name: 'approach', type: 'richText', editor: storyLexical, admin: whenOwnPage },
             {
               name: 'results',
               type: 'array',
@@ -331,7 +269,6 @@ export const Customers: CollectionConfig = {
                 { name: 'baseline', type: 'text', maxLength: 40 },
                 { name: 'period', type: 'text', maxLength: 40 },
                 { name: 'source', type: 'text', maxLength: 120 },
-                { name: 'verified', type: 'checkbox', defaultValue: false },
               ],
             },
             {
@@ -341,7 +278,7 @@ export const Customers: CollectionConfig = {
               fields: [
                 { name: 'product', type: 'relationship', relationTo: 'products', admin: { sortOptions: 'order' } },
                 { name: 'heading', type: 'text', maxLength: 90 },
-                { name: 'body', type: 'richText' },
+                { name: 'body', type: 'richText', editor: storyLexical },
               ],
             },
             {
@@ -352,7 +289,6 @@ export const Customers: CollectionConfig = {
                 { name: 'quote', type: 'textarea', required: true, maxLength: 400 },
                 { name: 'person', type: 'text', required: true, maxLength: 80 },
                 { name: 'role', type: 'text', maxLength: 100 },
-                { name: 'cleared', type: 'checkbox', defaultValue: false },
               ],
             },
           ],
