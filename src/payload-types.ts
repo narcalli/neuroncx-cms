@@ -283,6 +283,7 @@ export interface Page {
     | PlatformLayersBlock
     | TrustPanelBlock
     | StatBandBlock
+    | IntegrationsLandingBlock
     | WhatsappWidgetBlock
     | FAQBlock
     | PlatformLayersTwoBlock
@@ -4219,27 +4220,13 @@ export interface StatBandBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "WhatsappWidgetBlock".
+ * via the `definition` "IntegrationsLandingBlock".
  */
-export interface WhatsappWidgetBlock {
-  enabled?: boolean | null;
+export interface IntegrationsLandingBlock {
   /**
-   * In E.164 form, e.g. +919876543210. Used to build the chat link; the number itself is not shown on the page.
+   * Leave empty to use the main record (the one with Is main on). The page shows its hero, the integrations by category, its sections, FAQ and closing. Set the page hero to None.
    */
-  phone?: string | null;
-  label?: string | null;
-  /**
-   * What the visitor sends. The page reference is appended to it.
-   */
-  prefill?: string | null;
-  /**
-   * Appends [ref: page-slug] so the enquiry arrives already routed.
-   */
-  includeRef?: boolean | null;
-  /**
-   * For example "Mon–Sat, 9am–7pm IST". Not shown yet; reserved for a panel.
-   */
-  hoursNote?: string | null;
+  master?: (string | null) | IntegrationsMaster;
   /**
    * Keeps the block and its content but removes it from the page.
    */
@@ -4250,181 +4237,7 @@ export interface WhatsappWidgetBlock {
   htmlId?: string | null;
   id?: string | null;
   blockName?: string | null;
-  blockType: 'whatsappWidget';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "FAQBlock".
- */
-export interface FAQBlock {
-  heading: string;
-  /**
-   * Optional. One short paragraph above the list.
-   */
-  intro?: string | null;
-  /**
-   * Keep answers short, roughly 40 to 60 words each. If one needs to run long, it should be the exception, not the pattern.
-   */
-  items: {
-    question: string;
-    answer: {
-      root: {
-        type: string;
-        children: {
-          type: any;
-          version: number;
-          [k: string]: unknown;
-        }[];
-        direction: ('ltr' | 'rtl') | null;
-        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-        indent: number;
-        version: number;
-      };
-      [k: string]: unknown;
-    };
-    defaultOpen?: boolean | null;
-    id?: string | null;
-  }[];
-  background?: ('white' | 'cloud') | null;
-  /**
-   * Optional id for deep linking, e.g. faq
-   */
-  anchorId?: string | null;
-  emitSchema?: boolean | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'faq';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "PlatformLayersTwoBlock".
- */
-export interface PlatformLayersTwoBlock {
-  /**
-   * Short uppercase label above the heading. Optional.
-   */
-  eyebrow?: string | null;
-  heading: string;
-  intro?: string | null;
-  /**
-   * Navy inverts the heading and body text. Cards stay light.
-   */
-  theme?: ('light' | 'navy') | null;
-  /**
-   * Shows the numbered list in the sticky left column on large screens
-   */
-  showIndicators?: boolean | null;
-  /**
-   * Optional. Lets a link such as #platform-stack jump to this block.
-   */
-  anchorId?: string | null;
-  /**
-   * Numbered in the order listed. Three to six layers.
-   */
-  layers: {
-    title: string;
-    /**
-     * Short pill label such as "Unified Ingestion". Optional.
-     */
-    tag?: string | null;
-    /**
-     * One or two sentences, roughly 20 to 35 words
-     */
-    description: string;
-    /**
-     * Small line with a tick icon under the description. Optional.
-     */
-    footnote?: string | null;
-    /**
-     * Optional link shown in the card foot.
-     */
-    link?: {
-      label?: string | null;
-      type?: ('internal' | 'external') | null;
-      page?: (string | null) | Page;
-      url?: string | null;
-    };
-    id?: string | null;
-  }[];
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'platformLayersTwo';
-}
-/**
- * Short product capability descriptions. These appear in the sections on the home page and on the platform pages.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "features".
- */
-export interface Feature {
-  id: string;
-  /**
-   * The name of the capability, as a reader would say it. Keep it under 60 characters.
-   */
-  title: string;
-  /**
-   * Which part of the platform this belongs to. Decides where it appears on the site.
-   */
-  category: 'omnichannel-cx' | 'knowledge-base' | 'user-intelligence' | 'integrations';
-  /**
-   * One or two plain sentences describing what this does for the customer. Shown in listings and on the home page.
-   */
-  summary: string;
-  /**
-   * Optional longer explanation, shown on the feature page itself.
-   */
-  body?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  /**
-   * Optional illustration. Landscape images work best.
-   */
-  image?: (string | null) | Media;
-  /**
-   * Lower numbers appear first within a category.
-   */
-  order?: number | null;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * Enquiries submitted from the website contact form.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "enquiries".
- */
-export interface Enquiry {
-  id: string;
-  name: string;
-  company?: string | null;
-  email: string;
-  mobile?: string | null;
-  message?: string | null;
-  /**
-   * The page the form was submitted from.
-   */
-  sourcePage?: string | null;
-  handled?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
+  blockType: 'integrationsLanding';
 }
 /**
  * Integration landing pages, and the wording shared by every integration item page.
@@ -4673,6 +4486,215 @@ export interface IntegrationsMaster {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "WhatsappWidgetBlock".
+ */
+export interface WhatsappWidgetBlock {
+  enabled?: boolean | null;
+  /**
+   * In E.164 form, e.g. +919876543210. Used to build the chat link; the number itself is not shown on the page.
+   */
+  phone?: string | null;
+  label?: string | null;
+  /**
+   * What the visitor sends. The page reference is appended to it.
+   */
+  prefill?: string | null;
+  /**
+   * Appends [ref: page-slug] so the enquiry arrives already routed.
+   */
+  includeRef?: boolean | null;
+  /**
+   * For example "Mon–Sat, 9am–7pm IST". Not shown yet; reserved for a panel.
+   */
+  hoursNote?: string | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'whatsappWidget';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FAQBlock".
+ */
+export interface FAQBlock {
+  heading: string;
+  /**
+   * Optional. One short paragraph above the list.
+   */
+  intro?: string | null;
+  /**
+   * Keep answers short, roughly 40 to 60 words each. If one needs to run long, it should be the exception, not the pattern.
+   */
+  items: {
+    question: string;
+    answer: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    };
+    defaultOpen?: boolean | null;
+    id?: string | null;
+  }[];
+  background?: ('white' | 'cloud') | null;
+  /**
+   * Optional id for deep linking, e.g. faq
+   */
+  anchorId?: string | null;
+  emitSchema?: boolean | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'faq';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PlatformLayersTwoBlock".
+ */
+export interface PlatformLayersTwoBlock {
+  /**
+   * Short uppercase label above the heading. Optional.
+   */
+  eyebrow?: string | null;
+  heading: string;
+  intro?: string | null;
+  /**
+   * Navy inverts the heading and body text. Cards stay light.
+   */
+  theme?: ('light' | 'navy') | null;
+  /**
+   * Shows the numbered list in the sticky left column on large screens
+   */
+  showIndicators?: boolean | null;
+  /**
+   * Optional. Lets a link such as #platform-stack jump to this block.
+   */
+  anchorId?: string | null;
+  /**
+   * Numbered in the order listed. Three to six layers.
+   */
+  layers: {
+    title: string;
+    /**
+     * Short pill label such as "Unified Ingestion". Optional.
+     */
+    tag?: string | null;
+    /**
+     * One or two sentences, roughly 20 to 35 words
+     */
+    description: string;
+    /**
+     * Small line with a tick icon under the description. Optional.
+     */
+    footnote?: string | null;
+    /**
+     * Optional link shown in the card foot.
+     */
+    link?: {
+      label?: string | null;
+      type?: ('internal' | 'external') | null;
+      page?: (string | null) | Page;
+      url?: string | null;
+    };
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'platformLayersTwo';
+}
+/**
+ * Short product capability descriptions. These appear in the sections on the home page and on the platform pages.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "features".
+ */
+export interface Feature {
+  id: string;
+  /**
+   * The name of the capability, as a reader would say it. Keep it under 60 characters.
+   */
+  title: string;
+  /**
+   * Which part of the platform this belongs to. Decides where it appears on the site.
+   */
+  category: 'omnichannel-cx' | 'knowledge-base' | 'user-intelligence' | 'integrations';
+  /**
+   * One or two plain sentences describing what this does for the customer. Shown in listings and on the home page.
+   */
+  summary: string;
+  /**
+   * Optional longer explanation, shown on the feature page itself.
+   */
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Optional illustration. Landscape images work best.
+   */
+  image?: (string | null) | Media;
+  /**
+   * Lower numbers appear first within a category.
+   */
+  order?: number | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * Enquiries submitted from the website contact form.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "enquiries".
+ */
+export interface Enquiry {
+  id: string;
+  name: string;
+  company?: string | null;
+  email: string;
+  mobile?: string | null;
+  message?: string | null;
+  /**
+   * The page the form was submitted from.
+   */
+  sourcePage?: string | null;
+  handled?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -5062,6 +5084,7 @@ export interface PagesSelect<T extends boolean = true> {
         platformLayers?: T | PlatformLayersBlockSelect<T>;
         trustPanel?: T | TrustPanelBlockSelect<T>;
         statBand?: T | StatBandBlockSelect<T>;
+        integrationsLanding?: T | IntegrationsLandingBlockSelect<T>;
         whatsappWidget?: T | WhatsappWidgetBlockSelect<T>;
         faq?: T | FAQBlockSelect<T>;
         platformLayersTwo?: T | PlatformLayersTwoBlockSelect<T>;
@@ -6409,6 +6432,17 @@ export interface StatBandBlockSelect<T extends boolean = true> {
         id?: T;
       };
   note?: T;
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IntegrationsLandingBlock_select".
+ */
+export interface IntegrationsLandingBlockSelect<T extends boolean = true> {
+  master?: T;
   hidden?: T;
   htmlId?: T;
   id?: T;

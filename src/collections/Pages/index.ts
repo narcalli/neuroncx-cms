@@ -55,6 +55,7 @@ import { ContextEngine } from '../../blocks/ContextEngine/config'
 import { SolutionGrid } from '../../blocks/SolutionGrid/config'
 import { TrustPanel } from '../../blocks/TrustPanel/config'
 import { StatBand } from '../../blocks/StatBand/config'
+import { IntegrationsLanding } from '../../blocks/IntegrationsLanding/config'
 import { withPresentation, withMinimalPresentation } from '@/fields/presentation'
 
 import {
@@ -180,6 +181,7 @@ export const Pages: CollectionConfig<'pages'> = {
                 withMinimalPresentation(PlatformLayers), // test 2: navy stage
                 withMinimalPresentation(TrustPanel), // test 2: navy by design
                 withMinimalPresentation(StatBand), // test 1: crimson, edge to edge
+                withMinimalPresentation(IntegrationsLanding), // test 1: its own light hero, edge to edge
                 // Neither test, but a third case: a fixed overlay. It never
                 // occupies the band, so Highlight cannot reach its ground —
                 // it only remaps the pill's own surfaces, leaving a white-on-
