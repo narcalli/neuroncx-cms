@@ -731,7 +731,7 @@ export interface IntegrationCategory {
    */
   waRowTitle?: string | null;
   /**
-   * Lists the names of this category's live, published integrations, in order, cut to 72 characters on a whole name. It updates when an integration is published, changed, unpublished or deleted. Publishing an integration can therefore save this category as a new published version, so publish or discard any open draft of the category first.
+   * Lists the names of this category's live, published integrations, in order, cut to 70 characters on a whole name. It updates when an integration is published, changed, unpublished or deleted. Publishing an integration can therefore save this category as a new published version, so publish or discard any open draft of the category first.
    */
   waRowDescriptionAuto?: boolean | null;
   /**
@@ -4486,6 +4486,32 @@ export interface IntegrationsMaster {
    * Up to 7 integrations shown around the hero.
    */
   heroSystems?: (string | Integration)[] | null;
+  hero?: {
+    /**
+     * Optional, next to the main button, for example: See Omnichannel CX. Type a label to choose where it goes.
+     */
+    secondaryCta?: {
+      label?: string | null;
+      link?: {
+        type?: ('reference' | 'custom') | null;
+        newTab?: boolean | null;
+        reference?:
+          | ({
+              relationTo: 'pages';
+              value: string | Page;
+            } | null)
+          | ({
+              relationTo: 'posts';
+              value: string | Post;
+            } | null);
+        url?: string | null;
+      };
+    };
+    /**
+     * Optional. An illustration beside the hero, such as the hub diagram.
+     */
+    image?: (string | null) | Media;
+  };
   /**
    * 3 to 5 points, each with a title and one line.
    */
@@ -4558,6 +4584,16 @@ export interface IntegrationsMaster {
         id?: string | null;
       }[]
     | null;
+  closing?: {
+    /**
+     * The closing panel's heading, for example: Tell us what you're running.
+     */
+    heading?: string | null;
+    /**
+     * One or two sentences under the heading.
+     */
+    subheading?: string | null;
+  };
   /**
    * The closing button. Type a label to choose where it goes.
    */
@@ -6810,6 +6846,24 @@ export interface IntegrationsMasterSelect<T extends boolean = true> {
   h1?: T;
   subheading?: T;
   heroSystems?: T;
+  hero?:
+    | T
+    | {
+        secondaryCta?:
+          | T
+          | {
+              label?: T;
+              link?:
+                | T
+                | {
+                    type?: T;
+                    newTab?: T;
+                    reference?: T;
+                    url?: T;
+                  };
+            };
+        image?: T;
+      };
   fiveThings?:
     | T
     | {
@@ -6852,6 +6906,12 @@ export interface IntegrationsMasterSelect<T extends boolean = true> {
         question?: T;
         answer?: T;
         id?: T;
+      };
+  closing?:
+    | T
+    | {
+        heading?: T;
+        subheading?: T;
       };
   cta?:
     | T

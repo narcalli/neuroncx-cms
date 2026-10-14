@@ -170,7 +170,7 @@ export const WhatsappPreview: React.FC = () => {
           </div>
           <div style={{ color: '#667781' }}>
             {catDescription || <Empty what="Category row description is empty" />}
-            <Count value={catDescription} max={72} aim={60} />
+            <Count value={catDescription} max={70} aim={60} />
           </div>
         </div>
         <div style={button}>
@@ -189,7 +189,7 @@ export const WhatsappPreview: React.FC = () => {
           </div>
           <div style={{ color: '#667781' }}>
             {d.rowDescription || <Empty what="Row description is empty" />}
-            <Count value={d.rowDescription} max={72} aim={60} />
+            <Count value={d.rowDescription} max={70} aim={60} />
           </div>
         </div>
 

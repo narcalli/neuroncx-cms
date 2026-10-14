@@ -160,6 +160,32 @@ export const IntegrationsMaster: CollectionConfig = {
               maxRows: 7,
               admin: { description: 'Up to 7 integrations shown around the hero.' },
             },
+            {
+              name: 'hero',
+              type: 'group',
+              label: false,
+              fields: [
+                {
+                  name: 'secondaryCta',
+                  type: 'group',
+                  label: 'Second button',
+                  admin: {
+                    description:
+                      'Optional, next to the main button, for example: See Omnichannel CX. Type a label to choose where it goes.',
+                  },
+                  fields: [{ name: 'label', type: 'text', maxLength: 30 }, linkShownWith('label')],
+                },
+                {
+                  name: 'image',
+                  type: 'upload',
+                  relationTo: 'media',
+                  admin: {
+                    description:
+                      'Optional. An illustration beside the hero, such as the hub diagram.',
+                  },
+                },
+              ],
+            },
           ],
         },
         {
@@ -233,6 +259,28 @@ export const IntegrationsMaster: CollectionConfig = {
         {
           label: 'Closing',
           fields: [
+            {
+              name: 'closing',
+              type: 'group',
+              label: false,
+              fields: [
+                {
+                  name: 'heading',
+                  type: 'text',
+                  maxLength: 70,
+                  admin: {
+                    description:
+                      "The closing panel's heading, for example: Tell us what you're running.",
+                  },
+                },
+                {
+                  name: 'subheading',
+                  type: 'textarea',
+                  maxLength: 200,
+                  admin: { description: 'One or two sentences under the heading.' },
+                },
+              ],
+            },
             {
               name: 'cta',
               type: 'group',

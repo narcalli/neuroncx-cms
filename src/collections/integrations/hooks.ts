@@ -34,7 +34,7 @@ export const fallbackMetaTitle = (subject: string): string => {
 }
 
 /** Names joined with commas, as many whole names as fit in max characters. */
-export const fitNames = (names: string[], max = 72): string => {
+export const fitNames = (names: string[], max = 70): string => {
   let out = ''
   for (const name of names) {
     const next = out ? `${out}, ${name}` : name
@@ -173,7 +173,7 @@ export const itemFallbacks: CollectionBeforeChangeHook = async ({ data, original
   data.meta = meta
 
   if (!cur.waRowTitle && cur.name) data.waRowTitle = cutOnWord(String(cur.name), 24)
-  if (!cur.waRowDescription && cur.summary && String(cur.summary).length <= 72) {
+  if (!cur.waRowDescription && cur.summary && String(cur.summary).length <= 70) {
     data.waRowDescription = cur.summary
   }
 

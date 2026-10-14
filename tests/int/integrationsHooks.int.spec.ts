@@ -26,7 +26,7 @@ describe('integrations helpers', () => {
     expect(long.endsWith(' | NeuronCx')).toBe(true)
   })
 
-  it('fits whole names into 72 characters', () => {
+  it('fits whole names into 70 characters', () => {
     const names = [
       'Exotel',
       'Knowlarity',
@@ -36,8 +36,8 @@ describe('integrations helpers', () => {
       'One more',
     ]
     const text = fitNames(names)
-    expect(text.length).toBeLessThanOrEqual(72)
-    expect(text).toBe('Exotel, Knowlarity, Tata Smartflo, Asttecs, Another long telephony name')
+    expect(text.length).toBeLessThanOrEqual(70)
+    expect(text).toBe('Exotel, Knowlarity, Tata Smartflo, Asttecs')
     expect(fitNames([])).toBe('')
   })
 

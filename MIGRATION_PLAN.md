@@ -124,27 +124,27 @@ Before the cutover, move everything below into the master record, the categories
 
 | Block | Content today | Where it goes |
 | --- | --- | --- |
-| Stat Hero | Eyebrow "Integrations". Headline "Plugged into the systems you already run". Subhead "The assistant reads live availability, writes bookings back, and logs every conversation where your team already works. No second system to keep up to date." Buttons "Submit enquiry" to /contact, "See Omnichannel CX" to /omnichannel-cx | Master: `eyebrow`, `h1`, `subheading`. The second button has no master field yet |
+| Stat Hero | Eyebrow "Integrations". Headline "Plugged into the systems you already run". Subhead "The assistant reads live availability, writes bookings back, and logs every conversation where your team already works. No second system to keep up to date." Buttons "Submit enquiry" to /contact, "See Omnichannel CX" to /omnichannel-cx | Master: `eyebrow`, `h1`, `subheading`. "Submit enquiry" goes in `cta`, "See Omnichannel CX" in `hero.secondaryCta` (`label`, `link`) |
 | Integrations Marquee | Manual list of 12 names: WhatsApp, LeadSquared, DocPulse, Eka Care, Practo, Razorpay, Exotel, Knowlarity, Tata Smartflo, Asttecs, Medics, Zenoti | Master: `heroSystems` (up to 7), from items. WhatsApp, Medics and Zenoti are not integration items yet (integrations.md section 11 lists them as not yet entered) |
 | Integrations, "Messaging channels" | Heading "Where your customers already talk to you", filter by Messaging channels, plus one empty leftover manual row | Category Messaging channels: `hubHeading` |
 | Integrations, "Telephony and dialers" | Heading "Calls on the same record as chats", filter by Telephony and dialers, plus one empty leftover manual row | Category Telephony and dialers: `hubHeading` |
 | Integrations, "CRM and marketing" | Heading "Leads and answers written back where sales works", filter by CRM and marketing | Category CRM and marketing: `hubHeading` |
 | Integrations, "Hospital systems" | Heading "Live doctor availability, bookings and patient records", filter by Hospital systems | Category Hospital systems: `hubHeading` |
 | Integrations, "Booking and operations" | Heading "Third-party bookings brought into the same journeys", filter with no category chosen | Needs a "Booking and operations" category first (integrations.md section 12, step 1), then its `hubHeading` |
-| Closing CTA | Heading "Tell us what you're running". Subhead "If your CRM or HIS isn't listed, it usually still connects, send us the system and we'll tell you what's involved." (it uses an em dash today; rewrite without it). Button "Submit enquiry" to /contact | Master: `cta`. The heading and subhead have no master field; `waFallback` can carry the same idea for WhatsApp |
+| Closing CTA | Heading "Tell us what you're running". Subhead "If your CRM or HIS isn't listed, it usually still connects [em dash] send us the system and we'll tell you what's involved." The [em dash] marks where the page has an em dash; the wording needs rewriting before it moves. Button "Submit enquiry" to /contact | Master: `closing.heading`, `closing.subheading` (after the rewrite) and `cta`. `waFallback` can carry the same idea for WhatsApp |
 
 ### Page `integration` (published, title "Integrations", low impact hero, no SEO title)
 
 | Block | Content today | Where it goes |
 | --- | --- | --- |
-| Hero Right Placement | Eyebrow "Integrations". Headline "Integration with the systems you already run". The same subhead as above. Buttons "Book an integration demo" and "See all integrations" (links not set). An image (media 6accbf98db047676fb5d8146, the hub diagram) | Mostly a duplicate of the page above. The image has no master field yet |
+| Hero Right Placement | Eyebrow "Integrations". Headline "Integration with the systems you already run". The same subhead as above. Buttons "Book an integration demo" and "See all integrations" (links not set). An image (media 6accbf98db047676fb5d8146, the hub diagram) | Mostly a duplicate of the page above. The image goes in `hero.image`. "See all integrations" has no link today, so it does not need to move |
 | Integrations Marquee | Title "Works with the platforms your teams already use." Manual list of 8 names: WhatsApp, LeadSquared, DocPulse, Eka Care, Practo, Razorpay, Exotel, Knowlarity | Covered by `heroSystems` |
 | How It Works | Label "How it works". Heading "Connect once, then every conversation keeps your systems current". Intro "Your team keeps working in the tools it knows. NeuronCx sits between them and WhatsApp." Steps: 1 "Connect each system once": By API, webhook or a native connector, set up with your team. 2 "Conversations read and write": The assistant checks live data before it answers, and writes back what the customer chose. 3 "Every event lands on the record": Bookings, calls, payments and status changes all sit on the same customer history. Button to /contact | Master: `fiveThings` (3 to 5 rows of title and line) |
 | Integrations, "Messaging channels" | Heading "Where your customers already talk to you", plus one manual row "WhatsApp Business Platform" | Category `hubHeading`; WhatsApp Business Platform becomes an item |
 | Integrations, "Telephony and dialers" | Heading "Calls on the same record as chats" | Category `hubHeading` |
 | Integrations, "CRM and Marketing" | No heading | Nothing to move |
 
-Gaps to decide before the cutover: a second hero button, the closing heading and subhead, and the hero image have no field on the master record.
+Every part of both pages now has a field on the master record, a category or an item. Still to do before the cutover: rewrite the closing subhead without its em dash, create the "Booking and operations" category, and enter WhatsApp Business Platform, Medics and Zenoti as items if they should appear.
 
 ## Order
 

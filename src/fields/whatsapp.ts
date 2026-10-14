@@ -70,7 +70,8 @@ export const whatsappTab = (opts: WhatsappTabOptions = {}): Tab => {
       name: 'waRowDescription',
       type: 'text',
       label: 'Row description (list menu)',
-      maxLength: 72,
+      // WhatsApp allows 72; the NCX dashboard's list description allows 70.
+      maxLength: 70,
       validate: plainText,
       admin: { description: 'Aim for 60 characters.' },
     },

@@ -2,9 +2,11 @@
 import { Button, useForm, useFormFields } from '@payloadcms/ui'
 import React, { useState } from 'react'
 
+import { cutLine } from './cutLine'
+
 /**
  * "Fill from status flow": turns up to 5 What moves rows into WhatsApp key
- * points, as "<event>: <what happens>" cut to 60 characters. It only fills
+ * points, as "<event>: <what happens>", cut to 60 characters by cutLine.ts. It only fills
  * empty key point rows, then adds rows up to the limit of 5. It never
  * changes a line an editor has written, and skips lines already there.
  */
@@ -13,14 +15,6 @@ const MAX_ROWS = 5
 const MAX_LINE = 60
 
 const text = (v: unknown) => (typeof v === 'string' ? v.trim() : '')
-
-// Cut to max characters on a whole word, or hard when one word is too long.
-const cut = (s: string, max: number) => {
-  if (s.length <= max) return s
-  const part = s.slice(0, max + 1)
-  const space = part.lastIndexOf(' ')
-  return (space > 0 ? part.slice(0, space) : s.slice(0, max)).replace(/[\s,:;.]+$/, '')
-}
 
 export const FillKeyPoints: React.FC = () => {
   const { addFieldRow, dispatchFields, setModified } = useForm()
@@ -47,7 +41,7 @@ export const FillKeyPoints: React.FC = () => {
     const have = new Set(points.filter(Boolean).map((p) => p.toLowerCase()))
     const lines = flow
       .filter((r) => r.event && r.whatHappens)
-      .map((r) => cut(`${r.event}: ${r.whatHappens}`, MAX_LINE))
+      .map((r) => cutLine(`${r.event}: ${r.whatHappens}`, MAX_LINE))
       .filter((line) => !have.has(line.toLowerCase()))
 
     if (!lines.length) {
