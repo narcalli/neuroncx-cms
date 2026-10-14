@@ -2,7 +2,7 @@
 collection: integrations
 payload_slug: integrations
 config_file: src/collections/Integrations.ts
-own_page_route: /integrations/[slug] (not built yet)
+own_page_route: /integrations/[slug] (website src/app/(frontend)/integrations/[slug]/page.tsx)
 shared_groups: see fields_reference.md
 schema_checked: 14 Oct 2026, after the integrations restructure (main 817d27e) and the audit fixes
 ---
@@ -165,13 +165,13 @@ Integrations are not watched by the RAG pipeline yet. `with-rag.ts` is applied t
 | Integrations Marquee block | Same modes. Limit 4 to 40. Renders nothing if fewer than 4 entries match |
 | Partner Strip block | Same modes for its platforms list, limit 1 to 8. Its standards badges stay typed on the block |
 | /integrations page | One Integrations block per category, each set to filter |
-| /integrations/[slug] | Not built. Only entries in section 4's "own page" row |
+| /integrations/[slug] | Only entries in section 4's "own page" row; any other slug is a 404. Sections: hero with At a glance, What moves, Example, Edge cases, Setup, FAQ (with FAQ markup), Related, closing. Headings: the entry's Section headings, else the main master record's Item page labels |
 | WhatsApp menus | Once the WhatsApp group is added |
 | Knowledge base | Once the knowledge base group is added and the collection is watched |
 
 In collection modes, visitors only ever see published, live entries, sorted by `order` then `name`. The picking logic lives in the website's `src/utilities/integrations.ts`.
 
-Integration cards don't link anywhere today. The site's link component only understands pages and posts, so linking to an integration page needs adding there and in the Integrations block.
+Cards in the Integrations block link to an entry's own page when it has one. Other places that show integrations (the marquee, the partner strip, customer pages) don't link yet, and the site's link component still only understands pages and posts.
 
 ## 9. SEO
 
@@ -240,7 +240,7 @@ In this order:
 3. **Build the shared groups** in `src/fields/` from `fields_reference.md`, then move integrations onto them. `slug` becomes required, so fill slugs for existing entries first. `logo` moves to `image`.
 4. **Add the SEO plugin fields** to integrations.
 5. **Build the Guide tab, the rich text blocks and the Related tab.**
-6. **Build `/integrations/[slug]`** on the website, add integration links to the link component and the Integrations block, and serve pages only per section 4.
+6. ~~Build `/integrations/[slug]`~~ (built 14 Oct 2026, with Integrations block links). Still to do: integration links in the link component, the marquee, the partner strip and customer pages, and in the sitemap.
 7. **Fix the sitemap** so it includes pages, posts, case studies and integration pages (see note below).
 8. **Add redirects** from the old LeadSquared and DocPulse URLs once their new pages exist.
 9. **Add the WhatsApp and knowledge base groups**, and add integrations to `src/rag/sources.ts`.
