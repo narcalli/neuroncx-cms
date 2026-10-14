@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url'
 import { Categories } from './collections/Categories'
 import { Customers } from './collections/Customers'
 import { Integrations } from './collections/Integrations'
+import { IntegrationsMaster } from './collections/IntegrationsMaster'
 import { ConnectionTypes, IntegrationCategories, Products } from './collections/IntegrationTaxonomies'
 import { Sectors } from './collections/Sectors'
 import { Enquiries } from './collections/Enquiries'
@@ -58,6 +59,7 @@ export default buildConfig({
     Enquiries,
     Sectors,
     Customers,
+    IntegrationsMaster,
     Integrations,
     IntegrationCategories,
     ConnectionTypes,
