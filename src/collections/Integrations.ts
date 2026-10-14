@@ -14,7 +14,7 @@ import {
   itemSlugRule,
   requiredForOwnPage,
 } from './integrations/hooks'
-import { integrationSeoTab } from './integrations/seo'
+import { integrationSeoTab, seoCheckField } from './integrations/seo'
 
 // Visitors only ever get entries that are both published and Live. Drafts,
 // Pilot and Planned stay visible to logged-in editors only. Relationships
@@ -115,7 +115,42 @@ const sidebar: Field[] = [
         'Gives this integration a page at /integrations/<slug>. The Page tab appears while this is on. Publishing then needs a slug, a hero heading and an SEO title and description.',
     },
   },
+  seoCheckField('item'),
 ]
+
+// The WhatsApp tab, with the preview at the top and the "Fill from status
+// flow" button just above the key points.
+const whatsapp = (() => {
+  const tab = whatsappTab({
+    buttonActions: [
+      { label: 'Book a demo', value: 'bookDemo' },
+      { label: 'Other systems', value: 'otherSystems' },
+      { label: 'Talk to sales', value: 'talkToSales' },
+      { label: 'Open the page', value: 'openPage' },
+    ],
+    headerType: true,
+    linkLabel: true,
+    linkSetByHook:
+      'Set automatically: /integrations/<slug> when Own page is on, otherwise /integrations#<slug>. Empty while there is no slug.',
+  })
+  const fields = [...tab.fields]
+  const keyPoints = fields.findIndex((f) => 'name' in f && f.name === 'waKeyPoints')
+  fields.splice(keyPoints, 0, {
+    name: 'fillKeyPoints',
+    type: 'ui',
+    admin: {
+      components: { Field: '@/collections/integrations/admin/FillKeyPoints#FillKeyPoints' },
+    },
+  })
+  fields.unshift({
+    name: 'whatsappPreview',
+    type: 'ui',
+    admin: {
+      components: { Field: '@/collections/integrations/admin/WhatsappPreview#WhatsappPreview' },
+    },
+  })
+  return { ...tab, fields }
+})()
 
 const cardTab = {
   label: 'Card',
@@ -398,18 +433,7 @@ export const Integrations: CollectionConfig = {
         setupTab,
         exampleTab,
         faqTab(),
-        whatsappTab({
-          buttonActions: [
-            { label: 'Book a demo', value: 'bookDemo' },
-            { label: 'Other systems', value: 'otherSystems' },
-            { label: 'Talk to sales', value: 'talkToSales' },
-            { label: 'Open the page', value: 'openPage' },
-          ],
-          headerType: true,
-          linkLabel: true,
-          linkSetByHook:
-            'Set automatically: /integrations/<slug> when Own page is on, otherwise /integrations#<slug>. Empty while there is no slug.',
-        }),
+        whatsapp,
         kbaseTab(),
       ],
     },

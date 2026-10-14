@@ -1,4 +1,4 @@
-import type { Tab } from 'payload'
+import type { Tab, UIField } from 'payload'
 import {
   MetaDescriptionField,
   MetaImageField,
@@ -8,6 +8,24 @@ import {
 } from '@payloadcms/plugin-seo/fields'
 
 import { requiredForOwnPage } from './hooks'
+
+/**
+ * The SEO check panel for the sidebar (admin/SeoCheck.tsx): where the
+ * primary keyword appears, with live character counts. Read only.
+ */
+export const seoCheckField = (mode: 'item' | 'master'): UIField => ({
+  name: 'seoCheck',
+  type: 'ui',
+  admin: {
+    position: 'sidebar',
+    components: {
+      Field: {
+        path: '@/collections/integrations/admin/SeoCheck#SeoCheck',
+        clientProps: { mode },
+      },
+    },
+  },
+})
 
 /**
  * The SEO tab for integration items and the integrations master: keywords,

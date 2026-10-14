@@ -731,7 +731,7 @@ export interface IntegrationCategory {
    */
   waRowTitle?: string | null;
   /**
-   * Lists the names of this category's live, published integrations, in order, cut to 72 characters on a whole name. It updates when an integration is published, changed, unpublished or deleted.
+   * Lists the names of this category's live, published integrations, in order, cut to 72 characters on a whole name. It updates when an integration is published, changed, unpublished or deleted. Publishing an integration can therefore save this category as a new published version, so publish or discard any open draft of the category first.
    */
   waRowDescriptionAuto?: boolean | null;
   /**

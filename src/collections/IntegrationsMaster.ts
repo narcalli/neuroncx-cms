@@ -7,7 +7,7 @@ import { kbaseTab } from '../fields/kbase'
 import { link } from '../fields/link'
 import { plainText } from '../fields/validators/plainText'
 import { masterOneMain, masterSlugRule, onlyNameToken } from './integrations/hooks'
-import { integrationSeoTab } from './integrations/seo'
+import { integrationSeoTab, seoCheckField } from './integrations/seo'
 
 /**
  * Integrations master: the landing pages for integrations, such as the main
@@ -95,6 +95,7 @@ const sidebar: Field[] = [
       },
     ],
   },
+  seoCheckField('master'),
 ]
 
 export const IntegrationsMaster: CollectionConfig = {
