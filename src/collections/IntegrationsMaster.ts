@@ -38,6 +38,16 @@ const label = (name: string, title: string, example: string): Field => ({
   admin: { description: `For example: ${example}` },
 })
 
+// An optional heading for a section. Left empty, the page shows the default.
+const sectionHeading = (name: string, title: string, fallback: string, maxLength = 70): Field => ({
+  name,
+  type: 'text',
+  label: title,
+  maxLength,
+  validate: plainText,
+  admin: { placeholder: fallback, description: `Leave empty to show: ${fallback}` },
+})
+
 const sidebar: Field[] = [
   {
     name: 'name',
@@ -191,6 +201,11 @@ export const IntegrationsMaster: CollectionConfig = {
         {
           label: 'Sections',
           fields: [
+            sectionHeading(
+              'fiveThingsHeading',
+              'Five things heading',
+              'What connecting your systems gives you',
+            ),
             {
               name: 'fiveThings',
               type: 'array',
@@ -204,6 +219,11 @@ export const IntegrationsMaster: CollectionConfig = {
                 { name: 'line', type: 'text', required: true, maxLength: 140 },
               ],
             },
+            sectionHeading(
+              'whenFeedsGoWrongHeading',
+              'When feeds go wrong heading',
+              'When feeds go wrong',
+            ),
             {
               name: 'whenFeedsGoWrong',
               type: 'array',
@@ -232,6 +252,14 @@ export const IntegrationsMaster: CollectionConfig = {
               fields: [
                 { name: 'heading', type: 'text', maxLength: 60 },
                 { name: 'line', type: 'text', maxLength: 140 },
+                {
+                  ...sectionHeading('buttonLabel', 'Button text', 'Get in touch', 30),
+                  admin: {
+                    placeholder: 'Get in touch',
+                    description: 'Leave empty to show: Get in touch',
+                    condition: (_: unknown, siblingData: any) => Boolean(siblingData?.heading),
+                  },
+                } as Field,
                 linkShownWith('heading'),
               ],
             },
@@ -255,7 +283,7 @@ export const IntegrationsMaster: CollectionConfig = {
             },
           ],
         },
-        faqTab(),
+        faqTab({ headingFallback: 'Questions about integrations' }),
         {
           label: 'Closing',
           fields: [

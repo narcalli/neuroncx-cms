@@ -4327,6 +4327,10 @@ export interface IntegrationsMaster {
     image?: (string | null) | Media;
   };
   /**
+   * Leave empty to show: What connecting your systems gives you
+   */
+  fiveThingsHeading?: string | null;
+  /**
    * 3 to 5 points, each with a title and one line.
    */
   fiveThings?:
@@ -4336,6 +4340,10 @@ export interface IntegrationsMaster {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Leave empty to show: When feeds go wrong
+   */
+  whenFeedsGoWrongHeading?: string | null;
   /**
    * Common failures and what NeuronCx does, for example: The vendor stops sending updates.
    */
@@ -4352,6 +4360,10 @@ export interface IntegrationsMaster {
   apiCard?: {
     heading?: string | null;
     line?: string | null;
+    /**
+     * Leave empty to show: Get in touch
+     */
+    buttonLabel?: string | null;
     link?: {
       type?: ('reference' | 'custom') | null;
       newTab?: boolean | null;
@@ -4385,6 +4397,10 @@ export interface IntegrationsMaster {
      */
     related?: string | null;
   };
+  /**
+   * Leave empty to show: Questions about integrations
+   */
+  faqHeading?: string | null;
   /**
    * Up to 6. Questions phrased the way a buyer would ask them.
    */
@@ -6899,6 +6915,7 @@ export interface IntegrationsMasterSelect<T extends boolean = true> {
             };
         image?: T;
       };
+  fiveThingsHeading?: T;
   fiveThings?:
     | T
     | {
@@ -6906,6 +6923,7 @@ export interface IntegrationsMasterSelect<T extends boolean = true> {
         line?: T;
         id?: T;
       };
+  whenFeedsGoWrongHeading?: T;
   whenFeedsGoWrong?:
     | T
     | {
@@ -6918,6 +6936,7 @@ export interface IntegrationsMasterSelect<T extends boolean = true> {
     | {
         heading?: T;
         line?: T;
+        buttonLabel?: T;
         link?:
           | T
           | {
@@ -6935,6 +6954,7 @@ export interface IntegrationsMasterSelect<T extends boolean = true> {
         setup?: T;
         related?: T;
       };
+  faqHeading?: T;
   faqs?:
     | T
     | {

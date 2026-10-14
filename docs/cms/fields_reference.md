@@ -105,6 +105,7 @@ A collection may replace the fixed sections with its own page fields when it nee
 
 | Field | Type | Hard cap | Notes |
 |---|---|---|---|
+| `faqHeading` | text | 70 | Optional, only where the page shows a heading (`faqTab({ headingFallback })`; Integrations master). Empty shows the fallback |
 | `faqs` | array of `question` (120) + `answer` (600, plain text) | | Up to 6 |
 
 Used for the FAQ section and FAQPage structured data on the web page, and indexed for the knowledge base. Answers are plain text so the bot can use them as they are.

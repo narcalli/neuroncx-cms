@@ -60,7 +60,7 @@ Both: `name` (60), `slug` (60), `order`, drafts on, visitors read published entr
 
 Landing pages and the wording shared by item pages. One record has `isMain` on, and item pages read their headings from it. Visitors read published records.
 
-Sidebar: `name`, `slug` (checked against item slugs), `isMain`, `filter` (`categories`, `products`), SEO check panel. Tabs: SEO (as on items), Hero (`eyebrow` 40, `h1` 70 required, `subheading` 200, `heroSystems` up to 7, `hero.secondaryCta`, `hero.image`), Sections (`fiveThings`, `whenFeedsGoWrong`, `apiCard`), Item page labels (`labels.statusTable`, `edgeCases`, `setup`, `related`, 70 each, `{name}` only), FAQ, Closing (`closing.heading` 70, `closing.subheading` 200, `cta`), WhatsApp (`waIntro` 1024, `waListButton` 20, `waSectionTitle` 24, `waFallback` 300), Knowledge base.
+Sidebar: `name`, `slug` (checked against item slugs), `isMain`, `filter` (`categories`, `products`), SEO check panel. Tabs: SEO (as on items), Hero (`eyebrow` 40, `h1` 70 required, `subheading` 200, `heroSystems` up to 7, `hero.secondaryCta`, `hero.image`), Sections (`fiveThingsHeading` 70, `fiveThings`, `whenFeedsGoWrongHeading` 70, `whenFeedsGoWrong`, `apiCard` with `buttonLabel` 30), Item page labels (`labels.statusTable`, `edgeCases`, `setup`, `related`, 70 each, `{name}` only), FAQ (`faqHeading` 70, then `faqs`), Closing (`closing.heading` 70, `closing.subheading` 200, `cta`), WhatsApp (`waIntro` 1024, `waListButton` 20, `waSectionTitle` 24, `waFallback` 300), Knowledge base.
 
 ## 3. Target design, using the shared groups
 

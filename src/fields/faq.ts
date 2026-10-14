@@ -7,9 +7,25 @@ import { plainText } from './validators/plainText'
  * and FAQPage structured data, and the knowledge base. Answers are plain
  * text so the bot can use them as they are.
  */
-export const faqTab = (): Tab => ({
+export const faqTab = (opts: { headingFallback?: string } = {}): Tab => ({
   label: 'FAQ',
   fields: [
+    // Optional section heading, for records whose page shows one.
+    ...(opts.headingFallback
+      ? [
+          {
+            name: 'faqHeading',
+            type: 'text' as const,
+            label: 'FAQ heading',
+            maxLength: 70,
+            validate: plainText,
+            admin: {
+              placeholder: opts.headingFallback,
+              description: `Leave empty to show: ${opts.headingFallback}`,
+            },
+          },
+        ]
+      : []),
     {
       name: 'faqs',
       type: 'array',
