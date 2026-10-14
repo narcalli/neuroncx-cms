@@ -1,4 +1,5 @@
-import type { Field, FieldHook } from 'payload'
+import type { Field, FieldHook, Validate } from 'payload'
+import { select as validateSelect } from 'payload/shared'
 
 /**
  * The "Show" switch shared by every block that lists integrations
@@ -19,7 +20,11 @@ export const showWhenManual = (_: unknown, siblingData: { populateBy?: SourceMod
   sourceMode(siblingData) === 'manual'
 
 const idOf = (v: unknown): string | null =>
-  typeof v === 'string' ? v : v && typeof v === 'object' && 'id' in v ? String((v as { id: unknown }).id) : null
+  typeof v === 'string'
+    ? v
+    : v && typeof v === 'object' && 'id' in v
+      ? String((v as { id: unknown }).id)
+      : null
 
 // Visitors never get a hand-picked entry that is unpublished or not Live: it
 // is dropped from the list, not shown. Logged-in editors see the list as
@@ -30,12 +35,17 @@ const idOf = (v: unknown): string | null =>
 // reads a page and writes it back would otherwise drop the hidden entries
 // for good.
 const onlyLiveForVisitors: FieldHook = async ({ value, req }) => {
-  if (req.user || req.payloadAPI === 'local' || !Array.isArray(value) || value.length === 0) return value
+  if (req.user || req.payloadAPI === 'local' || !Array.isArray(value) || value.length === 0)
+    return value
   const ids = value.map(idOf).filter((id): id is string => Boolean(id))
   const live = await req.payload.find({
     collection: 'integrations',
     where: {
-      and: [{ id: { in: ids } }, { _status: { equals: 'published' } }, { status: { equals: 'live' } }],
+      and: [
+        { id: { in: ids } },
+        { _status: { equals: 'published' } },
+        { status: { equals: 'live' } },
+      ],
     },
     depth: 0,
     limit: ids.length,
@@ -54,12 +64,25 @@ const onlyLiveForVisitors: FieldHook = async ({ value, req }) => {
  * The switch and its settings, to sit just before the block's typed list.
  * limit sets the "How many" range for All and Filter.
  */
+// "Filter" with nothing chosen would filter on nothing and list every live
+// integration under the block's heading, so it needs a category or product.
+const filterNeedsAChoice: Validate = (value, options) => {
+  const builtIn = validateSelect(value as any, options as any)
+  if (builtIn !== true) return builtIn
+  if (value !== 'filter') return true
+  const sibling = (options.siblingData || {}) as { categories?: unknown[]; products?: unknown[] }
+  return (sibling.categories?.length || 0) + (sibling.products?.length || 0) > 0
+    ? true
+    : 'Choose at least one category or product to filter by, or switch to All live integrations.'
+}
+
 export const integrationSourceFields = (limit: { min: number; max: number }): Field[] => [
   {
     name: 'populateBy',
     type: 'select',
     label: 'Show',
     defaultValue: 'manual',
+    validate: filterNeedsAChoice,
     options: [
       { label: 'All live integrations', value: 'all' },
       { label: 'Filter by category or product', value: 'filter' },
@@ -75,7 +98,10 @@ export const integrationSourceFields = (limit: { min: number; max: number }): Fi
     relationTo: 'integrationCategories',
     hasMany: true,
     label: 'Categories',
-    admin: { sortOptions: 'order', condition: (_, siblingData) => sourceMode(siblingData) === 'filter' },
+    admin: {
+      sortOptions: 'order',
+      condition: (_, siblingData) => sourceMode(siblingData) === 'filter',
+    },
   },
   {
     name: 'products',
@@ -83,7 +109,10 @@ export const integrationSourceFields = (limit: { min: number; max: number }): Fi
     relationTo: 'products',
     hasMany: true,
     label: 'Products',
-    admin: { sortOptions: 'order', condition: (_, siblingData) => sourceMode(siblingData) === 'filter' },
+    admin: {
+      sortOptions: 'order',
+      condition: (_, siblingData) => sourceMode(siblingData) === 'filter',
+    },
   },
   {
     name: 'featuredOnly',

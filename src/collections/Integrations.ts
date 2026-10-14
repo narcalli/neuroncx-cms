@@ -333,6 +333,13 @@ const setupTab = {
       },
       fields: checklistFields(),
     },
+    {
+      // Set by the prefill hook: the connection type the checklist was last
+      // filled from, so a checklist the editor cleared stays clear.
+      name: 'setupChecklistSource',
+      type: 'text',
+      admin: { hidden: true },
+    },
   ] as Field[],
 }
 

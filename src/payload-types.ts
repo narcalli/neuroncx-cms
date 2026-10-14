@@ -983,6 +983,7 @@ export interface Integration {
         id?: string | null;
       }[]
     | null;
+  setupChecklistSource?: string | null;
   /**
    * A short example conversation, up to 8 messages. Demo-tenant details only.
    */
@@ -7039,6 +7040,7 @@ export interface IntegrationsSelect<T extends boolean = true> {
         providedBy?: T;
         id?: T;
       };
+  setupChecklistSource?: T;
   chatExample?:
     | T
     | {

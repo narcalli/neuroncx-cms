@@ -8,6 +8,8 @@ import type {
 import { ValidationError } from 'payload'
 import { text as validateText, textarea as validateTextarea } from 'payload/shared'
 
+import { plainTextProblem } from '../../fields/validators/plainText'
+
 /**
  * Hooks and checks for the Integrations section: integration items, their
  * categories and the integrations master records.
@@ -101,29 +103,41 @@ const refreshCategories = async (req: PayloadRequest, ids: (string | null)[]) =>
       if (!category?.waRowDescriptionAuto) continue
       const text = fitNames(await liveNamesInCategory(req, id))
       if (text === (category.waRowDescription || '')) continue
-      // The stored status, read past Payload's read hooks: those fill a
-      // missing _status with its default, draft, for categories saved
-      // before drafts were turned on.
-      const stored = (await req.payload.db.findOne({
-        collection: 'integrationCategories',
-        where: { id: { equals: id } },
-        req,
-      })) as Doc | null
+      // Written through the database adapter, not payload.update. This runs
+      // inside the integration's own save (its database transaction in
+      // production). A full Payload update that failed there would abort that
+      // transaction and so the integration's save, whatever the catch below
+      // does. The adapter write runs no validation and no hooks, so it cannot
+      // fail on a rule, cannot start another refresh, leaves the category's
+      // status as it is, and adds no new version.
       req.context[REFRESH_FLAG] = true
       try {
-        await req.payload.update({
+        await req.payload.db.updateOne({
           collection: 'integrationCategories',
-          id,
-          // Keep the category as it is: a draft stays a draft, and anything
-          // else is published. Without _status, a category saved before
-          // drafts existed would take the default, draft, and drop off the site.
-          data: {
-            waRowDescription: text,
-            _status: stored?._status === 'draft' ? 'draft' : 'published',
-          },
-          overrideAccess: true,
+          where: { id: { equals: id } },
+          data: { waRowDescription: text },
+          returning: false,
           req,
         })
+        // The admin shows a category's latest saved version, so that gets
+        // the same text. If an editor has an open draft, the draft gets it.
+        const latest = await req.payload.db.findVersions({
+          collection: 'integrationCategories',
+          where: { and: [{ parent: { equals: id } }, { latest: { equals: true } }] },
+          limit: 1,
+          pagination: false,
+          req,
+        })
+        const version = latest.docs[0] as Doc | undefined
+        if (version) {
+          await req.payload.db.updateVersion({
+            collection: 'integrationCategories',
+            id: version.id,
+            versionData: { ...version, version: { ...version.version, waRowDescription: text } },
+            returning: false,
+            req,
+          })
+        }
       } finally {
         delete req.context[REFRESH_FLAG]
       }
@@ -172,8 +186,18 @@ export const itemFallbacks: CollectionBeforeChangeHook = async ({ data, original
   if (!meta.description && cur.summary) meta.description = cur.summary
   data.meta = meta
 
-  if (!cur.waRowTitle && cur.name) data.waRowTitle = cutOnWord(String(cur.name), 24)
-  if (!cur.waRowDescription && cur.summary && String(cur.summary).length <= 70) {
+  // WhatsApp fields are plain text. A name or summary that is not is left
+  // out, so a publish never fails on a field the editor did not type.
+  if (!cur.waRowTitle && cur.name) {
+    const title = cutOnWord(String(cur.name), 24)
+    if (!plainTextProblem(title)) data.waRowTitle = title
+  }
+  if (
+    !cur.waRowDescription &&
+    cur.summary &&
+    String(cur.summary).length <= 70 &&
+    !plainTextProblem(String(cur.summary))
+  ) {
     data.waRowDescription = cur.summary
   }
 
@@ -183,9 +207,16 @@ export const itemFallbacks: CollectionBeforeChangeHook = async ({ data, original
       : `/integrations#${cur.slug}`
     : null
 
+  // Prefill once per connection type: setupChecklistSource remembers which
+  // connection type the checklist was last filled from. An editor who clears
+  // the checklist keeps it clear; changing the connection fills it again.
   const connection = idOf(cur.connection)
   const checklist = cur.setupChecklist
-  if (connection && (!Array.isArray(checklist) || checklist.length === 0)) {
+  if (
+    connection &&
+    connection !== cur.setupChecklistSource &&
+    (!Array.isArray(checklist) || checklist.length === 0)
+  ) {
     const type = (await req.payload.findByID({
       collection: 'connectionTypes',
       id: connection,
@@ -199,6 +230,7 @@ export const itemFallbacks: CollectionBeforeChangeHook = async ({ data, original
         item: row.item,
         providedBy: row.providedBy,
       }))
+      data.setupChecklistSource = connection
     }
   }
 
