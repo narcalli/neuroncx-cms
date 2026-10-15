@@ -38,7 +38,7 @@ Settings: `useAsTitle: name`, list columns name, category, status, featured, `de
 | Sidebar | `status` (live, pilot, planned; default live), `category` (required), `connection`, `products`, `featured`, `order`, `slug` (60, unique, checked against master slugs), `hasOwnPage`, SEO check panel |
 | Card tab | `logo`, `tagline` (60, aim 45), `summary` (120), `glance` (3 to 4: `title` 40, `line` 60) |
 | SEO tab | `primaryKeyword` (60), `secondaryKeywords` (up to 5, `keyword` 60), `meta.title` (60), `meta.description` (155), `meta.image` |
-| Page tab, shown with Own page on | `heroHeading` (70), `heroSubheading` (200), `cta` (`label` 30, `link`), `related` (up to 3), `headingOverrides` (`statusTable`, `edgeCases`, `setup`, `related`, 70 each) |
+| Page tab, shown with Own page on | `heroHeading` (70), `heroSubheading` (200), `cta` (`label` 30, `link`), `showClosing` (checkbox, default on; off hides the closing panel), `related` (up to 3), `headingOverrides` (`statusTable`, `edgeCases`, `setup`, `related`, 70 each) |
 | What moves tab | `statusFlow` (`event` 40, `inPartner` 40, `whatHappens` 120) |
 | Edge cases tab | `edgeCases` (`situation` 80, `whatWeDo` 160) |
 | Setup tab | `setupChecklist` (`item` 80, `providedBy`: you, neuroncx, partner) |
