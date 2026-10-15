@@ -16,6 +16,15 @@ const hashOf = (s: string) => createHash('sha256').update(s).digest('hex').slice
 
 type Result = { sent: number; unchanged: number; archived: number }
 
+/**
+ * How long one job may spend sending before it stops and lets a retry carry
+ * on. The job runner on Amplify is an HTTP request with a hard timeout; a job
+ * cut off mid-way would stay "processing" and never finish. Sections already
+ * sent are recorded as they go, so the retry skips them.
+ */
+const DEFAULT_BUDGET_MS = 20_000
+const budgetMs = () => Number(process.env.NCX_SYNC_BUDGET_MS) || DEFAULT_BUDGET_MS
+
 const findMappings = async (payload: BasePayload, collection: string, id: string) => {
   const res = await payload.find({
     collection: MAPPINGS,
@@ -78,10 +87,18 @@ export const purgeDoc = async (
   return { sent: 0, unchanged: 0, archived }
 }
 
+/**
+ * Brings NCX in line with what a visitor sees right now: sends changed
+ * sections of the published document, and archives everything if it is not
+ * published, hidden, or deleted. Every hook queues this, never a bare purge,
+ * so saving a draft of a live page leaves NCX as it is.
+ */
 export const syncDoc = async (
   payload: BasePayload,
   { collection, id }: { collection: string; id: string; locale?: string },
+  opts: { budgetMs?: number } = {},
 ): Promise<Result> => {
+  const deadline = Date.now() + (opts.budgetMs ?? budgetMs())
   const source = ragSources[collection]
   if (!source) return { sent: 0, unchanged: 0, archived: 0 }
 
@@ -90,8 +107,9 @@ export const syncDoc = async (
     return { sent: 0, unchanged: 0, archived: 0 }
   }
 
-  const doc = await loadDoc(payload, collection, id)
-  if (!doc || !source.shouldIndex(doc)) return purgeDoc(payload, { collection, id })
+  const saved = await loadDoc(payload, collection, id)
+  if (!saved || !source.shouldIndex(saved)) return purgeDoc(payload, { collection, id })
+  const doc = source.prepare ? source.prepare(saved) : saved
 
   const docTitle = String(source.titleOf(doc) || '').trim() || 'NeuronCX'
   const path = source.urlOf(doc)
@@ -106,10 +124,13 @@ export const syncDoc = async (
   let unchanged = 0
   let needsRetry = false
 
+  let outOfTime = false
+
   for (const section of sections) {
     const key = `${collection}:${id}:${section.key}`
     const prev = existing.get(key)
     existing.delete(key)
+    if (outOfTime) continue
 
     const sameAsTitle = section.heading.trim().toLowerCase() === docTitle.toLowerCase()
     const title = (sameAsTitle ? docTitle : `${docTitle} | ${section.heading}`).slice(0, 250)
@@ -121,6 +142,11 @@ export const syncDoc = async (
 
     if (prev?.pcmId && !prev.archived && prev.hash === hash) {
       unchanged++
+      continue
+    }
+
+    if (Date.now() > deadline) {
+      outOfTime = true
       continue
     }
 
@@ -146,16 +172,23 @@ export const syncDoc = async (
     sent++
   }
 
-  // Sections no longer on the page.
+  // Sections no longer on the page. Left for the retry when time ran out, so
+  // a section is never archived on a partial pass.
   let archived = 0
-  for (const m of existing.values()) {
-    if (await archiveMapping(payload, m)) archived++
+  if (!outOfTime) {
+    for (const m of existing.values()) {
+      if (await archiveMapping(payload, m)) archived++
+    }
   }
 
   payload.logger.info(
     `[ncx-sync] ${collection}/${id} "${docTitle}": sent ${sent}, unchanged ${unchanged}, archived ${archived}`,
   )
   await recordSync({ collection, id, title: docTitle, url: path, sections })
+
+  if (outOfTime) {
+    throw new Error(`[ncx-sync] ${collection}/${id}: sent ${sent} sections, more to send, will retry`)
+  }
 
   if (needsRetry) {
     // A section was edited before NCX finished indexing it. Its hash was left

@@ -1,3 +1,4 @@
+import { stripForVisitors } from '../collections/Customers'
 import type { RagSource } from './types'
 
 /**
@@ -37,14 +38,14 @@ export const ragSources: Record<string, RagSource> = {
     urlOf: () => '/',
   },
 
-  // Customers who asked not to be named appear under their anonymised name
-  // only, so the real name fields are never sent.
+  // Same stripping as the public API: a customer with "Show real name" off is
+  // sent under its anonymised name, without the details that would identify it.
   customers: {
     collection: 'customers',
     shouldIndex: (d) => published(d) && d.status !== 'past',
-    titleOf: (d) => (d.showName ? d.name : d.anonymisedName || 'A customer'),
+    prepare: stripForVisitors,
+    titleOf: (d) => d.name || 'A customer',
     urlOf: (d) => (d.hasOwnPage && d.slug ? `/customers/${d.slug}` : '/customers'),
-    omit: ['name', 'anonymisedName'],
   },
 
   integrations: {

@@ -105,8 +105,6 @@ export default buildConfig({
         return authHeader === `Bearer ${secret}`
       },
     },
-    // Lets the NCX sync run one job per document at a time (src/rag/tasks/shared.ts).
-    enableConcurrencyControl: true,
     tasks: [ragSyncDocTask, ragPurgeDocTask],
   },
 })

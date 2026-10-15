@@ -57,9 +57,9 @@ const isChannelField = (name: string) => /^wa[A-Z]/.test(name)
  */
 const isPlumbingField = (name: string) =>
   /(Url|URL|Href|Id|Ids)$/.test(name) ||
-  /^(cta|button)/i.test(name) ||
-  /(Cta|Button)/.test(name) ||
-  /^(primary|secondary)(Label|Text)$/.test(name)
+  /^(cta|ctas|button|buttons)$/i.test(name) ||
+  /(cta|button)(Label|Text|Link)$/i.test(name) ||
+  /^(primary|secondary)(Label|Text|Link)$/.test(name)
 
 /** Field names that make a good heading for a block, in order of preference. */
 const HEADING_FIELDS = ['heading', 'title', 'headline', 'name', 'eyebrow', 'label']
@@ -69,7 +69,26 @@ type BlockLookup = (slug: string) => Block | undefined
 type Ctx = {
   getBlock: BlockLookup
   omit: Set<string>
+  /** The whole document, for admin.condition functions. */
+  root: any
   inLink?: boolean
+}
+
+/**
+ * Hidden fields, and fields whose admin.condition is false for this document
+ * (a Story tab when Own page is off), are not on the site, so they are not sent.
+ */
+const visible = (field: any, siblingData: any, ctx: Ctx): boolean => {
+  if (field?.hidden || field?.admin?.hidden) return false
+  const condition = field?.admin?.condition
+  if (typeof condition !== 'function') return true
+  try {
+    return Boolean(
+      condition(ctx.root, siblingData ?? {}, { user: null, path: [], operation: 'update', blockData: undefined }),
+    )
+  } catch {
+    return true
+  }
 }
 
 const clean = (s: string) =>
@@ -206,10 +225,12 @@ export const fieldText = (fields: Field[], data: any, ctx: Ctx): string[] => {
   const out: string[] = []
 
   for (const field of fields as any[]) {
+    if (!visible(field, data, ctx)) continue
+
     switch (field.type) {
       case 'tabs':
         for (const tab of field.tabs as Tab[]) {
-          if (!skipTab(tab)) out.push(...fieldText(tab.fields, tabData(tab, data), ctx))
+          if (!skipTab(tab) && visible(tab, data, ctx)) out.push(...fieldText(tab.fields, tabData(tab, data), ctx))
         }
         continue
       case 'row':
@@ -308,13 +329,14 @@ const collectUnits = (
 
   const visit = (list: Field[]) => {
     for (const field of list as any[]) {
+      if (!visible(field, data, ctx)) continue
       if (field.type === 'row' || field.type === 'collapsible') {
         visit(field.fields)
         continue
       }
       if (field.type === 'tabs') {
         for (const tab of field.tabs as Tab[]) {
-          if (skipTab(tab)) continue
+          if (skipTab(tab) || !visible(tab, data, ctx)) continue
           units.push(
             ...collectUnits(tab.fields, tabData(tab, data), ctx, {
               key: `tab:${tabKey(tab)}`,
@@ -407,7 +429,7 @@ export const projectDoc = (
   doc: any,
   opts: { getBlock: BlockLookup; omit?: string[] },
 ): RagSection[] => {
-  const ctx: Ctx = { getBlock: opts.getBlock, omit: new Set(opts.omit || []) }
+  const ctx: Ctx = { getBlock: opts.getBlock, omit: new Set(opts.omit || []), root: doc }
   const units = collectUnits(fields, doc, ctx, { key: 'overview', heading: 'Overview' })
 
   // Two blocks can share a key only if ids are missing; keep keys unique.

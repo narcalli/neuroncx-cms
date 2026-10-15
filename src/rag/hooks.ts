@@ -19,13 +19,6 @@ const queueSync = async (req: any, collection: string, id: string) =>
     waitUntil: new Date(Date.now() + SETTLE_MS),
   })
 
-const queuePurge = async (req: any, collection: string, id: string) =>
-  req.payload.jobs.queue({
-    task: 'ragPurgeDoc',
-    input: { collection, id },
-    queue: RAG_QUEUE,
-  })
-
 export const ragAfterChange: CollectionAfterChangeHook = async ({
   doc,
   previousDoc,
@@ -45,14 +38,11 @@ export const ragAfterChange: CollectionAfterChangeHook = async ({
   // (interval is 100ms on pages and posts). Bail before doing any work.
   if (now !== 'published' && before !== 'published') return doc
 
-  if (now === 'published') {
-    // Published or republished: send the latest content. The sync itself
-    // decides whether the document is visible (status, Live, Own page...).
-    await queueSync(req, slug, String(doc.id))
-  } else if (before === 'published') {
-    // Unpublished: archive its post contents.
-    await queuePurge(req, slug, String(doc.id))
-  }
+  // Published, republished, unpublished, or a draft saved over a published
+  // version: the sync reads the published document and decides whether to
+  // send changes or archive (status, Live, Own page...). A draft save on a
+  // live page changes nothing there, so it costs one no-op job.
+  await queueSync(req, slug, String(doc.id))
 
   return doc
 }
@@ -61,6 +51,7 @@ export const ragAfterDelete: CollectionAfterDeleteHook = async ({ doc, id, colle
   if (req.context?.skipRag) return doc
   if (!isRagSource(collection.slug)) return doc
 
-  await queuePurge(req, collection.slug, String(doc?.id ?? id))
+  // The sync finds the document gone and archives its post contents.
+  await queueSync(req, collection.slug, String(doc?.id ?? id))
   return doc
 }

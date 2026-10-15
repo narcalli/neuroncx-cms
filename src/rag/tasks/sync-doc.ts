@@ -1,12 +1,11 @@
 // src/rag/tasks/sync-doc.ts
 import type { TaskConfig } from 'payload'
 
-import { ragConcurrency, ragRetries } from './shared'
+import { ragRetries } from './shared'
 
 export const ragSyncDocTask: TaskConfig<any> = {
   slug: 'ragSyncDoc',
   retries: ragRetries,
-  concurrency: ragConcurrency,
   inputSchema: [
     { name: 'collection', type: 'text', required: true },
     { name: 'id', type: 'text', required: true },
