@@ -1,37 +1,23 @@
 import type { RagSource } from './types'
 
-const TENANT = 'ncx'
+/**
+ * The collections sent to NCX post content, and when each document counts as
+ * visible. Only Integration items for now. Each rule matches the collection's
+ * public read access, so nothing reaches the bot that a site visitor could
+ * not see.
+ *
+ * To add a collection: add it here and wrap it with withRag() in
+ * payload.config.ts.
+ */
+
+const published = (d: any) => d?._status === 'published'
 
 export const ragSources: Record<string, RagSource> = {
-  pages: {
-    collection: 'pages',
-    shouldIndex: (d) => d._status === 'published' && Boolean(d.slug),
-    tenantOf: () => TENANT,
-    visibility: () => 'public',
-    urlOf: (d) => (d.slug === 'home' ? '/' : `/${d.slug}`),
-    // placeholder. Real block serializers land after the wiring is proven.
-    project: (d) => ({
-      title: d.title,
-      sections: [{ heading: 'Summary', body: d.meta?.description ?? '' }],
-    }),
-  },
-
-  posts: {
-    collection: 'posts',
-    shouldIndex: (d) => d._status === 'published' && Boolean(d.slug),
-    tenantOf: () => TENANT,
-    visibility: () => 'public',
-    urlOf: (d) => `/posts/${d.slug}`,
-    project: (d) => ({
-      title: d.title,
-      sections: [{ heading: 'Summary', body: d.meta?.description ?? '' }],
-    }),
-    metadataOf: (d) => ({
-      categories: (d.categories ?? []).map((c: any) =>
-        typeof c === 'object' ? (c.slug ?? c.title) : String(c),
-      ),
-      publishedAt: d.publishedAt ? new Date(d.publishedAt).getTime() : undefined,
-    }),
+  integrations: {
+    collection: 'integrations',
+    shouldIndex: (d) => published(d) && d.status === 'live' && d.includeInKbase !== false,
+    titleOf: (d) => d.name,
+    urlOf: (d) => (d.hasOwnPage && d.slug ? `/integrations/${d.slug}` : '/integrations'),
   },
 }
 

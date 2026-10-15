@@ -14,6 +14,7 @@ import { Sectors } from './collections/Sectors'
 import { Enquiries } from './collections/Enquiries'
 import { Features } from './collections/Features'
 import { Media } from './collections/Media'
+import { NcxPostContents } from './collections/NcxPostContents'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { Users } from './collections/Users'
@@ -50,8 +51,8 @@ export default buildConfig({
     url: process.env.DATABASE_URL || '',
   }),
   collections: [
-    withRag(Pages),
-    withRag(Posts),
+    Pages,
+    Posts,
     Media,
     Categories,
     Features,
@@ -60,10 +61,11 @@ export default buildConfig({
     Sectors,
     Customers,
     IntegrationsMaster,
-    Integrations,
+    withRag(Integrations),
     IntegrationCategories,
     ConnectionTypes,
     Products,
+    NcxPostContents,
   ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer, SiteSettings],
