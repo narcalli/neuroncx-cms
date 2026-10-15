@@ -45,5 +45,5 @@
 
 ## The WhatsApp bot
 
-- IID 4's bot (BotMaster 4) answers from the index `ncx26-website` through workflow 1010, "NCX Website WF on Rag2" (a copy of the Small Bites Rag2 workflow: text, voice notes and button replies; gpt-5-mini; prompt on AI config 261).
+- IID 4's bot (BotMaster 4) answers questions about NeuronCX integrations (and offers a demo) from the index `ncx26-website` through workflow 1010, "NCX Website WF on Rag2" (a copy of the Small Bites Rag2 workflow: text, voice notes and button replies; gpt-5-mini; prompt on AI config 261).
 - Cutover: set BotMaster 4's `DefaultKbaseShardLabel` to `ncx26-website` and its `BotWhatsAppNumber`, then Bot Initialize with `b_hook_90_wf` = 1010. Workflows 45 and 85 stay as they are, so pointing the hook back at 85 undoes it.
