@@ -6,7 +6,7 @@
  *   NODE_OPTIONS="--no-deprecation --import=tsx/esm" node --env-file=.env scripts/ncx-backfill.ts [--dry-run] [collection ...]
  *
  *   --dry-run   print the sections that would be sent; sends nothing
- *   collection  limit to these collections, e.g. pages posts
+ *   collection  limit to these collections, e.g. integrations
  *
  * Needs DATABASE_URL, and NCX_SYNC_URL + NCX_SYNC_KEY unless --dry-run.
  * Safe to run twice: unchanged sections are skipped. Run it while the job

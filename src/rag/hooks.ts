@@ -35,7 +35,7 @@ export const ragAfterChange: CollectionAfterChangeHook = async ({
   const before: Status = previousDoc?._status
 
   // Autosave on a draft. This is the overwhelming majority of calls
-  // (interval is 100ms on pages and posts). Bail before doing any work.
+  // (autosave fires every few hundred ms while editing). Bail before doing any work.
   if (now !== 'published' && before !== 'published') return doc
 
   // Published, republished, unpublished, or a draft saved over a published
