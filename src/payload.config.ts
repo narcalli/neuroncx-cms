@@ -14,6 +14,7 @@ import { Sectors } from './collections/Sectors'
 import { Enquiries } from './collections/Enquiries'
 import { Features } from './collections/Features'
 import { Media } from './collections/Media'
+import { NcxPostContents } from './collections/NcxPostContents'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { Users } from './collections/Users'
@@ -54,16 +55,17 @@ export default buildConfig({
     withRag(Posts),
     Media,
     Categories,
-    Features,
+    withRag(Features),
     Users,
     Enquiries,
     Sectors,
-    Customers,
-    IntegrationsMaster,
-    Integrations,
+    withRag(Customers),
+    withRag(IntegrationsMaster),
+    withRag(Integrations),
     IntegrationCategories,
     ConnectionTypes,
     Products,
+    NcxPostContents,
   ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer, SiteSettings],
@@ -103,6 +105,8 @@ export default buildConfig({
         return authHeader === `Bearer ${secret}`
       },
     },
+    // Lets the NCX sync run one job per document at a time (src/rag/tasks/shared.ts).
+    enableConcurrencyControl: true,
     tasks: [ragSyncDocTask, ragPurgeDocTask],
   },
 })
