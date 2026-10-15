@@ -239,6 +239,16 @@ const pageTab = {
       ],
     },
     {
+      name: 'showClosing',
+      type: 'checkbox',
+      label: 'Show closing panel',
+      defaultValue: true,
+      admin: {
+        description:
+          'The dark panel at the end of the page, with the heading and text from the main integrations master record. Off leaves it out on this page only.',
+      },
+    },
+    {
       name: 'related',
       type: 'relationship',
       relationTo: 'integrations',

@@ -938,6 +938,10 @@ export interface Integration {
     };
   };
   /**
+   * The dark panel at the end of the page, with the heading and text from the main integrations master record. Off leaves it out on this page only.
+   */
+  showClosing?: boolean | null;
+  /**
    * Up to 3. Leave empty to show other live integrations in the same category.
    */
   related?: (string | Integration)[] | null;
@@ -7063,6 +7067,7 @@ export interface IntegrationsSelect<T extends boolean = true> {
               url?: T;
             };
       };
+  showClosing?: T;
   related?: T;
   headingOverrides?:
     | T
