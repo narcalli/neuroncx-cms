@@ -38,7 +38,7 @@
 
 ## Setup
 
-- **Backend env** (dashboard-backend): `CMS_SYNC_KEY` (shared secret), `CMS_SYNC_TREATMENT_ID` (55 today), optional `CMS_SYNC_SHARD_ID` to point at another shard.
+- **Backend env** (dashboard-backend): `CMS_SYNC_KEY` (shared secret), `CMS_SYNC_TREATMENT_ID` (88: IID 4, shard 60 / index `ncx26-website`, text indexing WF 53), optional `CMS_SYNC_SHARD_ID` to point at another shard.
 - **CMS env** (Amplify): `NCX_SYNC_URL`, `NCX_SYNC_KEY` (same value as `CMS_SYNC_KEY`), `NCX_SITE_URL`, and `CRON_SECRET`. With `NCX_SYNC_URL` or `NCX_SYNC_KEY` unset the sync does nothing.
 - **Job runner:** Amplify does not run background jobs, so a scheduler calls the runner every minute:
   - `GET {CMS URL}/api/payload-jobs/run?allQueues=true&limit=1`
@@ -47,3 +47,8 @@
 - **First load:** run once from a machine with the CMS `.env`:
   - `NODE_OPTIONS="--no-deprecation --import=tsx/esm" node --env-file=.env scripts/ncx-backfill.ts --dry-run` to see the sections
   - the same without `--dry-run` to send them, with the scheduler paused
+
+## The WhatsApp bot
+
+- IID 4's bot (BotMaster 4) answers from the index `ncx26-website` through workflow 1010, "NCX Website WF on Rag2" (a copy of the Small Bites Rag2 workflow: text, voice notes and button replies; gpt-5-mini; prompt on AI config 261).
+- Cutover: set BotMaster 4's `DefaultKbaseShardLabel` to `ncx26-website` and its `BotWhatsAppNumber`, then Bot Initialize with `b_hook_90_wf` = 1010. Workflows 45 and 85 stay as they are, so pointing the hook back at 85 undoes it.
