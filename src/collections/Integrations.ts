@@ -1,9 +1,12 @@
 import type { Access, CollectionConfig, Field, Where } from 'payload'
 
 import { authenticated } from '../access/authenticated'
+import { cardTab as sharedCardTab } from '../fields/card'
+import { featuredField, nameField, orderField, slugField, statusField } from '../fields/core'
 import { faqTab } from '../fields/faq'
 import { kbaseTab } from '../fields/kbase'
-import { link } from '../fields/link'
+import { hasOwnPageField, ownPageTab } from '../fields/ownPage'
+import { seoCheckField, seoTab } from '../fields/seo'
 import { plainText } from '../fields/validators/plainText'
 import { whatsappTab } from '../fields/whatsapp'
 import { checklistFields } from './integrations/checklist'
@@ -12,9 +15,7 @@ import {
   itemRefreshCategories,
   itemRefreshCategoriesAfterDelete,
   itemSlugRule,
-  requiredForOwnPage,
 } from './integrations/hooks'
-import { integrationSeoTab, seoCheckField } from './integrations/seo'
 
 // Visitors only ever get entries that are both published and Live. Drafts,
 // Pilot and Planned stay visible to logged-in editors only. Relationships
@@ -26,8 +27,6 @@ const liveOrAuthenticated: Access = ({ req: { user } }) => {
   }
   return publishedAndLive
 }
-
-const ownPageOn = (data: Record<string, unknown> | undefined) => Boolean(data?.hasOwnPage)
 
 /**
  * Integration items: the systems NeuronCx connects to, kept in one place so
@@ -41,22 +40,13 @@ const ownPageOn = (data: Record<string, unknown> | undefined) => Boolean(data?.h
  * Category, connection and products link to their own collections
  * (IntegrationTaxonomies.ts), so editors manage those lists in the admin.
  * Fallbacks, waLink and the checklist prefill: integrations/hooks.ts.
+ * The Core, Card, Own page and SEO fields come from the shared groups in
+ * src/fields, with this collection's own names, limits and wording.
  */
 
 // Sidebar: the existing tagging fields, the slug and the own page switch.
 const sidebar: Field[] = [
-  {
-    name: 'status',
-    type: 'select',
-    required: true,
-    defaultValue: 'live',
-    options: [
-      { label: 'Live', value: 'live' },
-      { label: 'Pilot', value: 'pilot' },
-      { label: 'Planned', value: 'planned' },
-    ],
-    admin: { position: 'sidebar', description: 'Only Live integrations show on the public site.' },
-  },
+  statusField({ defaultValue: 'live', description: 'Only Live integrations show on the public site.' }),
   {
     name: 'category',
     type: 'relationship',
@@ -77,44 +67,16 @@ const sidebar: Field[] = [
     hasMany: true,
     admin: { position: 'sidebar', sortOptions: 'order' },
   },
-  {
-    name: 'featured',
-    type: 'checkbox',
-    defaultValue: false,
-    admin: {
-      position: 'sidebar',
-      description: 'Tick to include in the short list on the home page.',
-    },
-  },
-  {
-    name: 'order',
-    type: 'number',
-    defaultValue: 100,
-    admin: { position: 'sidebar', description: 'Lower numbers show first.' },
-  },
-  {
-    name: 'slug',
-    type: 'text',
-    unique: true,
-    index: true,
-    maxLength: 60,
+  featuredField({ description: 'Tick to include in the short list on the home page.' }),
+  orderField({ description: 'Lower numbers show first.' }),
+  slugField({
     validate: itemSlugRule,
-    admin: {
-      position: 'sidebar',
-      description: 'Used in the address /integrations/<slug>. Needed to publish with Own page on.',
-    },
-  },
-  {
-    name: 'hasOwnPage',
-    type: 'checkbox',
-    label: 'Own page',
-    defaultValue: false,
-    admin: {
-      position: 'sidebar',
-      description:
-        'Gives this integration a page at /integrations/<slug>. The Page tab appears while this is on. Publishing then needs a slug, a hero heading and an SEO title and description.',
-    },
-  },
+    description: 'Used in the address /integrations/<slug>. Needed to publish with Own page on.',
+  }),
+  hasOwnPageField({
+    description:
+      'Gives this integration a page at /integrations/<slug>. The Page tab appears while this is on. Publishing then needs a slug, a hero heading and an SEO title and description.',
+  }),
   seoCheckField('item'),
 ]
 
@@ -152,27 +114,11 @@ const whatsapp = (() => {
   return { ...tab, fields }
 })()
 
-const cardTab = {
-  label: 'Card',
-  fields: [
-    {
-      name: 'logo',
-      type: 'upload',
-      relationTo: 'media',
-      admin: { description: 'Transparent PNG or SVG. Leave empty to show the name only.' },
-    },
-    {
-      name: 'tagline',
-      type: 'text',
-      maxLength: 60,
-      admin: { description: 'A short line under the name. Aim for 45 characters.' },
-    },
-    {
-      name: 'summary',
-      type: 'text',
-      maxLength: 120,
-      admin: { description: 'What flows between the two systems, in plain words.' },
-    },
+const cardTab = sharedCardTab({
+  image: { name: 'logo', description: 'Transparent PNG or SVG. Leave empty to show the name only.' },
+  tagline: { description: 'A short line under the name. Aim for 45 characters.' },
+  summary: { maxLength: 120, description: 'What flows between the two systems, in plain words.' },
+  extra: [
     {
       name: 'glance',
       type: 'array',
@@ -189,92 +135,34 @@ const cardTab = {
         { name: 'line', type: 'text', required: true, maxLength: 60 },
       ],
     },
-  ] as Field[],
-}
-
-const headingOverride = (name: string, label: string): Field => ({
-  name,
-  type: 'text',
-  label,
-  maxLength: 70,
+  ],
 })
 
-const pageTab = {
-  label: 'Page',
-  admin: { condition: (data: Record<string, unknown>) => ownPageOn(data) },
-  fields: [
-    {
-      name: 'heroHeading',
-      type: 'text',
-      label: 'Hero heading',
-      maxLength: 70,
-      validate: requiredForOwnPage('a hero heading'),
-      admin: {
-        description:
-          'An action, the partner name and the result, for example: Book DocPulse appointments on WhatsApp. Needed to publish with Own page on.',
-      },
-    },
-    {
-      name: 'heroSubheading',
-      type: 'textarea',
-      label: 'Hero subheading',
-      maxLength: 200,
-      admin: { description: 'Who does what, and what lands where, in two sentences.' },
-    },
-    {
-      name: 'cta',
-      type: 'group',
-      label: 'Call to action',
-      admin: { description: 'The closing button. Type a label to choose where it goes.' },
-      fields: [
-        { name: 'label', type: 'text', maxLength: 30 },
-        // Shown, and required, only once there is a label.
-        link({
-          appearances: false,
-          disableLabel: true,
-          overrides: {
-            admin: { condition: (_: unknown, siblingData: any) => Boolean(siblingData?.label) },
-          },
-        }),
-      ],
-    },
-    {
-      name: 'showClosing',
-      type: 'checkbox',
-      label: 'Show closing panel',
-      defaultValue: true,
-      admin: {
-        description:
-          'The dark panel at the end of the page, with the heading and text from the main integrations master record. Off leaves it out on this page only.',
-      },
-    },
-    {
-      name: 'related',
-      type: 'relationship',
-      relationTo: 'integrations',
-      hasMany: true,
-      maxRows: 3,
-      filterOptions: ({ id }) => (id ? { id: { not_equals: id } } : true),
-      admin: {
-        description: 'Up to 3. Leave empty to show other live integrations in the same category.',
-      },
-    },
-    {
-      name: 'headingOverrides',
-      type: 'group',
-      label: 'Section headings',
-      admin: {
-        description: 'Leave empty to use the headings from the main integrations master record.',
-      },
-      fields: [
-        headingOverride('statusTable', 'Status table'),
-        headingOverride('edgeCases', 'Edge cases'),
-        headingOverride('setup', 'Setup'),
-        headingOverride('related', 'Related'),
-      ],
-    },
-  ] as Field[],
-}
+const pageTab = ownPageTab({
+  heroHeading: {
+    description:
+      'An action, the partner name and the result, for example: Book DocPulse appointments on WhatsApp. Needed to publish with Own page on.',
+  },
+  heroSubheading: { description: 'Who does what, and what lands where, in two sentences.' },
+  cta: { description: 'The closing button. Type a label to choose where it goes.' },
+  showClosing: {
+    description:
+      'The dark panel at the end of the page, with the heading and text from the main integrations master record. Off leaves it out on this page only.',
+  },
+  related: {
+    relationTo: 'integrations',
+    description: 'Up to 3. Leave empty to show other live integrations in the same category.',
+  },
+  headingOverrides: {
+    description: 'Leave empty to use the headings from the main integrations master record.',
+    keys: [
+      ['statusTable', 'Status table'],
+      ['edgeCases', 'Edge cases'],
+      ['setup', 'Setup'],
+      ['related', 'Related'],
+    ],
+  },
+})
 
 const whatMovesTab = {
   label: 'What moves',
@@ -402,6 +290,16 @@ const exampleTab = {
   ] as Field[],
 }
 
+const integrationSeoTab = seoTab({
+  keywordDescription:
+    'The search phrase this page should rank for, for example docpulse whatsapp appointment booking. Used in the SEO title when that is left empty.',
+  ownPage: {
+    titleDescription:
+      'Left empty, it is filled as "<primary keyword> with NeuronCx | NeuronCx", or the name if there is no keyword. Needed to publish with Own page on.',
+    descriptionDescription: 'Left empty, it is filled from the summary. Needed to publish with Own page on.',
+  },
+})
+
 export const Integrations: CollectionConfig = {
   slug: 'integrations',
   labels: {
@@ -431,19 +329,13 @@ export const Integrations: CollectionConfig = {
     afterDelete: [itemRefreshCategoriesAfterDelete],
   },
   fields: [
-    {
-      name: 'name',
-      type: 'text',
-      required: true,
-      unique: true,
-      maxLength: 60,
-    },
+    nameField({ maxLength: 60 }),
     ...sidebar,
     {
       type: 'tabs',
       tabs: [
         cardTab,
-        integrationSeoTab({ forItems: true }),
+        integrationSeoTab,
         pageTab,
         whatMovesTab,
         edgeCasesTab,

@@ -5,9 +5,9 @@ import { authenticatedOrPublished } from '../access/authenticatedOrPublished'
 import { faqTab } from '../fields/faq'
 import { kbaseTab } from '../fields/kbase'
 import { link } from '../fields/link'
+import { seoCheckField, seoTab } from '../fields/seo'
 import { plainText } from '../fields/validators/plainText'
 import { masterOneMain, masterSlugRule, onlyNameToken } from './integrations/hooks'
-import { integrationSeoTab, seoCheckField } from './integrations/seo'
 
 /**
  * Integrations master: the landing pages for integrations, such as the main
@@ -135,7 +135,10 @@ export const IntegrationsMaster: CollectionConfig = {
     {
       type: 'tabs',
       tabs: [
-        integrationSeoTab(),
+        seoTab({
+          keywordDescription:
+            'The search phrase this page should rank for, for example whatsapp crm integration.',
+        }),
         {
           label: 'Hero',
           fields: [

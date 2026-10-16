@@ -7,11 +7,12 @@ import {
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
 
-import { requiredForOwnPage } from './hooks'
+import { requiredForOwnPage } from './validators/ownPage'
 
 /**
- * The SEO check panel for the sidebar (admin/SeoCheck.tsx): where the
- * primary keyword appears, with live character counts. Read only.
+ * The SEO check panel for the sidebar (collections/integrations/admin/SeoCheck.tsx):
+ * where the primary keyword appears, with live character counts. Read only.
+ * "item" checks heroHeading and summary; "master" checks h1.
  */
 export const seoCheckField = (mode: 'item' | 'master'): UIField => ({
   name: 'seoCheck',
@@ -28,12 +29,16 @@ export const seoCheckField = (mode: 'item' | 'master'): UIField => ({
 })
 
 /**
- * The SEO tab for integration items and the integrations master: keywords,
- * then the SEO plugin fields under meta (meta.title, meta.description,
- * meta.image), as on Pages. The plugin's generate buttons are off: they are
- * written for Pages and Posts and would produce the wrong title here.
+ * The SEO tab: keywords, then the SEO plugin fields under meta (meta.title,
+ * meta.description, meta.image), as on Pages. The plugin's generate buttons
+ * are off: they are written for Pages and Posts. With `ownPage`, the title
+ * and description are needed to publish with Own page on, and their
+ * descriptions explain the fallbacks the collection's hook fills in.
  */
-export const integrationSeoTab = (opts: { forItems?: boolean } = {}): Tab => ({
+export const seoTab = (opts: {
+  keywordDescription: string
+  ownPage?: { titleDescription: string; descriptionDescription: string }
+}): Tab => ({
   label: 'SEO',
   fields: [
     {
@@ -41,11 +46,7 @@ export const integrationSeoTab = (opts: { forItems?: boolean } = {}): Tab => ({
       type: 'text',
       label: 'Primary keyword',
       maxLength: 60,
-      admin: {
-        description: opts.forItems
-          ? 'The search phrase this page should rank for, for example docpulse whatsapp appointment booking. Used in the SEO title when that is left empty.'
-          : 'The search phrase this page should rank for, for example whatsapp crm integration.',
-      },
+      admin: { description: opts.keywordDescription },
     },
     {
       name: 'secondaryKeywords',
@@ -70,13 +71,10 @@ export const integrationSeoTab = (opts: { forItems?: boolean } = {}): Tab => ({
           hasGenerateFn: false,
           overrides: {
             maxLength: 60,
-            ...(opts.forItems
+            ...(opts.ownPage
               ? {
                   validate: requiredForOwnPage('an SEO title'),
-                  admin: {
-                    description:
-                      'Left empty, it is filled as "<primary keyword> with NeuronCx | NeuronCx", or the name if there is no keyword. Needed to publish with Own page on.',
-                  },
+                  admin: { description: opts.ownPage.titleDescription },
                 }
               : {}),
           },
@@ -86,13 +84,10 @@ export const integrationSeoTab = (opts: { forItems?: boolean } = {}): Tab => ({
           hasGenerateFn: false,
           overrides: {
             maxLength: 155,
-            ...(opts.forItems
+            ...(opts.ownPage
               ? {
                   validate: requiredForOwnPage('an SEO description'),
-                  admin: {
-                    description:
-                      'Left empty, it is filled from the summary. Needed to publish with Own page on.',
-                  },
+                  admin: { description: opts.ownPage.descriptionDescription },
                 }
               : {}),
           },
