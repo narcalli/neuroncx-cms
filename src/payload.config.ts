@@ -5,6 +5,7 @@ import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
 import { fileURLToPath } from 'url'
 
+import { AgentFamilies } from './collections/AgentFamilies'
 import { Categories } from './collections/Categories'
 import { Customers } from './collections/Customers'
 import { Integrations } from './collections/Integrations'
@@ -14,6 +15,7 @@ import { Sectors } from './collections/Sectors'
 import { Enquiries } from './collections/Enquiries'
 import { Features } from './collections/Features'
 import { Media } from './collections/Media'
+import { MicroApps } from './collections/MicroApps'
 import { NcxPostContents } from './collections/NcxPostContents'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
@@ -65,6 +67,8 @@ export default buildConfig({
     IntegrationCategories,
     ConnectionTypes,
     Products,
+    MicroApps,
+    AgentFamilies,
     NcxPostContents,
   ],
   cors: [getServerSideURL()].filter(Boolean),

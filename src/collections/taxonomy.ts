@@ -150,7 +150,7 @@ export const refuseDeleteWhileUsed =
   }
 
 export const taxonomy = (opts: {
-  slug: CollectionSlug
+  slug: string
   singular: string
   plural: string
   description: string

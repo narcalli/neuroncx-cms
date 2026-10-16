@@ -27,6 +27,32 @@ export const headingOverride = (name: string, label: string): Field => ({
 })
 
 /**
+ * A list of points with a short title and one line, such as benefits or use
+ * cases: title 50, line 140.
+ */
+export const titleLineList = (opts: {
+  name: string
+  label: string
+  singular: string
+  plural: string
+  minRows?: number
+  maxRows: number
+  description: string
+}): Field => ({
+  name: opts.name,
+  type: 'array',
+  label: opts.label,
+  labels: { singular: opts.singular, plural: opts.plural },
+  ...(opts.minRows ? { minRows: opts.minRows } : {}),
+  maxRows: opts.maxRows,
+  admin: { description: opts.description },
+  fields: [
+    { name: 'title', type: 'text', required: true, maxLength: 50 },
+    { name: 'line', type: 'text', required: true, maxLength: 140 },
+  ],
+})
+
+/**
  * The Page tab, shown while Own page is on. Fields in order: hero heading and
  * subheading, `afterHero` (for example benefits), the call to action, the
  * closing panel switch when given, related entries, section headings when
