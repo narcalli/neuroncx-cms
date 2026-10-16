@@ -8,18 +8,21 @@
 - Families are an `agentFamilies` collection, built like `integrationCategories`. The Lists collection and the WhatsApp lists global from the earlier `feat/shared-field-groups` branch are not brought over.
 - `verticals` is a hasMany relationship to `sectors`. Sectors are not seeded yet.
 - `waRowDescription` is 70 characters, matching the NCX dashboard and the integration collections.
-- A `microAppsMaster` collection will hold the hub copy, built like `integrationsMaster`.
+- A `microAppsMaster` collection holds the hub copy, built like `integrationsMaster`.
+- All three collections sit in a "Bot swarm" admin group.
+- An agent's `slug` is required. It is filled in from the name when the agent is created, and can be changed afterwards.
+- An empty `waRowTitle` or `waRowDescription` is filled from `name` and `summary`, cut on a whole word to 24 and 70 characters. A note shows under a row title cut from the name.
 
 ---
 
 ## collection: microApps (admin label "Micro-apps swarm")
-payload_slug: microApps (not built yet)
-config_file: src/collections/MicroApps/index.ts (planned)
-supporting_collection: agentFamilies (planned), microAppsMaster for the hub copy (planned)
-own_page_route: /bot-swarm/[slug] (planned)
+payload_slug: microApps
+config_file: src/collections/MicroApps/index.ts, hooks in src/collections/MicroApps/hooks.ts
+supporting_collection: agentFamilies (src/collections/AgentFamilies.ts), microAppsMaster for the hub copy (src/collections/MicroAppsMaster.ts)
+own_page_route: /bot-swarm/[slug] (website page not built yet)
 hub_page: /bot-swarm (the existing CMS page)
 shared_groups: all seven, see fields_reference.md
-status: design only, 13 Oct 2026. Nothing in this file is built yet
+status: the three collections are built on branch feat/bot-swarm-collections, not merged, 16 Oct 2026. No entries seeded. The website pages, the blocks and the knowledge base sync are not built
 
 # Micro-apps swarm
 
@@ -83,35 +86,63 @@ Micro-apps swarm uses all seven groups from `fields_reference.md`, with no chang
 | WhatsApp | Used by the assistant's "what can your agents do" menus |
 | Knowledge base | Every live agent is included |
 
-### Fields only micro-apps swarm has
+### Fields, as built
 
-All text fields are plain text, checked by the shared plain-text validator.
+Every field of `microApps`, shared groups included, in admin order.
 
-| Field | Type | Placement | Notes |
-| --- | --- | --- | --- |
-| `status` | select: live, pilot, planned. Required, default planned | sidebar | Only live and pilot show publicly |
-| `family` | relationship to `agentFamilies`, required | sidebar | Groups agents on the hub page and in WhatsApp menus |
-| `channel` | select, hasMany: whatsapp, calls, web | sidebar | Where the agent works |
-| `verticals` | relationship to `sectors`, hasMany | sidebar | Where it is used today |
-| `searchName` | text, 60 | Detail tab | The job people search for, such as "Prescription reading AI". Used in the agent page title and H1 support line |
-| `keyPoints` | array of text (60), 3 to 4 | Card tab | Short lines for cards and the bento grid |
-| `startsWhen` | textarea, 200 | Panel tab | What sets the agent off |
-| `customerSees` | textarea, 240 | Panel tab | What the customer sees. Leave empty for agents that work on call recordings |
-| `hears` | textarea, 200 | Panel tab |  |
-| `checks` | textarea, 300 | Panel tab |  |
-| `acts` | textarea, 300 | Panel tab |  |
-| `handsOver` | textarea, 240 | Panel tab | Required before the agent can have its own page |
-| `records` | textarea, 200 | Panel tab |  |
-| `teamControls` | textarea, 240 | Panel tab | What the organisation can change from the dashboard without code |
-| `result` | text, 140 | Panel tab | One line on what changes for the team |
-| `passesTo` | relationship to `microApps`, hasMany | Panel tab | The next agent in the chain, such as Prescription understanding to Test matching and pricing |
-| `proof` | text, 140 | Page tab | One line, such as "Live at a diagnostics chain". Follows the customers collection's `showName` rule |
-| `customers` | relationship to `customers`, hasMany | Page tab | Where it is live |
-| `integrations` | relationship to `integrations`, hasMany | Page tab | Systems it books, bills or files into |
-| `crmFeatures` | relationship to `crmFeatures`, hasMany | Page tab | Features it depends on, usually Customer 360 |
-| `callQualityAssessments` | relationship, hasMany | Page tab | Call quality agents only. Added once that collection exists |
-| `episodicEngagements` | relationship, hasMany | Page tab | Added once that collection exists |
-| `media` | upload | Page tab | A flow graphic or screenshot, such as the payment flow |
+| Field | Type and limit | Where | Notes |
+|---|---|---|---|
+| `name` | text, required, unique, 60 | Above tabs | |
+| `status` | select: live, pilot, planned. Required, default planned | Sidebar | Live and Pilot are public, Planned never |
+| `family` | relationship to `agentFamilies`, required | Sidebar | |
+| `channel` | select, hasMany: whatsapp, calls, web | Sidebar | |
+| `verticals` | relationship to `sectors`, hasMany | Sidebar | |
+| `featured` | checkbox, default false | Sidebar | |
+| `isUSP` | checkbox, default false | Sidebar | |
+| `order` | number, default 100 | Sidebar | |
+| `slug` | text, required, unique, indexed, 60 | Sidebar | Filled in from the name when the agent is created, editable afterwards. Lowercase and dashes. Cannot match a bot swarm master slug |
+| `hasOwnPage` | checkbox, default false | Sidebar | Publishing with it on needs status Live, heroHeading, the eight panel fields and proof |
+| `seoCheck` | panel, display only | Sidebar | Shows where the primary keyword appears |
+| `image` | upload | Card | Optional |
+| `icon` | select from the icon library | Card | |
+| `tagline` | text, 60 | Card | Aim for 45 |
+| `summary` | text, required, 140 | Card | Aim for 120 |
+| `keyPoints` | array of `line` (60), 3 to 4 | Card | Plain text |
+| `description` | rich text | Detail | |
+| `whoItsFor` | textarea, 300 | Detail | |
+| `searchName` | text, 60 | Detail | Plain text |
+| `startsWhen` | textarea, 200 | Panel | Plain text, needed for own page |
+| `customerSees` | textarea, 240 | Panel | Plain text, optional |
+| `hears` | textarea, 200 | Panel | Plain text, needed for own page |
+| `checks` | textarea, 300 | Panel | Plain text, needed for own page |
+| `acts` | textarea, 300 | Panel | Plain text, needed for own page |
+| `handsOver` | textarea, 240 | Panel | Plain text, needed for own page |
+| `records` | textarea, 200 | Panel | Plain text, needed for own page |
+| `teamControls` | textarea, 240 | Panel | Plain text, needed for own page |
+| `result` | text, 140 | Panel | Plain text, needed for own page |
+| `passesTo` | relationship to `microApps`, hasMany | Panel | Cannot include the agent itself |
+| `heroHeading` | text, 70 | Page | Needed for own page |
+| `heroSubheading` | textarea, 200 | Page | |
+| `benefits` | array of `title` (50) + `line` (140), 3 to 4 | Page | |
+| `useCases` | array of `title` (50) + `line` (140), up to 4 | Page | One per sector |
+| `cta` | group: `label` (30), `link` | Page | Link shows once a label is typed |
+| `related` | relationship to `microApps`, hasMany, up to 3 | Page | Excludes itself |
+| `headingOverrides` | group of text (70): `panel`, `chain`, `teamControls`, `result`, `useCases`, `worksWith`, `related` | Page | Optional. An empty key uses the main master record's `labels` |
+| `proof` | text, 140 | Page | Plain text, needed for own page. Follows the customers collection's `showName` rule |
+| `customers` | relationship to `customers`, hasMany | Page | |
+| `integrations` | relationship to `integrations`, hasMany | Page | |
+| `media` | upload | Page | |
+| `faqs` | array of `question` (120) + `answer` (600), up to 6 | FAQ | Shared group |
+| `waRowTitle` (24), `waRowDescription` (70), `waHeaderType`, `waHeader` (60), `waBody` (1024), `waKeyPoints` (3 to 5 × 60), `waFooter` (60), `waButtons` (up to 3, label 20, action: bookDemo, otherAgents, talkToSales, openPage), `waLinkLabel` (20) | Shared WhatsApp group | WhatsApp | Plain text. An empty row title or description is filled from `name` and `summary`, cut on a whole word to 24 and 70; a note shows under a row title cut from the name |
+| `waLink` | text, read only | WhatsApp | `/bot-swarm/<slug>` with Own page on, otherwise `/bot-swarm#<slug>` |
+| `includeInKbase` (default true), `kbAnswer` (600), `kbFacts` (160 each), `kbQuestions` (120 each), `kbSynonyms` (40 each), `kbLastReviewed` | Shared Knowledge base group | Knowledge base | Not connected to the NCX sync yet |
+| `primaryKeyword` | text, 60 | SEO | |
+| `secondaryKeywords` | array of `keyword` (60), up to 5 | SEO | |
+| `meta.title` (60), `meta.description` (155), `meta.image` | SEO plugin fields | SEO | An empty title is filled from the keyword or name, an empty description from the summary. Needed for own page |
+
+Drafts on, no autosave. List columns: name, family, status, hasOwnPage.
+
+Not built yet, added once those collections exist: `crmFeatures` (features it depends on, usually Customer 360), `callQualityAssessments` (call quality agents only) and `episodicEngagements`, each a hasMany relationship on the Page tab.
 
 ### Supporting collection: `agentFamilies`
 
@@ -141,7 +172,48 @@ Starting families, from the Notion page:
 
 A fourth family, "Follow up", may be needed for Qualify, Recover and Status updates (open item 3).
 
-Admin: both collections sit in a "Micro-apps swarm" group in the sidebar. Drafts on for `microApps`, no autosave. Tabs: Card, Detail, Panel, Page, FAQ, WhatsApp, Knowledge base, SEO.
+### Supporting collection: `microAppsMaster`
+
+The hub copy and the wording every agent page shares, built like `integrationsMaster`. One record has Is main on; agent pages read their section headings from that record only. Visitors see published records only.
+
+| Field | Type and limit | Where | Notes |
+|---|---|---|---|
+| `name` | text, required, 60 | Sidebar | For editors |
+| `slug` | text, required, unique, indexed, 60 | Sidebar | Lowercase and dashes. Cannot match an agent slug |
+| `isMain` | checkbox, default false | Sidebar | Only one record can have it on |
+| `filter.families` | relationship to `agentFamilies`, hasMany | Sidebar | All three filters empty means every live and pilot agent |
+| `filter.sectors` | relationship to `sectors`, hasMany | Sidebar | |
+| `filter.channel` | select, hasMany: whatsapp, calls, web | Sidebar | |
+| `seoCheck` | panel, display only | Sidebar | Checks `h1`, meta title and description for the keyword |
+| `primaryKeyword` | text, 60 | SEO | |
+| `secondaryKeywords` | array of `keyword` (60), up to 5 | SEO | |
+| `meta.title` (60), `meta.description` (155), `meta.image` | SEO plugin fields | SEO | |
+| `eyebrow` | text, 40 | Hero | |
+| `h1` | text, required, 70 | Hero | |
+| `subheading` | textarea, 200 | Hero | |
+| `heroAgents` | relationship to `microApps`, hasMany, up to 4 | Hero | Shown as chips |
+| `hero.secondaryCta` | group: `label` (30), `link` | Hero | Link shows once a label is typed |
+| `hero.image` | upload | Hero | |
+| `introHeading`, `intro` | text (70); rich text | Sections | |
+| `proofStripHeading`, `proofStrip` | text (70); array of `figure` (20), `label` (60), `pending` (checkbox), up to 4 | Sections | Pending rows are never sent to visitors |
+| `comparisonHeading`, `comparison` | text (70); array of `oldWay` (120), `withAgents` (120), up to 5 | Sections | |
+| `fiveStepsHeading`, `fiveSteps` | text (70); array of `title` (30), `line` (140), exactly 5 | Sections | |
+| `underneathHeading`, `underneath` | text (70); array of `title` (50), `line` (140), exactly 3 | Sections | |
+| `worksWithHeading` | text, 70 | Sections | Heading only. The integrations come from the agents |
+| `byIndustryHeading`, `byIndustry` | text (70); array of `sector` (relationship to `sectors`, required), `title` (50), `line` (140), up to 4 | Sections | |
+| `trustCardsHeading`, `trustCards` | text (70); array of `title` (50), `line` (140), up to 4 | Sections | |
+| `labels.panel`, `labels.chain`, `labels.teamControls`, `labels.result`, `labels.useCases`, `labels.worksWith`, `labels.related` | text, 70 each | Agent page labels | `{name}` is the only token. Read from the main record only. Same keys as `microApps.headingOverrides` |
+| `faqHeading` | text, 70 | FAQ | Empty shows "Questions about the bot swarm" |
+| `faqs` | array of `question` (120) + `answer` (600), up to 6 | FAQ | Shared group |
+| `closing.heading` | text, 70 | Closing | |
+| `closing.subheading` | textarea, 200 | Closing | |
+| `cta` | group: `label` (30), `link` | Closing | Link shows once a label is typed |
+| `waIntro` (1024), `waListButton` (20), `waSectionTitle` (24), `waFallback` (300) | text and textarea | WhatsApp | Plain text, same limits as `integrationsMaster` |
+| `includeInKbase`, `kbAnswer` (600), `kbFacts` (160 each), `kbQuestions` (120 each), `kbSynonyms` (40 each), `kbLastReviewed` | Shared Knowledge base group | Knowledge base | Not connected to the NCX sync yet |
+
+Every section heading is plain text. A section with nothing in it is left out of the page; `worksWith` is left out while its heading is empty.
+
+Admin: all three collections sit in a "Bot swarm" group in the sidebar. Drafts on for all three, no autosave. `microApps` tabs: Card, Detail, Panel, Page, FAQ, WhatsApp, Knowledge base, SEO.
 
 ## 4. What is visible, and when
 
@@ -340,11 +412,11 @@ Order on the hub, per the Notion note "Prescription comes first": Prescription u
 
 ## 13. What the CMS needs
 
-Nothing below is built. In this order:
+Items 1 to 4 are built on branch `feat/bot-swarm-collections`, not merged, with no entries seeded. The rest are not built. In this order:
 
 1. **Shared field groups** in `src/fields/`, the same step the B2C CRM and category definitions files list. Build once, used by all.
 2. **`agentFamilies` collection**, with the three starting families.
-3. **`microApps` collection**, with the shared groups, the fields in section 3, the read access in section 4 and the "Micro-apps swarm" admin group.
+3. **`microApps` collection**, with the shared groups, the fields in section 3, the read access in section 4 and the "Bot swarm" admin group.
 4. **`microAppsMaster` collection** for the hub copy, built like `integrationsMaster`. Its slugs and agent slugs must not clash.
 5. **"Pull from micro-apps swarm" option** on the Card Grid and Bento Grid blocks: all, by family, by channel, by vertical, hand-picked, with a limit. Only live and pilot entries for visitors.
 6. **Agent panel block** for the five-step strip, so the hub and agent pages render it the same way.
