@@ -3,10 +3,16 @@ import type { CollectionConfig, Field } from 'payload'
 import { authenticated } from '../access/authenticated'
 import { authenticatedOrPublished } from '../access/authenticatedOrPublished'
 import { faqTab } from '../fields/faq'
+import {
+  closingTab,
+  linkShownWith,
+  masterRecordFields,
+  masterWhatsappTab,
+  pageLabel,
+  sectionHeading,
+} from '../fields/hub'
 import { kbaseTab } from '../fields/kbase'
-import { link } from '../fields/link'
 import { seoCheckField, seoTab } from '../fields/seo'
-import { plainText } from '../fields/validators/plainText'
 import { masterOneMain, masterSlugRule, onlyNameToken } from './integrations/hooks'
 
 /**
@@ -18,68 +24,19 @@ import { masterOneMain, masterSlugRule, onlyNameToken } from './integrations/hoo
  * Visitors see published records only.
  */
 
-// A link that appears, and is required, only once the sibling label or
-// heading has text.
-const linkShownWith = (sibling: string) =>
-  link({
-    appearances: false,
-    disableLabel: true,
-    overrides: {
-      admin: { condition: (_: unknown, siblingData: any) => Boolean(siblingData?.[sibling]) },
-    },
-  })
-
-const label = (name: string, title: string, example: string): Field => ({
-  name,
-  type: 'text',
-  label: title,
-  maxLength: 70,
-  validate: onlyNameToken,
-  admin: { description: `For example: ${example}` },
-})
-
-// An optional heading for a section. Left empty, the page shows the default.
-const sectionHeading = (name: string, title: string, fallback: string, maxLength = 70): Field => ({
-  name,
-  type: 'text',
-  label: title,
-  maxLength,
-  validate: plainText,
-  admin: { placeholder: fallback, description: `Leave empty to show: ${fallback}` },
-})
+const label = (name: string, title: string, example: string): Field =>
+  pageLabel(name, title, example, onlyNameToken)
 
 const sidebar: Field[] = [
-  {
-    name: 'name',
-    type: 'text',
-    required: true,
-    maxLength: 60,
-    admin: { position: 'sidebar', description: 'For editors, for example Main integrations page.' },
-  },
-  {
-    name: 'slug',
-    type: 'text',
-    required: true,
-    unique: true,
-    index: true,
-    maxLength: 60,
-    validate: masterSlugRule,
-    admin: {
-      position: 'sidebar',
+  ...masterRecordFields({
+    name: 'For editors, for example Main integrations page.',
+    slug: {
+      validate: masterSlugRule,
       description: 'Lowercase, dashes only. Cannot be the same as an integration item slug.',
     },
-  },
-  {
-    name: 'isMain',
-    type: 'checkbox',
-    label: 'Is main',
-    defaultValue: false,
-    admin: {
-      position: 'sidebar',
-      description:
-        'The main integrations page. Integration item pages take their section headings from this record. Only one record can have it on.',
-    },
-  },
+    isMain:
+      'The main integrations page. Integration item pages take their section headings from this record. Only one record can have it on.',
+  }),
   {
     name: 'filter',
     type: 'group',
@@ -287,83 +244,16 @@ export const IntegrationsMaster: CollectionConfig = {
           ],
         },
         faqTab({ headingFallback: 'Questions about integrations' }),
-        {
-          label: 'Closing',
-          fields: [
-            {
-              name: 'closing',
-              type: 'group',
-              label: false,
-              fields: [
-                {
-                  name: 'heading',
-                  type: 'text',
-                  maxLength: 70,
-                  admin: {
-                    description:
-                      "The closing panel's heading, for example: Tell us what you're running.",
-                  },
-                },
-                {
-                  name: 'subheading',
-                  type: 'textarea',
-                  maxLength: 200,
-                  admin: { description: 'One or two sentences under the heading.' },
-                },
-              ],
-            },
-            {
-              name: 'cta',
-              type: 'group',
-              label: 'Call to action',
-              admin: { description: 'The closing button. Type a label to choose where it goes.' },
-              fields: [{ name: 'label', type: 'text', maxLength: 30 }, linkShownWith('label')],
-            },
-          ],
-        },
-        {
-          label: 'WhatsApp',
-          description: 'Plain text only. These limits are the ones WhatsApp enforces.',
-          fields: [
-            {
-              name: 'waIntro',
-              type: 'textarea',
-              label: 'Intro message',
-              maxLength: 1024,
-              validate: plainText,
-              admin: {
-                description: 'Sent before the list of integrations. Aim for 300 characters.',
-              },
-            },
-            {
-              name: 'waListButton',
-              type: 'text',
-              label: 'List button',
-              maxLength: 20,
-              validate: plainText,
-              admin: { description: 'The button that opens the list, for example See systems.' },
-            },
-            {
-              name: 'waSectionTitle',
-              type: 'text',
-              label: 'Section title',
-              maxLength: 24,
-              validate: plainText,
-              admin: { description: 'The heading above the rows in the list.' },
-            },
-            {
-              name: 'waFallback',
-              type: 'textarea',
-              label: 'Fallback message',
-              maxLength: 300,
-              validate: plainText,
-              admin: {
-                description:
-                  'Sent when someone asks about a system that is not listed, for example: We connect to most booking systems. Tell us which one you use.',
-              },
-            },
-          ],
-        },
+        closingTab({
+          headingDescription:
+            "The closing panel's heading, for example: Tell us what you're running.",
+        }),
+        masterWhatsappTab({
+          intro: 'Sent before the list of integrations. Aim for 300 characters.',
+          listButton: 'The button that opens the list, for example See systems.',
+          fallback:
+            'Sent when someone asks about a system that is not listed, for example: We connect to most booking systems. Tell us which one you use.',
+        }),
         kbaseTab(),
       ],
     },

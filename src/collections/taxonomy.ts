@@ -12,6 +12,7 @@ import { text as validateText } from 'payload/shared'
 
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
+import { slugify } from '../utilities/slugify'
 
 /**
  * Editable lists that other collections link to: integration categories,
@@ -19,13 +20,6 @@ import { authenticated } from '../access/authenticated'
  * rename and reorder them in the admin, and everything that links to an
  * entry follows, because it links instead of copying its text.
  */
-
-const slugify = (s: string) =>
-  s
-    .toLowerCase()
-    .normalize('NFKD')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
 
 const slugFormat = (example: string) => (value: unknown) =>
   typeof value === 'string' && /^[a-z0-9]+(-[a-z0-9]+)*$/.test(value)

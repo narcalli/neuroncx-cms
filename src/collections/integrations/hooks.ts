@@ -1,6 +1,7 @@
 import type { CollectionBeforeChangeHook, Validate } from 'payload'
 import { text as validateText } from 'payload/shared'
 
+import { nameTokenRule } from '../../fields/validators/nameToken'
 import { requiredForOwnPage } from '../../fields/validators/ownPage'
 import { plainTextProblem } from '../../fields/validators/plainText'
 import { SLUG_PATTERN, slugFreeIn } from '../../fields/validators/slugFree'
@@ -143,13 +144,4 @@ export const masterSlugRule: Validate = async (value, options) => {
 export const masterOneMain = oneMainRecord('integrationsMaster')
 
 /** Heading labels may use {name} and no other placeholder. */
-export const onlyNameToken: Validate = (value, options) => {
-  const builtIn = validateText(value, options as any)
-  if (builtIn !== true) return builtIn
-  if (typeof value !== 'string') return true
-  const rest = value.replace(/\{name\}/g, '')
-  const token = rest.match(/\{[^}]*\}?|\}/)
-  return token
-    ? `Only {name} can be used here. Remove ${token[0]}, for example: What moves between {name} and NeuronCx.`
-    : true
-}
+export const onlyNameToken = nameTokenRule('What moves between {name} and NeuronCx')

@@ -82,6 +82,7 @@ export interface Config {
     integrationCategories: IntegrationCategory;
     connectionTypes: ConnectionType;
     products: Product;
+    microAppsMaster: MicroAppsMaster;
     microApps: MicroApp;
     agentFamilies: AgentFamily;
     ncxPostContents: NcxPostContent;
@@ -114,6 +115,7 @@ export interface Config {
     integrationCategories: IntegrationCategoriesSelect<false> | IntegrationCategoriesSelect<true>;
     connectionTypes: ConnectionTypesSelect<false> | ConnectionTypesSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
+    microAppsMaster: MicroAppsMasterSelect<false> | MicroAppsMasterSelect<true>;
     microApps: MicroAppsSelect<false> | MicroAppsSelect<true>;
     agentFamilies: AgentFamiliesSelect<false> | AgentFamiliesSelect<true>;
     ncxPostContents: NcxPostContentsSelect<false> | NcxPostContentsSelect<true>;
@@ -4723,6 +4725,467 @@ export interface Enquiry {
   createdAt: string;
 }
 /**
+ * The bot swarm hub copy, and the wording shared by every agent page.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "microAppsMaster".
+ */
+export interface MicroAppsMaster {
+  id: string;
+  /**
+   * For editors, for example Main bot swarm page.
+   */
+  name: string;
+  /**
+   * Lowercase, dashes only. Cannot be the same as an agent slug.
+   */
+  slug: string;
+  /**
+   * The main bot swarm page. Agent pages take their section headings from this record. Only one record can have it on.
+   */
+  isMain?: boolean | null;
+  /**
+   * Leave all three empty to list every live and pilot agent.
+   */
+  filter?: {
+    families?: (string | AgentFamily)[] | null;
+    sectors?: (string | Sector)[] | null;
+    channel?: ('whatsapp' | 'calls' | 'web')[] | null;
+  };
+  /**
+   * The search phrase this page should rank for, for example ai agents for customer service.
+   */
+  primaryKeyword?: string | null;
+  /**
+   * Up to 5 related phrases.
+   */
+  secondaryKeywords?:
+    | {
+        keyword: string;
+        id?: string | null;
+      }[]
+    | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (string | null) | Media;
+    description?: string | null;
+  };
+  /**
+   * The small line above the heading, for example Bot swarm.
+   */
+  eyebrow?: string | null;
+  /**
+   * The page heading, for example: Small agents that each finish one job.
+   */
+  h1: string;
+  subheading?: string | null;
+  /**
+   * Up to 4 agents, shown as chips in the hero.
+   */
+  heroAgents?: (string | MicroApp)[] | null;
+  hero?: {
+    /**
+     * Optional, next to the main button, for example: See Omnichannel CX. Type a label to choose where it goes.
+     */
+    secondaryCta?: {
+      label?: string | null;
+      link?: {
+        type?: ('reference' | 'custom') | null;
+        newTab?: boolean | null;
+        reference?:
+          | ({
+              relationTo: 'pages';
+              value: string | Page;
+            } | null)
+          | ({
+              relationTo: 'posts';
+              value: string | Post;
+            } | null);
+        url?: string | null;
+      };
+    };
+    /**
+     * Optional. An illustration beside the hero, such as the chat panel.
+     */
+    image?: (string | null) | Media;
+  };
+  /**
+   * For example: One record, many small agents. The section is left out while the intro is empty.
+   */
+  introHeading?: string | null;
+  /**
+   * A short introduction under the hero.
+   */
+  intro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * For example: In use today.
+   */
+  proofStripHeading?: string | null;
+  /**
+   * Up to 4 confirmed figures. Tick Pending for a figure that is not confirmed yet: it is kept here and never shown on the site. The section is left out of the page while it has no rows.
+   */
+  proofStrip?:
+    | {
+        /**
+         * For example 3 agents.
+         */
+        figure: string;
+        /**
+         * For example: in one conversation, with no retyping.
+         */
+        label: string;
+        /**
+         * Not confirmed yet. Never shown on the site.
+         */
+        pending?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * For example: Menu bots and agents.
+   */
+  comparisonHeading?: string | null;
+  /**
+   * Up to 5 rows, the old way beside the way with agents. The section is left out of the page while it has no rows.
+   */
+  comparison?:
+    | {
+        oldWay: string;
+        withAgents: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * For example: How every agent works.
+   */
+  fiveStepsHeading?: string | null;
+  /**
+   * Exactly 5: hears, checks, acts, hands over, records. The section is left out of the page while it has no rows.
+   */
+  fiveSteps?:
+    | {
+        title: string;
+        line: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * For example: What sits underneath.
+   */
+  underneathHeading?: string | null;
+  /**
+   * Exactly 3 columns. The section is left out of the page while it has no rows.
+   */
+  underneath?:
+    | {
+        title: string;
+        line: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * For example: Works with the systems you run. The integrations come from the agents on the page. The section is left out while this heading is empty.
+   */
+  worksWithHeading?: string | null;
+  /**
+   * For example: By industry.
+   */
+  byIndustryHeading?: string | null;
+  /**
+   * Up to 4, one per sector. The section is left out of the page while it has no rows.
+   */
+  byIndustry?:
+    | {
+        sector: string | Sector;
+        title: string;
+        line: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * For example: You stay in charge.
+   */
+  trustCardsHeading?: string | null;
+  /**
+   * Up to 4. The section is left out of the page while it has no rows.
+   */
+  trustCards?:
+    | {
+        title: string;
+        line: string;
+        id?: string | null;
+      }[]
+    | null;
+  labels?: {
+    /**
+     * For example: How {name} works
+     */
+    panel?: string | null;
+    /**
+     * For example: Where {name} sits in the chain
+     */
+    chain?: string | null;
+    /**
+     * For example: What your team controls
+     */
+    teamControls?: string | null;
+    /**
+     * For example: What changes for your team
+     */
+    result?: string | null;
+    /**
+     * For example: Where {name} is used
+     */
+    useCases?: string | null;
+    /**
+     * For example: Systems {name} works with
+     */
+    worksWith?: string | null;
+    /**
+     * For example: Other agents in this family
+     */
+    related?: string | null;
+  };
+  /**
+   * Leave empty to show: Questions about the bot swarm
+   */
+  faqHeading?: string | null;
+  /**
+   * Up to 6. Questions phrased the way a buyer would ask them.
+   */
+  faqs?:
+    | {
+        question: string;
+        /**
+         * Plain text, no formatting.
+         */
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  closing?: {
+    /**
+     * The closing panel's heading, for example: Tell us which job to take off your team.
+     */
+    heading?: string | null;
+    /**
+     * One or two sentences under the heading.
+     */
+    subheading?: string | null;
+  };
+  /**
+   * The closing button. Type a label to choose where it goes.
+   */
+  cta?: {
+    label?: string | null;
+    link?: {
+      type?: ('reference' | 'custom') | null;
+      newTab?: boolean | null;
+      reference?:
+        | ({
+            relationTo: 'pages';
+            value: string | Page;
+          } | null)
+        | ({
+            relationTo: 'posts';
+            value: string | Post;
+          } | null);
+      url?: string | null;
+    };
+  };
+  /**
+   * Sent before the list of agent families. Aim for 300 characters.
+   */
+  waIntro?: string | null;
+  /**
+   * The button that opens the list, for example See agents.
+   */
+  waListButton?: string | null;
+  /**
+   * The heading above the rows in the list.
+   */
+  waSectionTitle?: string | null;
+  /**
+   * Sent when someone asks about a job no agent does yet, for example: Tell us which job takes your team the most time.
+   */
+  waFallback?: string | null;
+  /**
+   * Only published entries with this on are sent to the knowledge base.
+   */
+  includeInKbase?: boolean | null;
+  /**
+   * A complete answer to "What is this?", written for the virtual agents.
+   */
+  kbAnswer?: string | null;
+  /**
+   * Short, checkable facts. One fact per line.
+   */
+  kbFacts?:
+    | {
+        fact: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * How a customer might ask about it.
+   */
+  kbQuestions?:
+    | {
+        question: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Other names people use for it.
+   */
+  kbSynonyms?:
+    | {
+        synonym: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * So answers that have gone stale can be found and fixed.
+   */
+  kbLastReviewed?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * Groups for the bot swarm agents. Used in each agent's Family field, as the sections of the bot swarm hub and in WhatsApp menus.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "agentFamilies".
+ */
+export interface AgentFamily {
+  id: string;
+  name: string;
+  /**
+   * A short fixed code for addresses and filters. Filled in from the name if left empty. Lowercase, dashes only.
+   */
+  slug: string;
+  /**
+   * Lower numbers come first in dropdowns and lists.
+   */
+  order?: number | null;
+  /**
+   * The section heading on the bot swarm hub, for example "Book and get paid".
+   */
+  hubHeading?: string | null;
+  /**
+   * One line shown under the family heading on the hub.
+   */
+  description?: string | null;
+  /**
+   * The problem the family solves, in the team's words, for example: Your team spends the day confirming slots and chasing payments.
+   */
+  painLine?: string | null;
+  /**
+   * How the agents in the family work together, for example: One agent books the appointment, the next sends the payment link and stays with it until it is settled.
+   */
+  summary?: string | null;
+  /**
+   * Shown with the family heading on the hub.
+   */
+  icon?:
+    | (
+        | 'message'
+        | 'chat'
+        | 'check'
+        | 'calendar'
+        | 'card'
+        | 'document'
+        | 'refresh'
+        | 'bolt'
+        | 'layers'
+        | 'gauge'
+        | 'plug'
+        | 'shield'
+        | 'shieldCheck'
+        | 'lock'
+        | 'globe'
+        | 'server'
+        | 'eye'
+        | 'users'
+        | 'user'
+        | 'phone'
+        | 'smartphone'
+        | 'mail'
+        | 'messageCircle'
+        | 'send'
+        | 'inbox'
+        | 'headphones'
+        | 'mic'
+        | 'video'
+        | 'bell'
+        | 'handshake'
+        | 'stethoscope'
+        | 'heartPulse'
+        | 'hospital'
+        | 'activity'
+        | 'flask'
+        | 'pill'
+        | 'graduationCap'
+        | 'building'
+        | 'mapPin'
+        | 'database'
+        | 'cloud'
+        | 'workflow'
+        | 'bot'
+        | 'sparkles'
+        | 'search'
+        | 'chart'
+        | 'trendingUp'
+        | 'target'
+        | 'rocket'
+        | 'key'
+        | 'fileText'
+        | 'clipboardList'
+        | 'link'
+        | 'settings'
+        | 'puzzle'
+        | 'timer'
+        | 'clock'
+        | 'badgeCheck'
+        | 'star'
+        | 'briefcase'
+      )
+    | null;
+  /**
+   * The family as a row in the WhatsApp menu.
+   */
+  waRowTitle?: string | null;
+  /**
+   * Lists the names of this family's live and pilot agents that are published, in order, cut to 70 characters on a whole name. It updates when an agent is published, changed, unpublished or deleted. Publishing an agent can therefore save this family as a new published version, so publish or discard any open draft of the family first.
+   */
+  waRowDescriptionAuto?: boolean | null;
+  /**
+   * Aim for 60 characters. Written for you while the automatic switch above is on.
+   */
+  waRowDescription?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
  * The bot swarm: small agents with one job each, such as Payment services. Each entry is written once and shown wherever agents are listed.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -4760,11 +5223,11 @@ export interface MicroApp {
    */
   order?: number | null;
   /**
-   * Used in the address /bot-swarm/<slug>. Needed to publish with Own page on.
+   * Used in the address /bot-swarm/<slug>. Filled in from the name when the agent is created, and can be changed. Lowercase, dashes only. Cannot be the same as a bot swarm master record slug.
    */
-  slug?: string | null;
+  slug: string;
   /**
-   * Gives this agent a page at /bot-swarm/<slug>. The Page tab appears while this is on. Publishing then needs status Live, a slug, a hero heading, every Panel field except Customer sees, proof, and an SEO title and description.
+   * Gives this agent a page at /bot-swarm/<slug>. The Page tab appears while this is on. Publishing then needs status Live, a hero heading, every Panel field except Customer sees, proof, and an SEO title and description.
    */
   hasOwnPage?: boolean | null;
   /**
@@ -4974,7 +5437,7 @@ export interface MicroApp {
    */
   related?: (string | MicroApp)[] | null;
   /**
-   * Optional. Leave empty to use the standard headings.
+   * Optional. Leave empty to use the agent page labels from the main bot swarm master record.
    */
   headingOverrides?: {
     panel?: string | null;
@@ -5062,7 +5525,7 @@ export interface MicroApp {
    */
   waLinkLabel?: string | null;
   /**
-   * Set automatically: /bot-swarm/<slug> when Own page is on, otherwise /bot-swarm#<slug>. Empty while there is no slug.
+   * Set automatically: /bot-swarm/<slug> when Own page is on, otherwise /bot-swarm#<slug>.
    */
   waLink?: string | null;
   /**
@@ -5131,122 +5594,6 @@ export interface MicroApp {
      */
     description?: string | null;
   };
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * Groups for the bot swarm agents. Used in each agent's Family field, as the sections of the bot swarm hub and in WhatsApp menus.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "agentFamilies".
- */
-export interface AgentFamily {
-  id: string;
-  name: string;
-  /**
-   * A short fixed code for addresses and filters. Filled in from the name if left empty. Lowercase, dashes only.
-   */
-  slug: string;
-  /**
-   * Lower numbers come first in dropdowns and lists.
-   */
-  order?: number | null;
-  /**
-   * The section heading on the bot swarm hub, for example "Book and get paid".
-   */
-  hubHeading?: string | null;
-  /**
-   * One line shown under the family heading on the hub.
-   */
-  description?: string | null;
-  /**
-   * The problem the family solves, in the team's words, for example: Your team spends the day confirming slots and chasing payments.
-   */
-  painLine?: string | null;
-  /**
-   * How the agents in the family work together, for example: One agent books the appointment, the next sends the payment link and stays with it until it is settled.
-   */
-  summary?: string | null;
-  /**
-   * Shown with the family heading on the hub.
-   */
-  icon?:
-    | (
-        | 'message'
-        | 'chat'
-        | 'check'
-        | 'calendar'
-        | 'card'
-        | 'document'
-        | 'refresh'
-        | 'bolt'
-        | 'layers'
-        | 'gauge'
-        | 'plug'
-        | 'shield'
-        | 'shieldCheck'
-        | 'lock'
-        | 'globe'
-        | 'server'
-        | 'eye'
-        | 'users'
-        | 'user'
-        | 'phone'
-        | 'smartphone'
-        | 'mail'
-        | 'messageCircle'
-        | 'send'
-        | 'inbox'
-        | 'headphones'
-        | 'mic'
-        | 'video'
-        | 'bell'
-        | 'handshake'
-        | 'stethoscope'
-        | 'heartPulse'
-        | 'hospital'
-        | 'activity'
-        | 'flask'
-        | 'pill'
-        | 'graduationCap'
-        | 'building'
-        | 'mapPin'
-        | 'database'
-        | 'cloud'
-        | 'workflow'
-        | 'bot'
-        | 'sparkles'
-        | 'search'
-        | 'chart'
-        | 'trendingUp'
-        | 'target'
-        | 'rocket'
-        | 'key'
-        | 'fileText'
-        | 'clipboardList'
-        | 'link'
-        | 'settings'
-        | 'puzzle'
-        | 'timer'
-        | 'clock'
-        | 'badgeCheck'
-        | 'star'
-        | 'briefcase'
-      )
-    | null;
-  /**
-   * The family as a row in the WhatsApp menu.
-   */
-  waRowTitle?: string | null;
-  /**
-   * Lists the names of this family's live and pilot agents that are published, in order, cut to 70 characters on a whole name. It updates when an agent is published, changed, unpublished or deleted. Publishing an agent can therefore save this family as a new published version, so publish or discard any open draft of the family first.
-   */
-  waRowDescriptionAuto?: boolean | null;
-  /**
-   * Aim for 60 characters. Written for you while the automatic switch above is on.
-   */
-  waRowDescription?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -5529,6 +5876,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'products';
         value: string | Product;
+      } | null)
+    | ({
+        relationTo: 'microAppsMaster';
+        value: string | MicroAppsMaster;
       } | null)
     | ({
         relationTo: 'microApps';
@@ -7794,6 +8145,177 @@ export interface ProductsSelect<T extends boolean = true> {
   icon?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "microAppsMaster_select".
+ */
+export interface MicroAppsMasterSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  isMain?: T;
+  filter?:
+    | T
+    | {
+        families?: T;
+        sectors?: T;
+        channel?: T;
+      };
+  primaryKeyword?: T;
+  secondaryKeywords?:
+    | T
+    | {
+        keyword?: T;
+        id?: T;
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+      };
+  eyebrow?: T;
+  h1?: T;
+  subheading?: T;
+  heroAgents?: T;
+  hero?:
+    | T
+    | {
+        secondaryCta?:
+          | T
+          | {
+              label?: T;
+              link?:
+                | T
+                | {
+                    type?: T;
+                    newTab?: T;
+                    reference?: T;
+                    url?: T;
+                  };
+            };
+        image?: T;
+      };
+  introHeading?: T;
+  intro?: T;
+  proofStripHeading?: T;
+  proofStrip?:
+    | T
+    | {
+        figure?: T;
+        label?: T;
+        pending?: T;
+        id?: T;
+      };
+  comparisonHeading?: T;
+  comparison?:
+    | T
+    | {
+        oldWay?: T;
+        withAgents?: T;
+        id?: T;
+      };
+  fiveStepsHeading?: T;
+  fiveSteps?:
+    | T
+    | {
+        title?: T;
+        line?: T;
+        id?: T;
+      };
+  underneathHeading?: T;
+  underneath?:
+    | T
+    | {
+        title?: T;
+        line?: T;
+        id?: T;
+      };
+  worksWithHeading?: T;
+  byIndustryHeading?: T;
+  byIndustry?:
+    | T
+    | {
+        sector?: T;
+        title?: T;
+        line?: T;
+        id?: T;
+      };
+  trustCardsHeading?: T;
+  trustCards?:
+    | T
+    | {
+        title?: T;
+        line?: T;
+        id?: T;
+      };
+  labels?:
+    | T
+    | {
+        panel?: T;
+        chain?: T;
+        teamControls?: T;
+        result?: T;
+        useCases?: T;
+        worksWith?: T;
+        related?: T;
+      };
+  faqHeading?: T;
+  faqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  closing?:
+    | T
+    | {
+        heading?: T;
+        subheading?: T;
+      };
+  cta?:
+    | T
+    | {
+        label?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+            };
+      };
+  waIntro?: T;
+  waListButton?: T;
+  waSectionTitle?: T;
+  waFallback?: T;
+  includeInKbase?: T;
+  kbAnswer?: T;
+  kbFacts?:
+    | T
+    | {
+        fact?: T;
+        id?: T;
+      };
+  kbQuestions?:
+    | T
+    | {
+        question?: T;
+        id?: T;
+      };
+  kbSynonyms?:
+    | T
+    | {
+        synonym?: T;
+        id?: T;
+      };
+  kbLastReviewed?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

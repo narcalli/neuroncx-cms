@@ -1,5 +1,7 @@
 import type { Field, Validate } from 'payload'
 
+import { slugify } from '../utilities/slugify'
+
 /**
  * Core group (fields_reference.md, section 1). Each field is its own builder,
  * so a collection keeps its own order and placement: integrations has `name`
@@ -43,11 +45,16 @@ export const orderField = (opts: { description: string }): Field => ({
   admin: { position: 'sidebar', description: opts.description },
 })
 
-/** Unique and indexed, 60 characters. The collection supplies the rule and whether it is required. */
+/**
+ * Unique and indexed, 60 characters. The collection supplies the rule and
+ * whether it is required. With `fromName`, an empty slug is filled from the
+ * name when the entry is created; editors can change it afterwards.
+ */
 export const slugField = (opts: {
   validate: Validate
   description: string
   required?: boolean
+  fromName?: boolean
 }): Field => ({
   name: 'slug',
   type: 'text',
@@ -56,6 +63,18 @@ export const slugField = (opts: {
   index: true,
   maxLength: 60,
   validate: opts.validate,
+  ...(opts.fromName
+    ? {
+        hooks: {
+          beforeValidate: [
+            ({ value, data, operation }) =>
+              operation === 'create' && !value && data?.name
+                ? slugify(String(data.name)).slice(0, 60).replace(/-+$/, '')
+                : value,
+          ],
+        },
+      }
+    : {}),
   admin: { position: 'sidebar', description: opts.description },
 })
 

@@ -25,6 +25,11 @@ export type WhatsappTabOptions = {
    * see it. The string is the field's admin description.
    */
   linkSetByHook?: string
+  /**
+   * The collection's hook fills an empty row title from the name, cut to 24
+   * characters. Shows a note under the row title while it holds a cut name.
+   */
+  rowTitleFromName?: boolean
 }
 
 // A path on the site, with an optional anchor, or a full URL.
@@ -65,6 +70,9 @@ export const whatsappTab = (opts: WhatsappTabOptions = {}): Tab => {
       label: 'Row title (list menu)',
       maxLength: 24,
       validate: plainText,
+      ...(opts.rowTitleFromName
+        ? { admin: { components: { Description: '@/fields/admin/RowTitleNote#RowTitleNote' } } }
+        : {}),
     },
     {
       name: 'waRowDescription',

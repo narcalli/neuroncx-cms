@@ -46,8 +46,9 @@ const liveOrPilotOrAuthenticated: Access = ({ req: { user } }) => {
  * agent; see liveOrPilotOrAuthenticated above.
  *
  * Uses the shared groups in src/fields. Agent pages are at /bot-swarm/[slug];
- * the hub at /bot-swarm is a CMS page. Fallbacks, waLink, the own page rule
- * and the family refresh: MicroApps/hooks.ts.
+ * the hub copy is in the bot swarm master (MicroAppsMaster.ts). Fallbacks,
+ * the WhatsApp row, waLink, the own page rule and the family refresh:
+ * MicroApps/hooks.ts.
  */
 
 const sidebar: Field[] = [
@@ -92,13 +93,16 @@ const sidebar: Field[] = [
   isUSPField({ description: 'Marks an agent that most sets NeuronCx apart, so blocks can pull it out.' }),
   orderField({ description: 'Lower numbers show first.' }),
   slugField({
+    required: true,
+    fromName: true,
     validate: microAppSlugRule,
-    description: 'Used in the address /bot-swarm/<slug>. Needed to publish with Own page on.',
+    description:
+      'Used in the address /bot-swarm/<slug>. Filled in from the name when the agent is created, and can be changed. Lowercase, dashes only. Cannot be the same as a bot swarm master record slug.',
   }),
   hasOwnPageField({
     validate: ownPageRule,
     description:
-      'Gives this agent a page at /bot-swarm/<slug>. The Page tab appears while this is on. Publishing then needs status Live, a slug, a hero heading, every Panel field except Customer sees, proof, and an SEO title and description.',
+      'Gives this agent a page at /bot-swarm/<slug>. The Page tab appears while this is on. Publishing then needs status Live, a hero heading, every Panel field except Customer sees, proof, and an SEO title and description.',
   }),
   seoCheckField('item'),
 ]
@@ -290,7 +294,8 @@ const page = ownPageTab({
     description: 'Up to 3. Leave empty to show other agents in the same family.',
   },
   headingOverrides: {
-    description: 'Optional. Leave empty to use the standard headings.',
+    description:
+      'Optional. Leave empty to use the agent page labels from the main bot swarm master record.',
     keys: [
       ['panel', 'Panel'],
       ['chain', 'Chain'],
@@ -346,7 +351,8 @@ const whatsapp = whatsappTab({
   headerType: true,
   linkLabel: true,
   linkSetByHook:
-    'Set automatically: /bot-swarm/<slug> when Own page is on, otherwise /bot-swarm#<slug>. Empty while there is no slug.',
+    'Set automatically: /bot-swarm/<slug> when Own page is on, otherwise /bot-swarm#<slug>.',
+  rowTitleFromName: true,
 })
 
 const seo = seoTab({

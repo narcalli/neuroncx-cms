@@ -32,6 +32,7 @@ import { OrderedListFeatureClient as OrderedListFeatureClient_e70f5e05f09f93e00b
 import { SeoCheck as SeoCheck_f005860eaae4bc0f6f58072e00aa4b7e } from '@/collections/integrations/admin/SeoCheck'
 import { WhatsappPreview as WhatsappPreview_46da6f23e7eb1a14a653b9c74f39e9f1 } from '@/collections/integrations/admin/WhatsappPreview'
 import { FillKeyPoints as FillKeyPoints_429d4a4d03d610ec6cdfceba54f73123 } from '@/collections/integrations/admin/FillKeyPoints'
+import { RowTitleNote as RowTitleNote_0de3420eae5817929962befc71f92317 } from '@/fields/admin/RowTitleNote'
 import { FolderTypeField as FolderTypeField_2b8867833a34864a02ddf429b0728a40 } from '@payloadcms/next/client'
 import { RowLabel as RowLabel_ec255a65fa6fa8d1faeb09cf35284224 } from '@/Header/RowLabel'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
@@ -73,6 +74,7 @@ export const importMap = {
   "@/collections/integrations/admin/SeoCheck#SeoCheck": SeoCheck_f005860eaae4bc0f6f58072e00aa4b7e,
   "@/collections/integrations/admin/WhatsappPreview#WhatsappPreview": WhatsappPreview_46da6f23e7eb1a14a653b9c74f39e9f1,
   "@/collections/integrations/admin/FillKeyPoints#FillKeyPoints": FillKeyPoints_429d4a4d03d610ec6cdfceba54f73123,
+  "@/fields/admin/RowTitleNote#RowTitleNote": RowTitleNote_0de3420eae5817929962befc71f92317,
   "@payloadcms/next/client#FolderTypeField": FolderTypeField_2b8867833a34864a02ddf429b0728a40,
   "@/Header/RowLabel#RowLabel": RowLabel_ec255a65fa6fa8d1faeb09cf35284224,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,

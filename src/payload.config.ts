@@ -16,6 +16,7 @@ import { Enquiries } from './collections/Enquiries'
 import { Features } from './collections/Features'
 import { Media } from './collections/Media'
 import { MicroApps } from './collections/MicroApps'
+import { MicroAppsMaster } from './collections/MicroAppsMaster'
 import { NcxPostContents } from './collections/NcxPostContents'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
@@ -67,6 +68,7 @@ export default buildConfig({
     IntegrationCategories,
     ConnectionTypes,
     Products,
+    MicroAppsMaster,
     MicroApps,
     AgentFamilies,
     NcxPostContents,
