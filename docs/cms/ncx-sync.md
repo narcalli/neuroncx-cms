@@ -6,8 +6,8 @@
 ## What it does
 
 - Only **Integration items** are synced. Every published section of an integration item becomes one post content in NCX (IID 4), so the WhatsApp bot can answer from it.
-- New sections arrive in NCX as **Awaiting Approval**. Nothing reaches the bot until someone approves it in the dashboard (status dropdown on the post content).
-- Edited sections update the same post content in place: title, text and embedding. An approved section stays approved.
+- New sections arrive in NCX as **Active**, so the bot can answer from them as soon as they are indexed (about a minute). This is the backend setting `CMS_SYNC_STATUS_ID=1`; set it to `7` to have new sections wait as Awaiting Approval instead.
+- Edited sections update the same post content in place: title, text and embedding. Their status is not changed.
 - A section emptied out, an item unpublished or no longer Live, or a deleted item: its post contents are set to **Archived**.
 
 ## When an integration item is sent
@@ -33,7 +33,7 @@
 
 ## Setup
 
-- **Backend env** (dashboard-backend): `CMS_SYNC_KEY` (shared secret), `CMS_SYNC_TREATMENT_ID` (88: IID 4, shard 60 / index `ncx26-website`, text indexing WF 53), optional `CMS_SYNC_SHARD_ID` to point at another shard.
+- **Backend env** (dashboard-backend): `CMS_SYNC_KEY` (shared secret), `CMS_SYNC_STATUS_ID=1` (new sections go live as Active; default 7, Awaiting Approval), `CMS_SYNC_TREATMENT_ID` (88: IID 4, shard 60 / index `ncx26-website`, text indexing WF 53), optional `CMS_SYNC_SHARD_ID` to point at another shard.
 - **CMS env** (Amplify): `NCX_SYNC_URL`, `NCX_SYNC_KEY` (same value as `CMS_SYNC_KEY`), `NCX_SITE_URL`, and `CRON_SECRET`. With `NCX_SYNC_URL` or `NCX_SYNC_KEY` unset the sync does nothing.
 - **Job runner:** Amplify does not run background jobs, so a scheduler calls the runner every minute:
   - `GET {CMS URL}/api/payload-jobs/run?allQueues=true&limit=1`
