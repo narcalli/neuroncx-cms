@@ -4959,6 +4959,10 @@ export interface MicroAppsMaster {
      */
     worksWith?: string | null;
     /**
+     * For example: Questions about {name}
+     */
+    faq?: string | null;
+    /**
      * For example: Other agents in this family
      */
     related?: string | null;
@@ -5446,6 +5450,7 @@ export interface MicroApp {
     result?: string | null;
     useCases?: string | null;
     worksWith?: string | null;
+    faq?: string | null;
     related?: string | null;
   };
   /**
@@ -8259,6 +8264,7 @@ export interface MicroAppsMasterSelect<T extends boolean = true> {
         result?: T;
         useCases?: T;
         worksWith?: T;
+        faq?: T;
         related?: T;
       };
   faqHeading?: T;
@@ -8394,6 +8400,7 @@ export interface MicroAppsSelect<T extends boolean = true> {
         result?: T;
         useCases?: T;
         worksWith?: T;
+        faq?: T;
         related?: T;
       };
   proof?: T;

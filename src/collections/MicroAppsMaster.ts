@@ -338,6 +338,7 @@ export const MicroAppsMaster: CollectionConfig = {
                 label('result', 'Result and proof', 'What changes for your team'),
                 label('useCases', 'Use cases', 'Where {name} is used'),
                 label('worksWith', 'Works with', 'Systems {name} works with'),
+                label('faq', 'FAQ', 'Questions about {name}'),
                 label('related', 'Related', 'Other agents in this family'),
               ],
             },

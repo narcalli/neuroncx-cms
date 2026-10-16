@@ -127,7 +127,7 @@ Every field of `microApps`, shared groups included, in admin order.
 | `useCases` | array of `title` (50) + `line` (140), up to 4 | Page | One per sector |
 | `cta` | group: `label` (30), `link` | Page | Link shows once a label is typed |
 | `related` | relationship to `microApps`, hasMany, up to 3 | Page | Excludes itself |
-| `headingOverrides` | group of text (70): `panel`, `chain`, `teamControls`, `result`, `useCases`, `worksWith`, `related` | Page | Optional. An empty key uses the main master record's `labels` |
+| `headingOverrides` | group of text (70): `panel`, `chain`, `teamControls`, `result`, `useCases`, `worksWith`, `faq`, `related` | Page | Optional. An empty key uses the main master record's `labels` |
 | `proof` | text, 140 | Page | Plain text, needed for own page. Follows the customers collection's `showName` rule |
 | `customers` | relationship to `customers`, hasMany | Page | |
 | `integrations` | relationship to `integrations`, hasMany | Page | |
@@ -202,7 +202,7 @@ The hub copy and the wording every agent page shares, built like `integrationsMa
 | `worksWithHeading` | text, 70 | Sections | Heading only. The integrations come from the agents |
 | `byIndustryHeading`, `byIndustry` | text (70); array of `sector` (relationship to `sectors`, required), `title` (50), `line` (140), up to 4 | Sections | |
 | `trustCardsHeading`, `trustCards` | text (70); array of `title` (50), `line` (140), up to 4 | Sections | |
-| `labels.panel`, `labels.chain`, `labels.teamControls`, `labels.result`, `labels.useCases`, `labels.worksWith`, `labels.related` | text, 70 each | Agent page labels | `{name}` is the only token. Read from the main record only. Same keys as `microApps.headingOverrides` |
+| `labels.panel`, `labels.chain`, `labels.teamControls`, `labels.result`, `labels.useCases`, `labels.worksWith`, `labels.faq`, `labels.related` | text, 70 each | Agent page labels | `{name}` is the only token. Read from the main record only. Same keys as `microApps.headingOverrides` |
 | `faqHeading` | text, 70 | FAQ | Empty shows "Questions about the bot swarm" |
 | `faqs` | array of `question` (120) + `answer` (600), up to 6 | FAQ | Shared group |
 | `closing.heading` | text, 70 | Closing | |

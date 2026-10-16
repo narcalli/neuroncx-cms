@@ -303,6 +303,7 @@ const page = ownPageTab({
       ['result', 'Result and proof'],
       ['useCases', 'Use cases'],
       ['worksWith', 'Works with'],
+      ['faq', 'FAQ'],
       ['related', 'Related'],
     ],
   },
