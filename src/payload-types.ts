@@ -2995,12 +2995,30 @@ export interface IntegrationsBlock {
   label?: string | null;
   heading?: string | null;
   intro?: string | null;
+  /**
+   * For example: anything else connects over the NeuronCx REST API and webhooks.
+   */
+  footnote?: string | null;
   populateBy?: ('all' | 'filter' | 'selection' | 'manual') | null;
   categories?: (string | IntegrationCategory)[] | null;
   products?: (string | Product)[] | null;
   featuredOnly?: boolean | null;
   selectedDocs?: (string | Integration)[] | null;
   limit?: number | null;
+  items?:
+    | {
+        name: string;
+        /**
+         * What flows between the two systems, in plain words.
+         */
+        summary?: string | null;
+        /**
+         * Transparent PNG or SVG. Leave empty to show the name only.
+         */
+        logo?: (string | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
   cardDesign: {
     design: 'grid' | 'logoCard' | 'directory' | 'feature' | 'story' | 'pill';
     /**
@@ -3027,24 +3045,6 @@ export interface IntegrationsBlock {
     };
     showAllLink?: boolean | null;
   };
-  items?:
-    | {
-        name: string;
-        /**
-         * What flows between the two systems, in plain words.
-         */
-        summary?: string | null;
-        /**
-         * Transparent PNG or SVG. Leave empty to show the name only.
-         */
-        logo?: (string | null) | Media;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * For example: anything else connects over the NeuronCx REST API and webhooks.
-   */
-  footnote?: string | null;
   /**
    * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
@@ -4953,6 +4953,10 @@ export interface PayloadJob {
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
+  /**
+   * Used for concurrency control. Jobs with the same key are subject to exclusive/supersedes rules.
+   */
+  concurrencyKey?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -6008,12 +6012,21 @@ export interface IntegrationsBlockSelect<T extends boolean = true> {
   label?: T;
   heading?: T;
   intro?: T;
+  footnote?: T;
   populateBy?: T;
   categories?: T;
   products?: T;
   featuredOnly?: T;
   selectedDocs?: T;
   limit?: T;
+  items?:
+    | T
+    | {
+        name?: T;
+        summary?: T;
+        logo?: T;
+        id?: T;
+      };
   cardDesign?:
     | T
     | {
@@ -6032,15 +6045,6 @@ export interface IntegrationsBlockSelect<T extends boolean = true> {
             };
         showAllLink?: T;
       };
-  items?:
-    | T
-    | {
-        name?: T;
-        summary?: T;
-        logo?: T;
-        id?: T;
-      };
-  footnote?: T;
   background?: T;
   width?: T;
   spacingTop?: T;
@@ -7397,6 +7401,7 @@ export interface PayloadJobsSelect<T extends boolean = true> {
   queue?: T;
   waitUntil?: T;
   processing?: T;
+  concurrencyKey?: T;
   updatedAt?: T;
   createdAt?: T;
 }
