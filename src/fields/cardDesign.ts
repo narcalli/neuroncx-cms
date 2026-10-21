@@ -44,6 +44,10 @@ export const cardDesignFields = (): Field => ({
         { label: 'Story card', value: 'story' },
         { label: 'Pill', value: 'pill' },
       ],
+      admin: {
+        // A small picture of each design instead of a dropdown.
+        components: { Field: '@/fields/CardDesignPicker/Component#CardDesignPickerField' },
+      },
     },
     {
       // No default: empty fits as many cards as the width allows, which is

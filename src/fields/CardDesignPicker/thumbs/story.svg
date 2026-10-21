@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="100" viewBox="0 0 160 100" fill="none">
+  <!-- Story card: a picture (a logo, or a soft gradient with the name), then a small label, a headline and a link. -->
+  <defs>
+    <linearGradient id="a" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#c9cfe0"/>
+      <stop offset="1" stop-color="#e8ebf3"/>
+    </linearGradient>
+    <linearGradient id="b" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f3c9c9"/>
+      <stop offset="1" stop-color="#ffebee"/>
+    </linearGradient>
+  </defs>
+  <rect width="160" height="100" rx="6" fill="#f6f7fa"/>
+  <rect x="10" y="10" width="43" height="36" rx="5" fill="url(#a)"/>
+  <circle cx="22" cy="28" r="3" fill="#ffffff"/>
+  <rect x="27" y="26.5" width="16" height="3" rx="1.5" fill="#ffffff"/>
+  <rect x="58.5" y="10.5" width="42" height="35" rx="5" fill="#ffffff" stroke="#e2e6ef"/>
+  <rect x="69" y="23" width="21" height="10" rx="2.5" fill="#edf0f6"/>
+  <rect x="106" y="10" width="43" height="36" rx="5" fill="url(#b)"/>
+  <circle cx="118" cy="28" r="3" fill="#ffffff"/>
+  <rect x="123" y="26.5" width="16" height="3" rx="1.5" fill="#ffffff"/>
+  <g id="text">
+    <rect x="10" y="53" width="14" height="2.5" rx="1.25" fill="#8a92a6"/>
+    <rect x="10" y="60" width="40" height="3.5" rx="1.75" fill="#5a6379"/>
+    <rect x="10" y="67" width="30" height="3.5" rx="1.75" fill="#5a6379"/>
+    <rect x="10" y="76" width="15" height="2.5" rx="1.25" fill="#c62828"/>
+  </g>
+  <use href="#text" x="48"/>
+  <use href="#text" x="96"/>
+</svg>
