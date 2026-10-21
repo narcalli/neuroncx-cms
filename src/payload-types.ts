@@ -3001,6 +3001,29 @@ export interface IntegrationsBlock {
   featuredOnly?: boolean | null;
   selectedDocs?: (string | Integration)[] | null;
   limit?: number | null;
+  cardDesign: {
+    design: 'grid' | 'logoCard' | 'directory' | 'feature' | 'story' | 'pill';
+    columns?: ('2' | '3' | '4') | null;
+    lastRow?: ('stretch' | 'center' | 'leave') | null;
+    /**
+     * Show a heading for each category.
+     */
+    groupByCategory?: boolean | null;
+    /**
+     * Used only for integrations that have their own page.
+     */
+    linkLabel?: string | null;
+    look?: {
+      cardColor?: ('grey' | 'lavender' | 'white') | null;
+      border?: ('none' | 'solid' | 'gradient') | null;
+      borderColor?: ('blue' | 'violet' | 'crimson' | 'navy') | null;
+      /**
+       * A thin rule under the content, matches the border color.
+       */
+      accentLine?: boolean | null;
+    };
+    showAllLink?: boolean | null;
+  };
   items?:
     | {
         name: string;
@@ -5992,6 +6015,24 @@ export interface IntegrationsBlockSelect<T extends boolean = true> {
   featuredOnly?: T;
   selectedDocs?: T;
   limit?: T;
+  cardDesign?:
+    | T
+    | {
+        design?: T;
+        columns?: T;
+        lastRow?: T;
+        groupByCategory?: T;
+        linkLabel?: T;
+        look?:
+          | T
+          | {
+              cardColor?: T;
+              border?: T;
+              borderColor?: T;
+              accentLine?: T;
+            };
+        showAllLink?: T;
+      };
   items?:
     | T
     | {

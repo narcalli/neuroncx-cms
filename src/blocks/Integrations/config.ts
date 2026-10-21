@@ -1,5 +1,6 @@
 import type { Block } from 'payload'
 
+import { cardDesignFields } from '../../fields/cardDesign'
 import { integrationSourceFields, showWhenManual } from '../../fields/integrationSource'
 
 /**
@@ -16,6 +17,7 @@ export const Integrations: Block = {
     { name: 'heading', type: 'text', label: 'Heading' },
     { name: 'intro', type: 'textarea', label: 'Intro line' },
     ...integrationSourceFields({ min: 1, max: 24 }),
+    cardDesignFields(),
     {
       name: 'items',
       type: 'array',
