@@ -3003,6 +3003,9 @@ export interface IntegrationsBlock {
   limit?: number | null;
   cardDesign: {
     design: 'grid' | 'logoCard' | 'directory' | 'feature' | 'story' | 'pill';
+    /**
+     * Leave empty to fit as many as the width allows.
+     */
     columns?: ('2' | '3' | '4') | null;
     lastRow?: ('stretch' | 'center' | 'leave') | null;
     /**
@@ -4950,10 +4953,6 @@ export interface PayloadJob {
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
-  /**
-   * Used for concurrency control. Jobs with the same key are subject to exclusive/supersedes rules.
-   */
-  concurrencyKey?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -7398,7 +7397,6 @@ export interface PayloadJobsSelect<T extends boolean = true> {
   queue?: T;
   waitUntil?: T;
   processing?: T;
-  concurrencyKey?: T;
   updatedAt?: T;
   createdAt?: T;
 }

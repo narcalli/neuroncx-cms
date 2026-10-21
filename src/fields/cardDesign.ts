@@ -9,8 +9,8 @@ import { cardLookFields } from './cardOptions'
  *
  * A block saved before this group existed has no stored value for any of it.
  * Payload fills each field's defaultValue on read, so such a block reads as
- * design grid, last row left as is and no category headings, and the website
- * draws it as before.
+ * design grid, no fixed cards per row, last row left as is and no category
+ * headings, and the website draws it as before.
  */
 
 type Design = 'grid' | 'logoCard' | 'directory' | 'feature' | 'story' | 'pill'
@@ -46,16 +46,20 @@ export const cardDesignFields = (): Field => ({
       ],
     },
     {
+      // No default: empty fits as many cards as the width allows, which is
+      // how blocks saved before this group existed have always looked.
       name: 'columns',
       type: 'select',
       label: 'Cards per row',
-      defaultValue: '3',
       options: [
         { label: '2', value: '2' },
         { label: '3', value: '3' },
         { label: '4', value: '4' },
       ],
-      admin: { condition: designIsNot('directory', 'pill') },
+      admin: {
+        condition: designIsNot('directory', 'pill'),
+        description: 'Leave empty to fit as many as the width allows.',
+      },
     },
     {
       name: 'lastRow',
