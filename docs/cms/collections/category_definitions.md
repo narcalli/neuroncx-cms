@@ -81,8 +81,8 @@ Example of the split: "What counts as an episode" (a booking, an enrolment, an o
 | `anatomy` | array, up to 6: `part` (40), `explanation` (160) | Definition tab | The parts that make up the new way |
 | `whyNow` | array, up to 3: `heading` (60), `text` (240) | Page tab | Why the old way breaks today |
 | `proofPoints` | array, up to 4: `stat` (60), `claim` (160), `sourceName` (80), `sourceUrl` (text, URL check), `sourceDate` (date) | Page tab | Outside facts only, each with its source. Shown with the source linked |
-| `maturity` | select: live, pilot, vision. Required, default vision | sidebar | How much of the idea NeuronCx runs for clients today. See section 4 |
-| `caveatText` | text, 120, default "Now in pilot with care providers" | sidebar | Shown when `maturity` is pilot. Editable per entry |
+| `status` | the shared status field (`src/fields/status.ts`): live, pilot, planned. Required, default planned | sidebar | How much of the idea NeuronCx runs for clients today. See section 4 |
+| `caveatText` | text, 120, default "Now in pilot with care providers" | sidebar | Shown when `status` is pilot. Editable per entry |
 | `bridgeLine` | text, 200 | Page tab | One line linking the idea to NeuronCx. The only place in the entry that sells |
 | `crmFeatures` | relationship to `crmFeatures`, hasMany | Page tab | Features that deliver this idea |
 | `episodicEngagements` | relationship, hasMany | Page tab | Added once that collection exists |
@@ -95,16 +95,16 @@ Admin: a "Positioning" group in the sidebar. Drafts on, no autosave. Tabs: Card,
 
 All rows assume the entry is published. Drafts are never visible.
 
-| Maturity | hasOwnPage | Own page | Cards and blocks | Knowledge base |
+| Status | hasOwnPage | Own page | Cards and blocks | Knowledge base |
 | --- | --- | --- | --- | --- |
 | live | on | yes, in sitemap | yes, linked | yes |
 | live | off | no, 404 | yes, no link | yes |
 | pilot | either | only if on, with `caveatText` under the bridge line | yes, with a "Pilot" tag | yes, `kbAnswer` must say it is in pilot |
-| vision | either | no | no | no |
+| planned | either | no | no | no |
 
-Visitors and the public API must never receive vision entries. Enforce this in the collection's read access, not only in the website.
+Visitors and the public API must never receive planned entries. Enforce this in the collection's read access, not only in the website.
 
-`maturity` describes NeuronCx's delivery, not the idea. The definition, table and examples are always written as plain fact. The caveat sits only next to the bridge line and any section that describes what NeuronCx does.
+`status` describes NeuronCx's delivery, not the idea. The definition, table and examples are always written as plain fact. The caveat sits only next to the bridge line and any section that describes what NeuronCx does.
 
 Unlike other collections, `hasOwnPage` should almost always be on. Turn it off only for a short-lived entry used inside a single home page block.
 
@@ -178,7 +178,7 @@ Taken from the home page Section 2 drafts in Notion. This is the first entry to 
 2. **Every channel keeps its own piece.** WhatsApp, phone lines, payment links and branch systems each hold part of the story, so the same person shows up as several records.
 3. **Agents can now do the follow-up.** Once each episode carries a plan, an agent can send the reminder, take the payment and pass anything that needs judgement to a person.
 
-**maturity:** pilot for the care copilot and milestone parts, live for the single record and episode history. Confirm before publishing (open item 4).
+**status:** pilot for the care copilot and milestone parts, live for the single record and episode history. Confirm before publishing (open item 4).
 
 **bridgeLine:** NeuronCx's agents run each episode for you, booking, taking payment and following up, which is why we call it an agentic CRM for episodic engagements.
 
@@ -237,7 +237,7 @@ James asked for this section in category definitions. Notion has only the starti
 - Retool 2026 Build vs. Buy Report, Business Wire, 17 Feb 2026: https://www.businesswire.com/news/home/20260217548274/en/Retools-2026-Build-vs.-Buy-Report-Reveals-35-of-Enterprises-Have-Already-Replaced-SaaS-With-Custom-Software
 - Forrester, "The rise of application generation platforms": https://www.forrester.com/blogs/the-rise-of-application-generation-platforms/
 
-**maturity:** to confirm with James.
+**status:** to confirm with James.
 
 **bridgeLine** (draft): Every NeuronCx client gets engineers who build in their own setup, so the CRM and its agents fit how your organisation already works.
 
@@ -308,7 +308,7 @@ Rules:
 
 ## 11. Candidate entries
 
-| Entry | Old way | What the notes show | Likely maturity |
+| Entry | Old way | What the notes show | Likely status |
 | --- | --- | --- | --- |
 | Episodic CRM | Sales CRM | Full draft: definition, table, cards, anatomy (section 6) | pilot, to confirm |
 | Forward-deployed engineering | Legacy customer success | One-line note and a product area mention (section 7) | to confirm |
@@ -332,7 +332,7 @@ Nothing below is built. In this order:
 
 ## 13. Before publishing an entry
 
-- [ ]  Maturity set honestly: live only if clients work this way with NeuronCx today
+- [ ]  Status set honestly: live only if clients work this way with NeuronCx today
 - [ ]  Definition about 55 words, starts "An X is…", makes sense on its own
 - [ ]  Old-way column fair, no competitor named
 - [ ]  Every outside number in `proofPoints` with a working source link
@@ -347,6 +347,6 @@ Nothing below is built. In this order:
 1. **FDE content:** section 7 is a draft. James to answer the four questions there and correct the table.
 2. **Route:** root-level slugs such as /episodic-crm (matches the link already in the Notion copy) need the slug check in section 12. The alternative is a /what-is/[slug] prefix, which avoids clashes but makes longer URLs.
 3. **Single-tenant SaaS:** its own entry, or part of forward-deployed engineering.
-4. **Episodic CRM maturity:** the Notion copy marks the care copilot and milestone parts "Now in pilot with care providers". Confirm whether the entry as a whole is pilot or live.
+4. **Episodic CRM status:** the Notion copy marks the care copilot and milestone parts "Now in pilot with care providers". Confirm whether the entry as a whole is pilot or live.
 5. **Keyword volumes:** check every "not measured" term in section 9 before building pages.
 6. **Collection name:** James's list says `category_definition`. This file uses `categoryDefinitions` to match the repo's camelCase.

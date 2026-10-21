@@ -3,12 +3,12 @@
 ---
 
 ## collection: crmFeatures (admin label "B2C CRM")
-payload_slug: crmFeatures (not built yet)
-config_file: src/collections/CrmFeatures/index.ts (planned)
+payload_slug: crmFeatures
+config_file: src/collections/CrmFeatures/index.ts
 own_page_route: /crm/[slug] (planned)
 hub_page: /crm-for-agentic-workflows
 shared_groups: all seven, see fields_reference.md
-status: design only, 13 Oct 2026. Nothing in this file is built yet
+status: collection built (21 Oct 2026). Website route, blocks and knowledge base not built yet
 
 # B2C CRM
 
@@ -68,7 +68,7 @@ B2C CRM uses all seven groups from `fields_reference.md`, with no changes to the
 
 | Field | Type | Placement | Notes |
 | --- | --- | --- | --- |
-| `status` | select: live, beta, planned. Required, default planned | sidebar | Only live and beta show publicly. Beta is labelled on the site |
+| `status` | select: live, pilot, planned. Required, default planned | sidebar | Only live and pilot show publicly. Pilot is labelled on the site |
 | `area` | relationship to `crmAreas`, required | sidebar | Groups features on the hub page and in WhatsApp menus |
 | `problemSolved` | select, hasMany: strangerFollowUp, silentDropOff, duplicateRecords | sidebar | Which of the three problems in section 1 it answers. Optional |
 | `legacyGap` | text, 160 | Detail tab | One line on how a sales-pipeline CRM handles this. Never names a competitor |
@@ -107,12 +107,12 @@ All rows assume the entry is published. Drafts are never visible.
 | --- | --- | --- | --- | --- |
 | live | on | yes, links to the page | yes, in sitemap | yes |
 | live | off | yes, no link | no, 404 | yes |
-| beta | either | yes, labelled "Beta" | only if on | yes, described as in beta |
+| pilot | either | yes, labelled "Pilot" | only if on | yes, described as a pilot |
 | planned | either | no | no | no |
 
 Visitors and the public API must never receive planned entries. Enforce this in the collection's read access, not only in the website.
 
-Turn `hasOwnPage` on only when the feature is live or in beta, the page sections are written, and there is at least one demo-tenant screenshot.
+Turn `hasOwnPage` on only when the feature is live or in pilot, the page sections are written, and there is at least one demo-tenant screenshot.
 
 ## 5. Writing rules
 
@@ -162,25 +162,25 @@ With more than 10 features, the assistant first asks which area, then lists that
 | `kbQuestions` | How a customer asks | "Can I see a customer's full history?" / "Does NeuronCx merge duplicate contacts?" |
 | `kbSynonyms` | Other names | Patient 360, customer profile, single customer view |
 
-Only live and beta features go into the knowledge base. Beta features must say so in `kbAnswer`.
+Only live and pilot features go into the knowledge base. Pilot features must say so in `kbAnswer`.
 
 ## 8. Where entries appear
 
 | Place | How features are picked |
 | --- | --- |
-| /crm-for-agentic-workflows (hub) | One section per area, each showing that area's live and beta features by `order` |
+| /crm-for-agentic-workflows (hub) | One section per area, each showing that area's live and pilot features by `order` |
 | Home page technical pillars | Hand-picked, usually `isUSP` features |
 | Card Grid and Bento Grid blocks | A new "pull from B2C CRM" option: all, by area, by problem, or hand-picked. Same pattern as the Integrations block |
 | /crm/[slug] | One page per feature with `hasOwnPage` on |
 | Integration and customer pages | "Works with" and "Used by" lists, from the relationships |
 | WhatsApp assistant | Area menu, then feature list, then the feature message |
-| Knowledge base | Every live and beta feature |
+| Knowledge base | Every live and pilot feature |
 
 Cards link to the feature page only when `hasOwnPage` is on.
 
 ### Hub page cards
 
-Each card shows the `icon`, the `name` (with a "USP" tag when `isUSP` is on, and a "Beta" tag when status is beta), the `tagline` and the `summary`. Cards are grouped under each area's name and `intro` line, in area `order`, then feature `order`.
+Each card shows the `icon`, the `name` (with a "USP" tag when `isUSP` is on, and a "Pilot" tag when status is pilot), the `tagline` and the `summary`. Cards are grouped under each area's name and `intro` line, in area `order`, then feature `order`.
 
 ### Feature page layout (/crm/[slug])
 
@@ -252,7 +252,7 @@ Nothing below is built. In this order:
 1. **Shared field groups** in `src/fields/`: core, card, detail, ownPage, faq, whatsapp and kbase, plus the plain-text check in `src/fields/validators/plainText.ts`, exactly as `fields_reference.md` defines them.
 2. **`crmAreas` collection**, with the four starting areas.
 3. **`crmFeatures` collection**, with the shared groups, the fields in section 3, the read access in section 4, and the "B2C CRM" admin group.
-4. **"Pull from B2C CRM" option** on the Card Grid and Bento Grid blocks: all, by area, by problem, hand-picked, with a limit. Only live and beta entries for visitors.
+4. **"Pull from B2C CRM" option** on the Card Grid and Bento Grid blocks: all, by area, by problem, hand-picked, with a limit. Only live and pilot entries for visitors.
 5. **Knowledge base:** add `crmFeatures` to `src/rag/sources.ts` and the collections `with-rag.ts` watches.
 6. **WhatsApp lists global** (`whatsappLists`), holding the menu button text and section title per collection, as planned in `fields_reference.md`.
 7. **Website:** the `/crm/[slug]` route, built on the same light layout as the integration and customer pages, and card links that follow `hasOwnPage`.

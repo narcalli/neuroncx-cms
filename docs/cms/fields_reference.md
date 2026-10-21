@@ -1,7 +1,7 @@
 # Fields reference
 
 **Repo:** neuroncx-cms (Payload)
-**Last updated:** 13 Oct 2026
+**Last updated:** 21 Oct 2026
 **Applies to:** every content collection that feeds the website, WhatsApp or the knowledge base
 
 ## Why this exists
@@ -167,10 +167,23 @@ What gets indexed, in order of weight: `kbAnswer`, `kbFacts`, `faqs`, `descripti
 
 | Collection | Core | Card | Detail | Own page | FAQ | WhatsApp | Knowledge base | Own fields |
 |---|---|---|---|---|---|---|---|---|
-| CRM features (`crm-features`) | Yes | Yes | Yes | Yes | Yes | Yes | Yes | None yet |
+| B2C CRM (`crmFeatures`) | Yes | Yes | Yes, plus SEO tab | Yes | Yes | Yes | Yes | status, area, problemSolved, legacyGap, screenshots, integrations, customers. See collections/b2c_crm.md |
 | Integrations (`integrations`) | Own fields for now | Own fields for now | Own fields for now | Own fields, with Page tab | Yes | Yes | Yes | status, category, connection, products, glance, statusFlow, edgeCases, setupChecklist, chatExample, see collections/integrations.md |
 
 Add a row whenever a collection adopts a group.
+
+## Other shared pieces
+
+Not field groups, but used across collections and blocks.
+
+| Piece | File | What it is |
+|---|---|---|
+| Status | `src/fields/status.ts` | Select: live, pilot, planned. Required, default planned, sidebar. Every new collection uses it |
+| Public read access | `src/access/publicLiveOrPilot.ts` | Logged-in users read everything. Everyone else reads only published entries with status live or pilot |
+| SEO tab | `src/fields/seo.ts` | The same hand-built SEO tab as Pages and Posts, from `@payloadcms/plugin-seo/fields` |
+| Lists | `src/collections/Lists` | One editable collection for small lists: CRM areas and agent families, with a `type` field |
+| WhatsApp lists | `src/WhatsappLists/config.ts` | The `whatsappLists` global: list button and section title per collection |
+| Card design | `src/fields/cardDesign.ts` | A block field group, not a collection group. `cardDesignFields({ designs, defaultDesign })` adds the design picker, columns, last row, category headings, link text, the feature look and the "All integrations" card option. Defaults live in `CARD_DESIGN_DEFAULTS`, which the website mirrors in `src/components/cards/defaults.ts` |
 
 ## Open items
 
