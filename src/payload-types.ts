@@ -77,12 +77,14 @@ export interface Config {
     enquiries: Enquiry;
     sectors: Sector;
     customers: Customer;
+    integrationsMaster: IntegrationsMaster;
     integrations: Integration;
     integrationCategories: IntegrationCategory;
     connectionTypes: ConnectionType;
     products: Product;
     lists: List;
     crmFeatures: CrmFeature;
+    ncxPostContents: NcxPostContent;
     redirects: Redirect;
     'payload-mcp-api-keys': PayloadMcpApiKey;
     'payload-kv': PayloadKv;
@@ -107,12 +109,14 @@ export interface Config {
     enquiries: EnquiriesSelect<false> | EnquiriesSelect<true>;
     sectors: SectorsSelect<false> | SectorsSelect<true>;
     customers: CustomersSelect<false> | CustomersSelect<true>;
+    integrationsMaster: IntegrationsMasterSelect<false> | IntegrationsMasterSelect<true>;
     integrations: IntegrationsSelect<false> | IntegrationsSelect<true>;
     integrationCategories: IntegrationCategoriesSelect<false> | IntegrationCategoriesSelect<true>;
     connectionTypes: ConnectionTypesSelect<false> | ConnectionTypesSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
     lists: ListsSelect<false> | ListsSelect<true>;
     crmFeatures: CrmFeaturesSelect<false> | CrmFeaturesSelect<true>;
+    ncxPostContents: NcxPostContentsSelect<false> | NcxPostContentsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     'payload-mcp-api-keys': PayloadMcpApiKeysSelect<false> | PayloadMcpApiKeysSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -287,6 +291,7 @@ export interface Page {
     | PlatformLayersBlock
     | TrustPanelBlock
     | StatBandBlock
+    | IntegrationsLandingBlock
     | WhatsappWidgetBlock
     | FAQBlock
     | PlatformLayersTwoBlock
@@ -656,11 +661,95 @@ export interface IntegrationCategory {
    */
   order?: number | null;
   /**
-   * Optional. For example an intro line if the integrations page groups entries by category.
+   * The section heading on landing pages, for example "Where you book".
+   */
+  hubHeading?: string | null;
+  /**
+   * One line shown under the category heading on landing pages, for example: The booking and records systems your front desk already uses.
    */
   description?: string | null;
+  /**
+   * Shown with the category heading on landing pages.
+   */
+  icon?:
+    | (
+        | 'message'
+        | 'chat'
+        | 'check'
+        | 'calendar'
+        | 'card'
+        | 'document'
+        | 'refresh'
+        | 'bolt'
+        | 'layers'
+        | 'gauge'
+        | 'plug'
+        | 'shield'
+        | 'shieldCheck'
+        | 'lock'
+        | 'globe'
+        | 'server'
+        | 'eye'
+        | 'users'
+        | 'user'
+        | 'phone'
+        | 'smartphone'
+        | 'mail'
+        | 'messageCircle'
+        | 'send'
+        | 'inbox'
+        | 'headphones'
+        | 'mic'
+        | 'video'
+        | 'bell'
+        | 'handshake'
+        | 'stethoscope'
+        | 'heartPulse'
+        | 'hospital'
+        | 'activity'
+        | 'flask'
+        | 'pill'
+        | 'graduationCap'
+        | 'building'
+        | 'mapPin'
+        | 'database'
+        | 'cloud'
+        | 'workflow'
+        | 'bot'
+        | 'sparkles'
+        | 'search'
+        | 'chart'
+        | 'trendingUp'
+        | 'target'
+        | 'rocket'
+        | 'key'
+        | 'fileText'
+        | 'clipboardList'
+        | 'link'
+        | 'settings'
+        | 'puzzle'
+        | 'timer'
+        | 'clock'
+        | 'badgeCheck'
+        | 'star'
+        | 'briefcase'
+      )
+    | null;
+  /**
+   * The category as a row in the WhatsApp menu.
+   */
+  waRowTitle?: string | null;
+  /**
+   * Lists the names of this category's live, published integrations, in order, cut to 70 characters on a whole name. It updates when an integration is published, changed, unpublished or deleted. Publishing an integration can therefore save this category as a new published version, so publish or discard any open draft of the category first.
+   */
+  waRowDescriptionAuto?: boolean | null;
+  /**
+   * Aim for 60 characters. Written for you while the automatic switch above is on.
+   */
+  waRowDescription?: string | null;
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * NeuronCx products. Integrations tag the products they work with; other parts of the site can use the same list later.
@@ -757,19 +846,11 @@ export interface Integration {
   id: string;
   name: string;
   /**
-   * Transparent PNG or SVG. Leave empty to show the name only.
-   */
-  logo?: (string | null) | Media;
-  /**
-   * What flows between the two systems, in plain words.
-   */
-  summary?: string | null;
-  category: string | IntegrationCategory;
-  connection?: (string | null) | ConnectionType;
-  /**
    * Only Live integrations show on the public site.
    */
   status: 'live' | 'pilot' | 'planned';
+  category: string | IntegrationCategory;
+  connection?: (string | null) | ConnectionType;
   products?: (string | Product)[] | null;
   /**
    * Tick to include in the short list on the home page.
@@ -780,9 +861,263 @@ export interface Integration {
    */
   order?: number | null;
   /**
-   * Only needed if this integration gets its own page later.
+   * Used in the address /integrations/<slug>. Needed to publish with Own page on.
    */
   slug?: string | null;
+  /**
+   * Gives this integration a page at /integrations/<slug>. The Page tab appears while this is on. Publishing then needs a slug, a hero heading and an SEO title and description.
+   */
+  hasOwnPage?: boolean | null;
+  /**
+   * Transparent PNG or SVG. Leave empty to show the name only.
+   */
+  logo?: (string | null) | Media;
+  /**
+   * A short line under the name. Aim for 45 characters.
+   */
+  tagline?: string | null;
+  /**
+   * What flows between the two systems, in plain words.
+   */
+  summary?: string | null;
+  /**
+   * 3 to 4 short claims for the strip under the page hero, for example: Every status tracked.
+   */
+  glance?:
+    | {
+        title: string;
+        line: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * The search phrase this page should rank for, for example docpulse whatsapp appointment booking. Used in the SEO title when that is left empty.
+   */
+  primaryKeyword?: string | null;
+  /**
+   * Up to 5 related phrases.
+   */
+  secondaryKeywords?:
+    | {
+        keyword: string;
+        id?: string | null;
+      }[]
+    | null;
+  meta?: {
+    /**
+     * Left empty, it is filled as "<primary keyword> with NeuronCx | NeuronCx", or the name if there is no keyword. Needed to publish with Own page on.
+     */
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (string | null) | Media;
+    /**
+     * Left empty, it is filled from the summary. Needed to publish with Own page on.
+     */
+    description?: string | null;
+  };
+  /**
+   * An action, the partner name and the result, for example: Book DocPulse appointments on WhatsApp. Needed to publish with Own page on.
+   */
+  heroHeading?: string | null;
+  /**
+   * Who does what, and what lands where, in two sentences.
+   */
+  heroSubheading?: string | null;
+  /**
+   * The closing button. Type a label to choose where it goes.
+   */
+  cta?: {
+    label?: string | null;
+    link?: {
+      type?: ('reference' | 'custom') | null;
+      newTab?: boolean | null;
+      reference?:
+        | ({
+            relationTo: 'pages';
+            value: string | Page;
+          } | null)
+        | ({
+            relationTo: 'posts';
+            value: string | Post;
+          } | null);
+      url?: string | null;
+    };
+  };
+  /**
+   * The dark panel at the end of the page, with the heading and text from the main integrations master record. Off leaves it out on this page only.
+   */
+  showClosing?: boolean | null;
+  /**
+   * Up to 3. Leave empty to show other live integrations in the same category.
+   */
+  related?: (string | Integration)[] | null;
+  /**
+   * Leave empty to use the headings from the main integrations master record.
+   */
+  headingOverrides?: {
+    statusTable?: string | null;
+    edgeCases?: string | null;
+    setup?: string | null;
+    related?: string | null;
+  };
+  /**
+   * Each status change and what NeuronCx does with it, for example: Booked / Scheduled / The patient gets a WhatsApp confirmation.
+   */
+  statusFlow?:
+    | {
+        event: string;
+        inPartner?: string | null;
+        whatHappens: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * What happens when things do not go to plan, for example: The slot was taken in the meantime.
+   */
+  edgeCases?:
+    | {
+        situation: string;
+        whatWeDo: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * What has to happen to connect. Filled from the connection type's default checklist when a connection is set and this is empty.
+   */
+  setupChecklist?:
+    | {
+        /**
+         * One step, for example: Share the API key for your clinic.
+         */
+        item: string;
+        providedBy: 'you' | 'neuroncx' | 'partner';
+        id?: string | null;
+      }[]
+    | null;
+  setupChecklistSource?: string | null;
+  /**
+   * A short example conversation, up to 8 messages. Demo-tenant details only.
+   */
+  chatExample?:
+    | {
+        sender: 'customer' | 'business' | 'team';
+        /**
+         * For example 11:42.
+         */
+        time?: string | null;
+        text: string;
+        /**
+         * Optional. Names the agent or step, for example Payment services.
+         */
+        label?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Up to 6. Questions phrased the way a buyer would ask them.
+   */
+  faqs?:
+    | {
+        question: string;
+        /**
+         * Plain text, no formatting.
+         */
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  waRowTitle?: string | null;
+  /**
+   * Aim for 60 characters.
+   */
+  waRowDescription?: string | null;
+  /**
+   * List messages only allow a text header.
+   */
+  waHeaderType?: ('text' | 'image') | null;
+  /**
+   * Aim for 30 characters.
+   */
+  waHeader?: string | null;
+  /**
+   * Aim for 300 characters.
+   */
+  waBody?: string | null;
+  /**
+   * 3 to 5 short lines, sent inside the body.
+   */
+  waKeyPoints?:
+    | {
+        line: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Aim for 30 characters.
+   */
+  waFooter?: string | null;
+  /**
+   * Up to 3, which is the WhatsApp limit.
+   */
+  waButtons?:
+    | {
+        label: string;
+        /**
+         * What happens when the button is tapped.
+         */
+        action: 'bookDemo' | 'otherSystems' | 'talkToSales' | 'openPage';
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * The text on the link button, for example Read the guide.
+   */
+  waLinkLabel?: string | null;
+  /**
+   * Set automatically: /integrations/<slug> when Own page is on, otherwise /integrations#<slug>. Empty while there is no slug.
+   */
+  waLink?: string | null;
+  /**
+   * Only published entries with this on are sent to the knowledge base.
+   */
+  includeInKbase?: boolean | null;
+  /**
+   * A complete answer to "What is this?", written for the virtual agents.
+   */
+  kbAnswer?: string | null;
+  /**
+   * Short, checkable facts. One fact per line.
+   */
+  kbFacts?:
+    | {
+        fact: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * How a customer might ask about it.
+   */
+  kbQuestions?:
+    | {
+        question: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Other names people use for it.
+   */
+  kbSynonyms?:
+    | {
+        synonym: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * So answers that have gone stale can be found and fixed.
+   */
+  kbLastReviewed?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -805,11 +1140,45 @@ export interface ConnectionType {
    */
   order?: number | null;
   /**
-   * Optional. One line, for example: Built-in connector, no setup on your side.
+   * The short chip shown on cards, for example Webhooks.
+   */
+  badgeLabel?: string | null;
+  /**
+   * What this means for the client's team, in plain words.
    */
   description?: string | null;
+  /**
+   * When data moves between the two systems.
+   */
+  timing?: ('asItHappens' | 'scheduled' | 'onUpload') | null;
+  /**
+   * Who does what to connect, for example: Your vendor adds our webhook address.
+   */
+  typicalSetup?: string | null;
+  /**
+   * Copied into an integration's setup checklist when its connection is set and its checklist is empty.
+   */
+  defaultChecklist?:
+    | {
+        /**
+         * One step, for example: Share the API key for your clinic.
+         */
+        item: string;
+        providedBy: 'you' | 'neuroncx' | 'partner';
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * One line used inside WhatsApp messages, for example: Bookings arrive as they happen.
+   */
+  waLine?: string | null;
+  /**
+   * Answers "How do you connect to our system?" for this connection type, in plain words.
+   */
+  kbAnswer?: string | null;
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2632,6 +3001,10 @@ export interface IntegrationsBlock {
   label?: string | null;
   heading?: string | null;
   intro?: string | null;
+  /**
+   * For example: anything else connects over the NeuronCx REST API and webhooks.
+   */
+  footnote?: string | null;
   populateBy?: ('all' | 'filter' | 'selection' | 'manual') | null;
   categories?: (string | IntegrationCategory)[] | null;
   products?: (string | Product)[] | null;
@@ -2652,10 +3025,32 @@ export interface IntegrationsBlock {
         id?: string | null;
       }[]
     | null;
-  /**
-   * For example: anything else connects over the NeuronCx REST API and webhooks.
-   */
-  footnote?: string | null;
+  cardDesign: {
+    design: 'grid' | 'logoCard' | 'directory' | 'feature' | 'story' | 'pill';
+    /**
+     * Leave empty to fit as many as the width allows.
+     */
+    columns?: ('2' | '3' | '4') | null;
+    lastRow?: ('stretch' | 'center' | 'leave') | null;
+    /**
+     * Show a heading for each category.
+     */
+    groupByCategory?: boolean | null;
+    /**
+     * Used only for integrations that have their own page.
+     */
+    linkLabel?: string | null;
+    look?: {
+      cardColor?: ('grey' | 'lavender' | 'white') | null;
+      border?: ('none' | 'solid' | 'gradient') | null;
+      borderColor?: ('blue' | 'violet' | 'crimson' | 'navy') | null;
+      /**
+       * A thin rule under the content, matches the border color.
+       */
+      accentLine?: boolean | null;
+    };
+    showAllLink?: boolean | null;
+  };
   /**
    * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
@@ -3863,6 +4258,291 @@ export interface StatBandBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IntegrationsLandingBlock".
+ */
+export interface IntegrationsLandingBlock {
+  /**
+   * Leave empty to use the main record (the one with Is main on). The page shows its hero, the integrations by category, its sections, FAQ and closing. Set the page hero to None.
+   */
+  master?: (string | null) | IntegrationsMaster;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'integrationsLanding';
+}
+/**
+ * Integration landing pages, and the wording shared by every integration item page.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "integrationsMaster".
+ */
+export interface IntegrationsMaster {
+  id: string;
+  /**
+   * For editors, for example Main integrations page.
+   */
+  name: string;
+  /**
+   * Lowercase, dashes only. Cannot be the same as an integration item slug.
+   */
+  slug: string;
+  /**
+   * The main integrations page. Integration item pages take their section headings from this record. Only one record can have it on.
+   */
+  isMain?: boolean | null;
+  /**
+   * Leave both empty to list every live integration.
+   */
+  filter?: {
+    categories?: (string | IntegrationCategory)[] | null;
+    products?: (string | Product)[] | null;
+  };
+  /**
+   * The search phrase this page should rank for, for example whatsapp crm integration.
+   */
+  primaryKeyword?: string | null;
+  /**
+   * Up to 5 related phrases.
+   */
+  secondaryKeywords?:
+    | {
+        keyword: string;
+        id?: string | null;
+      }[]
+    | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (string | null) | Media;
+    description?: string | null;
+  };
+  /**
+   * The small line above the heading, for example Integrations.
+   */
+  eyebrow?: string | null;
+  /**
+   * The page heading, for example: Connect NeuronCx to the systems you already run.
+   */
+  h1: string;
+  subheading?: string | null;
+  /**
+   * Up to 7 integrations shown around the hero.
+   */
+  heroSystems?: (string | Integration)[] | null;
+  hero?: {
+    /**
+     * Optional, next to the main button, for example: See Omnichannel CX. Type a label to choose where it goes.
+     */
+    secondaryCta?: {
+      label?: string | null;
+      link?: {
+        type?: ('reference' | 'custom') | null;
+        newTab?: boolean | null;
+        reference?:
+          | ({
+              relationTo: 'pages';
+              value: string | Page;
+            } | null)
+          | ({
+              relationTo: 'posts';
+              value: string | Post;
+            } | null);
+        url?: string | null;
+      };
+    };
+    /**
+     * Optional. An illustration beside the hero, such as the hub diagram.
+     */
+    image?: (string | null) | Media;
+  };
+  /**
+   * Leave empty to show: What connecting your systems gives you
+   */
+  fiveThingsHeading?: string | null;
+  /**
+   * 3 to 5 points, each with a title and one line.
+   */
+  fiveThings?:
+    | {
+        title: string;
+        line: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Leave empty to show: When feeds go wrong
+   */
+  whenFeedsGoWrongHeading?: string | null;
+  /**
+   * Common failures and what NeuronCx does, for example: The vendor stops sending updates.
+   */
+  whenFeedsGoWrong?:
+    | {
+        problem: string;
+        whatHappens: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Type a heading to choose where the card links.
+   */
+  apiCard?: {
+    heading?: string | null;
+    line?: string | null;
+    /**
+     * Leave empty to show: Get in touch
+     */
+    buttonLabel?: string | null;
+    link?: {
+      type?: ('reference' | 'custom') | null;
+      newTab?: boolean | null;
+      reference?:
+        | ({
+            relationTo: 'pages';
+            value: string | Page;
+          } | null)
+        | ({
+            relationTo: 'posts';
+            value: string | Post;
+          } | null);
+      url?: string | null;
+    };
+  };
+  labels?: {
+    /**
+     * For example: What moves between {name} and NeuronCx
+     */
+    statusTable?: string | null;
+    /**
+     * For example: When things do not go to plan
+     */
+    edgeCases?: string | null;
+    /**
+     * For example: What it takes to connect {name}
+     */
+    setup?: string | null;
+    /**
+     * For example: Other systems like {name}
+     */
+    related?: string | null;
+  };
+  /**
+   * Leave empty to show: Questions about integrations
+   */
+  faqHeading?: string | null;
+  /**
+   * Up to 6. Questions phrased the way a buyer would ask them.
+   */
+  faqs?:
+    | {
+        question: string;
+        /**
+         * Plain text, no formatting.
+         */
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  closing?: {
+    /**
+     * The closing panel's heading, for example: Tell us what you're running.
+     */
+    heading?: string | null;
+    /**
+     * One or two sentences under the heading.
+     */
+    subheading?: string | null;
+  };
+  /**
+   * The closing button. Type a label to choose where it goes.
+   */
+  cta?: {
+    label?: string | null;
+    link?: {
+      type?: ('reference' | 'custom') | null;
+      newTab?: boolean | null;
+      reference?:
+        | ({
+            relationTo: 'pages';
+            value: string | Page;
+          } | null)
+        | ({
+            relationTo: 'posts';
+            value: string | Post;
+          } | null);
+      url?: string | null;
+    };
+  };
+  /**
+   * Sent before the list of integrations. Aim for 300 characters.
+   */
+  waIntro?: string | null;
+  /**
+   * The button that opens the list, for example See systems.
+   */
+  waListButton?: string | null;
+  /**
+   * The heading above the rows in the list.
+   */
+  waSectionTitle?: string | null;
+  /**
+   * Sent when someone asks about a system that is not listed, for example: We connect to most booking systems. Tell us which one you use.
+   */
+  waFallback?: string | null;
+  /**
+   * Only published entries with this on are sent to the knowledge base.
+   */
+  includeInKbase?: boolean | null;
+  /**
+   * A complete answer to "What is this?", written for the virtual agents.
+   */
+  kbAnswer?: string | null;
+  /**
+   * Short, checkable facts. One fact per line.
+   */
+  kbFacts?:
+    | {
+        fact: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * How a customer might ask about it.
+   */
+  kbQuestions?:
+    | {
+        question: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Other names people use for it.
+   */
+  kbSynonyms?:
+    | {
+        synonym: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * So answers that have gone stale can be found and fixed.
+   */
+  kbLastReviewed?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "WhatsappWidgetBlock".
  */
 export interface WhatsappWidgetBlock {
@@ -4436,6 +5116,32 @@ export interface CrmFeature {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Website sections sent to NeuronCX post content for the WhatsApp bot. New ones wait for approval in the NCX dashboard.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ncxPostContents".
+ */
+export interface NcxPostContent {
+  id: string;
+  key: string;
+  sourceCollection: string;
+  sourceId: string;
+  sectionKey: string;
+  title?: string | null;
+  pcmId?: number | null;
+  /**
+   * Empty when the section needs sending again, or is archived.
+   */
+  hash?: string | null;
+  /**
+   * The section left the site, so its post content is archived in NCX.
+   */
+  archived?: boolean | null;
+  syncedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
@@ -4618,6 +5324,10 @@ export interface PayloadJob {
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
+  /**
+   * Used for concurrency control. Jobs with the same key are subject to exclusive/supersedes rules.
+   */
+  concurrencyKey?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -4665,6 +5375,10 @@ export interface PayloadLockedDocument {
         value: string | Customer;
       } | null)
     | ({
+        relationTo: 'integrationsMaster';
+        value: string | IntegrationsMaster;
+      } | null)
+    | ({
         relationTo: 'integrations';
         value: string | Integration;
       } | null)
@@ -4687,6 +5401,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'crmFeatures';
         value: string | CrmFeature;
+      } | null)
+    | ({
+        relationTo: 'ncxPostContents';
+        value: string | NcxPostContent;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -4827,6 +5545,7 @@ export interface PagesSelect<T extends boolean = true> {
         platformLayers?: T | PlatformLayersBlockSelect<T>;
         trustPanel?: T | TrustPanelBlockSelect<T>;
         statBand?: T | StatBandBlockSelect<T>;
+        integrationsLanding?: T | IntegrationsLandingBlockSelect<T>;
         whatsappWidget?: T | WhatsappWidgetBlockSelect<T>;
         faq?: T | FAQBlockSelect<T>;
         platformLayersTwo?: T | PlatformLayersTwoBlockSelect<T>;
@@ -5672,6 +6391,7 @@ export interface IntegrationsBlockSelect<T extends boolean = true> {
   label?: T;
   heading?: T;
   intro?: T;
+  footnote?: T;
   populateBy?: T;
   categories?: T;
   products?: T;
@@ -5686,7 +6406,24 @@ export interface IntegrationsBlockSelect<T extends boolean = true> {
         logo?: T;
         id?: T;
       };
-  footnote?: T;
+  cardDesign?:
+    | T
+    | {
+        design?: T;
+        columns?: T;
+        lastRow?: T;
+        groupByCategory?: T;
+        linkLabel?: T;
+        look?:
+          | T
+          | {
+              cardColor?: T;
+              border?: T;
+              borderColor?: T;
+              accentLine?: T;
+            };
+        showAllLink?: T;
+      };
   background?: T;
   width?: T;
   spacingTop?: T;
@@ -6181,6 +6918,17 @@ export interface StatBandBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IntegrationsLandingBlock_select".
+ */
+export interface IntegrationsLandingBlockSelect<T extends boolean = true> {
+  master?: T;
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "WhatsappWidgetBlock_select".
  */
 export interface WhatsappWidgetBlockSelect<T extends boolean = true> {
@@ -6582,19 +7330,293 @@ export interface CustomersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "integrationsMaster_select".
+ */
+export interface IntegrationsMasterSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  isMain?: T;
+  filter?:
+    | T
+    | {
+        categories?: T;
+        products?: T;
+      };
+  primaryKeyword?: T;
+  secondaryKeywords?:
+    | T
+    | {
+        keyword?: T;
+        id?: T;
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+      };
+  eyebrow?: T;
+  h1?: T;
+  subheading?: T;
+  heroSystems?: T;
+  hero?:
+    | T
+    | {
+        secondaryCta?:
+          | T
+          | {
+              label?: T;
+              link?:
+                | T
+                | {
+                    type?: T;
+                    newTab?: T;
+                    reference?: T;
+                    url?: T;
+                  };
+            };
+        image?: T;
+      };
+  fiveThingsHeading?: T;
+  fiveThings?:
+    | T
+    | {
+        title?: T;
+        line?: T;
+        id?: T;
+      };
+  whenFeedsGoWrongHeading?: T;
+  whenFeedsGoWrong?:
+    | T
+    | {
+        problem?: T;
+        whatHappens?: T;
+        id?: T;
+      };
+  apiCard?:
+    | T
+    | {
+        heading?: T;
+        line?: T;
+        buttonLabel?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+            };
+      };
+  labels?:
+    | T
+    | {
+        statusTable?: T;
+        edgeCases?: T;
+        setup?: T;
+        related?: T;
+      };
+  faqHeading?: T;
+  faqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  closing?:
+    | T
+    | {
+        heading?: T;
+        subheading?: T;
+      };
+  cta?:
+    | T
+    | {
+        label?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+            };
+      };
+  waIntro?: T;
+  waListButton?: T;
+  waSectionTitle?: T;
+  waFallback?: T;
+  includeInKbase?: T;
+  kbAnswer?: T;
+  kbFacts?:
+    | T
+    | {
+        fact?: T;
+        id?: T;
+      };
+  kbQuestions?:
+    | T
+    | {
+        question?: T;
+        id?: T;
+      };
+  kbSynonyms?:
+    | T
+    | {
+        synonym?: T;
+        id?: T;
+      };
+  kbLastReviewed?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "integrations_select".
  */
 export interface IntegrationsSelect<T extends boolean = true> {
   name?: T;
-  logo?: T;
-  summary?: T;
+  status?: T;
   category?: T;
   connection?: T;
-  status?: T;
   products?: T;
   featured?: T;
   order?: T;
   slug?: T;
+  hasOwnPage?: T;
+  logo?: T;
+  tagline?: T;
+  summary?: T;
+  glance?:
+    | T
+    | {
+        title?: T;
+        line?: T;
+        id?: T;
+      };
+  primaryKeyword?: T;
+  secondaryKeywords?:
+    | T
+    | {
+        keyword?: T;
+        id?: T;
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+      };
+  heroHeading?: T;
+  heroSubheading?: T;
+  cta?:
+    | T
+    | {
+        label?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+            };
+      };
+  showClosing?: T;
+  related?: T;
+  headingOverrides?:
+    | T
+    | {
+        statusTable?: T;
+        edgeCases?: T;
+        setup?: T;
+        related?: T;
+      };
+  statusFlow?:
+    | T
+    | {
+        event?: T;
+        inPartner?: T;
+        whatHappens?: T;
+        id?: T;
+      };
+  edgeCases?:
+    | T
+    | {
+        situation?: T;
+        whatWeDo?: T;
+        id?: T;
+      };
+  setupChecklist?:
+    | T
+    | {
+        item?: T;
+        providedBy?: T;
+        id?: T;
+      };
+  setupChecklistSource?: T;
+  chatExample?:
+    | T
+    | {
+        sender?: T;
+        time?: T;
+        text?: T;
+        label?: T;
+        id?: T;
+      };
+  faqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  waRowTitle?: T;
+  waRowDescription?: T;
+  waHeaderType?: T;
+  waHeader?: T;
+  waBody?: T;
+  waKeyPoints?:
+    | T
+    | {
+        line?: T;
+        id?: T;
+      };
+  waFooter?: T;
+  waButtons?:
+    | T
+    | {
+        label?: T;
+        action?: T;
+        id?: T;
+      };
+  waLinkLabel?: T;
+  waLink?: T;
+  includeInKbase?: T;
+  kbAnswer?: T;
+  kbFacts?:
+    | T
+    | {
+        fact?: T;
+        id?: T;
+      };
+  kbQuestions?:
+    | T
+    | {
+        question?: T;
+        id?: T;
+      };
+  kbSynonyms?:
+    | T
+    | {
+        synonym?: T;
+        id?: T;
+      };
+  kbLastReviewed?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -6607,9 +7629,15 @@ export interface IntegrationCategoriesSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
   order?: T;
+  hubHeading?: T;
   description?: T;
+  icon?: T;
+  waRowTitle?: T;
+  waRowDescriptionAuto?: T;
+  waRowDescription?: T;
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -6619,9 +7647,22 @@ export interface ConnectionTypesSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
   order?: T;
+  badgeLabel?: T;
   description?: T;
+  timing?: T;
+  typicalSetup?: T;
+  defaultChecklist?:
+    | T
+    | {
+        item?: T;
+        providedBy?: T;
+        id?: T;
+      };
+  waLine?: T;
+  kbAnswer?: T;
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -6780,6 +7821,23 @@ export interface CrmFeaturesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ncxPostContents_select".
+ */
+export interface NcxPostContentsSelect<T extends boolean = true> {
+  key?: T;
+  sourceCollection?: T;
+  sourceId?: T;
+  sectionKey?: T;
+  title?: T;
+  pcmId?: T;
+  hash?: T;
+  archived?: T;
+  syncedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects_select".
  */
 export interface RedirectsSelect<T extends boolean = true> {
@@ -6864,6 +7922,7 @@ export interface PayloadJobsSelect<T extends boolean = true> {
   queue?: T;
   waitUntil?: T;
   processing?: T;
+  concurrencyKey?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -7339,8 +8398,9 @@ export interface TaskRagSyncDoc {
     locale?: string | null;
   };
   output: {
-    chunksEmbedded?: number | null;
-    chunksDeleted?: number | null;
+    sent?: number | null;
+    unchanged?: number | null;
+    archived?: number | null;
   };
 }
 /**
@@ -7353,7 +8413,9 @@ export interface TaskRagPurgeDoc {
     id: string;
   };
   output: {
-    chunksDeleted?: number | null;
+    sent?: number | null;
+    unchanged?: number | null;
+    archived?: number | null;
   };
 }
 /**

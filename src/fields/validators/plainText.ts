@@ -7,8 +7,10 @@ import {
 
 /**
  * Plain text only, for fields read by WhatsApp and the knowledge base, where
- * markdown shows up as stray symbols. Rejects markdown characters, a dash at
- * the start of a line, and em dashes.
+ * markdown shows up as stray symbols. Rejects the markdown characters * _ #
+ * ` [ ], a > at the start of a line (a quote), and em dashes. A hyphen at
+ * the start of a line is allowed: WhatsApp shows it as plain text, which
+ * suits short lists.
  *
  * Use as `validate: plainText` on a text, textarea or array field. A custom
  * validate replaces Payload's own, so this runs the built-in check for the
@@ -28,7 +30,6 @@ const BLOCKED: { char: string; name: string }[] = [
   { char: '`', name: 'the ` character' },
   { char: '[', name: 'the [ character' },
   { char: ']', name: 'the ] character' },
-  { char: '>', name: 'the > character' },
   { char: EM_DASH, name: 'the em dash. Use a comma, or split the sentence' },
 ]
 
@@ -39,8 +40,8 @@ export const plainTextProblem = (value: string): string | null => {
   for (const { char, name } of BLOCKED) {
     if (value.includes(char)) return `Remove ${name}. ${PLAIN}`
   }
-  if (/^\s*- /m.test(value)) {
-    return `Remove the dash at the start of the line. ${PLAIN}`
+  if (/^\s*>/m.test(value)) {
+    return `Remove the > at the start of the line. ${PLAIN}`
   }
   return null
 }

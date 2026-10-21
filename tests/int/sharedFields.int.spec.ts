@@ -100,7 +100,8 @@ describe('shared field groups', () => {
       'faqs.question': 120,
       'faqs.answer': 600,
       waRowTitle: 24,
-      waRowDescription: 72,
+      // WhatsApp allows 72; the NCX dashboard's list description allows 70.
+      waRowDescription: 70,
       waHeader: 60,
       waBody: 1024,
       'waKeyPoints.line': 60,

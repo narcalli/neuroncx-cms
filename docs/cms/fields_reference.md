@@ -10,7 +10,7 @@ The same content entry (a CRM feature, an integration, a module, a bot agent) is
 
 1. **The website**, as a card and sometimes as a page of its own.
 2. **WhatsApp**, inside interactive messages with strict character limits.
-3. **The knowledge base**, indexed into the Redis vector store for the RAG virtual agents.
+3. **The knowledge base**, sent to NCX post content for the RAG virtual agents (see `ncx-sync.md`).
 
 This file defines each reusable field group **once**. Collections use these groups as they are and add only the fields that are specific to them. If a limit or a field name needs to change, it changes here and in the shared field file, never in one collection only.
 
@@ -105,6 +105,7 @@ A collection may replace the fixed sections with its own page fields when it nee
 
 | Field | Type | Hard cap | Notes |
 |---|---|---|---|
+| `faqHeading` | text | 70 | Optional, only where the page shows a heading (`faqTab({ headingFallback })`; Integrations master). Empty shows the fallback |
 | `faqs` | array of `question` (120) + `answer` (600, plain text) | | Up to 6 |
 
 Used for the FAQ section and FAQPage structured data on the web page, and indexed for the knowledge base. Answers are plain text so the bot can use them as they are.
@@ -116,13 +117,15 @@ Plain text only. Written for **interactive session messages** (inside the 24-hou
 | Field | Used in | Hard cap | Working limit |
 |---|---|---|---|
 | `waRowTitle` | List row title (this entry as a menu item) | 24 | 24 |
-| `waRowDescription` | List row description | 72 | 60 |
+| `waRowDescription` | List row description | 70 | 60 |
 | `waHeader` | Message header, text type | 60 | 30 |
 | `waBody` | Message body | 1024 | 300 |
 | `waKeyPoints` | Array of plain lines, sent inside the body | 3 to 5 lines | 60 each |
 | `waFooter` | Message footer | 60 | 30 |
 | `waButtons` | Array of `label` + `action`, sent as reply buttons | 3 buttons max, label 20 | 20 |
 | `waLink` | URL sent when the user wants more | | Own page if `hasOwnPage` is on, otherwise the anchor on the parent page |
+
+`waRowDescription` is capped at 70, not WhatsApp's 72, to match the NCX dashboard's list description limit.
 
 List-level fields (`waListButton`, 20, and `waSectionTitle`, 24) describe a whole list, not one entry. They live once per collection in a Payload global (`whatsappLists`), not on each entry.
 
@@ -156,7 +159,7 @@ What the RAG virtual agents index and answer from.
 | `kbSynonyms` | array of text | 40 each | Other names people use for it |
 | `kbLastReviewed` | date | | So stale answers can be found and fixed |
 
-Every collection that uses this group is added to the list `with-rag.ts` watches, so a published change reaches the bot without a separate step.
+Every collection that uses this group is listed in `src/rag/sources.ts` and wrapped with `withRag()`, so a published change reaches NCX post content without a separate step (`ncx-sync.md`).
 
 What gets indexed, in order of weight: `kbAnswer`, `kbFacts`, `faqs`, `description`. The bot should lean on the first two.
 
@@ -165,7 +168,7 @@ What gets indexed, in order of weight: `kbAnswer`, `kbFacts`, `faqs`, `descripti
 | Collection | Core | Card | Detail | Own page | FAQ | WhatsApp | Knowledge base | Own fields |
 |---|---|---|---|---|---|---|---|---|
 | CRM features (`crm-features`) | Yes | Yes | Yes | Yes | Yes | Yes | Yes | None yet |
-| Integrations (`integrations`) | Yes | Yes | Yes | Yes, with Guide tab | Yes | Planned | Planned | status, category, connection, products, glance, guide |
+| Integrations (`integrations`) | Own fields for now | Own fields for now | Own fields for now | Own fields, with Page tab | Yes | Yes | Yes | status, category, connection, products, glance, statusFlow, edgeCases, setupChecklist, chatExample, see collections/integrations.md |
 
 Add a row whenever a collection adopts a group.
 

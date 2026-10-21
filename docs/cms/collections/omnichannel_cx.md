@@ -202,7 +202,7 @@ Branch, test and amount are placeholders. Replace them with demo-tenant values b
 | Field | Limit | Example (WhatsApp) |
 | --- | --- | --- |
 | `waRowTitle` | 24 | WhatsApp |
-| `waRowDescription` | 72, aim for 60 | Bookings, payments and answers in one chat |
+| `waRowDescription` | 70, aim for 60 | Bookings, payments and answers in one chat |
 | `waHeader` | 60, aim for 30 | WhatsApp |
 | `waBody` | 1024, aim for 300 | Your customers book, pay and get updates on WhatsApp, the app they already use. They can type, send a voice note or share a photo, and when a question needs a person, your team picks up with the whole conversation in front of them. |
 | `waKeyPoints` | 3 to 5 lines, 60 each | Text, voice notes, photos and documents / Bookings and payments in the chat / Your team takes over with the full history |

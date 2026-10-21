@@ -15,6 +15,7 @@ import { BentoGridRowLabel as BentoGridRowLabel_9034f91f9a14222ac73beb8c9248a9e3
 import { DetailedProductSuiteHighlightRowLabel as DetailedProductSuiteHighlightRowLabel_3a3e2c9b76634a20e9fc275d09b6cc82 } from '@/blocks/DetailedProductSuite/RowLabel'
 import { DetailedProductSuiteRowLabel as DetailedProductSuiteRowLabel_3a3e2c9b76634a20e9fc275d09b6cc82 } from '@/blocks/DetailedProductSuite/RowLabel'
 import { IntegrationsMarqueeRowLabel as IntegrationsMarqueeRowLabel_e40e127a1e15772294aa68668bfab915 } from '@/blocks/IntegrationsMarquee/RowLabel'
+import { CardDesignPickerField as CardDesignPickerField_54cd30ae39099e803142646c21b639ac } from '@/fields/CardDesignPicker/Component'
 import { UnorderedListFeatureClient as UnorderedListFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { FAQRowLabel as FAQRowLabel_7a0a1ede3caede510531ae1d1981b8cd } from '@/blocks/FAQ/RowLabel'
 import { PlatformLayersTwoRowLabel as PlatformLayersTwoRowLabel_19120e38fe7d436094c242d081cf8d0b } from '@/blocks/PlatformLayersTwo/RowLabel'
@@ -29,6 +30,9 @@ import { BlocksFeatureClient as BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0
 import { FolderTableCell as FolderTableCell_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { FolderField as FolderField_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { OrderedListFeatureClient as OrderedListFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
+import { SeoCheck as SeoCheck_f005860eaae4bc0f6f58072e00aa4b7e } from '@/collections/integrations/admin/SeoCheck'
+import { WhatsappPreview as WhatsappPreview_46da6f23e7eb1a14a653b9c74f39e9f1 } from '@/collections/integrations/admin/WhatsappPreview'
+import { FillKeyPoints as FillKeyPoints_429d4a4d03d610ec6cdfceba54f73123 } from '@/collections/integrations/admin/FillKeyPoints'
 import { FolderTypeField as FolderTypeField_2b8867833a34864a02ddf429b0728a40 } from '@payloadcms/next/client'
 import { RowLabel as RowLabel_ec255a65fa6fa8d1faeb09cf35284224 } from '@/Header/RowLabel'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
@@ -53,6 +57,7 @@ export const importMap = {
   "@/blocks/DetailedProductSuite/RowLabel#DetailedProductSuiteHighlightRowLabel": DetailedProductSuiteHighlightRowLabel_3a3e2c9b76634a20e9fc275d09b6cc82,
   "@/blocks/DetailedProductSuite/RowLabel#DetailedProductSuiteRowLabel": DetailedProductSuiteRowLabel_3a3e2c9b76634a20e9fc275d09b6cc82,
   "@/blocks/IntegrationsMarquee/RowLabel#IntegrationsMarqueeRowLabel": IntegrationsMarqueeRowLabel_e40e127a1e15772294aa68668bfab915,
+  "@/fields/CardDesignPicker/Component#CardDesignPickerField": CardDesignPickerField_54cd30ae39099e803142646c21b639ac,
   "@payloadcms/richtext-lexical/client#UnorderedListFeatureClient": UnorderedListFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@/blocks/FAQ/RowLabel#FAQRowLabel": FAQRowLabel_7a0a1ede3caede510531ae1d1981b8cd,
   "@/blocks/PlatformLayersTwo/RowLabel#PlatformLayersTwoRowLabel": PlatformLayersTwoRowLabel_19120e38fe7d436094c242d081cf8d0b,
@@ -67,6 +72,9 @@ export const importMap = {
   "@payloadcms/next/rsc#FolderTableCell": FolderTableCell_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@payloadcms/next/rsc#FolderField": FolderField_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@payloadcms/richtext-lexical/client#OrderedListFeatureClient": OrderedListFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
+  "@/collections/integrations/admin/SeoCheck#SeoCheck": SeoCheck_f005860eaae4bc0f6f58072e00aa4b7e,
+  "@/collections/integrations/admin/WhatsappPreview#WhatsappPreview": WhatsappPreview_46da6f23e7eb1a14a653b9c74f39e9f1,
+  "@/collections/integrations/admin/FillKeyPoints#FillKeyPoints": FillKeyPoints_429d4a4d03d610ec6cdfceba54f73123,
   "@payloadcms/next/client#FolderTypeField": FolderTypeField_2b8867833a34864a02ddf429b0728a40,
   "@/Header/RowLabel#RowLabel": RowLabel_ec255a65fa6fa8d1faeb09cf35284224,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,

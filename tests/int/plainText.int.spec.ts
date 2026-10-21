@@ -15,19 +15,24 @@ describe('plainText', () => {
     expect(checkPlainText('A follow-up call, not a new lead - ever.')).toBe(true)
   })
 
-  it.each(['*', '_', '#', '`', '[', ']', '>'])('fails on %s and names it', (char) => {
+  it.each(['*', '_', '#', '`', '[', ']'])('fails on %s and names it', (char) => {
     expect(checkPlainText(`Some text ${char} here`)).toBe(
       `Remove the ${char} character. This field is plain text.`,
     )
   })
 
-  it('fails on a dash at the start of a line', () => {
-    expect(checkPlainText('- First point')).toBe(
-      'Remove the dash at the start of the line. This field is plain text.',
+  it('fails on a > at the start of a line, and allows it elsewhere', () => {
+    expect(checkPlainText('> A quoted line')).toBe(
+      'Remove the > at the start of the line. This field is plain text.',
     )
-    expect(checkPlainText('Intro\n- Second point')).toBe(
-      'Remove the dash at the start of the line. This field is plain text.',
+    expect(checkPlainText(['Intro', '  > quoted'].join('\n'))).toBe(
+      'Remove the > at the start of the line. This field is plain text.',
     )
+    expect(checkPlainText('Under 5 > over 2 hours')).toBe(true)
+  })
+
+  it('allows a hyphen at the start of a line, for short lists', () => {
+    expect(checkPlainText(['What moves:', '- Bookings', '- Payments'].join('\n'))).toBe(true)
   })
 
   it('fails on an em dash', () => {

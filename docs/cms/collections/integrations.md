@@ -2,9 +2,9 @@
 collection: integrations
 payload_slug: integrations
 config_file: src/collections/Integrations.ts
-own_page_route: /integrations/[slug] (not built yet)
+own_page_route: /integrations/[slug] (website src/app/(frontend)/integrations/[slug]/page.tsx)
 shared_groups: see fields_reference.md
-schema_checked: 13 Oct 2026, main 51a929c and feature/integration-taxonomies 7213565
+schema_checked: 14 Oct 2026, after the integrations restructure (main 817d27e) and the audit fixes
 ---
 
 # Integrations
@@ -26,28 +26,45 @@ It links to: case studies (`caseStudies`), and on the taxonomies branch, three s
 
 ## 2. Field schema as it stands
 
-<!-- Checked by hand on 13 Oct 2026. Replace with a generated table once a collection reference script exists (see section 12). -->
+Checked 14 Oct 2026, after the integrations restructure. The section is four collections in the admin group "Integrations". Restructure plan and follow-up steps: `MIGRATION_PLAN.md` in the repo root.
 
-Settings: `useAsTitle: name`, list columns name, category, status, featured, `defaultSort: order`, drafts on (no autosave, no scheduled publishing). Create, update and delete need a login. Visitors can only read entries that are published and have status `live` (`liveOrAuthenticated`). There are no tabs yet: every field sits in the main column.
+### Integration items (`integrations`)
 
-| Field | Type | Required | Limits | Options or target | On main | On taxonomies branch |
-|---|---|---|---|---|---|---|
-| `name` | text | yes | unique | | yes | same |
-| `logo` | upload | no | | media | yes | same |
-| `summary` | text | no | max 120 | "What flows between the two systems, in plain words." | yes | same |
-| `category` | | yes | | | select: messaging, telephony, crm-marketing, hospital-systems, payments, data-bi | relationship to `integrationCategories` |
-| `connection` | | no | | | select: native, api-webhooks, file-import | relationship to `connectionTypes` |
-| `status` | select | yes | default live | live, pilot, planned | yes | same |
-| `products` | hasMany | no | | | select: crm, campaigns, call-quality, bots, knowledge-base, workflows | relationship to `products` |
-| `featured` | checkbox | no | default false | home page short list | yes | same |
-| `order` | number | no | default 100 | lower shows first | yes | same |
-| `slug` | text | no | unique, indexed | | yes | same |
+Settings: `useAsTitle: name`, list columns name, category, status, featured, `defaultSort: order`, drafts on (no autosave). Create, update and delete need a login. Visitors read only entries that are published and Live (`liveOrAuthenticated`).
 
-On the taxonomies branch, categories, connection types and products become entries editors manage in the admin, sorted by their own `order`. Adding a category such as "Booking and operations" is then a new entry, not a code change.
+| Where | Fields |
+|---|---|
+| Main column | `name` (required, unique, 60) |
+| Sidebar | `status` (live, pilot, planned; default live), `category` (required), `connection`, `products`, `featured`, `order`, `slug` (60, unique, checked against master slugs), `hasOwnPage`, SEO check panel |
+| Card tab | `logo`, `tagline` (60, aim 45), `summary` (120), `glance` (3 to 4: `title` 40, `line` 60) |
+| SEO tab | `primaryKeyword` (60), `secondaryKeywords` (up to 5, `keyword` 60), `meta.title` (60), `meta.description` (155), `meta.image` |
+| Page tab, shown with Own page on | `heroHeading` (70), `heroSubheading` (200), `cta` (`label` 30, `link`), `showClosing` (checkbox, default on; off hides the closing panel), `related` (up to 3), `headingOverrides` (`statusTable`, `edgeCases`, `setup`, `related`, 70 each) |
+| What moves tab | `statusFlow` (`event` 40, `inPartner` 40, `whatHappens` 120) |
+| Edge cases tab | `edgeCases` (`situation` 80, `whatWeDo` 160) |
+| Setup tab | `setupChecklist` (`item` 80, `providedBy`: you, neuroncx, partner) |
+| Example tab | `chatExample` (up to 8: `sender`, `time` 10, `text` 300 plain, `label` 40) |
+| FAQ tab | `faqs` (up to 6: `question` 120, `answer` 600 plain) |
+| WhatsApp tab | preview panel, `waRowTitle` 24, `waRowDescription` 70, `waHeaderType`, `waHeader` 60, `waBody` 1024, "Fill from status flow", `waKeyPoints` (3 to 5, `line` 60), `waFooter` 60, `waButtons` (up to 3: `label` 20, `action`: bookDemo, otherSystems, talkToSales, openPage), `waLinkLabel` 20, `waLink` (read only) |
+| Knowledge base tab | `includeInKbase`, `kbAnswer` 600, `kbFacts` (`fact` 160), `kbQuestions` (`question` 120), `kbSynonyms` (`synonym` 40), `kbLastReviewed` |
+
+Publishing with Own page on needs `slug`, `heroHeading`, `meta.title` and `meta.description`. On save, when empty: `meta.title` becomes "<primaryKeyword or name> with NeuronCx | NeuronCx", `meta.description` the summary, `waRowTitle` the name and `waRowDescription` a summary of 70 or under (both only when plain text). `waLink` is always set from the slug. The setup checklist is filled from the connection type's default once per connection type.
+
+### Integration categories (`integrationCategories`) and connection types (`connectionTypes`)
+
+Both: `name` (60), `slug` (60), `order`, drafts on, visitors read published entries.
+
+- Categories add `hubHeading` (60), `description` (the hub intro, 140), `icon`, `waRowTitle` (24), `waRowDescriptionAuto` and `waRowDescription` (70). With the automatic switch on, the row description lists the category's live, published integrations, refreshed when one is published, changed, unpublished or deleted.
+- Connection types add `badgeLabel` (20), `description` (200), `timing` (asItHappens, scheduled, onUpload), `typicalSetup` (120), `defaultChecklist`, `waLine` (60), `kbAnswer` (600).
+
+### Integrations master (`integrationsMaster`)
+
+Landing pages and the wording shared by item pages. One record has `isMain` on, and item pages read their headings from it. Visitors read published records.
+
+Sidebar: `name`, `slug` (checked against item slugs), `isMain`, `filter` (`categories`, `products`), SEO check panel. Tabs: SEO (as on items), Hero (`eyebrow` 40, `h1` 70 required, `subheading` 200, `heroSystems` up to 7, `hero.secondaryCta`, `hero.image`), Sections (`fiveThingsHeading` 70, `fiveThings`, `whenFeedsGoWrongHeading` 70, `whenFeedsGoWrong`, `apiCard` with `buttonLabel` 30), Item page labels (`labels.statusTable`, `edgeCases`, `setup`, `related`, 70 each, `{name}` only), FAQ (`faqHeading` 70, then `faqs`), Closing (`closing.heading` 70, `closing.subheading` 200, `cta`), WhatsApp (`waIntro` 1024, `waListButton` 20, `waSectionTitle` 24, `waFallback` 300), Knowledge base.
 
 ## 3. Target design, using the shared groups
 
-The shared groups in `fields_reference.md` are not built yet (`src/fields/` has none of them). When they are, integrations uses them like this:
+The WhatsApp, FAQ and knowledge base groups are built (`src/fields/`) and used above. Core, card and detail are not built as shared groups yet, so integrations keeps its own name, slug, logo and summary until the Phase 2 steps in `MIGRATION_PLAN.md`. The target, once they are:
 
 | Group | Use | How integrations fills it |
 |---|---|---|
@@ -121,7 +138,7 @@ By field:
 | Field | Limit | Example (DocPulse) |
 |---|---|---|
 | `waRowTitle` | 24 | DocPulse |
-| `waRowDescription` | 72, aim for 60 | Book doctor appointments on WhatsApp |
+| `waRowDescription` | 70, aim for 60 | Book doctor appointments on WhatsApp |
 | `waHeader` | 60, aim for 30 | DocPulse integration |
 | `waBody` | 1024, aim for 300 | Patients book, cancel and reschedule DocPulse appointments in this chat, and every change updates the hospital's records. |
 | `waKeyPoints` | 3 to 5 lines, 60 each | Live slots from DocPulse / Cancel or reschedule by reply / No-shows recorded |
@@ -148,13 +165,13 @@ Integrations are not watched by the RAG pipeline yet. `with-rag.ts` is applied t
 | Integrations Marquee block | Same modes. Limit 4 to 40. Renders nothing if fewer than 4 entries match |
 | Partner Strip block | Same modes for its platforms list, limit 1 to 8. Its standards badges stay typed on the block |
 | /integrations page | One Integrations block per category, each set to filter |
-| /integrations/[slug] | Not built. Only entries in section 4's "own page" row |
+| /integrations/[slug] | Only entries in section 4's "own page" row; any other slug is a 404. Sections: hero with At a glance, What moves, Example, Edge cases, Setup, FAQ (with FAQ markup), Related, closing. Headings: the entry's Section headings, else the main master record's Item page labels |
 | WhatsApp menus | Once the WhatsApp group is added |
 | Knowledge base | Once the knowledge base group is added and the collection is watched |
 
 In collection modes, visitors only ever see published, live entries, sorted by `order` then `name`. The picking logic lives in the website's `src/utilities/integrations.ts`.
 
-Integration cards don't link anywhere today. The site's link component only understands pages and posts, so linking to an integration page needs adding there and in the Integrations block.
+Cards in the Integrations block link to an entry's own page when it has one. Other places that show integrations (the marquee, the partner strip, customer pages) don't link yet, and the site's link component still only understands pages and posts.
 
 ## 9. SEO
 
@@ -223,7 +240,7 @@ In this order:
 3. **Build the shared groups** in `src/fields/` from `fields_reference.md`, then move integrations onto them. `slug` becomes required, so fill slugs for existing entries first. `logo` moves to `image`.
 4. **Add the SEO plugin fields** to integrations.
 5. **Build the Guide tab, the rich text blocks and the Related tab.**
-6. **Build `/integrations/[slug]`** on the website, add integration links to the link component and the Integrations block, and serve pages only per section 4.
+6. ~~Build `/integrations/[slug]`~~ (built 14 Oct 2026, with Integrations block links). Still to do: integration links in the link component, the marquee, the partner strip and customer pages, and in the sitemap.
 7. **Fix the sitemap** so it includes pages, posts, case studies and integration pages (see note below).
 8. **Add redirects** from the old LeadSquared and DocPulse URLs once their new pages exist.
 9. **Add the WhatsApp and knowledge base groups**, and add integrations to `src/rag/sources.ts`.

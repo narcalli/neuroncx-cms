@@ -145,7 +145,7 @@ By field:
 | Field | Limit | Example (Customer 360) |
 | --- | --- | --- |
 | `waRowTitle` | 24 | Customer 360 |
-| `waRowDescription` | 72, aim for 60 | One record for every customer, across every channel |
+| `waRowDescription` | 70, aim for 60 | One record for every customer, across every channel |
 | `waHeader` | 60, aim for 30 | Customer 360 |
 | `waBody` | 1024, aim for 300 | Every chat, call, booking and visit lands on one record, so your team knows who they're talking to before they reply. |
 | `waKeyPoints` | 3 to 5 lines, 60 each | WhatsApp, calls and walk-ins on one record / Past bookings and visits in view / Works across all your locations |

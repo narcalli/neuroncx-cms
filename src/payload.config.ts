@@ -9,12 +9,14 @@ import { Categories } from './collections/Categories'
 import { CrmFeatures } from './collections/CrmFeatures'
 import { Customers } from './collections/Customers'
 import { Integrations } from './collections/Integrations'
+import { IntegrationsMaster } from './collections/IntegrationsMaster'
 import { Lists } from './collections/Lists'
 import { ConnectionTypes, IntegrationCategories, Products } from './collections/IntegrationTaxonomies'
 import { Sectors } from './collections/Sectors'
 import { Enquiries } from './collections/Enquiries'
 import { Features } from './collections/Features'
 import { Media } from './collections/Media'
+import { NcxPostContents } from './collections/NcxPostContents'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { Users } from './collections/Users'
@@ -52,8 +54,8 @@ export default buildConfig({
     url: process.env.DATABASE_URL || '',
   }),
   collections: [
-    withRag(Pages),
-    withRag(Posts),
+    Pages,
+    Posts,
     Media,
     Categories,
     Features,
@@ -61,12 +63,14 @@ export default buildConfig({
     Enquiries,
     Sectors,
     Customers,
-    Integrations,
+    IntegrationsMaster,
+    withRag(Integrations),
     IntegrationCategories,
     ConnectionTypes,
     Products,
     Lists,
     CrmFeatures,
+    NcxPostContents,
   ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer, SiteSettings, WhatsappLists],

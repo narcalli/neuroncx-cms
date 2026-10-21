@@ -202,7 +202,7 @@ The full chain shown in the hub chat panel: Prescription understanding, then Tes
 | Field | Limit | Example (Payment services) |
 | --- | --- | --- |
 | `waRowTitle` | 24 | Payment services |
-| `waRowDescription` | 72, aim for 60 | Sends a payment link and confirms payment in the chat |
+| `waRowDescription` | 70, aim for 60 | Sends a payment link and confirms payment in the chat |
 | `waHeader` | 60, aim for 30 | Payment services |
 | `waBody` | 1024, aim for 300 | Once a booking is made, this agent sends a payment link in the same chat. If the customer loses it, they get the live link again, a new one if it expired, or a note that they've already paid. |
 | `waKeyPoints` | 3 to 5 lines, 60 each | Link sent as soon as a booking is made / Lost or expired links handled in the chat / Payment confirmed without a call |

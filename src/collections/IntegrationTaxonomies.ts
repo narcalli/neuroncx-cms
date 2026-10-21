@@ -1,9 +1,20 @@
-import type { CollectionBeforeDeleteHook, CollectionConfig, Field, Where } from 'payload'
+import type {
+  Access,
+  CollectionBeforeDeleteHook,
+  CollectionConfig,
+  Field,
+  Validate,
+  Where,
+} from 'payload'
 import { APIError } from 'payload'
+import { text as validateText } from 'payload/shared'
 
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
 import { iconField } from '../fields/icons'
+import { plainText } from '../fields/validators/plainText'
+import { checklistFields } from './integrations/checklist'
+import { categoryAutoRowDescription } from './integrations/hooks'
 
 /**
  * The editable lists an integration is tagged with: its category, its
@@ -20,24 +31,48 @@ const slugify = (s: string) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
 
-const baseFields: Field[] = [
-  { name: 'name', type: 'text', required: true, unique: true },
+const slugFormat = (value: unknown) =>
+  typeof value === 'string' && /^[a-z0-9]+(-[a-z0-9]+)*$/.test(value)
+    ? true
+    : 'Lowercase letters, numbers and single dashes only, for example hospital-systems.'
+
+// With caps, the built-in text check runs first so maxLength holds. Without,
+// the slug check stays exactly as it was (Products).
+const slugRule =
+  (capped: boolean): Validate =>
+  (value, options) => {
+    if (capped) {
+      const builtIn = validateText(value, options as any)
+      if (builtIn !== true) return builtIn
+    }
+    return slugFormat(value)
+  }
+
+const baseFields = (capped: boolean): Field[] => [
+  {
+    name: 'name',
+    type: 'text',
+    required: true,
+    unique: true,
+    ...(capped ? { maxLength: 60 } : {}),
+  },
   {
     name: 'slug',
     type: 'text',
     required: true,
     unique: true,
     index: true,
+    ...(capped ? { maxLength: 60 } : {}),
     admin: {
-      description: 'A short fixed code for addresses and filters. Filled in from the name if left empty. Lowercase, dashes only.',
+      description:
+        'A short fixed code for addresses and filters. Filled in from the name if left empty. Lowercase, dashes only.',
     },
     hooks: {
-      beforeValidate: [({ value, data }) => value || (data?.name ? slugify(String(data.name)) : value)],
+      beforeValidate: [
+        ({ value, data }) => value || (data?.name ? slugify(String(data.name)) : value),
+      ],
     },
-    validate: (value: unknown) =>
-      typeof value === 'string' && /^[a-z0-9]+(-[a-z0-9]+)*$/.test(value)
-        ? true
-        : 'Lowercase letters, numbers and single dashes only, for example hospital-systems.',
+    validate: slugRule(capped),
   },
   {
     name: 'order',
@@ -47,8 +82,22 @@ const baseFields: Field[] = [
   },
 ]
 
+// For the lists with drafts: visitors see published entries, and entries
+// saved before drafts were turned on (they have no _status), so nothing that
+// shows today disappears.
+const publishedOrBeforeDrafts: Access = ({ req: { user } }) => {
+  if (user) return true
+  const where: Where = {
+    or: [{ _status: { equals: 'published' } }, { _status: { exists: false } }],
+  }
+  return where
+}
+
 /** Where each list is referenced, so an entry in use cannot be deleted. */
-type UsedBy = { integrationField: 'category' | 'connection' | 'products'; blockField?: 'categories' | 'products' }
+type UsedBy = {
+  integrationField: 'category' | 'connection' | 'products'
+  blockField?: 'categories' | 'products'
+}
 
 // Refuses to delete an entry that an integration or a page block still
 // points at, and names them, rather than leaving those integrations without a
@@ -81,14 +130,23 @@ const refuseDeleteWhileUsed =
     const uses: string[] = []
     if (integrations.totalDocs) {
       const names = integrations.docs.map((d) => d.name).join(', ')
-      uses.push(`${integrations.totalDocs} integration${integrations.totalDocs === 1 ? '' : 's'} (${names}${integrations.totalDocs > 5 ? ', ...' : ''})`)
+      uses.push(
+        `${integrations.totalDocs} integration${integrations.totalDocs === 1 ? '' : 's'} (${names}${integrations.totalDocs > 5 ? ', ...' : ''})`,
+      )
     }
     if (pages?.totalDocs) {
       const slugs = pages.docs.map((d) => d.slug).join(', ')
-      uses.push(`a block filter on ${pages.totalDocs} page${pages.totalDocs === 1 ? '' : 's'} (${slugs}${pages.totalDocs > 5 ? ', ...' : ''})`)
+      uses.push(
+        `a block filter on ${pages.totalDocs} page${pages.totalDocs === 1 ? '' : 's'} (${slugs}${pages.totalDocs > 5 ? ', ...' : ''})`,
+      )
     }
     if (uses.length) {
-      throw new APIError(`This ${noun} is still used by ${uses.join(' and ')}. Move them to another ${noun} first.`, 400, null, true)
+      throw new APIError(
+        `This ${noun} is still used by ${uses.join(' and ')}. Move them to another ${noun} first.`,
+        400,
+        null,
+        true,
+      )
     }
   }
 
@@ -101,13 +159,18 @@ const taxonomy = (opts: {
   usedBy: UsedBy
   noun: string
   fields?: Field[]
+  /** Caps name and slug at 60 characters. */
+  capped?: boolean
+  /** Drafts on, no autosave, with publishedOrBeforeDrafts read access. */
+  drafts?: boolean
+  hooks?: CollectionConfig['hooks']
 }): CollectionConfig => ({
   slug: opts.slug,
   labels: { singular: opts.singular, plural: opts.plural },
   access: {
     create: authenticated,
     delete: authenticated,
-    read: anyone,
+    read: opts.drafts ? publishedOrBeforeDrafts : anyone,
     update: authenticated,
   },
   admin: {
@@ -117,40 +180,152 @@ const taxonomy = (opts: {
     ...(opts.group ? { group: opts.group } : {}),
   },
   defaultSort: 'order',
-  hooks: { beforeDelete: [refuseDeleteWhileUsed(opts.usedBy, opts.noun)] },
-  fields: [...baseFields, ...(opts.fields || [])],
+  hooks: { ...opts.hooks, beforeDelete: [refuseDeleteWhileUsed(opts.usedBy, opts.noun)] },
+  ...(opts.drafts ? { versions: { drafts: true } } : {}),
+  fields: [...baseFields(Boolean(opts.capped)), ...(opts.fields || [])],
 })
 
 export const IntegrationCategories = taxonomy({
   slug: 'integrationCategories',
-  singular: 'Integration Category',
-  plural: 'Integration Categories',
+  singular: 'Integration category',
+  plural: 'Integration categories',
   group: 'Integrations',
-  description: "Groups for integrations. Used in each integration's Category field and in the blocks' Categories filter.",
+  description:
+    "Groups for integrations. Used in each integration's Category field and in the blocks' Categories filter.",
   usedBy: { integrationField: 'category', blockField: 'categories' },
   noun: 'category',
+  capped: true,
+  drafts: true,
+  hooks: { beforeChange: [categoryAutoRowDescription] },
   fields: [
+    {
+      name: 'hubHeading',
+      type: 'text',
+      label: 'Hub heading',
+      maxLength: 60,
+      admin: {
+        description: 'The section heading on landing pages, for example "Where you book".',
+      },
+    },
     {
       name: 'description',
       type: 'textarea',
-      admin: { description: 'Optional. For example an intro line if the integrations page groups entries by category.' },
+      label: 'Hub intro',
+      maxLength: 140,
+      admin: {
+        description:
+          'One line shown under the category heading on landing pages, for example: The booking and records systems your front desk already uses.',
+      },
+    },
+    iconField(undefined, { description: 'Shown with the category heading on landing pages.' }),
+    {
+      name: 'waRowTitle',
+      type: 'text',
+      label: 'WhatsApp row title',
+      maxLength: 24,
+      validate: plainText,
+      admin: { description: 'The category as a row in the WhatsApp menu.' },
+    },
+    {
+      name: 'waRowDescriptionAuto',
+      type: 'checkbox',
+      label: 'Fill the WhatsApp row description automatically',
+      defaultValue: false,
+      admin: {
+        description:
+          "Lists the names of this category's live, published integrations, in order, cut to 70 characters on a whole name. It updates when an integration is published, changed, unpublished or deleted. Publishing an integration can therefore save this category as a new published version, so publish or discard any open draft of the category first.",
+      },
+    },
+    {
+      name: 'waRowDescription',
+      type: 'text',
+      label: 'WhatsApp row description',
+      maxLength: 70,
+      validate: plainText,
+      admin: {
+        description:
+          'Aim for 60 characters. Written for you while the automatic switch above is on.',
+      },
     },
   ],
 })
 
 export const ConnectionTypes = taxonomy({
   slug: 'connectionTypes',
-  singular: 'Connection Type',
-  plural: 'Connection Types',
+  singular: 'Integration connection type',
+  plural: 'Integration connection types',
   group: 'Integrations',
-  description: 'How NeuronCx connects to an integration. Used in each integration\'s Connection field.',
+  description:
+    "How NeuronCx connects to an integration. Used in each integration's Connection field.",
   usedBy: { integrationField: 'connection' },
   noun: 'connection type',
+  capped: true,
+  drafts: true,
   fields: [
     {
-      name: 'description',
+      name: 'badgeLabel',
       type: 'text',
-      admin: { description: 'Optional. One line, for example: Built-in connector, no setup on your side.' },
+      label: 'Badge label',
+      maxLength: 20,
+      admin: { description: 'The short chip shown on cards, for example Webhooks.' },
+    },
+    {
+      name: 'description',
+      type: 'textarea',
+      maxLength: 200,
+      admin: { description: "What this means for the client's team, in plain words." },
+    },
+    {
+      name: 'timing',
+      type: 'select',
+      options: [
+        { label: 'As it happens', value: 'asItHappens' },
+        { label: 'Scheduled', value: 'scheduled' },
+        { label: 'On upload', value: 'onUpload' },
+      ],
+      admin: { description: 'When data moves between the two systems.' },
+    },
+    {
+      name: 'typicalSetup',
+      type: 'textarea',
+      label: 'Typical setup',
+      maxLength: 120,
+      admin: {
+        description: 'Who does what to connect, for example: Your vendor adds our webhook address.',
+      },
+    },
+    {
+      name: 'defaultChecklist',
+      type: 'array',
+      label: 'Default setup checklist',
+      labels: { singular: 'Step', plural: 'Steps' },
+      admin: {
+        description:
+          "Copied into an integration's setup checklist when its connection is set and its checklist is empty.",
+      },
+      fields: checklistFields(),
+    },
+    {
+      name: 'waLine',
+      type: 'text',
+      label: 'WhatsApp line',
+      maxLength: 60,
+      validate: plainText,
+      admin: {
+        description:
+          'One line used inside WhatsApp messages, for example: Bookings arrive as they happen.',
+      },
+    },
+    {
+      name: 'kbAnswer',
+      type: 'textarea',
+      label: 'Knowledge base answer',
+      maxLength: 600,
+      validate: plainText,
+      admin: {
+        description:
+          'Answers "How do you connect to our system?" for this connection type, in plain words.',
+      },
     },
   ],
 })
@@ -161,12 +336,18 @@ export const Products = taxonomy({
   slug: 'products',
   singular: 'Product',
   plural: 'Products',
-  description: 'NeuronCx products. Integrations tag the products they work with; other parts of the site can use the same list later.',
+  description:
+    'NeuronCx products. Integrations tag the products they work with; other parts of the site can use the same list later.',
   usedBy: { integrationField: 'products', blockField: 'products' },
   noun: 'product',
   group: 'Integrations',
   fields: [
-    { name: 'shortDescription', type: 'text', maxLength: 160, label: 'Short description (one line)' },
+    {
+      name: 'shortDescription',
+      type: 'text',
+      maxLength: 160,
+      label: 'Short description (one line)',
+    },
     iconField(undefined, { label: 'Icon (optional)' }),
   ],
 })
