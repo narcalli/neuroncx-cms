@@ -310,6 +310,15 @@ export interface Page {
    */
   generateSlug?: boolean | null;
   slug: string;
+  breadcrumbParent?: {
+    kind?: ('none' | 'page' | 'label') | null;
+    page?: (string | null) | Page;
+    label?: string | null;
+  };
+  /**
+   * Short name for the breadcrumb trail. Defaults to the page title.
+   */
+  breadcrumbLabel?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -5661,6 +5670,14 @@ export interface PagesSelect<T extends boolean = true> {
   publishedAt?: T;
   generateSlug?: T;
   slug?: T;
+  breadcrumbParent?:
+    | T
+    | {
+        kind?: T;
+        page?: T;
+        label?: T;
+      };
+  breadcrumbLabel?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;

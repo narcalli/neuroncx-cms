@@ -240,6 +240,58 @@ export const Pages: CollectionConfig<'pages'> = {
       },
     },
     slugField(),
+    // Breadcrumb trail only. URLs stay flat (/{slug}); nothing here changes routing.
+    {
+      name: 'breadcrumbParent',
+      type: 'group',
+      label: 'Breadcrumb parent',
+      admin: {
+        position: 'sidebar',
+      },
+      fields: [
+        {
+          name: 'kind',
+          type: 'select',
+          label: 'Parent',
+          defaultValue: 'none',
+          options: [
+            { label: 'None', value: 'none' },
+            { label: 'Page', value: 'page' },
+            { label: 'Label (no link)', value: 'label' },
+          ],
+        },
+        {
+          name: 'page',
+          type: 'relationship',
+          label: 'Parent page',
+          relationTo: 'pages',
+          // A page cannot be its own parent.
+          filterOptions: ({ id }) => (id ? { id: { not_equals: id } } : true),
+          admin: {
+            condition: (_, siblingData) => siblingData?.kind === 'page',
+          },
+        },
+        {
+          name: 'label',
+          type: 'text',
+          label: 'Parent label',
+          maxLength: 30,
+          admin: {
+            condition: (_, siblingData) => siblingData?.kind === 'label',
+          },
+        },
+      ],
+    },
+    {
+      name: 'breadcrumbLabel',
+      type: 'text',
+      label: 'Breadcrumb label',
+      maxLength: 40,
+      admin: {
+        position: 'sidebar',
+        description: 'Short name for the breadcrumb trail. Defaults to the page title.',
+      },
+    },
   ],
   hooks: {
     afterChange: [revalidatePage],
