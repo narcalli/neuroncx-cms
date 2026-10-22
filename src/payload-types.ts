@@ -3061,7 +3061,6 @@ export interface IntegrationsBlock {
        */
       accentLine?: boolean | null;
     };
-    showAllLink?: boolean | null;
   };
   /**
    * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
@@ -4430,7 +4429,6 @@ export interface IntegrationsMaster {
              */
             accentLine?: boolean | null;
           };
-          showAllLink?: boolean | null;
         };
         id?: string | null;
       }[]
@@ -4466,7 +4464,6 @@ export interface IntegrationsMaster {
        */
       accentLine?: boolean | null;
     };
-    showAllLink?: boolean | null;
   };
   /**
    * Leave empty to show: What connecting your systems gives you
@@ -6527,7 +6524,6 @@ export interface IntegrationsBlockSelect<T extends boolean = true> {
               borderColor?: T;
               accentLine?: T;
             };
-        showAllLink?: T;
       };
   background?: T;
   width?: T;
@@ -7520,7 +7516,6 @@ export interface IntegrationsMasterSelect<T extends boolean = true> {
                     borderColor?: T;
                     accentLine?: T;
                   };
-              showAllLink?: T;
             };
         id?: T;
       };
@@ -7541,7 +7536,6 @@ export interface IntegrationsMasterSelect<T extends boolean = true> {
               borderColor?: T;
               accentLine?: T;
             };
-        showAllLink?: T;
       };
   fiveThingsHeading?: T;
   fiveThings?:

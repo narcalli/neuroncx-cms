@@ -76,7 +76,6 @@ export type CardDesignValue = {
     borderColor?: ('blue' | 'violet' | 'crimson' | 'navy') | null
     accentLine?: boolean | null
   }
-  showAllLink?: boolean | null
   /** Only on groups built with allowItemDesigns. */
   allowItemDesigns?: boolean | null
 }
@@ -91,7 +90,6 @@ export const CARD_DESIGN_DEFAULTS = {
   columns: null,
   lastRow: 'leave',
   groupByCategory: false,
-  showAllLink: true,
   allowItemDesigns: true,
 } as const satisfies Omit<CardDesignValue, 'linkLabel' | 'look'>
 
@@ -104,8 +102,8 @@ export type CardDesignOptions = {
    * Adds the "Let integrations and categories use their own design" switch,
    * for blocks whose cards are integrations (an integration, or its category,
    * may choose one of ITEM_CARD_DESIGNS). While it is on, the settings such a
-   * design may need (the feature look, link text, the 'All integrations' card)
-   * show whatever the block's design, except for directory and pill.
+   * design may need (the feature look, link text) show whatever the block's
+   * design, except for directory and pill.
    */
   allowItemDesigns?: boolean
 }
@@ -226,13 +224,6 @@ export const cardDesignFields = ({
         label: false,
         admin: { condition: orForItems(designIs('feature')) },
         fields: [cardLookFields('white')],
-      },
-      {
-        name: 'showAllLink',
-        type: 'checkbox',
-        label: "Add an 'All integrations' card at the end",
-        defaultValue: CARD_DESIGN_DEFAULTS.showAllLink,
-        admin: { condition: orForItems(designIs('logoCard')) },
       },
     ],
   }

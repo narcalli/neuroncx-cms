@@ -82,20 +82,19 @@ describe('cardDesignFields', () => {
   it('builds the same fields with no argument as with allowItemDesigns off, and no switch', () => {
     const plain = cardDesignFields()
     const off = cardDesignFields({ allowItemDesigns: false })
-    expect(names(plain)).toEqual(['design', 'columns', 'lastRow', 'groupByCategory', 'linkLabel', 'look', 'showAllLink'])
+    expect(names(plain)).toEqual(['design', 'columns', 'lastRow', 'groupByCategory', 'linkLabel', 'look'])
     expect(JSON.stringify(off)).toBe(JSON.stringify(plain))
     expect(conditions(off)).toEqual(conditions(plain))
     // Without the switch, the settings follow the block's own design only.
     for (const d of CARD_DESIGN_NAMES) {
       expect(shownFor(plain, 'look', d, true)).toBe(d === 'feature')
       expect(shownFor(plain, 'linkLabel', d, true)).toBe(d === 'feature' || d === 'story')
-      expect(shownFor(plain, 'showAllLink', d, true)).toBe(d === 'logoCard')
     }
   })
 
   it('adds the switch with allowItemDesigns, on by default, hidden for directory and pill', () => {
     const field = cardDesignFields({ allowItemDesigns: true })
-    expect(names(field)).toEqual(['design', 'allowItemDesigns', 'columns', 'lastRow', 'groupByCategory', 'linkLabel', 'look', 'showAllLink'])
+    expect(names(field)).toEqual(['design', 'allowItemDesigns', 'columns', 'lastRow', 'groupByCategory', 'linkLabel', 'look'])
     const toggle = child(field, 'allowItemDesigns') as { defaultValue?: unknown; label?: unknown }
     expect(toggle.defaultValue).toBe(true)
     expect(toggle.label).toBe('Let integrations and categories use their own design')
@@ -104,11 +103,11 @@ describe('cardDesignFields', () => {
     }
   })
 
-  it('shows the look, link text and All integrations card while the switch is on', () => {
+  it('shows the look and link text while the switch is on', () => {
     const field = cardDesignFields({ allowItemDesigns: true })
     for (const d of CARD_DESIGN_NAMES) {
       const wholeList = d === 'directory' || d === 'pill'
-      for (const name of ['look', 'linkLabel', 'showAllLink']) {
+      for (const name of ['look', 'linkLabel']) {
         // On (or not yet set, which reads as on): shown for every design but directory and pill.
         expect(shownFor(field, name, d, true), `${name} on ${d}`).toBe(!wholeList)
         expect(shownFor(field, name, d, undefined), `${name} unset ${d}`).toBe(!wholeList)
@@ -116,7 +115,6 @@ describe('cardDesignFields', () => {
       // Off: back to the block's own design.
       expect(shownFor(field, 'look', d, false)).toBe(d === 'feature')
       expect(shownFor(field, 'linkLabel', d, false)).toBe(d === 'feature' || d === 'story')
-      expect(shownFor(field, 'showAllLink', d, false)).toBe(d === 'logoCard')
     }
   })
 
@@ -127,13 +125,17 @@ describe('cardDesignFields', () => {
       columns: null,
       lastRow: 'leave',
       groupByCategory: false,
-      showAllLink: true,
       allowItemDesigns: true,
     })
     expect((child(field, 'columns') as SelectField).defaultValue).toBeUndefined()
     expect((child(field, 'lastRow') as SelectField).defaultValue).toBe(CARD_DESIGN_DEFAULTS.lastRow)
     expect((child(field, 'groupByCategory') as { defaultValue?: unknown }).defaultValue).toBe(false)
-    expect((child(field, 'showAllLink') as { defaultValue?: unknown }).defaultValue).toBe(true)
+  })
+
+  it("has no 'All integrations' card option, with or without the switch", () => {
+    for (const field of [cardDesignFields(), cardDesignFields({ allowItemDesigns: true })]) {
+      expect(names(field)).not.toContain('showAllLink')
+    }
   })
 
   it('exports a value type that matches the generated block type', () => {
