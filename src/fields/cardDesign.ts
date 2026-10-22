@@ -27,6 +27,18 @@ export type CardDesignName = keyof typeof DESIGNS
 
 export const CARD_DESIGN_NAMES = Object.keys(DESIGNS) as CardDesignName[]
 
+/**
+ * The designs one integration may choose for itself. Directory and pill
+ * describe a whole list, so only a block can use them.
+ */
+export const ITEM_CARD_DESIGNS = ['grid', 'logoCard', 'feature', 'story'] as const satisfies readonly CardDesignName[]
+
+export type ItemCardDesignName = (typeof ITEM_CARD_DESIGNS)[number]
+
+/** Select options for the given designs, in the usual order, with their labels. */
+export const cardDesignOptions = (names: readonly CardDesignName[]) =>
+  CARD_DESIGN_NAMES.filter((d) => names.includes(d)).map((value) => ({ label: DESIGNS[value], value }))
+
 /** The saved cardDesign value, as a block stores it and the API returns it. */
 export type CardDesignValue = {
   design: CardDesignName
@@ -42,11 +54,14 @@ export type CardDesignValue = {
     accentLine?: boolean | null
   }
   showAllLink?: boolean | null
+  /** Only on groups built with allowItemDesigns. */
+  allowItemDesigns?: boolean | null
 }
 
 /**
  * What a block with no card design settings reads as. columns is null: no
- * fixed number per row, the cards fit the width.
+ * fixed number per row, the cards fit the width. allowItemDesigns applies
+ * only where the group offers the switch.
  */
 export const CARD_DESIGN_DEFAULTS = {
   design: 'grid',
@@ -54,6 +69,7 @@ export const CARD_DESIGN_DEFAULTS = {
   lastRow: 'leave',
   groupByCategory: false,
   showAllLink: true,
+  allowItemDesigns: true,
 } as const satisfies Omit<CardDesignValue, 'linkLabel' | 'look'>
 
 export type CardDesignOptions = {
@@ -61,11 +77,20 @@ export type CardDesignOptions = {
   designs?: CardDesignName[]
   /** The design a new block starts with. Must be one of `designs`. Grid when left out. */
   defaultDesign?: CardDesignName
+  /**
+   * Adds the "Let integrations use their own design" switch, for blocks whose
+   * cards are integrations (each may choose one of ITEM_CARD_DESIGNS). While
+   * it is on, the settings an integration's own design may need (the feature
+   * look, link text, the 'All integrations' card) show whatever the block's
+   * design, except for directory and pill.
+   */
+  allowItemDesigns?: boolean
 }
 
 export const cardDesignFields = ({
   designs = CARD_DESIGN_NAMES,
   defaultDesign = CARD_DESIGN_DEFAULTS.design,
+  allowItemDesigns = false,
 }: CardDesignOptions = {}): Field => {
   const offered = CARD_DESIGN_NAMES.filter((d) => designs.includes(d))
   if (!offered.length) throw new Error('cardDesignFields: offer at least one design.')
@@ -85,6 +110,14 @@ export const cardDesignFields = ({
     (_data, siblingData) =>
       !names.includes(current(siblingData))
 
+  // With allowItemDesigns: while the switch is on (it is unless turned off),
+  // integrations may bring their own design, so a setting that design needs
+  // shows too. Directory and pill draw one whole list, so they never do.
+  const itemsMayChoose = (siblingData: Record<string, unknown> | undefined) =>
+    siblingData?.allowItemDesigns !== false && !['directory', 'pill'].includes(current(siblingData))
+  const orForItems = (base: Condition): Condition =>
+    allowItemDesigns ? (data, siblingData, ctx) => base(data, siblingData, ctx) || itemsMayChoose(siblingData) : base
+
   return {
     name: 'cardDesign',
     type: 'group',
@@ -96,12 +129,26 @@ export const cardDesignFields = ({
         label: 'Design',
         required: true,
         defaultValue: defaultDesign,
-        options: offered.map((value) => ({ label: DESIGNS[value], value })),
+        options: cardDesignOptions(offered),
         admin: {
           // A small picture of each design instead of a dropdown.
           components: { Field: '@/fields/CardDesignPicker/Component#CardDesignPickerField' },
         },
       },
+      ...(allowItemDesigns
+        ? [
+            {
+              name: 'allowItemDesigns',
+              type: 'checkbox' as const,
+              label: 'Let integrations use their own design',
+              defaultValue: CARD_DESIGN_DEFAULTS.allowItemDesigns,
+              admin: {
+                condition: designIsNot('directory', 'pill'),
+                description: 'When off, every card uses the design above.',
+              },
+            },
+          ]
+        : []),
       {
         // No default: empty fits as many cards as the width allows, which is
         // how blocks saved before this group existed have always looked.
@@ -115,7 +162,9 @@ export const cardDesignFields = ({
         ],
         admin: {
           condition: designIsNot('directory', 'pill'),
-          description: 'Leave empty to fit as many as the width allows.',
+          description: allowItemDesigns
+            ? 'Leave empty to fit as many as the width allows. If integrations use different designs and this is empty, every group shows 3 per row.'
+            : 'Leave empty to fit as many as the width allows.',
         },
       },
       {
@@ -143,7 +192,7 @@ export const cardDesignFields = ({
         label: 'Link text',
         maxLength: 30,
         admin: {
-          condition: designIs('feature', 'story'),
+          condition: orForItems(designIs('feature', 'story')),
           description: 'Used only for integrations that have their own page.',
         },
       },
@@ -152,7 +201,7 @@ export const cardDesignFields = ({
         name: 'look',
         type: 'group',
         label: false,
-        admin: { condition: designIs('feature') },
+        admin: { condition: orForItems(designIs('feature')) },
         fields: [cardLookFields('white')],
       },
       {
@@ -160,7 +209,7 @@ export const cardDesignFields = ({
         type: 'checkbox',
         label: "Add an 'All integrations' card at the end",
         defaultValue: CARD_DESIGN_DEFAULTS.showAllLink,
-        admin: { condition: designIs('logoCard') },
+        admin: { condition: orForItems(designIs('logoCard')) },
       },
     ],
   }

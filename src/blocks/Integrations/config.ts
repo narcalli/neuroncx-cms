@@ -65,8 +65,8 @@ export const Integrations: Block = {
         },
         {
           label: 'Card design',
-          // All six designs.
-          fields: [cardDesignFields()],
+          // All six designs; integrations may bring their own (the switch is on by default).
+          fields: [cardDesignFields({ allowItemDesigns: true })],
         },
       ],
     },

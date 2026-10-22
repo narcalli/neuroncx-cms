@@ -881,6 +881,10 @@ export interface Integration {
    */
   summary?: string | null;
   /**
+   * Leave empty to follow the section. Used only where the section allows it.
+   */
+  cardDesign?: ('grid' | 'logoCard' | 'feature' | 'story') | null;
+  /**
    * 3 to 4 short claims for the strip under the page hero, for example: Every status tracked.
    */
   glance?:
@@ -3028,7 +3032,11 @@ export interface IntegrationsBlock {
   cardDesign: {
     design: 'grid' | 'logoCard' | 'directory' | 'feature' | 'story' | 'pill';
     /**
-     * Leave empty to fit as many as the width allows.
+     * When off, every card uses the design above.
+     */
+    allowItemDesigns?: boolean | null;
+    /**
+     * Leave empty to fit as many as the width allows. If integrations use different designs and this is empty, every group shows 3 per row.
      */
     columns?: ('2' | '3' | '4') | null;
     lastRow?: ('stretch' | 'center' | 'leave') | null;
@@ -6438,6 +6446,7 @@ export interface IntegrationsBlockSelect<T extends boolean = true> {
     | T
     | {
         design?: T;
+        allowItemDesigns?: T;
         columns?: T;
         lastRow?: T;
         groupByCategory?: T;
@@ -7539,6 +7548,7 @@ export interface IntegrationsSelect<T extends boolean = true> {
   logo?: T;
   tagline?: T;
   summary?: T;
+  cardDesign?: T;
   glance?:
     | T
     | {
