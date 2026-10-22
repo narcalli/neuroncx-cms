@@ -39,6 +39,29 @@ export type ItemCardDesignName = (typeof ITEM_CARD_DESIGNS)[number]
 export const cardDesignOptions = (names: readonly CardDesignName[]) =>
   CARD_DESIGN_NAMES.filter((d) => names.includes(d)).map((value) => ({ label: DESIGNS[value], value }))
 
+/**
+ * The card design an integration, or an integration category, may choose for
+ * its cards: one of ITEM_CARD_DESIGNS, optional and with no default, shown as
+ * the design pictures with a first tile that clears it. A card uses its
+ * integration's design, else its category's, else the section's, wherever the
+ * section lets integrations and categories use their own design.
+ */
+export const itemCardDesignField = ({ clearLabel, description }: { clearLabel: string; description: string }): Field => ({
+  name: 'cardDesign',
+  type: 'select',
+  label: 'Card design',
+  options: cardDesignOptions(ITEM_CARD_DESIGNS),
+  admin: {
+    description,
+    components: {
+      Field: {
+        path: '@/fields/CardDesignPicker/Component#CardDesignPickerField',
+        clientProps: { clearLabel },
+      },
+    },
+  },
+})
+
 /** The saved cardDesign value, as a block stores it and the API returns it. */
 export type CardDesignValue = {
   design: CardDesignName
@@ -78,11 +101,11 @@ export type CardDesignOptions = {
   /** The design a new block starts with. Must be one of `designs`. Grid when left out. */
   defaultDesign?: CardDesignName
   /**
-   * Adds the "Let integrations use their own design" switch, for blocks whose
-   * cards are integrations (each may choose one of ITEM_CARD_DESIGNS). While
-   * it is on, the settings an integration's own design may need (the feature
-   * look, link text, the 'All integrations' card) show whatever the block's
-   * design, except for directory and pill.
+   * Adds the "Let integrations and categories use their own design" switch,
+   * for blocks whose cards are integrations (an integration, or its category,
+   * may choose one of ITEM_CARD_DESIGNS). While it is on, the settings such a
+   * design may need (the feature look, link text, the 'All integrations' card)
+   * show whatever the block's design, except for directory and pill.
    */
   allowItemDesigns?: boolean
 }
@@ -140,7 +163,7 @@ export const cardDesignFields = ({
             {
               name: 'allowItemDesigns',
               type: 'checkbox' as const,
-              label: 'Let integrations use their own design',
+              label: 'Let integrations and categories use their own design',
               defaultValue: CARD_DESIGN_DEFAULTS.allowItemDesigns,
               admin: {
                 condition: designIsNot('directory', 'pill'),

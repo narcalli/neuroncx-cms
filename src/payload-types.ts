@@ -736,6 +736,10 @@ export interface IntegrationCategory {
       )
     | null;
   /**
+   * Every integration in this category uses it, unless the integration has its own. Leave empty to follow the section. Used only where the section allows it.
+   */
+  cardDesign?: ('grid' | 'logoCard' | 'feature' | 'story') | null;
+  /**
    * The category as a row in the WhatsApp menu.
    */
   waRowTitle?: string | null;
@@ -881,7 +885,7 @@ export interface Integration {
    */
   summary?: string | null;
   /**
-   * Leave empty to follow the section. Used only where the section allows it.
+   * Leave empty to use the category's design, or the section's when the category has none. Used only where the section allows it.
    */
   cardDesign?: ('grid' | 'logoCard' | 'feature' | 'story') | null;
   /**
@@ -7794,6 +7798,7 @@ export interface IntegrationCategoriesSelect<T extends boolean = true> {
   hubHeading?: T;
   description?: T;
   icon?: T;
+  cardDesign?: T;
   waRowTitle?: T;
   waRowDescriptionAuto?: T;
   waRowDescription?: T;

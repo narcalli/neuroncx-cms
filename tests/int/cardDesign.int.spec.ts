@@ -4,6 +4,7 @@ import { select as validateSelect } from 'payload/shared'
 import { describe, expect, expectTypeOf, it } from 'vitest'
 
 import { Integrations } from '@/collections/Integrations'
+import { IntegrationCategories } from '@/collections/IntegrationTaxonomies'
 import {
   CARD_DESIGN_DEFAULTS,
   CARD_DESIGN_NAMES,
@@ -23,7 +24,7 @@ const offered = (field: Field) =>
   design(field).options.map((o) => (typeof o === 'string' ? o : o.value))
 
 // Whether a field is shown in the admin for a block whose design is `value`
-// (and, where given, whose "Let integrations use their own design" switch is `on`).
+// (and, where given, whose "Let integrations and categories use their own design" switch is `on`).
 const shownFor = (field: Field, name: string, value?: string, on?: boolean) => {
   const condition = child(field, name).admin?.condition
   return condition ? condition({}, { design: value, allowItemDesigns: on }, {} as never) : true
@@ -97,7 +98,7 @@ describe('cardDesignFields', () => {
     expect(names(field)).toEqual(['design', 'allowItemDesigns', 'columns', 'lastRow', 'groupByCategory', 'linkLabel', 'look', 'showAllLink'])
     const toggle = child(field, 'allowItemDesigns') as { defaultValue?: unknown; label?: unknown }
     expect(toggle.defaultValue).toBe(true)
-    expect(toggle.label).toBe('Let integrations use their own design')
+    expect(toggle.label).toBe('Let integrations and categories use their own design')
     for (const d of CARD_DESIGN_NAMES) {
       expect(shownFor(field, 'allowItemDesigns', d)).toBe(d !== 'directory' && d !== 'pill')
     }
@@ -140,38 +141,52 @@ describe('cardDesignFields', () => {
   })
 })
 
-describe("an integration's own card design", () => {
-  const findField = (fields: Field[], name: string): Field | undefined => {
-    for (const f of fields) {
-      if ('name' in f && f.name === name) return f
-      if (f.type === 'tabs') {
-        for (const t of f.tabs) {
-          const hit = findField(t.fields, name)
-          if (hit) return hit
-        }
+const findField = (fields: Field[], name: string): Field | undefined => {
+  for (const f of fields) {
+    if ('name' in f && f.name === name) return f
+    if (f.type === 'tabs') {
+      for (const t of f.tabs) {
+        const hit = findField(t.fields, name)
+        if (hit) return hit
       }
     }
-    return undefined
   }
-  const field = findField(Integrations.fields, 'cardDesign') as SelectField
-  // Payload's own check for a select field's value.
-  const check = (value: unknown) =>
-    validateSelect(value as never, { ...field, req: { t: (k: string) => k } } as never)
+  return undefined
+}
 
-  it('offers the four item designs, optional and with no default', () => {
-    expect(field.options).toEqual([
-      { label: 'Grid', value: 'grid' },
-      { label: 'Logo card', value: 'logoCard' },
-      { label: 'Feature card', value: 'feature' },
-      { label: 'Story card', value: 'story' },
-    ])
-    expect(field.options.map((o) => (typeof o === 'string' ? o : o.value))).toEqual([...ITEM_CARD_DESIGNS])
-    expect(field.required).toBeFalsy()
-    expect(field.defaultValue).toBeUndefined()
-  })
+// The same field on an integration and on an integration category; only the
+// first tile (empty) says what an empty value falls back to.
+for (const [what, fields, clearLabel] of [
+  ['an integration', Integrations.fields, 'Follow the category'],
+  ['an integration category', IntegrationCategories.fields, 'Follow the section'],
+] as const) {
+  describe(`${what}'s own card design`, () => {
+    const field = findField(fields as Field[], 'cardDesign') as SelectField
+    // Payload's own check for a select field's value.
+    const check = (value: unknown) =>
+      validateSelect(value as never, { ...field, req: { t: (k: string) => k } } as never)
 
-  it('accepts empty and the four item designs, and rejects anything else', () => {
-    for (const ok of [undefined, null, ...ITEM_CARD_DESIGNS]) expect(check(ok), String(ok)).toBe(true)
-    for (const bad of ['directory', 'pill', 'carousel']) expect(check(bad), bad).not.toBe(true)
+    it('offers the four item designs, optional and with no default', () => {
+      expect(field.options).toEqual([
+        { label: 'Grid', value: 'grid' },
+        { label: 'Logo card', value: 'logoCard' },
+        { label: 'Feature card', value: 'feature' },
+        { label: 'Story card', value: 'story' },
+      ])
+      expect(field.options.map((o) => (typeof o === 'string' ? o : o.value))).toEqual([...ITEM_CARD_DESIGNS])
+      expect(field.required).toBeFalsy()
+      expect(field.defaultValue).toBeUndefined()
+    })
+
+    it(`uses the design pictures, with "${clearLabel}" for empty`, () => {
+      const component = field.admin?.components?.Field as { path?: string; clientProps?: { clearLabel?: string } }
+      expect(component.path).toBe('@/fields/CardDesignPicker/Component#CardDesignPickerField')
+      expect(component.clientProps?.clearLabel).toBe(clearLabel)
+    })
+
+    it('accepts empty and the four item designs, and rejects anything else', () => {
+      for (const ok of [undefined, null, ...ITEM_CARD_DESIGNS]) expect(check(ok), String(ok)).toBe(true)
+      for (const bad of ['directory', 'pill', 'carousel']) expect(check(bad), bad).not.toBe(true)
+    })
   })
-})
+}

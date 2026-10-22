@@ -11,6 +11,7 @@ import { text as validateText } from 'payload/shared'
 
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
+import { itemCardDesignField } from '../fields/cardDesign'
 import { iconField } from '../fields/icons'
 import { plainText } from '../fields/validators/plainText'
 import { checklistFields } from './integrations/checklist'
@@ -218,6 +219,12 @@ export const IntegrationCategories = taxonomy({
       },
     },
     iconField(undefined, { description: 'Shown with the category heading on landing pages.' }),
+    // Optional, no default: empty follows the section's design.
+    itemCardDesignField({
+      clearLabel: 'Follow the section',
+      description:
+        'Every integration in this category uses it, unless the integration has its own. Leave empty to follow the section. Used only where the section allows it.',
+    }),
     {
       name: 'waRowTitle',
       type: 'text',
