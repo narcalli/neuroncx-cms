@@ -1,8 +1,9 @@
-import type { CollectionConfig, Field } from 'payload'
+import type { CollectionConfig, Field, Validate } from 'payload'
 
 import { authenticated } from '../access/authenticated'
 import { authenticatedOrPublished } from '../access/authenticatedOrPublished'
 import { faqTab } from '../fields/faq'
+import { integrationSourceFields } from '../fields/integrationSource'
 import { kbaseTab } from '../fields/kbase'
 import { link } from '../fields/link'
 import { plainText } from '../fields/validators/plainText'
@@ -37,6 +38,17 @@ const label = (name: string, title: string, example: string): Field => ({
   validate: onlyNameToken,
   admin: { description: `For example: ${example}` },
 })
+
+// Each category may have one section on the page.
+const oneSectionPerCategory: Validate = (value) => {
+  const ids = (Array.isArray(value) ? value : [])
+    .map((row: { category?: unknown }) => {
+      const c = row?.category
+      return typeof c === 'object' && c ? String((c as { id: unknown }).id) : c ? String(c) : ''
+    })
+    .filter(Boolean)
+  return new Set(ids).size === ids.length ? true : 'Each category can have only one section.'
+}
 
 // An optional heading for a section. Left empty, the page shows the default.
 const sectionHeading = (name: string, title: string, fallback: string, maxLength = 70): Field => ({
@@ -162,6 +174,17 @@ export const IntegrationsMaster: CollectionConfig = {
               maxLength: 200,
             },
             {
+              name: 'heroLayout',
+              type: 'select',
+              label: 'Hero layout',
+              defaultValue: 'left',
+              options: [
+                { label: 'Left (image on the right)', value: 'left' },
+                { label: 'Centred', value: 'centred' },
+              ],
+              admin: { description: 'Centred has no image.' },
+            },
+            {
               name: 'heroSystems',
               type: 'relationship',
               label: 'Systems in the hero',
@@ -169,6 +192,22 @@ export const IntegrationsMaster: CollectionConfig = {
               hasMany: true,
               maxRows: 7,
               admin: { description: 'Up to 7 integrations shown around the hero.' },
+            },
+            {
+              name: 'logoStripOn',
+              type: 'checkbox',
+              label: 'Logo strip (scrolling logos under the hero)',
+              defaultValue: false,
+            },
+            {
+              name: 'logoStrip',
+              type: 'group',
+              label: false,
+              admin: { condition: (data) => Boolean(data?.logoStripOn) },
+              fields: integrationSourceFields(
+                { min: 4, max: 40 },
+                { modes: ['all', 'filter', 'selection'], defaultMode: 'all' },
+              ),
             },
             {
               name: 'hero',
@@ -190,9 +229,58 @@ export const IntegrationsMaster: CollectionConfig = {
                   type: 'upload',
                   relationTo: 'media',
                   admin: {
+                    condition: (data) => data?.heroLayout !== 'centred',
                     description:
                       'Optional. An illustration beside the hero, such as the hub diagram.',
                   },
+                },
+              ],
+            },
+          ],
+        },
+        {
+          label: 'Integration sections',
+          description:
+            'The integration sections, in page order, each showing one category. Each section shows its text as typed here. Left empty, the page shows every category with its own name, hub heading and hub intro.',
+          fields: [
+            {
+              name: 'integrationSections',
+              type: 'array',
+              label: 'Sections',
+              labels: { singular: 'Section', plural: 'Sections' },
+              validate: oneSectionPerCategory,
+              admin: {
+                components: {
+                  RowLabel: '@/collections/integrations/SectionRowLabel#SectionRowLabel',
+                },
+              },
+              fields: [
+                {
+                  name: 'category',
+                  type: 'relationship',
+                  relationTo: 'integrationCategories',
+                  required: true,
+                  admin: { sortOptions: 'order' },
+                },
+                {
+                  name: 'eyebrow',
+                  type: 'text',
+                  maxLength: 60,
+                  validate: plainText,
+                  admin: { description: 'The small line above the heading, for example Telephony and dialers.' },
+                },
+                {
+                  name: 'heading',
+                  type: 'text',
+                  maxLength: 70,
+                  validate: plainText,
+                },
+                {
+                  name: 'intro',
+                  type: 'textarea',
+                  maxLength: 200,
+                  validate: plainText,
+                  admin: { description: 'Optional. Leave empty for no intro line.' },
                 },
               ],
             },

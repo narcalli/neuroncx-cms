@@ -76,19 +76,29 @@ const filterNeedsAChoice: Validate = (value, options) => {
     : 'Choose at least one category or product to filter by, or switch to All live integrations.'
 }
 
-export const integrationSourceFields = (limit: { min: number; max: number }): Field[] => [
+const SOURCE_OPTIONS: { label: string; value: SourceMode }[] = [
+  { label: 'All live integrations', value: 'all' },
+  { label: 'Filter by category or product', value: 'filter' },
+  { label: 'Hand-picked', value: 'selection' },
+  { label: 'Manual list, old style', value: 'manual' },
+]
+
+/**
+ * `modes` limits the choices, for a place with no typed list of its own
+ * (the Integrations master's logo strip offers all, filter and hand-picked).
+ * Blocks pass nothing and get all four, with manual as the default.
+ */
+export const integrationSourceFields = (
+  limit: { min: number; max: number },
+  { modes, defaultMode = 'manual' }: { modes?: SourceMode[]; defaultMode?: SourceMode } = {},
+): Field[] => [
   {
     name: 'populateBy',
     type: 'select',
     label: 'Show',
-    defaultValue: 'manual',
+    defaultValue: defaultMode,
     validate: filterNeedsAChoice,
-    options: [
-      { label: 'All live integrations', value: 'all' },
-      { label: 'Filter by category or product', value: 'filter' },
-      { label: 'Hand-picked', value: 'selection' },
-      { label: 'Manual list, old style', value: 'manual' },
-    ],
+    options: modes ? SOURCE_OPTIONS.filter((o) => modes.includes(o.value)) : SOURCE_OPTIONS,
   },
   // Links to the editable lists, so a category or product added in the
   // admin is available here straight away.

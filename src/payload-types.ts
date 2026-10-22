@@ -4335,9 +4335,22 @@ export interface IntegrationsMaster {
   h1: string;
   subheading?: string | null;
   /**
+   * Centred has no image.
+   */
+  heroLayout?: ('left' | 'centred') | null;
+  /**
    * Up to 7 integrations shown around the hero.
    */
   heroSystems?: (string | Integration)[] | null;
+  logoStripOn?: boolean | null;
+  logoStrip?: {
+    populateBy?: ('all' | 'filter' | 'selection') | null;
+    categories?: (string | IntegrationCategory)[] | null;
+    products?: (string | Product)[] | null;
+    featuredOnly?: boolean | null;
+    selectedDocs?: (string | Integration)[] | null;
+    limit?: number | null;
+  };
   hero?: {
     /**
      * Optional, next to the main button, for example: See Omnichannel CX. Type a label to choose where it goes.
@@ -4364,6 +4377,21 @@ export interface IntegrationsMaster {
      */
     image?: (string | null) | Media;
   };
+  integrationSections?:
+    | {
+        category: string | IntegrationCategory;
+        /**
+         * The small line above the heading, for example Telephony and dialers.
+         */
+        eyebrow?: string | null;
+        heading?: string | null;
+        /**
+         * Optional. Leave empty for no intro line.
+         */
+        intro?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Leave empty to show: What connecting your systems gives you
    */
@@ -7359,7 +7387,19 @@ export interface IntegrationsMasterSelect<T extends boolean = true> {
   eyebrow?: T;
   h1?: T;
   subheading?: T;
+  heroLayout?: T;
   heroSystems?: T;
+  logoStripOn?: T;
+  logoStrip?:
+    | T
+    | {
+        populateBy?: T;
+        categories?: T;
+        products?: T;
+        featuredOnly?: T;
+        selectedDocs?: T;
+        limit?: T;
+      };
   hero?:
     | T
     | {
@@ -7377,6 +7417,15 @@ export interface IntegrationsMasterSelect<T extends boolean = true> {
                   };
             };
         image?: T;
+      };
+  integrationSections?:
+    | T
+    | {
+        category?: T;
+        eyebrow?: T;
+        heading?: T;
+        intro?: T;
+        id?: T;
       };
   fiveThingsHeading?: T;
   fiveThings?:

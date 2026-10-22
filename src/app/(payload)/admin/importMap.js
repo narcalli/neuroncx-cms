@@ -31,6 +31,7 @@ import { FolderTableCell as FolderTableCell_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 import { FolderField as FolderField_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { OrderedListFeatureClient as OrderedListFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { SeoCheck as SeoCheck_f005860eaae4bc0f6f58072e00aa4b7e } from '@/collections/integrations/admin/SeoCheck'
+import { SectionRowLabel as SectionRowLabel_42b6c136b438671fe9e8dabbb1c30866 } from '@/collections/integrations/SectionRowLabel'
 import { WhatsappPreview as WhatsappPreview_46da6f23e7eb1a14a653b9c74f39e9f1 } from '@/collections/integrations/admin/WhatsappPreview'
 import { FillKeyPoints as FillKeyPoints_429d4a4d03d610ec6cdfceba54f73123 } from '@/collections/integrations/admin/FillKeyPoints'
 import { FolderTypeField as FolderTypeField_2b8867833a34864a02ddf429b0728a40 } from '@payloadcms/next/client'
@@ -73,6 +74,7 @@ export const importMap = {
   "@payloadcms/next/rsc#FolderField": FolderField_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@payloadcms/richtext-lexical/client#OrderedListFeatureClient": OrderedListFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@/collections/integrations/admin/SeoCheck#SeoCheck": SeoCheck_f005860eaae4bc0f6f58072e00aa4b7e,
+  "@/collections/integrations/SectionRowLabel#SectionRowLabel": SectionRowLabel_42b6c136b438671fe9e8dabbb1c30866,
   "@/collections/integrations/admin/WhatsappPreview#WhatsappPreview": WhatsappPreview_46da6f23e7eb1a14a653b9c74f39e9f1,
   "@/collections/integrations/admin/FillKeyPoints#FillKeyPoints": FillKeyPoints_429d4a4d03d610ec6cdfceba54f73123,
   "@payloadcms/next/client#FolderTypeField": FolderTypeField_2b8867833a34864a02ddf429b0728a40,
