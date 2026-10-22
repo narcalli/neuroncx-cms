@@ -1,6 +1,7 @@
 import type { Access, CollectionConfig, Field, Where } from 'payload'
 
 import { authenticated } from '../access/authenticated'
+import { cardDesignOptions, ITEM_CARD_DESIGNS } from '../fields/cardDesign'
 import { faqTab } from '../fields/faq'
 import { kbaseTab } from '../fields/kbase'
 import { link } from '../fields/link'
@@ -172,6 +173,22 @@ const cardTab = {
       type: 'text',
       maxLength: 120,
       admin: { description: 'What flows between the two systems, in plain words.' },
+    },
+    {
+      // Optional, no default: empty follows the section's design.
+      name: 'cardDesign',
+      type: 'select',
+      label: 'Card design',
+      options: cardDesignOptions(ITEM_CARD_DESIGNS),
+      admin: {
+        description: 'Leave empty to follow the section. Used only where the section allows it.',
+        components: {
+          Field: {
+            path: '@/fields/CardDesignPicker/Component#CardDesignPickerField',
+            clientProps: { clearLabel: 'Follow the section' },
+          },
+        },
+      },
     },
     {
       name: 'glance',
