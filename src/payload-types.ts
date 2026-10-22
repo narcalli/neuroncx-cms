@@ -4397,9 +4397,73 @@ export interface IntegrationsMaster {
          * Optional. Leave empty for no intro line.
          */
         intro?: string | null;
+        usePageDesign?: boolean | null;
+        cardDesign?: {
+          design: 'grid' | 'logoCard' | 'directory' | 'feature' | 'story' | 'pill';
+          /**
+           * When off, every card uses the design above.
+           */
+          allowItemDesigns?: boolean | null;
+          /**
+           * Leave empty to fit as many as the width allows. If integrations use different designs and this is empty, every group shows 3 per row.
+           */
+          columns?: ('2' | '3' | '4') | null;
+          lastRow?: ('stretch' | 'center' | 'leave') | null;
+          /**
+           * Show a heading for each category.
+           */
+          groupByCategory?: boolean | null;
+          /**
+           * Used only for integrations that have their own page.
+           */
+          linkLabel?: string | null;
+          look?: {
+            cardColor?: ('grey' | 'lavender' | 'white') | null;
+            border?: ('none' | 'solid' | 'gradient') | null;
+            borderColor?: ('blue' | 'violet' | 'crimson' | 'navy') | null;
+            /**
+             * A thin rule under the content, matches the border color.
+             */
+            accentLine?: boolean | null;
+          };
+          showAllLink?: boolean | null;
+        };
         id?: string | null;
       }[]
     | null;
+  /**
+   * The default look for every section on this page.
+   */
+  cardDesign: {
+    design: 'grid' | 'logoCard' | 'directory' | 'feature' | 'story' | 'pill';
+    /**
+     * When off, every card uses the design above.
+     */
+    allowItemDesigns?: boolean | null;
+    /**
+     * Leave empty to fit as many as the width allows. If integrations use different designs and this is empty, every group shows 3 per row.
+     */
+    columns?: ('2' | '3' | '4') | null;
+    lastRow?: ('stretch' | 'center' | 'leave') | null;
+    /**
+     * Show a heading for each category.
+     */
+    groupByCategory?: boolean | null;
+    /**
+     * Used only for integrations that have their own page.
+     */
+    linkLabel?: string | null;
+    look?: {
+      cardColor?: ('grey' | 'lavender' | 'white') | null;
+      border?: ('none' | 'solid' | 'gradient') | null;
+      borderColor?: ('blue' | 'violet' | 'crimson' | 'navy') | null;
+      /**
+       * A thin rule under the content, matches the border color.
+       */
+      accentLine?: boolean | null;
+    };
+    showAllLink?: boolean | null;
+  };
   /**
    * Leave empty to show: What connecting your systems gives you
    */
@@ -7434,7 +7498,46 @@ export interface IntegrationsMasterSelect<T extends boolean = true> {
         eyebrow?: T;
         heading?: T;
         intro?: T;
+        usePageDesign?: T;
+        cardDesign?:
+          | T
+          | {
+              design?: T;
+              allowItemDesigns?: T;
+              columns?: T;
+              lastRow?: T;
+              groupByCategory?: T;
+              linkLabel?: T;
+              look?:
+                | T
+                | {
+                    cardColor?: T;
+                    border?: T;
+                    borderColor?: T;
+                    accentLine?: T;
+                  };
+              showAllLink?: T;
+            };
         id?: T;
+      };
+  cardDesign?:
+    | T
+    | {
+        design?: T;
+        allowItemDesigns?: T;
+        columns?: T;
+        lastRow?: T;
+        groupByCategory?: T;
+        linkLabel?: T;
+        look?:
+          | T
+          | {
+              cardColor?: T;
+              border?: T;
+              borderColor?: T;
+              accentLine?: T;
+            };
+        showAllLink?: T;
       };
   fiveThingsHeading?: T;
   fiveThings?:

@@ -1,4 +1,4 @@
-import type { ArrayField, Field, SelectField } from 'payload'
+import type { ArrayField, Field, GroupField, SelectField } from 'payload'
 
 import { describe, expect, it } from 'vitest'
 
@@ -45,6 +45,31 @@ describe('Integrations master', () => {
   it('keeps existing records as they are: left hero, no logo strip', () => {
     expect((findField(IntegrationsMaster.fields, 'heroLayout') as SelectField).defaultValue).toBe('left')
     expect((findField(IntegrationsMaster.fields, 'logoStripOn') as { defaultValue?: unknown }).defaultValue).toBe(false)
+  })
+
+  it('has a page-wide card design on its own tab, letting integrations use their own design', () => {
+    const tabs = IntegrationsMaster.fields.find((f) => f.type === 'tabs') as { tabs: { label?: unknown; fields: Field[] }[] }
+    const tab = tabs.tabs.find((t) => t.label === 'Card design')
+    expect(tab).toBeDefined()
+    const group = tab!.fields[0] as GroupField
+    expect('name' in group && group.name).toBe('cardDesign')
+    expect(group.admin?.description).toBe('The default look for every section on this page.')
+    expect(group.fields.some((f) => 'name' in f && f.name === 'allowItemDesigns')).toBe(true)
+  })
+
+  it("shows a section's own card design only when it does not use the page's design", () => {
+    const sections = findField(IntegrationsMaster.fields, 'integrationSections') as ArrayField
+    const rowField = (name: string) => sections.fields.find((f) => 'name' in f && f.name === name) as Field
+    const toggle = rowField('usePageDesign') as { defaultValue?: unknown; label?: unknown }
+    expect(toggle.defaultValue).toBe(true)
+    expect(toggle.label).toBe("Use the page's design")
+
+    const own = rowField('cardDesign') as GroupField
+    expect(own.fields.some((f) => 'name' in f && f.name === 'allowItemDesigns')).toBe(true)
+    const shown = (usePageDesign?: boolean) => own.admin?.condition?.({}, { usePageDesign }, {} as never)
+    expect(shown(true)).toBe(false)
+    expect(shown(undefined)).toBe(false)
+    expect(shown(false)).toBe(true)
   })
 
   it('allows one section per category', async () => {

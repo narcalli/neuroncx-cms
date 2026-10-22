@@ -1,7 +1,8 @@
-import type { CollectionConfig, Field, Validate } from 'payload'
+import type { CollectionConfig, Field, GroupField, Validate } from 'payload'
 
 import { authenticated } from '../access/authenticated'
 import { authenticatedOrPublished } from '../access/authenticatedOrPublished'
+import { cardDesignFields } from '../fields/cardDesign'
 import { faqTab } from '../fields/faq'
 import { integrationSourceFields } from '../fields/integrationSource'
 import { kbaseTab } from '../fields/kbase'
@@ -38,6 +39,13 @@ const label = (name: string, title: string, example: string): Field => ({
   validate: onlyNameToken,
   admin: { description: `For example: ${example}` },
 })
+
+// The card design group with extra admin settings (a description, or a
+// condition), keeping the group's own.
+const withGroupAdmin = (field: Field, admin: GroupField['admin']): Field => {
+  const group = field as GroupField
+  return { ...group, admin: { ...group.admin, ...admin } } as Field
+}
 
 // Each category may have one section on the page.
 const oneSectionPerCategory: Validate = (value) => {
@@ -282,8 +290,28 @@ export const IntegrationsMaster: CollectionConfig = {
                   validate: plainText,
                   admin: { description: 'Optional. Leave empty for no intro line.' },
                 },
+                {
+                  // Payload fills defaults when reading, so this switch, not an
+                  // empty value, decides whether the section follows the page.
+                  name: 'usePageDesign',
+                  type: 'checkbox',
+                  label: "Use the page's design",
+                  defaultValue: true,
+                },
+                withGroupAdmin(cardDesignFields({ allowItemDesigns: true }), {
+                  condition: (_: unknown, siblingData: { usePageDesign?: boolean } | undefined) =>
+                    siblingData?.usePageDesign === false,
+                }),
               ],
             },
+          ],
+        },
+        {
+          label: 'Card design',
+          fields: [
+            withGroupAdmin(cardDesignFields({ allowItemDesigns: true }), {
+              description: 'The default look for every section on this page.',
+            }),
           ],
         },
         {
