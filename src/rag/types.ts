@@ -1,4 +1,4 @@
-import type { CollectionSlug } from 'payload'
+import type { BasePayload, CollectionSlug } from 'payload'
 
 /** One piece of a document that becomes one NCX post content. */
 export type RagSection = {
@@ -27,4 +27,10 @@ export type RagSource = {
   urlOf: (doc: any) => string
   /** Top-level field names never sent, on top of the defaults in serialize.ts. */
   omit?: string[]
+  /**
+   * The document's sections, when the source has its own serializer (content
+   * collections and hubs, src/rag/content.ts). Without it, projectDoc walks
+   * the collection's fields.
+   */
+  serialize?: (payload: BasePayload, doc: any) => Promise<RagSection[]>
 }

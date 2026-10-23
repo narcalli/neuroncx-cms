@@ -6,7 +6,8 @@ import type { BasePayload } from 'payload'
 import { recordPurge, recordSync } from './debug/record'
 import { archivePostContent, ncxConfigured, upsertPostContent } from './ncx'
 import { projectDoc } from './serialize'
-import { ragSources } from './sources'
+import type { RagSection } from './types'
+import { getRagSource } from './sources'
 
 const MAPPINGS = 'ncxPostContents' as const
 
@@ -15,6 +16,21 @@ const siteUrl = () => (process.env.NCX_SITE_URL || 'https://neuroncx.in').replac
 const hashOf = (s: string) => createHash('sha256').update(s).digest('hex').slice(0, 32)
 
 type Result = { sent: number; unchanged: number; archived: number }
+
+/**
+ * One section as the NCX post content it becomes: the title the dashboard
+ * shows, the text the bot indexes, and the page it links to. Also used by
+ * scripts/rag-dry-run.ts, so a dry run shows exactly what would be sent.
+ */
+export const composePostContent = (docTitle: string, path: string, section: RagSection) => {
+  const sameAsTitle = section.heading.trim().toLowerCase() === docTitle.toLowerCase()
+  const title = (sameAsTitle ? docTitle : `${docTitle} | ${section.heading}`).slice(0, 250)
+  const link = `${siteUrl()}${path}${section.anchor ? `#${section.anchor}` : ''}`
+  const text = [sameAsTitle ? docTitle : `${docTitle} - ${section.heading}`, section.body, `More: ${link}`].join(
+    '\n\n',
+  )
+  return { title, text, link }
+}
 
 /**
  * How long one job may spend sending before it stops and lets a retry carry
@@ -99,7 +115,7 @@ export const syncDoc = async (
   opts: { budgetMs?: number } = {},
 ): Promise<Result> => {
   const deadline = Date.now() + (opts.budgetMs ?? budgetMs())
-  const source = ragSources[collection]
+  const source = getRagSource(collection)
   if (!source) return { sent: 0, unchanged: 0, archived: 0 }
 
   if (!ncxConfigured()) {
@@ -114,10 +130,12 @@ export const syncDoc = async (
   const docTitle = String(source.titleOf(doc) || '').trim() || 'NeuronCX'
   const path = source.urlOf(doc)
   const fields = payload.collections[collection as keyof typeof payload.collections].config.fields
-  const sections = projectDoc(fields, doc, {
-    getBlock: (slug) => (payload.blocks as any)?.[slug],
-    omit: source.omit,
-  })
+  const sections = source.serialize
+    ? await source.serialize(payload, doc)
+    : projectDoc(fields, doc, {
+        getBlock: (slug) => (payload.blocks as any)?.[slug],
+        omit: source.omit,
+      })
 
   const existing = new Map((await findMappings(payload, collection, id)).map((m) => [m.key, m]))
   let sent = 0
@@ -132,12 +150,7 @@ export const syncDoc = async (
     existing.delete(key)
     if (outOfTime) continue
 
-    const sameAsTitle = section.heading.trim().toLowerCase() === docTitle.toLowerCase()
-    const title = (sameAsTitle ? docTitle : `${docTitle} | ${section.heading}`).slice(0, 250)
-    const link = `${siteUrl()}${path}${section.anchor ? `#${section.anchor}` : ''}`
-    const text = [sameAsTitle ? docTitle : `${docTitle} - ${section.heading}`, section.body, `More: ${link}`].join(
-      '\n\n',
-    )
+    const { title, text, link } = composePostContent(docTitle, path, section)
     const hash = hashOf(`${title}\n${text}`)
 
     if (prev?.pcmId && !prev.archived && prev.hash === hash) {
