@@ -7,6 +7,10 @@ import { fileURLToPath } from 'url'
 
 import { Categories } from './collections/Categories'
 import { CrmFeatures } from './collections/CrmFeatures'
+import { MicroApps } from './collections/MicroApps'
+import { buildHubs } from './collections/Hubs'
+import { contentBlocks } from './content/sections/blocks'
+import { waEndpoint } from './endpoints/wa'
 import { Customers } from './collections/Customers'
 import { Integrations } from './collections/Integrations'
 import { IntegrationsMaster } from './collections/IntegrationsMaster'
@@ -53,6 +57,10 @@ export default buildConfig({
   db: mongooseAdapter({
     url: process.env.DATABASE_URL || '',
   }),
+  // Layout sections and page blocks, referenced by slug from content collections' layout fields.
+  blocks: contentBlocks(),
+  // Read-only menus for the WhatsApp bot (src/endpoints/wa.ts).
+  endpoints: [waEndpoint],
   collections: [
     Pages,
     Posts,
@@ -70,6 +78,9 @@ export default buildConfig({
     Products,
     Lists,
     CrmFeatures,
+    MicroApps,
+    // After every content collection: its pickers list them.
+    buildHubs(),
     NcxPostContents,
   ],
   cors: [getServerSideURL()].filter(Boolean),

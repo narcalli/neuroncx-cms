@@ -34,8 +34,12 @@ import { SeoCheck as SeoCheck_f005860eaae4bc0f6f58072e00aa4b7e } from '@/collect
 import { SectionRowLabel as SectionRowLabel_42b6c136b438671fe9e8dabbb1c30866 } from '@/collections/integrations/SectionRowLabel'
 import { WhatsappPreview as WhatsappPreview_46da6f23e7eb1a14a653b9c74f39e9f1 } from '@/collections/integrations/admin/WhatsappPreview'
 import { FillKeyPoints as FillKeyPoints_429d4a4d03d610ec6cdfceba54f73123 } from '@/collections/integrations/admin/FillKeyPoints'
+import { CharCounterDescription as CharCounterDescription_643d9d96b484f061684810597eecdf63 } from '@/fields/CharCounter/Component'
+import { LayoutNotes as LayoutNotes_1246ecb47d6376db4ba24d6f53f98882 } from '@/fields/LayoutField/LayoutNotes'
+import { LayoutBlocksField as LayoutBlocksField_a0dda4a1053be10b70417bfc5e9945c9 } from '@/fields/LayoutField/LayoutBlocksField'
 import { FolderTypeField as FolderTypeField_2b8867833a34864a02ddf429b0728a40 } from '@payloadcms/next/client'
 import { RowLabel as RowLabel_ec255a65fa6fa8d1faeb09cf35284224 } from '@/Header/RowLabel'
+import { LayoutRowLabel as LayoutRowLabel_bdd915eadcfa0d1f03b46a11a9fbeafa } from '@/fields/LayoutField/RowLabel'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
@@ -77,8 +81,12 @@ export const importMap = {
   "@/collections/integrations/SectionRowLabel#SectionRowLabel": SectionRowLabel_42b6c136b438671fe9e8dabbb1c30866,
   "@/collections/integrations/admin/WhatsappPreview#WhatsappPreview": WhatsappPreview_46da6f23e7eb1a14a653b9c74f39e9f1,
   "@/collections/integrations/admin/FillKeyPoints#FillKeyPoints": FillKeyPoints_429d4a4d03d610ec6cdfceba54f73123,
+  "@/fields/CharCounter/Component#CharCounterDescription": CharCounterDescription_643d9d96b484f061684810597eecdf63,
+  "@/fields/LayoutField/LayoutNotes#LayoutNotes": LayoutNotes_1246ecb47d6376db4ba24d6f53f98882,
+  "@/fields/LayoutField/LayoutBlocksField#LayoutBlocksField": LayoutBlocksField_a0dda4a1053be10b70417bfc5e9945c9,
   "@payloadcms/next/client#FolderTypeField": FolderTypeField_2b8867833a34864a02ddf429b0728a40,
   "@/Header/RowLabel#RowLabel": RowLabel_ec255a65fa6fa8d1faeb09cf35284224,
+  "@/fields/LayoutField/RowLabel#LayoutRowLabel": LayoutRowLabel_bdd915eadcfa0d1f03b46a11a9fbeafa,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }
