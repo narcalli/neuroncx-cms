@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="100" viewBox="0 0 160 100" fill="none">
+  <!-- Detailed product suite: two large cards, a watermark icon, highlight tiles and a button. -->
+  <rect width="160" height="100" rx="6" fill="#f6f7fa"/>
+  <g id="card">
+    <rect x="10.5" y="10.5" width="66" height="79" rx="7" fill="#ffffff" stroke="#e2e6ef"/>
+    <circle cx="66" cy="21" r="7" fill="#f7eaea"/>
+    <rect x="17" y="17" width="16" height="2.5" rx="1.25" fill="#c62828"/>
+    <rect x="17" y="24" width="34" height="4" rx="2" fill="#5a6379"/>
+    <rect x="17" y="32" width="46" height="2.5" rx="1.25" fill="#8a92a6"/>
+    <rect x="17" y="37" width="40" height="2.5" rx="1.25" fill="#8a92a6"/>
+    <rect x="17" y="45" width="24" height="12" rx="2" fill="#edf0f6"/>
+    <rect x="45" y="45" width="24" height="12" rx="2" fill="#edf0f6"/>
+    <rect x="17" y="60" width="24" height="12" rx="2" fill="#edf0f6"/>
+    <rect x="45" y="60" width="24" height="12" rx="2" fill="#edf0f6"/>
+    <rect x="17" y="78" width="26" height="6" rx="3" fill="#c62828"/>
+  </g>
+  <use href="#card" x="73"/>
+</svg>

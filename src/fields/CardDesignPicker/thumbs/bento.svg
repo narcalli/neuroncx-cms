@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="100" viewBox="0 0 160 100" fill="none">
+  <!-- Bento grid: tiles of mixed sizes, each with an icon, a title and a line. -->
+  <rect width="160" height="100" rx="6" fill="#f6f7fa"/>
+  <rect x="10.5" y="10.5" width="88" height="48" rx="6" fill="#ffffff" stroke="#e2e6ef"/>
+  <rect x="17" y="17" width="9" height="9" rx="2.5" fill="#edf0f6"/>
+  <rect x="17" y="33" width="40" height="4" rx="2" fill="#5a6379"/>
+  <rect x="17" y="42" width="56" height="2.5" rx="1.25" fill="#8a92a6"/>
+  <rect x="104.5" y="10.5" width="45" height="22" rx="6" fill="#ffffff" stroke="#e2e6ef"/>
+  <rect x="110" y="17" width="24" height="3" rx="1.5" fill="#5a6379"/>
+  <rect x="110" y="23" width="30" height="2.5" rx="1.25" fill="#8a92a6"/>
+  <rect x="104.5" y="36.5" width="45" height="22" rx="6" fill="#ffffff" stroke="#e2e6ef"/>
+  <rect x="110" y="43" width="24" height="3" rx="1.5" fill="#5a6379"/>
+  <rect x="110" y="49" width="30" height="2.5" rx="1.25" fill="#8a92a6"/>
+  <rect x="10.5" y="64.5" width="45" height="25" rx="6" fill="#ffffff" stroke="#e2e6ef"/>
+  <rect x="16" y="72" width="24" height="3" rx="1.5" fill="#5a6379"/>
+  <rect x="16" y="78" width="30" height="2.5" rx="1.25" fill="#8a92a6"/>
+  <rect x="59.5" y="64.5" width="90" height="25" rx="6" fill="#ffffff" stroke="#e2e6ef"/>
+  <rect x="66" y="72" width="36" height="3" rx="1.5" fill="#5a6379"/>
+  <rect x="66" y="78" width="60" height="2.5" rx="1.25" fill="#8a92a6"/>
+</svg>

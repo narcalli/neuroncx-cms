@@ -16,7 +16,7 @@ import { revalidateContent } from '../../content/revalidate'
 import { allSections, sectionBlockSlug } from '../../content/sections/defineSection'
 import { HUB_SECTION_KEYS, hubEntries } from '../../content/sections/hub'
 import { SITE_BLOCKS } from '../../content/sections/siteBlocks'
-import { cardDesignOptions, GROUPING_SECTION_CARD_DESIGNS } from '../../fields/cardDesign'
+import { GROUPING_SECTION_CARD_DESIGNS, itemCardDesignField } from '../../fields/cardDesign'
 import { slugRule } from '../../fields/core'
 import { countedText } from '../../fields/counted'
 import { faqTab } from '../../fields/faq'
@@ -245,14 +245,26 @@ export const buildHubs = (): CollectionConfig => {
           countedText({ name: 'eyebrow', label: 'Eyebrow (optional)', maxLength: 60 }),
           countedText({ name: 'heading', label: 'Heading', maxLength: 70 }),
           countedText({ name: 'intro', label: 'Intro (optional)', textarea: true, maxLength: 200 }),
-          {
-            name: 'cardDesign',
-            type: 'select',
+          itemCardDesignField({
             label: 'Card design (optional)',
-            options: cardDesignOptions(GROUPING_SECTION_CARD_DESIGNS),
+            clearLabel: 'Follow the grouping',
+            designs: GROUPING_SECTION_CARD_DESIGNS,
+            description:
+              "Leave empty to use the grouping's design, else the grid. The Product suite designs, Detailed product suite and Bento grid draw the whole section, and win over the grouping's choice. With a card grid design, an entry's or a grouping's own card design still wins where the design allows it.",
+          }),
+          {
+            name: 'bentoPattern',
+            type: 'select',
+            label: 'Bento sizes',
+            defaultValue: 'even',
+            options: [
+              { label: 'Even (rows of three or two)', value: 'even' },
+              { label: 'Featured (first card large)', value: 'featured' },
+              { label: 'Alternating (wide and narrow)', value: 'alternating' },
+            ],
             admin: {
-              description:
-                "Leave empty to use the hub's default. An entry's or a grouping's own design still wins where the design allows it. Product suite draws the whole section as large cards with each entry's steps, and also applies when the grouping chooses it.",
+              condition: (_, siblingData) => siblingData?.cardDesign === 'bento',
+              description: 'How the cards share the width. The order follows the entries.',
             },
           },
           hubEntries('entries', 'Entries (optional)', {

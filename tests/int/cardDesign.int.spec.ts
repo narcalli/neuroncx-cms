@@ -196,27 +196,52 @@ for (const [what, fields, clearLabel] of [
   })
 }
 
-describe('Product suite, for hub grouping sections and groupings only', () => {
+describe('section designs, for hub grouping sections and groupings only', () => {
   const values = (field: SelectField) => field.options.map((o) => (typeof o === 'string' ? o : o.value))
+  const SECTION = ['suite', 'suiteSteps', 'suite2', 'detailedSuite', 'bento']
 
-  it('is not offered by card blocks', () => {
-    expect(offered(cardDesignFields())).not.toContain('suite')
-    expect(offered(cardDesignFields({ allowItemDesigns: true }))).not.toContain('suite')
+  it('are not offered by card blocks', () => {
+    for (const field of [cardDesignFields(), cardDesignFields({ allowItemDesigns: true })]) {
+      for (const d of SECTION) expect(offered(field)).not.toContain(d)
+    }
   })
 
-  it('is offered by a grouping, after the four item designs, with the design pictures', () => {
+  it('are offered by a grouping, after the four item designs, with the design pictures', () => {
     const field = findField(Lists.fields, 'cardDesign') as SelectField
-    expect(values(field)).toEqual([...ITEM_CARD_DESIGNS, 'suite'])
-    expect(field.options.at(-1)).toEqual({ label: 'Product suite', value: 'suite' })
+    expect(values(field)).toEqual([...ITEM_CARD_DESIGNS, ...SECTION])
+    expect(field.options.slice(-5)).toEqual([
+      { label: 'Product suite: pills', value: 'suite' },
+      { label: 'Product suite: steps', value: 'suiteSteps' },
+      { label: 'Product suite 2', value: 'suite2' },
+      { label: 'Detailed product suite', value: 'detailedSuite' },
+      { label: 'Bento grid', value: 'bento' },
+    ])
     expect((field.admin?.components?.Field as { path?: string }).path).toBe(
       '@/fields/CardDesignPicker/Component#CardDesignPickerField',
     )
   })
 
-  it("is offered by a hub's grouping section, after the block designs", () => {
+  describe("a hub's grouping section", () => {
     const rows = findField(buildHubs().fields, 'groupingSections') as ArrayField
-    const field = rows.fields.find((f) => 'name' in f && f.name === 'cardDesign') as SelectField
-    expect(values(field)).toEqual([...CARD_DESIGN_NAMES, 'suite'])
+    const row = (name: string) => rows.fields.find((f) => 'name' in f && f.name === name) as SelectField
+
+    it('offers every block design, then the section designs, as pictures that can be cleared', () => {
+      const field = row('cardDesign')
+      expect(values(field)).toEqual([...CARD_DESIGN_NAMES, ...SECTION])
+      expect(field.required).toBeFalsy()
+      const component = field.admin?.components?.Field as { path?: string; clientProps?: { clearLabel?: string } }
+      expect(component.path).toBe('@/fields/CardDesignPicker/Component#CardDesignPickerField')
+      expect(component.clientProps?.clearLabel).toBe('Follow the grouping')
+    })
+
+    it('shows the bento sizes only for the bento grid, even by default', () => {
+      const field = row('bentoPattern')
+      expect(values(field)).toEqual(['even', 'featured', 'alternating'])
+      expect(field.defaultValue).toBe('even')
+      const shown = (cardDesign?: string) => field.admin?.condition?.({}, { cardDesign }, {} as never)
+      expect(shown('bento')).toBe(true)
+      for (const d of [undefined, 'grid', 'suite', 'detailedSuite']) expect(shown(d), String(d)).toBe(false)
+    })
   })
 })
 

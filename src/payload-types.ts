@@ -5822,9 +5822,11 @@ export interface List {
       )
     | null;
   /**
-   * Every entry in this grouping uses it, unless the entry has its own. Leave empty to follow the section. Used only where the section allows it. Product suite draws the grouping's whole section on the hub page as large cards with each entry's steps.
+   * Every entry in this grouping uses it, unless the entry has its own. Leave empty to follow the section. Used only where the section allows it. The Product suite designs, Detailed product suite and Bento grid draw the grouping's whole section on the hub page, unless the hub's section chooses its own design.
    */
-  cardDesign?: ('grid' | 'logoCard' | 'feature' | 'story' | 'suite') | null;
+  cardDesign?:
+    | ('grid' | 'logoCard' | 'feature' | 'story' | 'suite' | 'suiteSteps' | 'suite2' | 'detailedSuite' | 'bento')
+    | null;
   /**
    * The grouping as a row in a WhatsApp list menu. Plain text.
    */
@@ -6620,9 +6622,27 @@ export interface Hub {
         heading?: string | null;
         intro?: string | null;
         /**
-         * Leave empty to use the hub's default. An entry's or a grouping's own design still wins where the design allows it. Product suite draws the whole section as large cards with each entry's steps, and also applies when the grouping chooses it.
+         * Leave empty to use the grouping's design, else the grid. The Product suite designs, Detailed product suite and Bento grid draw the whole section, and win over the grouping's choice. With a card grid design, an entry's or a grouping's own card design still wins where the design allows it.
          */
-        cardDesign?: ('grid' | 'logoCard' | 'directory' | 'feature' | 'story' | 'pill' | 'suite') | null;
+        cardDesign?:
+          | (
+              | 'grid'
+              | 'logoCard'
+              | 'directory'
+              | 'feature'
+              | 'story'
+              | 'pill'
+              | 'suite'
+              | 'suiteSteps'
+              | 'suite2'
+              | 'detailedSuite'
+              | 'bento'
+            )
+          | null;
+        /**
+         * How the cards share the width. The order follows the entries.
+         */
+        bentoPattern?: ('even' | 'featured' | 'alternating') | null;
         /**
          * Hand-picked, in order. Leave empty to show every live entry in the grouping.
          */
@@ -9802,6 +9822,7 @@ export interface HubsSelect<T extends boolean = true> {
         heading?: T;
         intro?: T;
         cardDesign?: T;
+        bentoPattern?: T;
         entries?: T;
         id?: T;
       };

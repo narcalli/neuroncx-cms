@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="100" viewBox="0 0 160 100" fill="none">
+  <!-- Product suite 2: numbered cards, each with an icon, a title, a line and a link. -->
+  <rect width="160" height="100" rx="6" fill="#f6f7fa"/>
+  <g id="card">
+    <rect x="10.5" y="18.5" width="42" height="64" rx="6" fill="#ffffff" stroke="#e2e6ef"/>
+    <rect x="16" y="25" width="9" height="3" rx="1.5" fill="#c62828"/>
+    <rect x="16" y="33" width="9" height="9" rx="2.5" fill="#edf0f6"/>
+    <rect x="16" y="48" width="28" height="3.5" rx="1.75" fill="#5a6379"/>
+    <rect x="16" y="56" width="30" height="2.5" rx="1.25" fill="#8a92a6"/>
+    <rect x="16" y="62" width="24" height="2.5" rx="1.25" fill="#8a92a6"/>
+    <rect x="16" y="73" width="15" height="2.5" rx="1.25" fill="#c62828"/>
+  </g>
+  <use href="#card" x="48"/>
+  <use href="#card" x="96"/>
+</svg>

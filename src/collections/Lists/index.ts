@@ -154,7 +154,7 @@ export const Lists: CollectionConfig = {
       clearLabel: 'Follow the section',
       designs: GROUPING_CARD_DESIGNS,
       description:
-        "Every entry in this grouping uses it, unless the entry has its own. Leave empty to follow the section. Used only where the section allows it. Product suite draws the grouping's whole section on the hub page as large cards with each entry's steps.",
+        "Every entry in this grouping uses it, unless the entry has its own. Leave empty to follow the section. Used only where the section allows it. The Product suite designs, Detailed product suite and Bento grid draw the grouping's whole section on the hub page, unless the hub's section chooses its own design.",
     }),
     {
       name: 'waRowTitle',
