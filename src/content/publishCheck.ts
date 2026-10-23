@@ -1,5 +1,6 @@
 import type { PayloadRequest } from 'payload'
 
+import { heroDesignOf, HERO_DESIGN_NAMES, type HeroDesignName } from '../fields/heroDesign'
 import { sectionKeysIn } from '../fields/layout'
 import { defaultLayoutBlocks } from './hubs'
 import type { ContentCollectionEntry } from './registry'
@@ -12,13 +13,44 @@ export type PublishProblem = { path: string; message: string }
 
 const empty = (v: unknown) => typeof v !== 'string' || !v.trim()
 
+/** Rows of an array field with every one of the given fields filled. */
+const filledRows = (rows: unknown, keys: string[]): number =>
+  Array.isArray(rows) ? rows.filter((r) => r && keys.every((k) => !empty(r[k]))).length : 0
+
+/**
+ * What the entry's hero design needs (fields_reference.md section 4):
+ * Conversation at least 2 chat messages, Picture on the right a picture,
+ * Stats at least 2 stats. An entry with no design uses the collection's
+ * default.
+ */
+export const heroDesignProblems = (
+  doc: Doc,
+  allowed: readonly HeroDesignName[] = HERO_DESIGN_NAMES,
+): PublishProblem[] => {
+  const design = heroDesignOf(doc, allowed)
+  if (design === 'conversation' && filledRows(doc.heroChat, ['text']) < 2) {
+    return [{ path: 'heroChat', message: 'Add at least 2 chat messages for the Conversation hero, or pick another hero design.' }]
+  }
+  if (design === 'rightPlacement' && !doc.heroMedia) {
+    return [{ path: 'heroMedia', message: 'Add a hero picture for the Picture on the right hero, or pick another hero design.' }]
+  }
+  if (design === 'stats' && filledRows(doc.heroStats, ['value', 'label']) < 2) {
+    return [{ path: 'heroStats', message: 'Add at least 2 stats for the Stats hero, or pick another hero design.' }]
+  }
+  return []
+}
+
 /**
  * What every entry with Own page on needs before it is published
- * (foundation.md section 4.3). `doc` is the saved entry merged with the
- * incoming change, after the fallbacks have run.
+ * (foundation.md section 4.3), with what its hero design needs.
+ * `doc` is the saved entry merged with the incoming change, after the
+ * fallbacks have run.
  */
-export const ownPageProblems = (doc: Doc): PublishProblem[] => {
-  const problems: PublishProblem[] = []
+export const ownPageProblems = (
+  doc: Doc,
+  heroDesigns: readonly HeroDesignName[] = HERO_DESIGN_NAMES,
+): PublishProblem[] => {
+  const problems: PublishProblem[] = [...heroDesignProblems(doc, heroDesigns)]
   if (empty(doc.heroHeading)) {
     problems.push({ path: 'heroHeading', message: 'Add a hero heading before publishing with Own page on.' })
   }

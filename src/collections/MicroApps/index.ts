@@ -175,13 +175,7 @@ const page: Field[] = [
   // TODO: callQualityAssessments (relationship, hasMany, call quality agents
   // only), once that collection exists.
   // TODO: episodicEngagements (relationship, hasMany), once that collection exists.
-  {
-    name: 'media',
-    type: 'upload',
-    label: 'Flow graphic or screenshot',
-    relationTo: 'media',
-    admin: { description: 'Optional, such as the payment flow.' },
-  },
+  // The flow graphic or screenshot is the Page tab's heroMedia (the Own page group).
 ]
 
 export const MicroApps = defineContentCollection({
@@ -192,6 +186,7 @@ export const MicroApps = defineContentCollection({
   groupBy: { listType: 'agentFamily', field: 'family', required: true },
   groups: ['core', 'card', 'detail', 'ownPage', 'faq', 'whatsapp', 'kbase'],
   ownPage: { omit: ['howItWorks'] },
+  heroDesigns: ['conversation', 'rightPlacement', 'stats'],
   fields: { sidebar, detail, card, page },
   extraTabs: [{ after: 'detail', tab: panel }],
   sections: [

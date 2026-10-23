@@ -1,7 +1,7 @@
 # Fields reference
 
 **Repo:** neuroncx-cms (Payload)
-**Last updated:** 21 Oct 2026
+**Last updated:** 23 Oct 2026
 **Applies to:** every content collection that feeds the website, WhatsApp or the knowledge base
 
 ## Why this exists
@@ -81,21 +81,49 @@ Integrations currently has `summary` at 120. It moves to this group, keeping 120
 
 Decides whether the entry gets a page of its own. Lets every entry start as a card and be promoted later without a schema change.
 
+### Fields
+
 | Field | Type | Hard cap | Notes |
 |---|---|---|---|
 | `hasOwnPage` | checkbox, default false | | Sidebar |
-| `heroHeading` | text | 70 | Required when `hasOwnPage` is on |
-| `heroSubheading` | textarea | 200 | |
+| `heroDesign` | select, picture picker | | `conversation`, `rightPlacement` or `stats`. Default `conversation`. Each collection lists the designs it allows with the `heroDesigns` option of `defineContentCollection` (all three when left out) |
+| `heroEyebrow` | text | 40 | Empty uses the grouping's name |
+| `heroHeading` | text | 70 | Required when `hasOwnPage` is on. The page's only H1 |
+| `heroSubheading` | textarea | 200 | Empty uses `summary` |
+| `heroChips` | array of `label` (30) | | Up to 4. Empty uses the card's `keyPoints` |
+| `cta` | group: `label` (30), `link` | | The main button, in the hero and the closing panel |
+| `heroSecondaryCta` | group: `label` (30), `link` | | A second button in the hero |
+| `heroChat` | array, shared field (`src/fields/chatExample.ts`) | | Up to 8 messages: `sender` (`customer`, `business`, `team`), `text` (300, plain text), optional `entry` (relationship to the same collection, the agent label, business messages only). Hubs use the same field |
+| `heroChatCaption` | text | 80 | |
+| `heroMedia` | upload (media) | | The flow graphic or screenshot. Replaces the bot swarm's old `media` field |
+| `heroMediaAlt` | text | 160 | Empty uses the picture's own alt text |
+| `heroWorkflowFromChain` | checkbox | | `conversation` only. Lists the entry and the entries in its chain (`passesTo`), by name and card icon, under the chat |
+| `heroStats` | array of `value` (12) + `label` (40) | | `conversation` (optional, up to 4) and `stats` (2 to 4) |
+| `heroMotion` | select: `on`, `off` | | `rightPlacement` only. Default `on` |
 | `benefits` | array of `title` (50) + `line` (140) | | 3 to 6 items |
 | `howItWorks` | array of `title` (50) + `line` (140) | | 3 to 5 steps |
 | `useCases` | array of `title` (50) + `line` (140) | | Up to 4 |
-| `cta` | group: `label` (30), `link` | | Closing call to action |
 | `related` | relationship to the same collection, hasMany | | Up to 3. If empty, the page shows other entries from the same collection by `order` |
 
-Behaviour:
+### Hero designs
+
+Each design is an existing light hero block, fed from the fields above by an adapter on the website (`src/components/sections/entryHeroAdapters.ts`). The blocks are unchanged on pages. A field only one design uses shows only for that design.
+
+| Design | Block | Reads | Needs to publish |
+|---|---|---|---|
+| `conversation` | Conversation hero | Eyebrow, heading, subheading, chips, both buttons, chat (customer messages as the customer's side, business and team messages as the business's), caption, chain as workflow steps, stats | At least 2 chat messages |
+| `rightPlacement` | Hero, picture on the right | Eyebrow, heading, subheading, both buttons, picture, alt text, motion | A picture |
+| `stats` | Stat hero | Eyebrow, heading, subheading, both buttons, stats | At least 2 stats |
+
+The conversation hero lists the agents that reply under the chat, once each. It can't show which agent sent which message.
+
+Every design has the same slim bar at the top: the breadcrumb trail (hub, grouping, entry) and the entry's Pilot tag (Planned, in a draft preview).
+
+### Behaviour
 
 - **Off:** the Page tab is hidden, the route returns 404, the entry stays out of the sitemap, and its card has no "Learn more" link.
-- **On:** the Page tab fields above become required before publishing (`admin.condition` plus a conditional `validate`). The route renders, the entry is added to the sitemap and the card links through.
+- **On:** the Page tab fields above become required before publishing (`admin.condition` plus the publish check). The route renders, the entry is added to the sitemap and the card links through.
+- **Knowledge base:** the hero's presentation fields (design, eyebrow, chips, second button, chat, caption, picture, alt text, chain switch, motion, stats) are never sent. The heading and subheading are.
 
 Each collection sets its own route base in its doc, for example `/crm/[slug]` or `/integrations/[slug]`.
 

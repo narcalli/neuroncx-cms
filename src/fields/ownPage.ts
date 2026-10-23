@@ -1,15 +1,22 @@
-import type { ArrayField, CheckboxField, CollectionSlug, Field, Tab, Validate } from 'payload'
+import type { ArrayField, CheckboxField, CollectionSlug, Condition, Field, GroupField, Tab, Validate } from 'payload'
 import { text as validateText } from 'payload/shared'
 
+import { chatExampleFields } from './chatExample'
+import { countedText } from './counted'
+import { heroDesignField, heroDesignOf, HERO_DESIGN_NAMES, type HeroDesignName } from './heroDesign'
 import { link } from './link'
 
 /**
  * Own page group (fields_reference.md, section 4). Every entry starts as a
  * card; hasOwnPage promotes it to a page of its own without a schema change.
  *
- *   const page = ownPage('crmFeatures')
+ *   const page = ownPage('crmFeatures', { heroDesigns: ['conversation'] })
  *   page.sidebar  the hasOwnPage switch, for the sidebar
  *   page.tab      the Page tab, shown only while hasOwnPage is on
+ *
+ * The hero fields are written once and fed to whichever hero design the
+ * entry picks (heroDesign); a field only one design uses shows only for it.
+ * What each design needs to publish is in src/content/publishCheck.ts.
  *
  * While the tab is hidden its fields are not validated, so an entry without
  * a page can always be published.
@@ -46,7 +53,38 @@ const titleAndLine = (
   ],
 })
 
-export const ownPage = (collection: CollectionSlug): { sidebar: CheckboxField; tab: Tab } => {
+/** A field at a share of its row, keeping its other admin settings (the counter). */
+const withWidth = <T extends { admin?: object }>(field: T, width: string): T => ({ ...field, admin: { ...field.admin, width } })
+
+/** A button that may be left empty: a label, and once there is one, where it goes. */
+const button = (name: string, label: string, description: string): GroupField => ({
+  name,
+  type: 'group',
+  label,
+  admin: { description },
+  fields: [
+    { name: 'label', type: 'text', maxLength: 30 },
+    // Shown, and required, only once there is a label.
+    link({
+      appearances: false,
+      disableLabel: true,
+      overrides: {
+        admin: { condition: (_: unknown, siblingData: any) => Boolean(siblingData?.label) },
+      },
+    }),
+  ],
+})
+
+export const ownPage = (
+  collection: CollectionSlug,
+  { heroDesigns = HERO_DESIGN_NAMES }: { heroDesigns?: readonly HeroDesignName[] } = {},
+): { sidebar: CheckboxField; tab: Tab } => {
+  // Shown only while the entry's design (or the collection's default) is one of these.
+  const forDesign =
+    (...designs: HeroDesignName[]): Condition =>
+    (data) =>
+      designs.includes(heroDesignOf(data, heroDesigns))
+
   const sidebar: CheckboxField = {
     name: 'hasOwnPage',
     type: 'checkbox',
@@ -60,6 +98,13 @@ export const ownPage = (collection: CollectionSlug): { sidebar: CheckboxField; t
   }
 
   const fields: Field[] = [
+    heroDesignField(heroDesigns),
+    countedText({
+      name: 'heroEyebrow',
+      label: 'Eyebrow (optional)',
+      maxLength: 40,
+      description: "The small line above the heading. Leave empty to use the grouping's name.",
+    }),
     {
       name: 'heroHeading',
       type: 'text',
@@ -69,6 +114,82 @@ export const ownPage = (collection: CollectionSlug): { sidebar: CheckboxField; t
       admin: { description: 'The page heading. Needed to publish with Own page on.' },
     },
     { name: 'heroSubheading', type: 'textarea', label: 'Hero subheading', maxLength: 200 },
+    {
+      name: 'heroChips',
+      type: 'array',
+      label: 'Chips',
+      labels: { singular: 'Chip', plural: 'Chips' },
+      maxRows: 4,
+      admin: { initCollapsed: true, description: "Up to 4 short labels in the hero. Leave empty to use the card's key points." },
+      fields: [countedText({ name: 'label', label: 'Label', maxLength: 30, required: true })],
+    },
+    button('cta', 'Call to action', 'The main button, in the hero and the closing panel. Type a label to choose where it goes.'),
+    button('heroSecondaryCta', 'Second button (optional)', 'A second button in the hero. Type a label to choose where it goes.'),
+    ...chatExampleFields({
+      agent: {
+        name: 'entry',
+        type: 'relationship',
+        label: 'Agent label (optional)',
+        relationTo: [collection],
+        admin: { description: 'The entry that sends this message, named under the chat.' },
+      },
+      captionDescription: 'A line at the top of the chat, such as where it takes place.',
+    }),
+    {
+      name: 'heroMedia',
+      type: 'upload',
+      label: 'Hero picture',
+      relationTo: 'media',
+      admin: { description: 'A flow graphic or screenshot. Needed for Picture on the right.' },
+    },
+    countedText({
+      name: 'heroMediaAlt',
+      label: 'Picture description (alt text)',
+      maxLength: 160,
+      description: "What the picture shows, for screen readers. Leave empty to use the picture's own alt text.",
+    }),
+    {
+      name: 'heroWorkflowFromChain',
+      type: 'checkbox',
+      label: 'Show the chain under the chat',
+      defaultValue: false,
+      admin: {
+        condition: forDesign('conversation'),
+        description: 'Lists this entry and the entries in its chain (Passes to), by name and card icon, under the chat.',
+      },
+    },
+    {
+      name: 'heroMotion',
+      type: 'select',
+      label: 'Picture motion',
+      defaultValue: 'on',
+      options: [
+        { label: 'On', value: 'on' },
+        { label: 'Off', value: 'off' },
+      ],
+      admin: { condition: forDesign('rightPlacement'), description: 'The picture drifts in gently. Off keeps it still.' },
+    },
+    {
+      name: 'heroStats',
+      type: 'array',
+      label: 'Stats',
+      labels: { singular: 'Stat', plural: 'Stats' },
+      maxRows: 4,
+      admin: {
+        initCollapsed: true,
+        condition: forDesign('conversation', 'stats'),
+        description: 'Real, defensible figures only. Stats needs 2 to 4; Conversation shows any under the hero.',
+      },
+      fields: [
+        {
+          type: 'row',
+          fields: [
+            withWidth(countedText({ name: 'value', label: 'Value', maxLength: 12, required: true, description: 'Such as 40% or 2x.' }), '35%'),
+            withWidth(countedText({ name: 'label', label: 'Label', maxLength: 40, required: true, description: 'What the number means.' }), '65%'),
+          ],
+        },
+      ],
+    },
     titleAndLine(
       'benefits',
       'Benefits',
@@ -90,23 +211,6 @@ export const ownPage = (collection: CollectionSlug): { sidebar: CheckboxField; t
       { maxRows: 4 },
       'Up to 4, one per vertical where possible.',
     ),
-    {
-      name: 'cta',
-      type: 'group',
-      label: 'Call to action',
-      admin: { description: 'The closing button. Type a label to choose where it goes.' },
-      fields: [
-        { name: 'label', type: 'text', maxLength: 30 },
-        // Shown, and required, only once there is a label.
-        link({
-          appearances: false,
-          disableLabel: true,
-          overrides: {
-            admin: { condition: (_: unknown, siblingData: any) => Boolean(siblingData?.label) },
-          },
-        }),
-      ],
-    },
     {
       name: 'related',
       type: 'relationship',

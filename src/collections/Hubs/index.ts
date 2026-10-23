@@ -18,6 +18,7 @@ import { HUB_SECTION_KEYS, hubEntries } from '../../content/sections/hub'
 import { SITE_BLOCKS } from '../../content/sections/siteBlocks'
 import { GROUPING_SECTION_CARD_DESIGNS, itemCardDesignField } from '../../fields/cardDesign'
 import { slugRule } from '../../fields/core'
+import { chatExampleFields } from '../../fields/chatExample'
 import { countedText } from '../../fields/counted'
 import { faqTab } from '../../fields/faq'
 import { kbaseTab } from '../../fields/kbase'
@@ -163,55 +164,12 @@ export const buildHubs = (): CollectionConfig => {
           condition: (data) => data?.heroDesign !== 'conversation',
         },
       },
-      {
-        name: 'heroChat',
-        type: 'array',
-        label: 'Chat',
-        labels: { singular: 'Message', plural: 'Messages' },
-        maxRows: 8,
-        admin: {
-          initCollapsed: true,
-          description: 'Up to 8 messages. Label each reply with the entry that sends it.',
-        },
-        fields: [
-          {
-            type: 'row',
-            fields: [
-              {
-                name: 'sender',
-                type: 'select',
-                required: true,
-                defaultValue: 'customer',
-                options: [
-                  { label: 'Customer', value: 'customer' },
-                  { label: 'Entry (agent)', value: 'entry' },
-                  { label: 'Team member', value: 'team' },
-                ],
-                admin: { width: '30%' },
-              },
-              hubEntries('entry', 'Sent by', {
-                one: true,
-                admin: {
-                  width: '70%',
-                  condition: (_, siblingData) => siblingData?.sender === 'entry',
-                },
-              }),
-            ],
-          },
-          {
-            name: 'text',
-            type: 'textarea',
-            required: true,
-            maxLength: 300,
-            admin: { description: 'Demo details only, no real customer names or figures.' },
-          },
-        ],
-      },
-      countedText({
-        name: 'heroChatCaption',
-        label: 'Chat caption (optional)',
-        maxLength: 80,
-        description: 'Under the chat in the standard design, at the top of the chat in the conversation design.',
+      ...chatExampleFields({
+        agent: hubEntries('entry', 'Agent label (optional)', {
+          one: true,
+          description: 'The entry that sends this message, shown with it.',
+        }),
+        captionDescription: 'Under the chat in the standard design, at the top of the chat in the conversation design.',
       }),
       optionalCta('heroCta', 'Main button'),
       optionalCta('heroSecondaryCta', 'Second button'),

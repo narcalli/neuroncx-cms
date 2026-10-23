@@ -211,3 +211,27 @@ describe('changes and safety', () => {
     expect(source).not.toMatch(/\.delete\(\s*\{/)
   })
 })
+
+describe('hero fields', () => {
+  it("sends an agent's hero picture as live media and remaps its chat labels", async () => {
+    stubFetch()
+    const p = createPromoter({ LIVE, LOCAL, liveHeaders: {}, WRITE: false })
+    const pay = doc({ id: 'local-pay', slug: 'payment-services' })
+    const { body, problems } = await p.toLiveRecord(
+      'microApps',
+      doc({
+        id: 'local-agent',
+        slug: 'appointment-assistance',
+        family: fam,
+        heroDesign: 'rightPlacement',
+        heroMedia: doc({ id: 'local-media', filename: 'flow.png', mimeType: 'image/png', url: '/api/media/file/flow.png' }),
+        heroChat: [{ id: 'row', sender: 'business', entry: { relationTo: 'microApps', value: pay }, text: 'Hi' }],
+      }),
+      new Set(),
+    )
+    expect(problems).toEqual([])
+    expect(body.heroMedia).toBe('dry-run:flow.png')
+    expect(body.heroChat[0].entry).toEqual({ relationTo: 'microApps', value: 'live-pay' })
+    expect(JSON.stringify(body)).not.toMatch(/local-/)
+  })
+})

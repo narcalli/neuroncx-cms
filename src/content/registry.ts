@@ -1,6 +1,7 @@
 import type { CollectionSlug } from 'payload'
 
 import type { ListType } from '../collections/Lists'
+import type { HeroDesignName } from '../fields/heroDesign'
 
 /**
  * Every content collection built with defineContentCollection(), keyed by
@@ -39,6 +40,8 @@ export type ContentCollectionEntry = {
   headings: Record<string, string>
   /** Whether entries go to the knowledge base (the kbase group). */
   kbase: boolean
+  /** The hero designs an entry's own page may use (heroDesign). Empty without the ownPage group. */
+  heroDesigns: HeroDesignName[]
   kb: ContentKbOptions
 }
 

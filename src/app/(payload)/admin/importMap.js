@@ -34,6 +34,7 @@ import { SeoCheck as SeoCheck_f005860eaae4bc0f6f58072e00aa4b7e } from '@/collect
 import { SectionRowLabel as SectionRowLabel_42b6c136b438671fe9e8dabbb1c30866 } from '@/collections/integrations/SectionRowLabel'
 import { WhatsappPreview as WhatsappPreview_46da6f23e7eb1a14a653b9c74f39e9f1 } from '@/collections/integrations/admin/WhatsappPreview'
 import { FillKeyPoints as FillKeyPoints_429d4a4d03d610ec6cdfceba54f73123 } from '@/collections/integrations/admin/FillKeyPoints'
+import { HeroDesignPickerField as HeroDesignPickerField_b69917ee4326e530cc6db1497a016f17 } from '@/fields/HeroDesignPicker/Component'
 import { CharCounterDescription as CharCounterDescription_643d9d96b484f061684810597eecdf63 } from '@/fields/CharCounter/Component'
 import { LayoutNotes as LayoutNotes_1246ecb47d6376db4ba24d6f53f98882 } from '@/fields/LayoutField/LayoutNotes'
 import { LayoutBlocksField as LayoutBlocksField_a0dda4a1053be10b70417bfc5e9945c9 } from '@/fields/LayoutField/LayoutBlocksField'
@@ -81,6 +82,7 @@ export const importMap = {
   "@/collections/integrations/SectionRowLabel#SectionRowLabel": SectionRowLabel_42b6c136b438671fe9e8dabbb1c30866,
   "@/collections/integrations/admin/WhatsappPreview#WhatsappPreview": WhatsappPreview_46da6f23e7eb1a14a653b9c74f39e9f1,
   "@/collections/integrations/admin/FillKeyPoints#FillKeyPoints": FillKeyPoints_429d4a4d03d610ec6cdfceba54f73123,
+  "@/fields/HeroDesignPicker/Component#HeroDesignPickerField": HeroDesignPickerField_b69917ee4326e530cc6db1497a016f17,
   "@/fields/CharCounter/Component#CharCounterDescription": CharCounterDescription_643d9d96b484f061684810597eecdf63,
   "@/fields/LayoutField/LayoutNotes#LayoutNotes": LayoutNotes_1246ecb47d6376db4ba24d6f53f98882,
   "@/fields/LayoutField/LayoutBlocksField#LayoutBlocksField": LayoutBlocksField_a0dda4a1053be10b70417bfc5e9945c9,

@@ -5520,10 +5520,120 @@ export interface MicroApp {
    */
   passesTo?: (string | MicroApp)[] | null;
   /**
+   * Every design reads the hero fields below; the fields only one design uses show when it is picked. Conversation needs at least 2 chat messages, Picture on the right needs a picture, Stats needs at least 2 stats.
+   */
+  heroDesign: 'conversation' | 'rightPlacement' | 'stats';
+  /**
+   * The small line above the heading. Leave empty to use the grouping's name.
+   */
+  heroEyebrow?: string | null;
+  /**
    * The page heading. Needed to publish with Own page on.
    */
   heroHeading?: string | null;
   heroSubheading?: string | null;
+  /**
+   * Up to 4 short labels in the hero. Leave empty to use the card's key points.
+   */
+  heroChips?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * The main button, in the hero and the closing panel. Type a label to choose where it goes.
+   */
+  cta?: {
+    label?: string | null;
+    link?: {
+      type?: ('reference' | 'custom') | null;
+      newTab?: boolean | null;
+      reference?:
+        | ({
+            relationTo: 'pages';
+            value: string | Page;
+          } | null)
+        | ({
+            relationTo: 'posts';
+            value: string | Post;
+          } | null);
+      url?: string | null;
+    };
+  };
+  /**
+   * A second button in the hero. Type a label to choose where it goes.
+   */
+  heroSecondaryCta?: {
+    label?: string | null;
+    link?: {
+      type?: ('reference' | 'custom') | null;
+      newTab?: boolean | null;
+      reference?:
+        | ({
+            relationTo: 'pages';
+            value: string | Page;
+          } | null)
+        | ({
+            relationTo: 'posts';
+            value: string | Post;
+          } | null);
+      url?: string | null;
+    };
+  };
+  /**
+   * Up to 8 messages, in order. Demo details only, no real customer names or figures.
+   */
+  heroChat?:
+    | {
+        sender: 'customer' | 'business' | 'team';
+        /**
+         * The entry that sends this message, named under the chat.
+         */
+        entry?: {
+          relationTo: 'microApps';
+          value: string | MicroApp;
+        } | null;
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * A line at the top of the chat, such as where it takes place.
+   */
+  heroChatCaption?: string | null;
+  /**
+   * A flow graphic or screenshot. Needed for Picture on the right.
+   */
+  heroMedia?: (string | null) | Media;
+  /**
+   * What the picture shows, for screen readers. Leave empty to use the picture's own alt text.
+   */
+  heroMediaAlt?: string | null;
+  /**
+   * Lists this entry and the entries in its chain (Passes to), by name and card icon, under the chat.
+   */
+  heroWorkflowFromChain?: boolean | null;
+  /**
+   * The picture drifts in gently. Off keeps it still.
+   */
+  heroMotion?: ('on' | 'off') | null;
+  /**
+   * Real, defensible figures only. Stats needs 2 to 4; Conversation shows any under the hero.
+   */
+  heroStats?:
+    | {
+        /**
+         * Such as 40% or 2x.
+         */
+        value: string;
+        /**
+         * What the number means.
+         */
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * 3 to 6 outcomes, each with a short line.
    */
@@ -5545,26 +5655,6 @@ export interface MicroApp {
       }[]
     | null;
   /**
-   * The closing button. Type a label to choose where it goes.
-   */
-  cta?: {
-    label?: string | null;
-    link?: {
-      type?: ('reference' | 'custom') | null;
-      newTab?: boolean | null;
-      reference?:
-        | ({
-            relationTo: 'pages';
-            value: string | Page;
-          } | null)
-        | ({
-            relationTo: 'posts';
-            value: string | Post;
-          } | null);
-      url?: string | null;
-    };
-  };
-  /**
    * Up to 3. Leave empty to show other entries from this collection, by order.
    */
   related?: (string | MicroApp)[] | null;
@@ -5581,10 +5671,6 @@ export interface MicroApp {
    * Usually Customer 360.
    */
   crmFeatures?: (string | CrmFeature)[] | null;
-  /**
-   * Optional, such as the payment flow.
-   */
-  media?: (string | null) | Media;
   /**
    * The sections between the page hero and the end of the page, in order. Drag to reorder. Read-only while Use page defaults is on.
    */
@@ -5987,10 +6073,120 @@ export interface CrmFeature {
    */
   legacyGap?: string | null;
   /**
+   * Every design reads the hero fields below; the fields only one design uses show when it is picked. Conversation needs at least 2 chat messages, Picture on the right needs a picture, Stats needs at least 2 stats.
+   */
+  heroDesign: 'conversation' | 'rightPlacement' | 'stats';
+  /**
+   * The small line above the heading. Leave empty to use the grouping's name.
+   */
+  heroEyebrow?: string | null;
+  /**
    * The page heading. Needed to publish with Own page on.
    */
   heroHeading?: string | null;
   heroSubheading?: string | null;
+  /**
+   * Up to 4 short labels in the hero. Leave empty to use the card's key points.
+   */
+  heroChips?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * The main button, in the hero and the closing panel. Type a label to choose where it goes.
+   */
+  cta?: {
+    label?: string | null;
+    link?: {
+      type?: ('reference' | 'custom') | null;
+      newTab?: boolean | null;
+      reference?:
+        | ({
+            relationTo: 'pages';
+            value: string | Page;
+          } | null)
+        | ({
+            relationTo: 'posts';
+            value: string | Post;
+          } | null);
+      url?: string | null;
+    };
+  };
+  /**
+   * A second button in the hero. Type a label to choose where it goes.
+   */
+  heroSecondaryCta?: {
+    label?: string | null;
+    link?: {
+      type?: ('reference' | 'custom') | null;
+      newTab?: boolean | null;
+      reference?:
+        | ({
+            relationTo: 'pages';
+            value: string | Page;
+          } | null)
+        | ({
+            relationTo: 'posts';
+            value: string | Post;
+          } | null);
+      url?: string | null;
+    };
+  };
+  /**
+   * Up to 8 messages, in order. Demo details only, no real customer names or figures.
+   */
+  heroChat?:
+    | {
+        sender: 'customer' | 'business' | 'team';
+        /**
+         * The entry that sends this message, named under the chat.
+         */
+        entry?: {
+          relationTo: 'crmFeatures';
+          value: string | CrmFeature;
+        } | null;
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * A line at the top of the chat, such as where it takes place.
+   */
+  heroChatCaption?: string | null;
+  /**
+   * A flow graphic or screenshot. Needed for Picture on the right.
+   */
+  heroMedia?: (string | null) | Media;
+  /**
+   * What the picture shows, for screen readers. Leave empty to use the picture's own alt text.
+   */
+  heroMediaAlt?: string | null;
+  /**
+   * Lists this entry and the entries in its chain (Passes to), by name and card icon, under the chat.
+   */
+  heroWorkflowFromChain?: boolean | null;
+  /**
+   * The picture drifts in gently. Off keeps it still.
+   */
+  heroMotion?: ('on' | 'off') | null;
+  /**
+   * Real, defensible figures only. Stats needs 2 to 4; Conversation shows any under the hero.
+   */
+  heroStats?:
+    | {
+        /**
+         * Such as 40% or 2x.
+         */
+        value: string;
+        /**
+         * What the number means.
+         */
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * 3 to 6 outcomes, each with a short line.
    */
@@ -6021,26 +6217,6 @@ export interface CrmFeature {
         id?: string | null;
       }[]
     | null;
-  /**
-   * The closing button. Type a label to choose where it goes.
-   */
-  cta?: {
-    label?: string | null;
-    link?: {
-      type?: ('reference' | 'custom') | null;
-      newTab?: boolean | null;
-      reference?:
-        | ({
-            relationTo: 'pages';
-            value: string | Page;
-          } | null)
-        | ({
-            relationTo: 'posts';
-            value: string | Post;
-          } | null);
-      url?: string | null;
-    };
-  };
   /**
    * Up to 3. Leave empty to show other entries from this collection, by order.
    */
@@ -6559,18 +6735,18 @@ export interface Hub {
    */
   heroMedia?: (string | null) | Media;
   /**
-   * Up to 8 messages. Label each reply with the entry that sends it.
+   * Up to 8 messages, in order. Demo details only, no real customer names or figures.
    */
   heroChat?:
     | {
-        sender: 'customer' | 'entry' | 'team';
+        sender: 'customer' | 'business' | 'team';
+        /**
+         * The entry that sends this message, shown with it.
+         */
         entry?: {
           relationTo: 'microApps';
           value: string | MicroApp;
         } | null;
-        /**
-         * Demo details only, no real customer names or figures.
-         */
         text: string;
         id?: string | null;
       }[]
@@ -9514,8 +9690,62 @@ export interface CrmFeaturesSelect<T extends boolean = true> {
   description?: T;
   whoItsFor?: T;
   legacyGap?: T;
+  heroDesign?: T;
+  heroEyebrow?: T;
   heroHeading?: T;
   heroSubheading?: T;
+  heroChips?:
+    | T
+    | {
+        label?: T;
+        id?: T;
+      };
+  cta?:
+    | T
+    | {
+        label?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+            };
+      };
+  heroSecondaryCta?:
+    | T
+    | {
+        label?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+            };
+      };
+  heroChat?:
+    | T
+    | {
+        sender?: T;
+        entry?: T;
+        text?: T;
+        id?: T;
+      };
+  heroChatCaption?: T;
+  heroMedia?: T;
+  heroMediaAlt?: T;
+  heroWorkflowFromChain?: T;
+  heroMotion?: T;
+  heroStats?:
+    | T
+    | {
+        value?: T;
+        label?: T;
+        id?: T;
+      };
   benefits?:
     | T
     | {
@@ -9536,19 +9766,6 @@ export interface CrmFeaturesSelect<T extends boolean = true> {
         title?: T;
         line?: T;
         id?: T;
-      };
-  cta?:
-    | T
-    | {
-        label?: T;
-        link?:
-          | T
-          | {
-              type?: T;
-              newTab?: T;
-              reference?: T;
-              url?: T;
-            };
       };
   related?: T;
   screenshots?:
@@ -9659,20 +9876,14 @@ export interface MicroAppsSelect<T extends boolean = true> {
   teamControls?: T;
   result?: T;
   passesTo?: T;
+  heroDesign?: T;
+  heroEyebrow?: T;
   heroHeading?: T;
   heroSubheading?: T;
-  benefits?:
+  heroChips?:
     | T
     | {
-        title?: T;
-        line?: T;
-        id?: T;
-      };
-  useCases?:
-    | T
-    | {
-        title?: T;
-        line?: T;
+        label?: T;
         id?: T;
       };
   cta?:
@@ -9688,12 +9899,58 @@ export interface MicroAppsSelect<T extends boolean = true> {
               url?: T;
             };
       };
+  heroSecondaryCta?:
+    | T
+    | {
+        label?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+            };
+      };
+  heroChat?:
+    | T
+    | {
+        sender?: T;
+        entry?: T;
+        text?: T;
+        id?: T;
+      };
+  heroChatCaption?: T;
+  heroMedia?: T;
+  heroMediaAlt?: T;
+  heroWorkflowFromChain?: T;
+  heroMotion?: T;
+  heroStats?:
+    | T
+    | {
+        value?: T;
+        label?: T;
+        id?: T;
+      };
+  benefits?:
+    | T
+    | {
+        title?: T;
+        line?: T;
+        id?: T;
+      };
+  useCases?:
+    | T
+    | {
+        title?: T;
+        line?: T;
+        id?: T;
+      };
   related?: T;
   proof?: T;
   customers?: T;
   integrations?: T;
   crmFeatures?: T;
-  media?: T;
   layout?: T | {};
   faqs?:
     | T

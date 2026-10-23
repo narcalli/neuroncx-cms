@@ -202,7 +202,7 @@ One collection for every hub page, one record per content collection. Replaces b
 | --- | --- |
 | Sidebar | `name`, `slug`, `forCollection` (select from the registry, unique), `isMain` |
 | SEO | `primaryKeyword`, `secondaryKeywords`, `meta.title`, `meta.description`, `meta.image` |
-| Hero | `eyebrow` (40), `h1` (70, required), `subheading` (200), `heroChips` (up to 4, 30 each), `heroMedia`, `heroChat` (up to 8: sender, entry relationship for the label, text 300), `heroChatCaption` (80), `cta`, `secondaryCta` |
+| Hero | `eyebrow` (40), `h1` (70, required), `subheading` (200), `heroChips` (up to 4, 30 each), `heroMedia`, `heroChat` (the shared chat field, fields_reference.md section 4: up to 8 messages from customer, business or team, plain text 300, entry relationship for the label), `heroChatCaption` (80), `cta`, `secondaryCta` |
 | Grouping sections | One row per grouping, in page order: `group` (relationship to `Lists`), `eyebrow` (60), `heading` (70), `intro` (200), card design override, optional hand-picked entries. With no rows: every grouping in `order`, using its own name and intro |
 | Hub layout | A `layout` field for the hub page itself, using hub sections (how it works, layers, works with, by industry, trust, articles) and site blocks |
 | Entry defaults | `defaultLayout` for entry pages, and `labels` (section headings with `{name}`) |

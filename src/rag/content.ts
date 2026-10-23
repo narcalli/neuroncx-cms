@@ -37,7 +37,27 @@ const HEADINGS: Record<string, string> = {
 }
 
 /** Fields that only shape the page. */
-const NEVER = ['layout', 'usePageDefaults', 'defaultLayout']
+/**
+ * Page plumbing, never sent: the layout, and how the own page hero
+ * looks (design, demo chat, picture, chips, stats, motion). The
+ * hero heading and subheading are content and still go.
+ */
+const NEVER = [
+  'layout',
+  'usePageDefaults',
+  'defaultLayout',
+  'heroDesign',
+  'heroEyebrow',
+  'heroChips',
+  'heroSecondaryCta',
+  'heroChat',
+  'heroChatCaption',
+  'heroMedia',
+  'heroMediaAlt',
+  'heroWorkflowFromChain',
+  'heroMotion',
+  'heroStats',
+]
 
 /** What a visitor receives, for collections that strip fields after a read. */
 const VISITOR_VIEW: Partial<Record<string, (doc: any) => any>> = { customers: stripForVisitors }

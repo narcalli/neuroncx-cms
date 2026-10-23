@@ -66,6 +66,11 @@ const ownPage = {
   slug: 'payment-services',
   summary: 'Sends the link.',
   heroHeading: 'Payment links that follow through',
+  // What the default conversation hero needs.
+  heroChat: [
+    { sender: 'customer', text: 'Can I pay here?' },
+    { sender: 'business', text: 'Here is your link.' },
+  ],
   hasOwnPage: true,
   _status: 'published',
 }

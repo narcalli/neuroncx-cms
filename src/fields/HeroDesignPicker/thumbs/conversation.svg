@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="100" viewBox="0 0 160 100" fill="none">
+  <!-- Conversation: heading and buttons on the left, a chat panel on the right, on the light stage. -->
+  <rect width="160" height="100" rx="6" fill="#e9eef6"/>
+  <circle cx="30" cy="22" r="26" fill="#dfe6f1"/>
+  <rect x="12" y="30" width="20" height="2.5" rx="1.25" fill="#c62828"/>
+  <rect x="12" y="36" width="52" height="6" rx="3" fill="#1a2035"/>
+  <rect x="12" y="47" width="58" height="2.5" rx="1.25" fill="#8a92a6"/>
+  <rect x="12" y="52" width="48" height="2.5" rx="1.25" fill="#8a92a6"/>
+  <rect x="12" y="61" width="22" height="7" rx="2" fill="#c62828"/>
+  <rect x="37" y="61" width="22" height="7" rx="2" fill="#ffffff" stroke="#d6dbe6"/>
+  <rect x="88.5" y="16.5" width="60" height="68" rx="6" fill="#ffffff" stroke="#e2e6ef"/>
+  <rect x="94" y="23" width="30" height="2.5" rx="1.25" fill="#8a92a6"/>
+  <rect x="118" y="31" width="25" height="7" rx="3" fill="#edf0f6"/>
+  <rect x="94" y="41" width="34" height="7" rx="3" fill="#dcefe9"/>
+  <rect x="94" y="51" width="30" height="7" rx="3" fill="#dcefe9"/>
+  <rect x="122" y="61" width="21" height="7" rx="3" fill="#edf0f6"/>
+  <rect x="94" y="73" width="26" height="2" rx="1" fill="#b3bac9"/>
+</svg>

@@ -241,7 +241,16 @@ describe('config mistakes', () => {
 
 describe('publish check', () => {
   const config = full('zzPublish')
-  const base = { name: 'Payment services', slug: 'payment-services', summary: 'Sends the link.' }
+  // Two chat messages: what the default conversation hero needs (heroDesign.int.spec.ts).
+  const base = {
+    name: 'Payment services',
+    slug: 'payment-services',
+    summary: 'Sends the link.',
+  heroChat: [
+    { sender: 'customer', text: 'Can I pay here?' },
+    { sender: 'business', text: 'Here is your link.' },
+  ],
+  }
 
   it('publishes without page fields while Own page is off', async () => {
     expect(await refused(config, { ...base, _status: 'published', hasOwnPage: false })).toEqual([])
@@ -259,7 +268,7 @@ describe('publish check', () => {
 
   it('needs the SEO description when there is no summary to fill it from', async () => {
     expect(
-      await refused(config, { name: 'No summary', _status: 'published', hasOwnPage: true }),
+      await refused(config, { name: 'No summary', heroChat: base.heroChat, _status: 'published', hasOwnPage: true }),
     ).toEqual(['heroHeading', 'meta.description'])
   })
 
@@ -441,6 +450,7 @@ describe('knowledge base, revalidation and registry', () => {
       defaultLayout: ['integrations', 'related'],
       headings: {},
       kbase: true,
+      heroDesigns: ['conversation', 'rightPlacement', 'stats'],
       kb: { resolve: ['family'], exclude: [] },
     })
     cardsOnly('zzRegistryCards')

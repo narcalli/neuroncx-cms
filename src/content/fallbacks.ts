@@ -91,7 +91,7 @@ export const contentPublishCheck =
     const cur: Doc = { ...originalDoc, ...data, meta: { ...originalDoc?.meta, ...data.meta } }
     if (cur._status !== 'published' || !cur.hasOwnPage) return data
 
-    const problems = [...ownPageProblems(cur), ...(await sectionPublishProblems(entry, cur, req))]
+    const problems = [...ownPageProblems(cur, entry.heroDesigns), ...(await sectionPublishProblems(entry, cur, req))]
     if (problems.length) {
       throw new ValidationError({ collection: entry.slug, errors: problems })
     }

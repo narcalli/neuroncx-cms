@@ -10,6 +10,7 @@ import { authenticated } from '../access/authenticated'
 import { publicLiveOrPilot } from '../access/publicLiveOrPilot'
 import type { ListType } from '../collections/Lists'
 import { ITEM_CARD_DESIGNS, itemCardDesignField, type ItemCardDesignName } from '../fields/cardDesign'
+import { HERO_DESIGN_NAMES, type HeroDesignName } from '../fields/heroDesign'
 import {
   cardTab,
   coreFields,
@@ -77,6 +78,8 @@ export type ContentCollectionOptions = {
   defaultLayout?: string[]
   /** The card designs an entry may pick. All item designs when left out. */
   cardDesigns?: ItemCardDesignName[]
+  /** The hero designs an entry's own page may use. All of them when left out. Needs the ownPage group. */
+  heroDesigns?: HeroDesignName[]
   kb?: { resolve?: string[]; exclude?: string[] }
   /** Extra Payload hooks, run after the factory's own. */
   hooks?: CollectionConfig['hooks']
@@ -146,6 +149,14 @@ export const defineContentCollection = (opts: ContentCollectionOptions): Collect
     throw new Error(`${slug}: cardDesigns must be one or more of ${ITEM_CARD_DESIGNS.join(', ')}.`)
   }
 
+  if (opts.heroDesigns && !groups.has('ownPage')) {
+    throw new Error(`${slug}: heroDesigns needs the ownPage group.`)
+  }
+  const heroDesigns = opts.heroDesigns ?? [...HERO_DESIGN_NAMES]
+  if (!heroDesigns.length || heroDesigns.some((d) => !HERO_DESIGN_NAMES.includes(d))) {
+    throw new Error(`${slug}: heroDesigns must be one or more of ${HERO_DESIGN_NAMES.join(', ')}.`)
+  }
+
   const sectionKeys = (opts.sections ?? []).map((s) => (typeof s === 'string' ? s : s.key))
   if (sectionKeys.length && !groups.has('ownPage')) {
     throw new Error(`${slug}: sections need the ownPage group.`)
@@ -165,6 +176,7 @@ export const defineContentCollection = (opts: ContentCollectionOptions): Collect
       (opts.sections ?? []).flatMap((s) => (typeof s === 'string' ? [] : [[s.key, s.headingDefault]])),
     ),
     kbase: groups.has('kbase'),
+    heroDesigns: groups.has('ownPage') ? heroDesigns : [],
     kb: { resolve: opts.kb?.resolve ?? [], exclude: opts.kb?.exclude ?? [] },
   }
   const layout = sectionKeys.length
@@ -193,7 +205,7 @@ export const defineContentCollection = (opts: ContentCollectionOptions): Collect
     throw new Error(`${slug}: ownPage.omit needs the ownPage group.`)
   }
   const omit = new Set<string>(opts.ownPage?.omit ?? [])
-  const shared = groups.has('ownPage') ? ownPage(slug as CollectionSlug) : null
+  const shared = groups.has('ownPage') ? ownPage(slug as CollectionSlug, { heroDesigns }) : null
   const page = shared && {
     sidebar: shared.sidebar,
     tab: {
