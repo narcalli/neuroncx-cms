@@ -1,5 +1,4 @@
 import type {
-  Access,
   CollectionBeforeDeleteHook,
   CollectionConfig,
   Field,
@@ -11,6 +10,7 @@ import { text as validateText } from 'payload/shared'
 
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
+import { publishedOrBeforeDrafts } from '../access/publishedOrBeforeDrafts'
 import { itemCardDesignField } from '../fields/cardDesign'
 import { iconField } from '../fields/icons'
 import { plainText } from '../fields/validators/plainText'
@@ -82,17 +82,6 @@ const baseFields = (capped: boolean): Field[] => [
     admin: { description: 'Lower numbers come first in dropdowns and lists.' },
   },
 ]
-
-// For the lists with drafts: visitors see published entries, and entries
-// saved before drafts were turned on (they have no _status), so nothing that
-// shows today disappears.
-const publishedOrBeforeDrafts: Access = ({ req: { user } }) => {
-  if (user) return true
-  const where: Where = {
-    or: [{ _status: { equals: 'published' } }, { _status: { exists: false } }],
-  }
-  return where
-}
 
 /** Where each list is referenced, so an entry in use cannot be deleted. */
 type UsedBy = {

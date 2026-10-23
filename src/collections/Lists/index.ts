@@ -2,9 +2,14 @@ import type { CollectionConfig, Validate, Where } from 'payload'
 import { slugField } from 'payload'
 import { text as validateText } from 'payload/shared'
 
-import { anyone } from '../../access/anyone'
 import { authenticated } from '../../access/authenticated'
+import { collectionForListType, hubPagePath } from '../../content/registry'
+import { publishedOrBeforeDrafts } from '../../access/publishedOrBeforeDrafts'
+import { itemCardDesignField } from '../../fields/cardDesign'
 import { slugRule, toSlug } from '../../fields/core'
+import { iconField } from '../../fields/icons'
+import { plainText } from '../../fields/validators/plainText'
+import { previewUrl } from '../../utilities/generatePreviewPath'
 
 /**
  * Small editable lists the content collections group their entries by, kept
@@ -16,12 +21,22 @@ import { slugRule, toSlug } from '../../fields/core'
  * Names and slugs are unique within a type, so a CRM area and an agent family
  * may share one. Enforced by the compound indexes below, with a validation
  * message first so editors see why.
+ *
+ * Every type has the same grouping fields (foundation.md section 6.2): the
+ * heading copy on the hub, an icon, a card design between the entry's and
+ * the section's, and the entry as a row in a WhatsApp menu.
+ *
+ * Drafts are on. Entries saved before that have no _status and stay visible
+ * to visitors (publishedOrBeforeDrafts).
  */
 
 const TYPES = [
   { label: 'CRM area', value: 'crmArea' },
   { label: 'Agent family', value: 'agentFamily' },
 ] as const
+
+/** The kinds of list, such as crmArea. A content collection groups its entries by one. */
+export type ListType = (typeof TYPES)[number]['value']
 
 const typeLabel = (type: unknown) => TYPES.find((t) => t.value === type)?.label ?? 'entry'
 
@@ -51,10 +66,12 @@ const uniqueWithinType =
 
 const nameRule = uniqueWithinType('name', (value, options) => validateText(value, options as any))
 
-const onlyFor =
-  (type: (typeof TYPES)[number]['value']) =>
-  (_: unknown, siblingData: { type?: string } | undefined) =>
-    siblingData?.type === type
+/** A grouping previews on the hub page of the collection it groups, in draft mode. */
+const listPreview = (doc: Record<string, any>): string | null => {
+  const entry = collectionForListType(doc?.type)
+  const path = entry ? hubPagePath(entry) : null
+  return path ? previewUrl(path) : null
+}
 
 export const Lists: CollectionConfig = {
   slug: 'lists',
@@ -62,7 +79,7 @@ export const Lists: CollectionConfig = {
   access: {
     create: authenticated,
     delete: authenticated,
-    read: anyone,
+    read: publishedOrBeforeDrafts,
     update: authenticated,
   },
   admin: {
@@ -71,8 +88,11 @@ export const Lists: CollectionConfig = {
     group: 'Platform',
     description:
       'Short lists other collections group their entries by, such as CRM areas and agent families.',
+    livePreview: { url: ({ data }) => listPreview(data) },
+    preview: (doc) => listPreview(doc),
   },
   defaultSort: 'order',
+  versions: { drafts: { autosave: false } },
   indexes: [
     { fields: ['name', 'type'], unique: true },
     { fields: ['slug', 'type'], unique: true },
@@ -114,29 +134,42 @@ export const Lists: CollectionConfig = {
       name: 'intro',
       type: 'text',
       maxLength: 140,
-      admin: {
-        condition: onlyFor('crmArea'),
-        description: "One line shown above the area's features on the CRM hub page.",
-      },
+      admin: { description: "One line under the grouping's heading on the hub page." },
     },
     {
       name: 'painLine',
       type: 'text',
-      label: 'Pain line',
+      label: 'Pain line (optional)',
       maxLength: 120,
-      admin: {
-        condition: onlyFor('agentFamily'),
-        description: "The problem the family solves, in the team's words.",
-      },
+      admin: { description: "The problem the grouping solves, in the team's words." },
     },
     {
       name: 'summary',
       type: 'text',
       maxLength: 200,
-      admin: {
-        condition: onlyFor('agentFamily'),
-        description: 'How the agents in the family work together.',
-      },
+      admin: { description: 'How the entries in the grouping work together.' },
+    },
+    iconField(undefined, { description: 'Shown with the grouping heading on the hub page.' }),
+    itemCardDesignField({
+      clearLabel: 'Follow the section',
+      description:
+        'Every entry in this grouping uses it, unless the entry has its own. Leave empty to follow the section. Used only where the section allows it.',
+    }),
+    {
+      name: 'waRowTitle',
+      type: 'text',
+      label: 'Row title (WhatsApp menu)',
+      maxLength: 24,
+      validate: plainText,
+      admin: { description: 'The grouping as a row in a WhatsApp list menu. Plain text.' },
+    },
+    {
+      name: 'waRowDescription',
+      type: 'text',
+      label: 'Row description (WhatsApp menu)',
+      maxLength: 70,
+      validate: plainText,
+      admin: { description: 'The line under the row title. Aim for 60 characters. Plain text.' },
     },
   ],
 }
