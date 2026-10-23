@@ -35,25 +35,25 @@ describe('agents', () => {
     expect(target(live({ data: doc }))?.path).toBe('/bot-swarm/payment-services')
   })
 
-  it('open the hub preview, where the card is, without one', async () => {
-    expect(target(await preview({ slug: 'qualify', hasOwnPage: false }, {} as any))?.path).toBe('/bot-swarm-preview')
+  it('open the hub page, where the card is, without one', async () => {
+    expect(target(await preview({ slug: 'qualify', hasOwnPage: false }, {} as any))?.path).toBe('/bot-swarm')
   })
 })
 
 describe('hubs and groupings', () => {
-  it('a hub opens its hub page', async () => {
+  it('a hub opens its hub page at the collection route', async () => {
     const hubs = buildHubs()
     expect(target(await hubs.admin!.preview!({ forCollection: 'microApps' }, {} as any))?.path).toBe(
-      '/bot-swarm-preview',
+      '/bot-swarm',
     )
     expect(await hubs.admin!.preview!({ forCollection: 'nothing' }, {} as any)).toBeNull()
   })
 
   it('an agent family opens the bot swarm hub page; a list type with no collection has no preview', async () => {
-    expect(target(await Lists.admin!.preview!({ type: 'agentFamily' }, {} as any))?.path).toBe('/bot-swarm-preview')
+    expect(target(await Lists.admin!.preview!({ type: 'agentFamily' }, {} as any))?.path).toBe('/bot-swarm')
     expect(await Lists.admin!.preview!({ type: 'crmArea' }, {} as any)).toBeNull()
     expect(target((Lists.admin!.livePreview as any).url({ data: { type: 'agentFamily' } }))?.path).toBe(
-      '/bot-swarm-preview',
+      '/bot-swarm',
     )
   })
 })

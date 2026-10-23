@@ -68,7 +68,7 @@ export const contentSlugs = (): CollectionSlug[] => [...entries.keys()] as Colle
  * does, the route base is still a CMS page and the hub renders at the route
  * plus "-preview" (neuroncx-website src/content/registry.ts, hubAtRoute).
  */
-const HUBS_AT_ROUTE = new Set<string>()
+const HUBS_AT_ROUTE = new Set<string>(['microApps'])
 
 /** Where the hub page renders on the website today, or null without a route. */
 export const hubPagePath = (entry: Pick<ContentCollectionEntry, 'slug' | 'route'>): string | null =>
