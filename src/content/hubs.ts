@@ -22,6 +22,10 @@ export const findPublishedHub = async (
     },
     limit: 1,
     depth: 0,
+    // No count query alongside the find: as a save's first query, the two run
+    // at once and the find can reach Atlas before the count has opened the
+    // transaction, which aborts the save.
+    pagination: false,
     overrideAccess: true,
     req: req as PayloadRequest,
   })
