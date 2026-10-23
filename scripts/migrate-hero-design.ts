@@ -1,5 +1,5 @@
 /**
- * Hero design migration, local only (23 Oct 2026). See
+ * Hero design and optional closing migration, local only (23 Oct 2026). See
  * src/content/heroMigration.ts for what changes. Updates every microApps and
  * hubs record and every saved version of them in place, so drafts and the
  * published version both carry the new fields and no new version is made.
@@ -48,6 +48,6 @@ await migrate('hubs', hubHeroPatch)
 // What the agents use now.
 const agents = await db.collections.microApps.find({}, { slug: 1, heroDesign: 1, heroMedia: 1, media: 1, showClosing: 1 }).lean()
 for (const a of agents) {
-  say(`  ${a.slug}: ${a.heroDesign}${a.heroMedia ? ', picture kept' : ''}`)
+  say(`  ${a.slug}: ${a.heroDesign}${a.heroMedia ? ', picture kept' : ''}, closing ${a.showClosing ? 'on' : 'off'}`)
 }
 process.exit(0)

@@ -19,6 +19,7 @@ import { SITE_BLOCKS } from '../../content/sections/siteBlocks'
 import { GROUPING_SECTION_CARD_DESIGNS, itemCardDesignField } from '../../fields/cardDesign'
 import { slugRule } from '../../fields/core'
 import { chatExampleFields } from '../../fields/chatExample'
+import { showClosingField } from '../../fields/closing'
 import { countedText } from '../../fields/counted'
 import { faqTab } from '../../fields/faq'
 import { kbaseTab } from '../../fields/kbase'
@@ -299,6 +300,7 @@ export const buildHubs = (): CollectionConfig => {
   const closing: Tab = {
     label: 'Closing',
     fields: [
+      showClosingField('Shows the closing panel at the end of the hub page. Entry pages each have their own switch.'),
       {
         name: 'closing',
         type: 'group',

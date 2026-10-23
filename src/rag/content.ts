@@ -38,8 +38,8 @@ const HEADINGS: Record<string, string> = {
 
 /** Fields that only shape the page. */
 /**
- * Page plumbing, never sent: the layout, and how the own page hero
- * looks (design, demo chat, picture, chips, stats, motion). The
+ * Page plumbing, never sent: the layout, and how the own page hero and
+ * closing look (design, demo chat, picture, chips, stats, motion). The
  * hero heading and subheading are content and still go.
  */
 const NEVER = [
@@ -57,6 +57,7 @@ const NEVER = [
   'heroWorkflowFromChain',
   'heroMotion',
   'heroStats',
+  'showClosing',
 ]
 
 /** What a visitor receives, for collections that strip fields after a read. */

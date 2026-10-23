@@ -2,6 +2,7 @@ import type { ArrayField, CheckboxField, CollectionSlug, Condition, Field, Group
 import { text as validateText } from 'payload/shared'
 
 import { chatExampleFields } from './chatExample'
+import { showClosingField } from './closing'
 import { countedText } from './counted'
 import { heroDesignField, heroDesignOf, HERO_DESIGN_NAMES, type HeroDesignName } from './heroDesign'
 import { link } from './link'
@@ -222,6 +223,7 @@ export const ownPage = (
         description: 'Up to 3. Leave empty to show other entries from this collection, by order.',
       },
     },
+    showClosingField('Ends this page with the closing panel. Off hides it on this page only.'),
   ]
 
   const tab: Tab = {

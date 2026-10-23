@@ -5659,6 +5659,10 @@ export interface MicroApp {
    */
   related?: (string | MicroApp)[] | null;
   /**
+   * Ends this page with the closing panel. Off hides it on this page only.
+   */
+  showClosing?: boolean | null;
+  /**
    * One line, such as Live at a diagnostics chain. Name a customer only where the customers collection's Show real name is on.
    */
   proof?: string | null;
@@ -6221,6 +6225,10 @@ export interface CrmFeature {
    * Up to 3. Leave empty to show other entries from this collection, by order.
    */
   related?: (string | CrmFeature)[] | null;
+  /**
+   * Ends this page with the closing panel. Off hides it on this page only.
+   */
+  showClosing?: boolean | null;
   /**
    * Demo-tenant screenshots only.
    */
@@ -6911,6 +6919,10 @@ export interface Hub {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Shows the closing panel at the end of the hub page. Entry pages each have their own switch.
+   */
+  showClosing?: boolean | null;
   /**
    * The navy panel at the end of the hub and every entry page.
    */
@@ -9768,6 +9780,7 @@ export interface CrmFeaturesSelect<T extends boolean = true> {
         id?: T;
       };
   related?: T;
+  showClosing?: T;
   screenshots?:
     | T
     | {
@@ -9947,6 +9960,7 @@ export interface MicroAppsSelect<T extends boolean = true> {
         id?: T;
       };
   related?: T;
+  showClosing?: T;
   proof?: T;
   customers?: T;
   integrations?: T;
@@ -10100,6 +10114,7 @@ export interface HubsSelect<T extends boolean = true> {
         answer?: T;
         id?: T;
       };
+  showClosing?: T;
   closing?:
     | T
     | {

@@ -104,6 +104,7 @@ Decides whether the entry gets a page of its own. Lets every entry start as a ca
 | `howItWorks` | array of `title` (50) + `line` (140) | | 3 to 5 steps |
 | `useCases` | array of `title` (50) + `line` (140) | | Up to 4 |
 | `related` | relationship to the same collection, hasMany | | Up to 3. If empty, the page shows other entries from the same collection by `order` |
+| `showClosing` | checkbox, default true | | Off hides the closing panel on this entry's page only. Hubs have the same switch for the hub page |
 
 ### Hero designs
 
@@ -123,7 +124,8 @@ Every design has the same slim bar at the top: the breadcrumb trail (hub, groupi
 
 - **Off:** the Page tab is hidden, the route returns 404, the entry stays out of the sitemap, and its card has no "Learn more" link.
 - **On:** the Page tab fields above become required before publishing (`admin.condition` plus the publish check). The route renders, the entry is added to the sitemap and the card links through.
-- **Knowledge base:** the hero's presentation fields (design, eyebrow, chips, second button, chat, caption, picture, alt text, chain switch, motion, stats) are never sent. The heading and subheading are.
+- **Closing:** shown at the end of the page unless `showClosing` is off. It stays the only navy section. With it off, the footer follows the last section, which keeps its own bottom spacing.
+- **Knowledge base:** the hero's presentation fields (design, eyebrow, chips, second button, chat, caption, picture, alt text, chain switch, motion, stats) and `showClosing` are never sent. The heading and subheading are.
 
 Each collection sets its own route base in its doc, for example `/crm/[slug]` or `/integrations/[slug]`.
 
