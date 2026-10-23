@@ -46,11 +46,20 @@ export const cardDesignOptions = (names: readonly CardDesignName[]) =>
  * integration's design, else its category's, else the section's, wherever the
  * section lets integrations and categories use their own design.
  */
-export const itemCardDesignField = ({ clearLabel, description }: { clearLabel: string; description: string }): Field => ({
+export const itemCardDesignField = ({
+  clearLabel,
+  description,
+  designs = ITEM_CARD_DESIGNS,
+}: {
+  clearLabel: string
+  description: string
+  /** The designs to offer. All of ITEM_CARD_DESIGNS when left out. */
+  designs?: readonly ItemCardDesignName[]
+}): Field => ({
   name: 'cardDesign',
   type: 'select',
   label: 'Card design',
-  options: cardDesignOptions(ITEM_CARD_DESIGNS),
+  options: cardDesignOptions(designs),
   admin: {
     description,
     components: {

@@ -1,8 +1,5 @@
-# micro apps swarm.md
-
 ---
-
-## collection: microApps (admin label "Micro-apps swarm")
+collection: microApps (admin label "Micro-apps swarm")
 payload_slug: microApps (not built yet)
 config_file: src/collections/MicroApps/index.ts (planned)
 supporting_collection: agentFamilies (planned)
@@ -10,8 +7,18 @@ own_page_route: /agents/[slug] (planned)
 hub_page: /platform/bot-swarm
 shared_groups: all seven, see fields_reference.md
 status: design only, 13 Oct 2026. Nothing in this file is built yet
+---
 
 # Micro-apps swarm
+
+> **`foundation.md` wins.** Where this file and `docs/cms/foundation.md` disagree, follow `foundation.md`. That covers routes, hubs, the layout field and the collection cards block. In particular:
+>
+> - **Hub:** the bot swarm hub is a record in the shared `hubs` collection. Its hero, grouping sections, layout, FAQ, closing and WhatsApp text replace the hub layout in section 9 and the WhatsApp lists global in section 13.
+> - **Families:** an `agentFamily` type in `Lists`, not a separate `agentFamilies` collection.
+> - **Agent pages:** built from the `layout` field. The five-step panel and the chain are the `agentPanel` and `agentChain` sections, and the agent page layout in section 9 becomes the hub record's default entry layout.
+> - **Blocks:** the collection cards block replaces the "pull from micro-apps swarm" option.
+> - **Routes:** set by decision 3 in `foundation.md` section 11, which settles open item 6 here.
+> - **Knowledge base:** the shared serializer in `foundation.md` section 7.3, not a hand-written entry in `src/rag/sources.ts`.
 
 Read this file before adding or editing an agent, writing an agent page or the bot swarm hub, choosing which agents a block shows, writing the WhatsApp or knowledge base text for an agent, or building or changing the collection. Read `fields_reference.md` alongside it for the shared field groups.
 
