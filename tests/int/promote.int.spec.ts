@@ -7,7 +7,9 @@ import {
   describeError,
   matchOf,
   orderCollections,
+  promoteCollections,
   ruleFor,
+  skipReason,
 } from '../../scripts/promote-page.mjs'
 
 /**
@@ -67,6 +69,38 @@ describe('order and matching', () => {
     expect(ruleFor('hubs', ['layout', 3, 'selectedDocs', 0], 'hubWorksWithSection')?.to).toBe('integrations')
     expect(ruleFor('hubs', ['layout', 3, 'selectedDocs', 0], 'hubArticlesSection')?.to).toBe('posts')
     expect(ruleFor('microApps', ['passesTo', 2], undefined)?.to).toBe('microApps')
+  })
+})
+
+describe('skipping', () => {
+  it('skips an agent with no family, and says why', () => {
+    expect(skipReason('microApps', { slug: 'qualify', family: null })).toBe('no family: set one locally to promote it')
+    expect(skipReason('microApps', { slug: 'qualify' })).toBe('no family: set one locally to promote it')
+    expect(skipReason('microApps', { slug: 'payment-services', family: 'fam' })).toBeNull()
+    expect(skipReason('lists', { slug: 'book-and-get-paid' })).toBeNull()
+  })
+
+  it('lists the skipped agent in the dry run, and leaves it out of the plan', async () => {
+    const lines: string[] = []
+    const logSpy = vi.spyOn(console, 'log').mockImplementation((...m) => void lines.push(m.join(' ')))
+    const records = [
+      { id: 'a', slug: 'qualify', status: 'planned', _status: 'draft', family: null },
+      { id: 'b', slug: 'payment-services', status: 'planned', _status: 'draft', family: 'fam' },
+    ]
+    const seen: string[] = []
+    const fake = {
+      readLocal: async () => records,
+      findLive: async (_c: string, match: Doc) => (seen.push(match.slug), null),
+      toLiveRecord: async (_c: string, local: Doc) => ({ body: { slug: local.slug }, problems: [], deferred: false }),
+      save: async () => ({}),
+      remember: () => {},
+    }
+    await promoteCollections(fake, { collections: ['microApps'], slugs: [], WRITE: false, PUBLISH: false })
+    logSpy.mockRestore()
+    expect(lines).toContain('  [skipped]   qualify  status planned, local draft  no family: set one locally to promote it')
+    expect(lines.some((l) => l.includes('[new]') && l.includes('payment-services'))).toBe(true)
+    expect(lines.at(-1)).toContain('1 new, 0 changed, 0 unchanged, 1 skipped, 0 refused.')
+    expect(seen).not.toContain('qualify')
   })
 })
 

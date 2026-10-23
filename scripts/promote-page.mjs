@@ -80,6 +80,23 @@ export const ruleFor = (collection, pathParts, blockType) => {
   return (RELATIONS[collection] || []).find((r) => r.path === p && (!r.blockType || r.blockType === blockType))
 }
 
+/**
+ * Fields a record must have before it is promoted at all. A record without
+ * one is skipped, not refused: it is still being written locally, so the run
+ * passes over it and says so. Agents need a family: live will not publish an
+ * agent without one, and its hub and menus group by it.
+ */
+export const REQUIRED_TO_PROMOTE = { microApps: ['family'] }
+
+/** Why a record is skipped, or null when it can be promoted. */
+export const skipReason = (collection, doc) => {
+  const missing = (REQUIRED_TO_PROMOTE[collection] || []).filter((f) => {
+    const v = doc?.[f]
+    return v === null || v === undefined || v === '' || (Array.isArray(v) && !v.length)
+  })
+  return missing.length ? `no ${missing.join(', ')}: set ${missing.length > 1 ? 'them' : 'one'} locally to promote it` : null
+}
+
 /** How a record is found on live: by slug, Lists entries by slug and type, media by filename. */
 export const matchOf = (collection, doc) =>
   collection === 'lists'
@@ -389,7 +406,7 @@ async function promotePage(p, { LIVE, liveHeaders, LOCAL, slug, WRITE, PUBLISH }
   log(`Saved. Live page id: ${saved?.id}, status: ${PUBLISH ? 'published' : 'draft'}`)
 }
 
-async function promoteCollections(p, { collections, slugs, WRITE, PUBLISH }) {
+export async function promoteCollections(p, { collections, slugs, WRITE, PUBLISH }) {
   const ordered = orderCollections(collections)
   log(`Collections, in order: ${ordered.join(', ')}`)
 
@@ -400,12 +417,14 @@ async function promoteCollections(p, { collections, slugs, WRITE, PUBLISH }) {
     const docs = await p.readLocal(c, slugs)
     locals.set(c, docs)
     for (const d of docs) {
+      // A skipped record is never "created in this run", so nothing may link to it as if it were.
+      if (skipReason(c, d)) continue
       const match = matchOf(c, d)
       if (!(await p.findLive(c, match))) plan.add(`${c}:${JSON.stringify(match)}`)
     }
   }
 
-  const counts = { new: 0, changed: 0, unchanged: 0, refused: 0, saved: 0, failed: 0 }
+  const counts = { new: 0, changed: 0, unchanged: 0, skipped: 0, refused: 0, saved: 0, failed: 0 }
   for (const c of ordered) {
     log(`\n${c}: ${locals.get(c).length} record(s)`)
     const second = []
@@ -413,6 +432,12 @@ async function promoteCollections(p, { collections, slugs, WRITE, PUBLISH }) {
       const match = matchOf(c, local)
       const name = `${match.slug ?? local.id}${match.type ? ` (${match.type})` : ''}`
       const status = `status ${local.status ?? '-'}, local ${local._status ?? 'no drafts'}`
+      const skip = skipReason(c, local)
+      if (skip) {
+        log(`  [skipped]   ${name}  ${status}  ${skip}`)
+        counts.skipped++
+        continue
+      }
       if (!match.slug) {
         log(`  [refused]   ${local.name ?? local.id}: no slug, so it cannot be matched on live`)
         counts.refused++
@@ -463,7 +488,7 @@ async function promoteCollections(p, { collections, slugs, WRITE, PUBLISH }) {
   }
 
   log(
-    `\n${counts.new} new, ${counts.changed} changed, ${counts.unchanged} unchanged, ${counts.refused} refused.` +
+    `\n${counts.new} new, ${counts.changed} changed, ${counts.unchanged} unchanged, ${counts.skipped} skipped, ${counts.refused} refused.` +
       (WRITE ? ` Saved ${counts.saved} as ${PUBLISH ? 'published' : 'drafts'}, ${counts.failed} failed.` : ' Dry run: nothing written. Re-run with --write to save drafts.'),
   )
   if (counts.refused || counts.failed) process.exitCode = 1
