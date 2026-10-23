@@ -1,10 +1,13 @@
-import type { Field, GroupField, SelectField } from 'payload'
+import type { ArrayField, Field, GroupField, RadioField, SelectField } from 'payload'
 
 import { select as validateSelect } from 'payload/shared'
 import { describe, expect, expectTypeOf, it } from 'vitest'
 
+import { buildHubs } from '@/collections/Hubs'
 import { Integrations } from '@/collections/Integrations'
 import { IntegrationCategories } from '@/collections/IntegrationTaxonomies'
+import { Lists } from '@/collections/Lists'
+import '@/collections/MicroApps'
 import {
   CARD_DESIGN_DEFAULTS,
   CARD_DESIGN_NAMES,
@@ -192,3 +195,44 @@ for (const [what, fields, clearLabel] of [
     })
   })
 }
+
+describe('Product suite, for hub grouping sections and groupings only', () => {
+  const values = (field: SelectField) => field.options.map((o) => (typeof o === 'string' ? o : o.value))
+
+  it('is not offered by card blocks', () => {
+    expect(offered(cardDesignFields())).not.toContain('suite')
+    expect(offered(cardDesignFields({ allowItemDesigns: true }))).not.toContain('suite')
+  })
+
+  it('is offered by a grouping, after the four item designs, with the design pictures', () => {
+    const field = findField(Lists.fields, 'cardDesign') as SelectField
+    expect(values(field)).toEqual([...ITEM_CARD_DESIGNS, 'suite'])
+    expect(field.options.at(-1)).toEqual({ label: 'Product suite', value: 'suite' })
+    expect((field.admin?.components?.Field as { path?: string }).path).toBe(
+      '@/fields/CardDesignPicker/Component#CardDesignPickerField',
+    )
+  })
+
+  it("is offered by a hub's grouping section, after the block designs", () => {
+    const rows = findField(buildHubs().fields, 'groupingSections') as ArrayField
+    const field = rows.fields.find((f) => 'name' in f && f.name === 'cardDesign') as SelectField
+    expect(values(field)).toEqual([...CARD_DESIGN_NAMES, 'suite'])
+  })
+})
+
+describe('hero design', () => {
+  const hubs = buildHubs()
+  const field = findField(hubs.fields, 'heroDesign') as RadioField
+  const picture = findField(hubs.fields, 'heroMedia') as Field & { admin?: { condition?: (d: unknown) => boolean } }
+
+  it('is standard or conversation, standard by default', () => {
+    expect(field.options.map((o) => (typeof o === 'string' ? o : o.value))).toEqual(['standard', 'conversation'])
+    expect(field.defaultValue).toBe('standard')
+  })
+
+  it('hides the picture for the conversation design, which has none', () => {
+    expect(picture.admin?.condition?.({ heroDesign: 'conversation' })).toBe(false)
+    expect(picture.admin?.condition?.({ heroDesign: 'standard' })).toBe(true)
+    expect(picture.admin?.condition?.({})).toBe(true)
+  })
+})

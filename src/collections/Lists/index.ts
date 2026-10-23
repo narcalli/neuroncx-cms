@@ -5,7 +5,7 @@ import { text as validateText } from 'payload/shared'
 import { authenticated } from '../../access/authenticated'
 import { collectionForListType, hubPagePath } from '../../content/registry'
 import { publishedOrBeforeDrafts } from '../../access/publishedOrBeforeDrafts'
-import { itemCardDesignField } from '../../fields/cardDesign'
+import { GROUPING_CARD_DESIGNS, itemCardDesignField } from '../../fields/cardDesign'
 import { slugRule, toSlug } from '../../fields/core'
 import { iconField } from '../../fields/icons'
 import { plainText } from '../../fields/validators/plainText'
@@ -152,8 +152,9 @@ export const Lists: CollectionConfig = {
     iconField(undefined, { description: 'Shown with the grouping heading on the hub page.' }),
     itemCardDesignField({
       clearLabel: 'Follow the section',
+      designs: GROUPING_CARD_DESIGNS,
       description:
-        'Every entry in this grouping uses it, unless the entry has its own. Leave empty to follow the section. Used only where the section allows it.',
+        "Every entry in this grouping uses it, unless the entry has its own. Leave empty to follow the section. Used only where the section allows it. Product suite draws the grouping's whole section on the hub page as large cards with each entry's steps.",
     }),
     {
       name: 'waRowTitle',

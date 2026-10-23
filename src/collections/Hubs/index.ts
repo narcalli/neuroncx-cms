@@ -16,7 +16,7 @@ import { revalidateContent } from '../../content/revalidate'
 import { allSections, sectionBlockSlug } from '../../content/sections/defineSection'
 import { HUB_SECTION_KEYS, hubEntries } from '../../content/sections/hub'
 import { SITE_BLOCKS } from '../../content/sections/siteBlocks'
-import { cardDesignOptions, CARD_DESIGN_NAMES } from '../../fields/cardDesign'
+import { cardDesignOptions, GROUPING_SECTION_CARD_DESIGNS } from '../../fields/cardDesign'
 import { slugRule } from '../../fields/core'
 import { countedText } from '../../fields/counted'
 import { faqTab } from '../../fields/faq'
@@ -126,6 +126,21 @@ export const buildHubs = (): CollectionConfig => {
   const hero: Tab = {
     label: 'Hero',
     fields: [
+      {
+        name: 'heroDesign',
+        type: 'radio',
+        label: 'Hero design',
+        defaultValue: 'standard',
+        options: [
+          { label: 'Standard (light, with breadcrumbs)', value: 'standard' },
+          { label: 'Conversation (chat on a gradient stage)', value: 'conversation' },
+        ],
+        admin: {
+          layout: 'horizontal',
+          description:
+            'Conversation shows the chat as an animated thread, with the names of the entries that reply listed under it. It has no picture and no breadcrumbs.',
+        },
+      },
       countedText({ name: 'eyebrow', label: 'Eyebrow (optional)', maxLength: 40 }),
       countedText({ name: 'h1', label: 'Page heading (H1)', maxLength: 70, required: true }),
       countedText({ name: 'subheading', label: 'Subheading', textarea: true, maxLength: 200 }),
@@ -143,7 +158,10 @@ export const buildHubs = (): CollectionConfig => {
         type: 'upload',
         label: 'Picture (optional)',
         relationTo: 'media',
-        admin: { description: 'Shown instead of the chat when there is no chat.' },
+        admin: {
+          description: 'Shown instead of the chat when there is no chat.',
+          condition: (data) => data?.heroDesign !== 'conversation',
+        },
       },
       {
         name: 'heroChat',
@@ -189,7 +207,12 @@ export const buildHubs = (): CollectionConfig => {
           },
         ],
       },
-      countedText({ name: 'heroChatCaption', label: 'Chat caption (optional)', maxLength: 80 }),
+      countedText({
+        name: 'heroChatCaption',
+        label: 'Chat caption (optional)',
+        maxLength: 80,
+        description: 'Under the chat in the standard design, at the top of the chat in the conversation design.',
+      }),
       optionalCta('heroCta', 'Main button'),
       optionalCta('heroSecondaryCta', 'Second button'),
     ],
@@ -226,10 +249,10 @@ export const buildHubs = (): CollectionConfig => {
             name: 'cardDesign',
             type: 'select',
             label: 'Card design (optional)',
-            options: cardDesignOptions(CARD_DESIGN_NAMES),
+            options: cardDesignOptions(GROUPING_SECTION_CARD_DESIGNS),
             admin: {
               description:
-                "Leave empty to use the hub's default. An entry's or a grouping's own design still wins where the design allows it.",
+                "Leave empty to use the hub's default. An entry's or a grouping's own design still wins where the design allows it. Product suite draws the whole section as large cards with each entry's steps, and also applies when the grouping chooses it.",
             },
           },
           hubEntries('entries', 'Entries (optional)', {

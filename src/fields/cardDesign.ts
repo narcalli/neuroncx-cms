@@ -21,11 +21,18 @@ const DESIGNS = {
   feature: 'Feature card',
   story: 'Story card',
   pill: 'Pill',
+  suite: 'Product suite',
 } as const
 
-export type CardDesignName = keyof typeof DESIGNS
+type AnyCardDesignName = keyof typeof DESIGNS
 
-export const CARD_DESIGN_NAMES = Object.keys(DESIGNS) as CardDesignName[]
+/**
+ * The designs a card block offers. Product suite is not one of them: it draws
+ * a hub grouping as one whole section (see GROUPING_SECTION_CARD_DESIGNS).
+ */
+export const CARD_DESIGN_NAMES = ['grid', 'logoCard', 'directory', 'feature', 'story', 'pill'] as const satisfies readonly AnyCardDesignName[]
+
+export type CardDesignName = (typeof CARD_DESIGN_NAMES)[number]
 
 /**
  * The designs one integration may choose for itself. Directory and pill
@@ -35,9 +42,23 @@ export const ITEM_CARD_DESIGNS = ['grid', 'logoCard', 'feature', 'story'] as con
 
 export type ItemCardDesignName = (typeof ITEM_CARD_DESIGNS)[number]
 
+/**
+ * The designs a grouping section on a hub page offers: every block design,
+ * plus Product suite, which draws the whole section as the Product suite
+ * block (large cards, each with its steps and summary).
+ */
+export const GROUPING_SECTION_CARD_DESIGNS = [...CARD_DESIGN_NAMES, 'suite'] as const
+
+/** The designs a grouping (Lists) may choose: the item designs, plus Product suite for its whole section. */
+export const GROUPING_CARD_DESIGNS = [...ITEM_CARD_DESIGNS, 'suite'] as const
+
+export type GroupingCardDesignName = (typeof GROUPING_CARD_DESIGNS)[number]
+
 /** Select options for the given designs, in the usual order, with their labels. */
-export const cardDesignOptions = (names: readonly CardDesignName[]) =>
-  CARD_DESIGN_NAMES.filter((d) => names.includes(d)).map((value) => ({ label: DESIGNS[value], value }))
+export const cardDesignOptions = (names: readonly AnyCardDesignName[]) =>
+  (Object.keys(DESIGNS) as AnyCardDesignName[])
+    .filter((d) => names.includes(d))
+    .map((value) => ({ label: DESIGNS[value], value }))
 
 /**
  * The card design an integration, or an integration category, may choose for
@@ -53,8 +74,8 @@ export const itemCardDesignField = ({
 }: {
   clearLabel: string
   description: string
-  /** The designs to offer. All of ITEM_CARD_DESIGNS when left out. */
-  designs?: readonly ItemCardDesignName[]
+  /** The designs to offer. All of ITEM_CARD_DESIGNS when left out. Groupings may add Product suite. */
+  designs?: readonly GroupingCardDesignName[]
 }): Field => ({
   name: 'cardDesign',
   type: 'select',
@@ -104,7 +125,7 @@ export const CARD_DESIGN_DEFAULTS = {
 
 export type CardDesignOptions = {
   /** The designs to offer, shown in the usual order. All six when left out. */
-  designs?: CardDesignName[]
+  designs?: readonly CardDesignName[]
   /** The design a new block starts with. Must be one of `designs`. Grid when left out. */
   defaultDesign?: CardDesignName
   /**

@@ -11,13 +11,14 @@ import grid from './thumbs/grid.svg'
 import logoCard from './thumbs/logoCard.svg'
 import pill from './thumbs/pill.svg'
 import story from './thumbs/story.svg'
+import suite from './thumbs/suite.svg'
 
 /**
  * The card design choice (fields/cardDesign.ts) as small pictures: a rough
  * wireframe of each design in the site's colours. The stored value is the
  * select value, as before.
  */
-const THUMBS: Record<string, { src: string }> = { grid, logoCard, directory, feature, story, pill }
+const THUMBS: Record<string, { src: string }> = { grid, logoCard, directory, feature, story, pill, suite }
 
 const thumb = (value: string) => {
   const src = THUMBS[value]?.src

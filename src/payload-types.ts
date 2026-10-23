@@ -5822,9 +5822,9 @@ export interface List {
       )
     | null;
   /**
-   * Every entry in this grouping uses it, unless the entry has its own. Leave empty to follow the section. Used only where the section allows it.
+   * Every entry in this grouping uses it, unless the entry has its own. Leave empty to follow the section. Used only where the section allows it. Product suite draws the grouping's whole section on the hub page as large cards with each entry's steps.
    */
-  cardDesign?: ('grid' | 'logoCard' | 'feature' | 'story') | null;
+  cardDesign?: ('grid' | 'logoCard' | 'feature' | 'story' | 'suite') | null;
   /**
    * The grouping as a row in a WhatsApp list menu. Plain text.
    */
@@ -6536,6 +6536,10 @@ export interface Hub {
     image?: (string | null) | Media;
     description?: string | null;
   };
+  /**
+   * Conversation shows the chat as an animated thread, with the names of the entries that reply listed under it. It has no picture and no breadcrumbs.
+   */
+  heroDesign?: ('standard' | 'conversation') | null;
   eyebrow?: string | null;
   h1: string;
   subheading?: string | null;
@@ -6569,6 +6573,9 @@ export interface Hub {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Under the chat in the standard design, at the top of the chat in the conversation design.
+   */
   heroChatCaption?: string | null;
   /**
    * Optional. Leave the label empty to hide this button.
@@ -6613,9 +6620,9 @@ export interface Hub {
         heading?: string | null;
         intro?: string | null;
         /**
-         * Leave empty to use the hub's default. An entry's or a grouping's own design still wins where the design allows it.
+         * Leave empty to use the hub's default. An entry's or a grouping's own design still wins where the design allows it. Product suite draws the whole section as large cards with each entry's steps, and also applies when the grouping chooses it.
          */
-        cardDesign?: ('grid' | 'logoCard' | 'directory' | 'feature' | 'story' | 'pill') | null;
+        cardDesign?: ('grid' | 'logoCard' | 'directory' | 'feature' | 'story' | 'pill' | 'suite') | null;
         /**
          * Hand-picked, in order. Leave empty to show every live entry in the grouping.
          */
@@ -9749,6 +9756,7 @@ export interface HubsSelect<T extends boolean = true> {
         image?: T;
         description?: T;
       };
+  heroDesign?: T;
   eyebrow?: T;
   h1?: T;
   subheading?: T;
