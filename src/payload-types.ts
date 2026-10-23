@@ -587,6 +587,14 @@ export interface HubStepsSection {
    * Leave empty to show the default heading: "How it works". Words in braces, such as {name}, are filled in for each entry.
    */
   heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
   hears?: {
     title?: string | null;
     line?: string | null;
@@ -606,6 +614,24 @@ export interface HubStepsSection {
   records?: {
     title?: string | null;
     line?: string | null;
+  };
+  /**
+   * Optional. Leave the label empty to hide this button.
+   */
+  cta?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: string | Post;
+        } | null);
+    url?: string | null;
+    label?: string | null;
   };
   /**
    * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
@@ -629,196 +655,140 @@ export interface HubStepsSection {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "HubLayersSection".
+ * via the `definition` "pages".
  */
-export interface HubLayersSection {
-  /**
-   * Leave empty to show the default heading: "What sits underneath". Words in braces, such as {name}, are filled in for each entry.
-   */
-  heading?: string | null;
-  layers?:
-    | {
-        title: string;
-        line?: string | null;
-        /**
-         * An entry in any content collection, or a page.
-         */
-        link?:
-          | ({
-              relationTo: 'microApps';
-              value: string | MicroApp;
-            } | null)
-          | ({
-              relationTo: 'pages';
-              value: string | Page;
-            } | null);
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
-   */
-  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'hubLayersSection';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "microApps".
- */
-export interface MicroApp {
+export interface Page {
   id: string;
-  name: string;
+  title: string;
+  hero: {
+    type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact';
+    richText?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    links?:
+      | {
+          link: {
+            type?: ('reference' | 'custom') | null;
+            newTab?: boolean | null;
+            reference?:
+              | ({
+                  relationTo: 'pages';
+                  value: string | Page;
+                } | null)
+              | ({
+                  relationTo: 'posts';
+                  value: string | Post;
+                } | null);
+            url?: string | null;
+            label: string;
+            /**
+             * Choose how the link should be rendered.
+             */
+            appearance?: ('default' | 'outline') | null;
+          };
+          id?: string | null;
+        }[]
+      | null;
+    media?: (string | null) | Media;
+  };
+  layout: (
+    | PartnerStripBlock
+    | StatHeroBlock
+    | LogoWallBlock
+    | ProblemStatementBlock
+    | JourneyEngineBlock
+    | ContextEngineBlock
+    | SolutionGridBlock
+    | ProductSuiteBlock
+    | ProductSuite2Block
+    | ProductInActionBlock
+    | TestimonialBlock
+    | CaseStudyGridBlock
+    | CustomerDirectoryBlock
+    | BentoGridBlock
+    | DetailedProductSuiteBlock
+    | AgenticFlowDemoBlock
+    | AgenticStatsBlock
+    | AgenticCartsDemoBlock
+    | AgenticOrbitBlock
+    | AgenticEpisodeBlock
+    | AgenticCasesBlock
+    | AgenticClosingBlock
+    | IntegrationsMarqueeBlock
+    | UseCasesBlock
+    | BenefitsBlock
+    | IntegrationsBlock
+    | ContactFormBlock
+    | HowItWorksBlock
+    | ClosingCTABlock
+    | FeatureThreadBlock
+    | ArticleGridBlock
+    | CallToActionBlock
+    | ContentBlock
+    | MediaBlock
+    | ArchiveBlock
+    | HeroFullBackgroundBlock
+    | HeroRightPlacementBlock
+    | HeroWorkforceGridBlock
+    | AgenticHeroBlock
+    | ConversationHeroBlock
+    | HeroStackBlock
+    | PlatformLayersBlock
+    | TrustPanelBlock
+    | StatBandBlock
+    | IntegrationsLandingBlock
+    | WhatsappWidgetBlock
+    | FAQBlock
+    | PlatformLayersTwoBlock
+  )[];
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (string | null) | Media;
+    description?: string | null;
+  };
+  publishedAt?: string | null;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
   generateSlug?: boolean | null;
   slug: string;
+  breadcrumbParent?: {
+    kind?: ('none' | 'page' | 'label') | null;
+    page?: (string | null) | Page;
+    label?: string | null;
+  };
   /**
-   * Only Live and Pilot entries appear on the website, WhatsApp and the knowledge base.
+   * Short name for the breadcrumb trail. Defaults to the page title.
    */
-  status: 'live' | 'pilot' | 'planned';
-  /**
-   * Groups entries on the hub page and in WhatsApp menus.
-   */
-  family: string | List;
-  /**
-   * Shown first wherever this collection is listed.
-   */
-  featured?: boolean | null;
-  /**
-   * Lower shows first, on grids and in WhatsApp lists.
-   */
-  order?: number | null;
-  /**
-   * Lets blocks pull out the entries that most set NeuronCx apart.
-   */
-  isUSP?: boolean | null;
-  /**
-   * Gives this entry a page of its own and adds it to the sitemap. The Page tab appears while this is on.
-   */
-  hasOwnPage?: boolean | null;
-  /**
-   * On: the page follows the default layout, and changes to the default reach it. Off: the layout on the Page tab is this page's own.
-   */
-  usePageDefaults?: boolean | null;
-  /**
-   * Where the agent works.
-   */
-  channel?: ('whatsapp' | 'calls' | 'web')[] | null;
-  /**
-   * Where it is used today.
-   */
-  verticals?: ('healthcare' | 'diagnostics' | 'education' | 'hospitality')[] | null;
-  /**
-   * A short line under the name. Aim for 45 characters.
-   */
-  tagline?: string | null;
-  /**
-   * One line on what it does. Aim for 120 characters.
-   */
-  summary: string;
-  /**
-   * From the shared icon library.
-   */
-  icon?:
-    | (
-        | 'message'
-        | 'chat'
-        | 'check'
-        | 'calendar'
-        | 'card'
-        | 'document'
-        | 'refresh'
-        | 'bolt'
-        | 'layers'
-        | 'gauge'
-        | 'plug'
-        | 'shield'
-        | 'shieldCheck'
-        | 'lock'
-        | 'globe'
-        | 'server'
-        | 'eye'
-        | 'users'
-        | 'user'
-        | 'phone'
-        | 'smartphone'
-        | 'mail'
-        | 'messageCircle'
-        | 'send'
-        | 'inbox'
-        | 'headphones'
-        | 'mic'
-        | 'video'
-        | 'bell'
-        | 'handshake'
-        | 'stethoscope'
-        | 'heartPulse'
-        | 'hospital'
-        | 'activity'
-        | 'flask'
-        | 'pill'
-        | 'graduationCap'
-        | 'building'
-        | 'mapPin'
-        | 'database'
-        | 'cloud'
-        | 'workflow'
-        | 'bot'
-        | 'sparkles'
-        | 'search'
-        | 'chart'
-        | 'trendingUp'
-        | 'target'
-        | 'rocket'
-        | 'key'
-        | 'fileText'
-        | 'clipboardList'
-        | 'link'
-        | 'settings'
-        | 'puzzle'
-        | 'timer'
-        | 'clock'
-        | 'badgeCheck'
-        | 'star'
-        | 'briefcase'
-      )
-    | null;
-  /**
-   * Optional. Logos go here for integrations.
-   */
-  image?: (string | null) | Media;
-  /**
-   * Leave empty to use the grouping's design, or the section's when the grouping has none.
-   */
-  cardDesign?: ('grid' | 'logoCard' | 'feature' | 'story') | null;
-  /**
-   * 3 to 4 short lines for cards and the bento grid.
-   */
-  keyPoints?:
-    | {
-        line: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * The full description. Also indexed for the knowledge base.
-   */
-  description?: {
+  breadcrumbLabel?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts".
+ */
+export interface Post {
+  id: string;
+  title: string;
+  heroImage?: (string | null) | Media;
+  content: {
     root: {
       type: string;
       children: {
@@ -832,244 +802,9 @@ export interface MicroApp {
       version: number;
     };
     [k: string]: unknown;
-  } | null;
-  /**
-   * The teams or roles that use it, such as front desk or call centre.
-   */
-  whoItsFor?: string | null;
-  /**
-   * The job people search for, such as Prescription reading AI. Used in the page title and the line under the heading.
-   */
-  searchName?: string | null;
-  /**
-   * What sets the agent off.
-   */
-  startsWhen?: string | null;
-  /**
-   * Leave empty for agents that work on call recordings.
-   */
-  customerSees?: string | null;
-  /**
-   * The request in the customer's own words, or the call recording.
-   */
-  hears?: string | null;
-  /**
-   * The organisation's own rules: locations, services, prices, slots, scoring sheets.
-   */
-  checks?: string | null;
-  /**
-   * The work done in the organisation's systems: books, charges, files, scores.
-   */
-  acts?: string | null;
-  /**
-   * When and how a person takes over. Fill this in before turning on Own page.
-   */
-  handsOver?: string | null;
-  /**
-   * What is logged, and where.
-   */
-  records?: string | null;
-  /**
-   * What the organisation can change from the dashboard without code.
-   */
-  teamControls?: string | null;
-  /**
-   * One line on what changes for the team.
-   */
-  result?: string | null;
-  /**
-   * The next agent in the chain, such as Prescription understanding to Test matching and pricing. Leave empty for the last agent.
-   */
-  passesTo?: (string | MicroApp)[] | null;
-  /**
-   * The page heading. Needed to publish with Own page on.
-   */
-  heroHeading?: string | null;
-  heroSubheading?: string | null;
-  /**
-   * 3 to 6 outcomes, each with a short line.
-   */
-  benefits?:
-    | {
-        title: string;
-        line: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Up to 4, one per vertical where possible.
-   */
-  useCases?:
-    | {
-        title: string;
-        line: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * The closing button. Type a label to choose where it goes.
-   */
-  cta?: {
-    label?: string | null;
-    link?: {
-      type?: ('reference' | 'custom') | null;
-      newTab?: boolean | null;
-      reference?:
-        | ({
-            relationTo: 'pages';
-            value: string | Page;
-          } | null)
-        | ({
-            relationTo: 'posts';
-            value: string | Post;
-          } | null);
-      url?: string | null;
-    };
   };
-  /**
-   * Up to 3. Leave empty to show other entries from this collection, by order.
-   */
-  related?: (string | MicroApp)[] | null;
-  /**
-   * One line, such as Live at a diagnostics chain. Name a customer only where the customers collection's Show real name is on.
-   */
-  proof?: string | null;
-  customers?: (string | Customer)[] | null;
-  /**
-   * Systems it books, bills or files into.
-   */
-  integrations?: (string | Integration)[] | null;
-  /**
-   * Usually Customer 360.
-   */
-  crmFeatures?: (string | CrmFeature)[] | null;
-  /**
-   * Optional, such as the payment flow.
-   */
-  media?: (string | null) | Media;
-  /**
-   * The sections between the page hero and the end of the page, in order. Drag to reorder. Read-only while Use page defaults is on.
-   */
-  layout?:
-    | (
-        | AgentPanelSection
-        | AgentChainSection
-        | AgentTeamControlsSection
-        | AgentResultSection
-        | BenefitsSection
-        | UseCasesSection
-        | IntegrationsSection
-        | CustomersSection
-        | FaqSection
-        | RelatedSection
-        | ClosingSection
-        | TestimonialBlock
-        | MediaBlock
-        | ProductInActionBlock
-        | CaseStudyGridBlock
-        | BenefitsBlock
-        | CallToActionBlock
-        | ContentBlock
-        | LogoWallBlock
-        | StatBandBlock
-        | TrustPanelBlock
-      )[]
-    | null;
-  /**
-   * Up to 6. Questions phrased the way a buyer would ask them.
-   */
-  faqs?:
-    | {
-        question: string;
-        /**
-         * Plain text, no formatting.
-         */
-        answer: string;
-        id?: string | null;
-      }[]
-    | null;
-  waRowTitle?: string | null;
-  /**
-   * Aim for 60 characters.
-   */
-  waRowDescription?: string | null;
-  /**
-   * Aim for 30 characters.
-   */
-  waHeader?: string | null;
-  /**
-   * Aim for 300 characters.
-   */
-  waBody?: string | null;
-  /**
-   * 3 to 5 short lines, sent inside the body.
-   */
-  waKeyPoints?:
-    | {
-        line: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Aim for 30 characters.
-   */
-  waFooter?: string | null;
-  /**
-   * Up to 3, which is the WhatsApp limit.
-   */
-  waButtons?:
-    | {
-        label: string;
-        /**
-         * The reply the assistant receives when the button is tapped, for example book-demo.
-         */
-        action: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Set on save: the entry's own page when Own page is on, otherwise its place on /bot-swarm.
-   */
-  waLink?: string | null;
-  /**
-   * Only published entries with this on are sent to the knowledge base.
-   */
-  includeInKbase?: boolean | null;
-  /**
-   * A complete answer to "What is this?", written for the virtual agents.
-   */
-  kbAnswer?: string | null;
-  /**
-   * Short, checkable facts. One fact per line.
-   */
-  kbFacts?:
-    | {
-        fact: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * How a customer might ask about it.
-   */
-  kbQuestions?:
-    | {
-        question: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Other names people use for it.
-   */
-  kbSynonyms?:
-    | {
-        synonym: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * So answers that have gone stale can be found and fixed.
-   */
-  kbLastReviewed?: string | null;
+  relatedPosts?: (string | Post)[] | null;
+  categories?: (string | Category)[] | null;
   meta?: {
     title?: string | null;
     /**
@@ -1078,123 +813,19 @@ export interface MicroApp {
     image?: (string | null) | Media;
     description?: string | null;
   };
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * Short lists other collections group their entries by, such as CRM areas and agent families.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "lists".
- */
-export interface List {
-  id: string;
-  name: string;
-  /**
-   * Which list this entry belongs to.
-   */
-  type: 'crmArea' | 'agentFamily';
+  publishedAt?: string | null;
+  authors?: (string | User)[] | null;
+  populatedAuthors?:
+    | {
+        id?: string | null;
+        name?: string | null;
+      }[]
+    | null;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
   generateSlug?: boolean | null;
   slug: string;
-  /**
-   * Lower shows first, on hub pages and in WhatsApp menus.
-   */
-  order?: number | null;
-  /**
-   * One line under the grouping's heading on the hub page.
-   */
-  intro?: string | null;
-  /**
-   * The problem the grouping solves, in the team's words.
-   */
-  painLine?: string | null;
-  /**
-   * How the entries in the grouping work together.
-   */
-  summary?: string | null;
-  /**
-   * Shown with the grouping heading on the hub page.
-   */
-  icon?:
-    | (
-        | 'message'
-        | 'chat'
-        | 'check'
-        | 'calendar'
-        | 'card'
-        | 'document'
-        | 'refresh'
-        | 'bolt'
-        | 'layers'
-        | 'gauge'
-        | 'plug'
-        | 'shield'
-        | 'shieldCheck'
-        | 'lock'
-        | 'globe'
-        | 'server'
-        | 'eye'
-        | 'users'
-        | 'user'
-        | 'phone'
-        | 'smartphone'
-        | 'mail'
-        | 'messageCircle'
-        | 'send'
-        | 'inbox'
-        | 'headphones'
-        | 'mic'
-        | 'video'
-        | 'bell'
-        | 'handshake'
-        | 'stethoscope'
-        | 'heartPulse'
-        | 'hospital'
-        | 'activity'
-        | 'flask'
-        | 'pill'
-        | 'graduationCap'
-        | 'building'
-        | 'mapPin'
-        | 'database'
-        | 'cloud'
-        | 'workflow'
-        | 'bot'
-        | 'sparkles'
-        | 'search'
-        | 'chart'
-        | 'trendingUp'
-        | 'target'
-        | 'rocket'
-        | 'key'
-        | 'fileText'
-        | 'clipboardList'
-        | 'link'
-        | 'settings'
-        | 'puzzle'
-        | 'timer'
-        | 'clock'
-        | 'badgeCheck'
-        | 'star'
-        | 'briefcase'
-      )
-    | null;
-  /**
-   * Every entry in this grouping uses it, unless the entry has its own. Leave empty to follow the section. Used only where the section allows it.
-   */
-  cardDesign?: ('grid' | 'logoCard' | 'feature' | 'story') | null;
-  /**
-   * The grouping as a row in a WhatsApp list menu. Plain text.
-   */
-  waRowTitle?: string | null;
-  /**
-   * The line under the row title. Aim for 60 characters. Plain text.
-   */
-  waRowDescription?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -1373,183 +1004,6 @@ export interface FolderInterface {
   folderType?: 'media'[] | null;
   updatedAt: string;
   createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pages".
- */
-export interface Page {
-  id: string;
-  title: string;
-  hero: {
-    type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact';
-    richText?: {
-      root: {
-        type: string;
-        children: {
-          type: any;
-          version: number;
-          [k: string]: unknown;
-        }[];
-        direction: ('ltr' | 'rtl') | null;
-        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-        indent: number;
-        version: number;
-      };
-      [k: string]: unknown;
-    } | null;
-    links?:
-      | {
-          link: {
-            type?: ('reference' | 'custom') | null;
-            newTab?: boolean | null;
-            reference?:
-              | ({
-                  relationTo: 'pages';
-                  value: string | Page;
-                } | null)
-              | ({
-                  relationTo: 'posts';
-                  value: string | Post;
-                } | null);
-            url?: string | null;
-            label: string;
-            /**
-             * Choose how the link should be rendered.
-             */
-            appearance?: ('default' | 'outline') | null;
-          };
-          id?: string | null;
-        }[]
-      | null;
-    media?: (string | null) | Media;
-  };
-  layout: (
-    | PartnerStripBlock
-    | StatHeroBlock
-    | LogoWallBlock
-    | ProblemStatementBlock
-    | JourneyEngineBlock
-    | ContextEngineBlock
-    | SolutionGridBlock
-    | ProductSuiteBlock
-    | ProductSuite2Block
-    | ProductInActionBlock
-    | TestimonialBlock
-    | CaseStudyGridBlock
-    | CustomerDirectoryBlock
-    | BentoGridBlock
-    | DetailedProductSuiteBlock
-    | AgenticFlowDemoBlock
-    | AgenticStatsBlock
-    | AgenticCartsDemoBlock
-    | AgenticOrbitBlock
-    | AgenticEpisodeBlock
-    | AgenticCasesBlock
-    | AgenticClosingBlock
-    | IntegrationsMarqueeBlock
-    | UseCasesBlock
-    | BenefitsBlock
-    | IntegrationsBlock
-    | ContactFormBlock
-    | HowItWorksBlock
-    | ClosingCTABlock
-    | FeatureThreadBlock
-    | ArticleGridBlock
-    | CallToActionBlock
-    | ContentBlock
-    | MediaBlock
-    | ArchiveBlock
-    | HeroFullBackgroundBlock
-    | HeroRightPlacementBlock
-    | HeroWorkforceGridBlock
-    | AgenticHeroBlock
-    | ConversationHeroBlock
-    | HeroStackBlock
-    | PlatformLayersBlock
-    | TrustPanelBlock
-    | StatBandBlock
-    | IntegrationsLandingBlock
-    | WhatsappWidgetBlock
-    | FAQBlock
-    | PlatformLayersTwoBlock
-  )[];
-  meta?: {
-    title?: string | null;
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (string | null) | Media;
-    description?: string | null;
-  };
-  publishedAt?: string | null;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
-  breadcrumbParent?: {
-    kind?: ('none' | 'page' | 'label') | null;
-    page?: (string | null) | Page;
-    label?: string | null;
-  };
-  /**
-   * Short name for the breadcrumb trail. Defaults to the page title.
-   */
-  breadcrumbLabel?: string | null;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "posts".
- */
-export interface Post {
-  id: string;
-  title: string;
-  heroImage?: (string | null) | Media;
-  content: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
-  relatedPosts?: (string | Post)[] | null;
-  categories?: (string | Category)[] | null;
-  meta?: {
-    title?: string | null;
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (string | null) | Media;
-    description?: string | null;
-  };
-  publishedAt?: string | null;
-  authors?: (string | User)[] | null;
-  populatedAuthors?:
-    | {
-        id?: string | null;
-        name?: string | null;
-      }[]
-    | null;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -5804,6 +5258,586 @@ export interface PlatformLayersTwoBlock {
   blockType: 'platformLayersTwo';
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HubLayersSection".
+ */
+export interface HubLayersSection {
+  /**
+   * Leave empty to show the default heading: "What sits underneath". Words in braces, such as {name}, are filled in for each entry.
+   */
+  heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
+  layers?:
+    | {
+        title: string;
+        line?: string | null;
+        /**
+         * An entry in any content collection, or a page.
+         */
+        link?:
+          | ({
+              relationTo: 'microApps';
+              value: string | MicroApp;
+            } | null)
+          | ({
+              relationTo: 'pages';
+              value: string | Page;
+            } | null);
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'hubLayersSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "microApps".
+ */
+export interface MicroApp {
+  id: string;
+  name: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  /**
+   * Only Live and Pilot entries appear on the website, WhatsApp and the knowledge base.
+   */
+  status: 'live' | 'pilot' | 'planned';
+  /**
+   * Groups entries on the hub page and in WhatsApp menus.
+   */
+  family: string | List;
+  /**
+   * Shown first wherever this collection is listed.
+   */
+  featured?: boolean | null;
+  /**
+   * Lower shows first, on grids and in WhatsApp lists.
+   */
+  order?: number | null;
+  /**
+   * Lets blocks pull out the entries that most set NeuronCx apart.
+   */
+  isUSP?: boolean | null;
+  /**
+   * Gives this entry a page of its own and adds it to the sitemap. The Page tab appears while this is on.
+   */
+  hasOwnPage?: boolean | null;
+  /**
+   * On: the page follows the default layout, and changes to the default reach it. Off: the layout on the Page tab is this page's own.
+   */
+  usePageDefaults?: boolean | null;
+  /**
+   * Where the agent works.
+   */
+  channel?: ('whatsapp' | 'calls' | 'web')[] | null;
+  /**
+   * Where it is used today.
+   */
+  verticals?: ('healthcare' | 'diagnostics' | 'education' | 'hospitality')[] | null;
+  /**
+   * A short line under the name. Aim for 45 characters.
+   */
+  tagline?: string | null;
+  /**
+   * One line on what it does. Aim for 120 characters.
+   */
+  summary: string;
+  /**
+   * From the shared icon library.
+   */
+  icon?:
+    | (
+        | 'message'
+        | 'chat'
+        | 'check'
+        | 'calendar'
+        | 'card'
+        | 'document'
+        | 'refresh'
+        | 'bolt'
+        | 'layers'
+        | 'gauge'
+        | 'plug'
+        | 'shield'
+        | 'shieldCheck'
+        | 'lock'
+        | 'globe'
+        | 'server'
+        | 'eye'
+        | 'users'
+        | 'user'
+        | 'phone'
+        | 'smartphone'
+        | 'mail'
+        | 'messageCircle'
+        | 'send'
+        | 'inbox'
+        | 'headphones'
+        | 'mic'
+        | 'video'
+        | 'bell'
+        | 'handshake'
+        | 'stethoscope'
+        | 'heartPulse'
+        | 'hospital'
+        | 'activity'
+        | 'flask'
+        | 'pill'
+        | 'graduationCap'
+        | 'building'
+        | 'mapPin'
+        | 'database'
+        | 'cloud'
+        | 'workflow'
+        | 'bot'
+        | 'sparkles'
+        | 'search'
+        | 'chart'
+        | 'trendingUp'
+        | 'target'
+        | 'rocket'
+        | 'key'
+        | 'fileText'
+        | 'clipboardList'
+        | 'link'
+        | 'settings'
+        | 'puzzle'
+        | 'timer'
+        | 'clock'
+        | 'badgeCheck'
+        | 'star'
+        | 'briefcase'
+      )
+    | null;
+  /**
+   * Optional. Logos go here for integrations.
+   */
+  image?: (string | null) | Media;
+  /**
+   * Leave empty to use the grouping's design, or the section's when the grouping has none.
+   */
+  cardDesign?: ('grid' | 'logoCard' | 'feature' | 'story') | null;
+  /**
+   * 3 to 4 short lines for cards and the bento grid.
+   */
+  keyPoints?:
+    | {
+        line: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * The full description. Also indexed for the knowledge base.
+   */
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * The teams or roles that use it, such as front desk or call centre.
+   */
+  whoItsFor?: string | null;
+  /**
+   * The job people search for, such as Prescription reading AI. Used in the page title and the line under the heading.
+   */
+  searchName?: string | null;
+  /**
+   * What sets the agent off.
+   */
+  startsWhen?: string | null;
+  /**
+   * Leave empty for agents that work on call recordings.
+   */
+  customerSees?: string | null;
+  /**
+   * The request in the customer's own words, or the call recording.
+   */
+  hears?: string | null;
+  /**
+   * The organisation's own rules: locations, services, prices, slots, scoring sheets.
+   */
+  checks?: string | null;
+  /**
+   * The work done in the organisation's systems: books, charges, files, scores.
+   */
+  acts?: string | null;
+  /**
+   * When and how a person takes over. Fill this in before turning on Own page.
+   */
+  handsOver?: string | null;
+  /**
+   * What is logged, and where.
+   */
+  records?: string | null;
+  /**
+   * What the organisation can change from the dashboard without code.
+   */
+  teamControls?: string | null;
+  /**
+   * One line on what changes for the team.
+   */
+  result?: string | null;
+  /**
+   * The next agent in the chain, such as Prescription understanding to Test matching and pricing. Leave empty for the last agent.
+   */
+  passesTo?: (string | MicroApp)[] | null;
+  /**
+   * The page heading. Needed to publish with Own page on.
+   */
+  heroHeading?: string | null;
+  heroSubheading?: string | null;
+  /**
+   * 3 to 6 outcomes, each with a short line.
+   */
+  benefits?:
+    | {
+        title: string;
+        line: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Up to 4, one per vertical where possible.
+   */
+  useCases?:
+    | {
+        title: string;
+        line: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * The closing button. Type a label to choose where it goes.
+   */
+  cta?: {
+    label?: string | null;
+    link?: {
+      type?: ('reference' | 'custom') | null;
+      newTab?: boolean | null;
+      reference?:
+        | ({
+            relationTo: 'pages';
+            value: string | Page;
+          } | null)
+        | ({
+            relationTo: 'posts';
+            value: string | Post;
+          } | null);
+      url?: string | null;
+    };
+  };
+  /**
+   * Up to 3. Leave empty to show other entries from this collection, by order.
+   */
+  related?: (string | MicroApp)[] | null;
+  /**
+   * One line, such as Live at a diagnostics chain. Name a customer only where the customers collection's Show real name is on.
+   */
+  proof?: string | null;
+  customers?: (string | Customer)[] | null;
+  /**
+   * Systems it books, bills or files into.
+   */
+  integrations?: (string | Integration)[] | null;
+  /**
+   * Usually Customer 360.
+   */
+  crmFeatures?: (string | CrmFeature)[] | null;
+  /**
+   * Optional, such as the payment flow.
+   */
+  media?: (string | null) | Media;
+  /**
+   * The sections between the page hero and the end of the page, in order. Drag to reorder. Read-only while Use page defaults is on.
+   */
+  layout?:
+    | (
+        | AgentPanelSection
+        | AgentChainSection
+        | AgentTeamControlsSection
+        | AgentResultSection
+        | BenefitsSection
+        | UseCasesSection
+        | IntegrationsSection
+        | CustomersSection
+        | FaqSection
+        | RelatedSection
+        | ClosingSection
+        | TestimonialBlock
+        | MediaBlock
+        | ProductInActionBlock
+        | CaseStudyGridBlock
+        | BenefitsBlock
+        | CallToActionBlock
+        | ContentBlock
+        | LogoWallBlock
+        | StatBandBlock
+        | TrustPanelBlock
+      )[]
+    | null;
+  /**
+   * Up to 6. Questions phrased the way a buyer would ask them.
+   */
+  faqs?:
+    | {
+        question: string;
+        /**
+         * Plain text, no formatting.
+         */
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  waRowTitle?: string | null;
+  /**
+   * Aim for 60 characters.
+   */
+  waRowDescription?: string | null;
+  /**
+   * Aim for 30 characters.
+   */
+  waHeader?: string | null;
+  /**
+   * Aim for 300 characters.
+   */
+  waBody?: string | null;
+  /**
+   * 3 to 5 short lines, sent inside the body.
+   */
+  waKeyPoints?:
+    | {
+        line: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Aim for 30 characters.
+   */
+  waFooter?: string | null;
+  /**
+   * Up to 3, which is the WhatsApp limit.
+   */
+  waButtons?:
+    | {
+        label: string;
+        /**
+         * The reply the assistant receives when the button is tapped, for example book-demo.
+         */
+        action: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Set on save: the entry's own page when Own page is on, otherwise its place on /bot-swarm.
+   */
+  waLink?: string | null;
+  /**
+   * Only published entries with this on are sent to the knowledge base.
+   */
+  includeInKbase?: boolean | null;
+  /**
+   * A complete answer to "What is this?", written for the virtual agents.
+   */
+  kbAnswer?: string | null;
+  /**
+   * Short, checkable facts. One fact per line.
+   */
+  kbFacts?:
+    | {
+        fact: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * How a customer might ask about it.
+   */
+  kbQuestions?:
+    | {
+        question: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Other names people use for it.
+   */
+  kbSynonyms?:
+    | {
+        synonym: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * So answers that have gone stale can be found and fixed.
+   */
+  kbLastReviewed?: string | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (string | null) | Media;
+    description?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * Short lists other collections group their entries by, such as CRM areas and agent families.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lists".
+ */
+export interface List {
+  id: string;
+  name: string;
+  /**
+   * Which list this entry belongs to.
+   */
+  type: 'crmArea' | 'agentFamily';
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  /**
+   * Lower shows first, on hub pages and in WhatsApp menus.
+   */
+  order?: number | null;
+  /**
+   * One line under the grouping's heading on the hub page.
+   */
+  intro?: string | null;
+  /**
+   * The problem the grouping solves, in the team's words.
+   */
+  painLine?: string | null;
+  /**
+   * How the entries in the grouping work together.
+   */
+  summary?: string | null;
+  /**
+   * Shown with the grouping heading on the hub page.
+   */
+  icon?:
+    | (
+        | 'message'
+        | 'chat'
+        | 'check'
+        | 'calendar'
+        | 'card'
+        | 'document'
+        | 'refresh'
+        | 'bolt'
+        | 'layers'
+        | 'gauge'
+        | 'plug'
+        | 'shield'
+        | 'shieldCheck'
+        | 'lock'
+        | 'globe'
+        | 'server'
+        | 'eye'
+        | 'users'
+        | 'user'
+        | 'phone'
+        | 'smartphone'
+        | 'mail'
+        | 'messageCircle'
+        | 'send'
+        | 'inbox'
+        | 'headphones'
+        | 'mic'
+        | 'video'
+        | 'bell'
+        | 'handshake'
+        | 'stethoscope'
+        | 'heartPulse'
+        | 'hospital'
+        | 'activity'
+        | 'flask'
+        | 'pill'
+        | 'graduationCap'
+        | 'building'
+        | 'mapPin'
+        | 'database'
+        | 'cloud'
+        | 'workflow'
+        | 'bot'
+        | 'sparkles'
+        | 'search'
+        | 'chart'
+        | 'trendingUp'
+        | 'target'
+        | 'rocket'
+        | 'key'
+        | 'fileText'
+        | 'clipboardList'
+        | 'link'
+        | 'settings'
+        | 'puzzle'
+        | 'timer'
+        | 'clock'
+        | 'badgeCheck'
+        | 'star'
+        | 'briefcase'
+      )
+    | null;
+  /**
+   * Every entry in this grouping uses it, unless the entry has its own. Leave empty to follow the section. Used only where the section allows it.
+   */
+  cardDesign?: ('grid' | 'logoCard' | 'feature' | 'story') | null;
+  /**
+   * The grouping as a row in a WhatsApp list menu. Plain text.
+   */
+  waRowTitle?: string | null;
+  /**
+   * The line under the row title. Aim for 60 characters. Plain text.
+   */
+  waRowDescription?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
  * Capabilities of the NeuronCx CRM, such as Customer 360. Only Live and Pilot entries reach the website, WhatsApp and the knowledge base.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -6140,6 +6174,14 @@ export interface HubWorksWithSection {
    * Leave empty to show the default heading: "Works with". Words in braces, such as {name}, are filled in for each entry.
    */
   heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
   populateBy?: ('fromEntries' | 'selection') | null;
   selectedDocs?: (string | Integration)[] | null;
   /**
@@ -6171,6 +6213,14 @@ export interface HubIndustriesSection {
    * Leave empty to show the default heading: "By industry". Words in braces, such as {name}, are filled in for each entry.
    */
   heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
   industries?:
     | {
         vertical: string;
@@ -6219,6 +6269,14 @@ export interface HubTrustSection {
    * Leave empty to show the default heading: "What you stay in control of". Words in braces, such as {name}, are filled in for each entry.
    */
   heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
   /**
    * 3 to 4 cards.
    */
@@ -6325,6 +6383,14 @@ export interface HubArticlesSection {
    * Leave empty to show the default heading: "Read the latest". Words in braces, such as {name}, are filled in for each entry.
    */
   heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
   populateBy?: ('category' | 'selection') | null;
   /**
    * Leave empty for the latest posts from every category.

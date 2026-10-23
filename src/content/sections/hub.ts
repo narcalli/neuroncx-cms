@@ -1,6 +1,7 @@
 import type { Field, FilterOptions, RelationshipField } from 'payload'
 
 import { countedText } from '../../fields/counted'
+import { optionalCta } from '../../fields/optionalCta'
 import { iconField } from '../../fields/icons'
 import { contentSlugs } from '../registry'
 import { defineSection } from './defineSection'
@@ -24,6 +25,15 @@ export const hubEntries = (
   // Payload's polymorphic relationship types do not narrow on hasMany; the shape is valid.
   return { name, label, type: 'relationship', relationTo, hasMany: !opts.one, filterOptions: onlyHubCollection, admin } as RelationshipField
 }
+
+/**
+ * The optional lines around a hub section's heading: a small eyebrow above
+ * it and an intro under it. A function, so every section gets its own copy.
+ */
+const headCopy = (): Field[] => [
+  countedText({ name: 'eyebrow', label: 'Eyebrow (optional)', maxLength: 60, description: 'The small line above the heading.' }),
+  countedText({ name: 'intro', label: 'Intro (optional)', textarea: true, maxLength: 200, description: 'One or two sentences under the heading.' }),
+]
 
 const withWidth = <T extends { admin?: object }>(field: T, width: string): T => ({
   ...field,
@@ -61,11 +71,13 @@ export const hubStepsSection = defineSection({
   requiredWhenOn: [],
   headingDefault: 'How it works',
   fields: [
+    ...headCopy(),
     step('hears', 'Hears'),
     step('checks', 'Checks'),
     step('acts', 'Acts'),
     step('handsOver', 'Hands over'),
     step('records', 'Records'),
+    optionalCta('cta', 'Button under the steps (optional)'),
   ],
 })
 
@@ -76,6 +88,7 @@ export const hubLayersSection = defineSection({
   requiredWhenOn: [],
   headingDefault: 'What sits underneath',
   fields: () => [
+    ...headCopy(),
     {
       name: 'layers',
       type: 'array',
@@ -103,6 +116,7 @@ export const hubWorksWithSection = defineSection({
   requiredWhenOn: [],
   headingDefault: 'Works with',
   fields: [
+    ...headCopy(),
     {
       name: 'populateBy',
       type: 'select',
@@ -134,6 +148,7 @@ export const hubIndustriesSection = defineSection({
   requiredWhenOn: [],
   headingDefault: 'By industry',
   fields: () => [
+    ...headCopy(),
     {
       name: 'industries',
       type: 'array',
@@ -158,6 +173,7 @@ export const hubTrustSection = defineSection({
   requiredWhenOn: [],
   headingDefault: 'What you stay in control of',
   fields: [
+    ...headCopy(),
     {
       name: 'cards',
       type: 'array',
@@ -181,6 +197,7 @@ export const hubArticlesSection = defineSection({
   requiredWhenOn: [],
   headingDefault: 'Read the latest',
   fields: [
+    ...headCopy(),
     {
       name: 'populateBy',
       type: 'select',
