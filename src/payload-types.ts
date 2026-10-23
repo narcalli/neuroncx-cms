@@ -6539,7 +6539,7 @@ export interface Hub {
     description?: string | null;
   };
   /**
-   * Conversation shows the chat as an animated thread, with the names of the entries that reply listed under it. It has no picture and no breadcrumbs.
+   * Conversation shows the chat as an animated thread, with the names of the entries that reply listed under it. It has no picture.
    */
   heroDesign?: ('standard' | 'conversation') | null;
   eyebrow?: string | null;

@@ -132,13 +132,13 @@ export const buildHubs = (): CollectionConfig => {
         label: 'Hero design',
         defaultValue: 'standard',
         options: [
-          { label: 'Standard (light, with breadcrumbs)', value: 'standard' },
+          { label: 'Standard (light, with the picture or chat beside it)', value: 'standard' },
           { label: 'Conversation (chat on a gradient stage)', value: 'conversation' },
         ],
         admin: {
           layout: 'horizontal',
           description:
-            'Conversation shows the chat as an animated thread, with the names of the entries that reply listed under it. It has no picture and no breadcrumbs.',
+            'Conversation shows the chat as an animated thread, with the names of the entries that reply listed under it. It has no picture.',
         },
       },
       countedText({ name: 'eyebrow', label: 'Eyebrow (optional)', maxLength: 40 }),
