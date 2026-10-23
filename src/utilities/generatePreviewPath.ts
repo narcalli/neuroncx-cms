@@ -20,6 +20,16 @@ type Props = {
   req: PayloadRequest
 }
 
+/**
+ * The website's preview link for any path on it: /next/preview turns draft
+ * mode on with the shared PREVIEW_SECRET and opens the path, so unpublished
+ * changes show. Used by the admin's Preview button and live preview.
+ */
+export const previewUrl = (path: string): string => {
+  const params = new URLSearchParams({ path, previewSecret: process.env.PREVIEW_SECRET || '' })
+  return `${process.env.NEXT_PUBLIC_SITE_URL || ''}/next/preview?${params.toString()}`
+}
+
 export const generatePreviewPath = ({ collection, slug }: Props) => {
   const path = `${collectionPrefixMap[collection]}/${slug}`
 
