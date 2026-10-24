@@ -96,21 +96,34 @@ export const iconOptions: { label: string; value: string }[] = [
  */
 export const iconField = (
   defaultValue?: string,
-  opts?: { name?: string; label?: string; required?: boolean; description?: string },
-): SelectField => ({
-  name: opts?.name || 'icon',
-  type: 'select',
-  label: opts?.label || 'Icon',
-  defaultValue,
-  required: opts?.required,
-  options: iconOptions,
-  admin: {
-    description: opts?.description,
-    components: {
-      Field: {
-        path: '@/fields/IconPicker/Component#IconPickerField',
-        clientProps: { allowClear: !defaultValue && !opts?.required },
+  opts?: {
+    name?: string
+    label?: string
+    required?: boolean
+    description?: string
+    /** Offer only these icons, in the library's order. All of them when left out. */
+    only?: readonly string[]
+  },
+): SelectField => {
+  if (opts?.only) {
+    const unknown = opts.only.filter((v) => !iconOptions.some((o) => o.value === v))
+    if (unknown.length) throw new Error(`iconField: no icon named ${unknown.join(', ')} in the library.`)
+  }
+  return {
+    name: opts?.name || 'icon',
+    type: 'select',
+    label: opts?.label || 'Icon',
+    defaultValue,
+    required: opts?.required,
+    options: opts?.only ? iconOptions.filter((o) => opts.only!.includes(o.value)) : iconOptions,
+    admin: {
+      description: opts?.description,
+      components: {
+        Field: {
+          path: '@/fields/IconPicker/Component#IconPickerField',
+          clientProps: { allowClear: !defaultValue && !opts?.required, ...(opts?.only ? { only: [...opts.only] } : {}) },
+        },
       },
     },
-  },
-})
+  }
+}

@@ -1,14 +1,55 @@
 import type { GlobalConfig } from 'payload'
 
+import { iconField } from '../fields/icons'
+import { link } from '../fields/link'
 import { revalidateHeader } from './hooks/revalidateHeader'
 
-// Old-style dropdown columns stay visible only while a row still has them, so
-// existing menus keep working but nobody builds a new one the old way.
-const hasLegacyColumns = (_: unknown, siblingData: { columns?: unknown[] } | undefined) =>
-  Boolean(siblingData?.columns?.length)
+const isLink = (_: unknown, siblingData: { type?: string } | undefined) => siblingData?.type !== 'megaMenu'
 
-const isDropdown = (_: unknown, siblingData: { type?: string } | undefined) =>
-  siblingData?.type === 'dropdown'
+const isMegaMenu = (_: unknown, siblingData: { type?: string } | undefined) => siblingData?.type === 'megaMenu'
+
+const featuredOn = (_: unknown, siblingData: { enabled?: boolean } | undefined) => Boolean(siblingData?.enabled)
+
+/** How a mega menu lays itself out, for editors (the website follows the same rules). */
+export const MEGA_MENU_LAYOUT =
+  'The menu panel sizes itself. A single group hides its label. Groups with 4 or more items wrap into 2 columns. The featured card only shows when the menu has 5 or more items in total.'
+
+/**
+ * The icons a mega menu item may use: 30 of the shared library
+ * (src/fields/icons.ts), the ones that name a product, a job or a sector.
+ */
+export const MENU_ICONS = [
+  'message',
+  'chat',
+  'bot',
+  'sparkles',
+  'workflow',
+  'bolt',
+  'layers',
+  'database',
+  'users',
+  'chart',
+  'gauge',
+  'target',
+  'plug',
+  'link',
+  'puzzle',
+  'globe',
+  'shield',
+  'shieldCheck',
+  'lock',
+  'settings',
+  'fileText',
+  'clipboardList',
+  'graduationCap',
+  'hospital',
+  'stethoscope',
+  'building',
+  'briefcase',
+  'rocket',
+  'search',
+  'headphones',
+] as const
 
 const announcementOn = (_: unknown, siblingData: { enabled?: boolean } | undefined) =>
   Boolean(siblingData?.enabled)
@@ -71,7 +112,7 @@ export const Header: GlobalConfig = {
       admin: {
         initCollapsed: true,
         description:
-          'Each item is either a plain link or a dropdown. Only add links to pages that exist. A menu full of dead links is worse than a short menu.',
+          'Each item is either a plain link or a mega menu. Only add links to pages that exist. A menu full of dead links is worse than a short menu.',
         components: {
           RowLabel: '@/Header/RowLabel#RowLabel',
         },
@@ -81,77 +122,127 @@ export const Header: GlobalConfig = {
           name: 'label',
           type: 'text',
           required: true,
+          maxLength: 30,
           label: 'Menu label',
         },
         {
           name: 'type',
-          type: 'radio',
+          type: 'select',
           label: 'What this item does',
+          required: true,
           defaultValue: 'link',
           options: [
-            { label: 'Goes straight to a page', value: 'link' },
-            { label: 'Opens a dropdown', value: 'dropdown' },
+            { label: 'Link (goes straight to a page)', value: 'link' },
+            { label: 'Mega menu (opens a panel of links)', value: 'megaMenu' },
           ],
-          admin: { layout: 'horizontal' },
         },
+        link({ appearances: false, disableLabel: true, overrides: { admin: { condition: isLink } } }),
+        {
+          name: 'groups',
+          type: 'array',
+          label: 'Groups',
+          labels: { singular: 'Group', plural: 'Groups' },
+          admin: {
+            initCollapsed: true,
+            condition: isMegaMenu,
+            description: MEGA_MENU_LAYOUT,
+          },
+          fields: [
+            {
+              name: 'label',
+              type: 'text',
+              label: 'Group label (optional)',
+              maxLength: 24,
+              admin: { description: 'Such as Modules or Agents. Hidden when the menu has a single group.' },
+            },
+            {
+              name: 'items',
+              type: 'array',
+              label: 'Items',
+              labels: { singular: 'Item', plural: 'Items' },
+              minRows: 1,
+              admin: { initCollapsed: true },
+              fields: [
+                iconField(undefined, { only: MENU_ICONS }),
+                { name: 'label', type: 'text', required: true, maxLength: 30 },
+                {
+                  name: 'description',
+                  type: 'text',
+                  label: 'Description (optional)',
+                  maxLength: 50,
+                  admin: { description: 'One short line naming what this does' },
+                },
+                link({ appearances: false, disableLabel: true }),
+                {
+                  name: 'badge',
+                  type: 'select',
+                  label: 'Badge',
+                  defaultValue: 'none',
+                  options: [
+                    { label: 'None', value: 'none' },
+                    { label: 'New', value: 'new' },
+                    { label: 'Beta', value: 'beta' },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          name: 'featured',
+          type: 'group',
+          label: 'Featured card',
+          admin: {
+            condition: isMegaMenu,
+            description: 'A card in the last column of the panel. It only shows when the menu has 5 or more items in total.',
+          },
+          fields: [
+            { name: 'enabled', type: 'checkbox', label: 'Show the featured card', defaultValue: false },
+            { name: 'eyebrow', type: 'text', maxLength: 20, admin: { condition: featuredOn } },
+            { name: 'title', type: 'text', maxLength: 50, admin: { condition: featuredOn } },
+            {
+              name: 'image',
+              type: 'upload',
+              label: 'Image (optional)',
+              relationTo: 'media',
+              admin: { condition: featuredOn },
+            },
+            link({ appearances: false, disableLabel: true, overrides: { admin: { condition: featuredOn } } }),
+            { name: 'linkLabel', type: 'text', label: 'Link text', maxLength: 24, admin: { condition: featuredOn } },
+          ],
+        },
+        // The fields below held the menu before the mega menu. They are kept,
+        // hidden, so no saved menu loses anything: the website still reads
+        // them for a menu that has not been copied into the fields above
+        // (scripts/migrate-mega-menu.ts).
         {
           name: 'href',
           type: 'text',
-          label: 'Link address',
-          admin: {
-            description: 'Where this goes when clicked, e.g. /integrations.',
-            condition: (_, siblingData) => siblingData?.type !== 'dropdown',
-          },
+          label: 'Link address (old)',
+          admin: { hidden: true },
         },
         {
           name: 'items',
           type: 'array',
-          label: 'Dropdown links',
+          label: 'Dropdown links (old)',
           maxRows: 12,
-          admin: {
-            initCollapsed: true,
-            condition: isDropdown,
-            description:
-              'One flat list, top to bottom. Use a group heading to start a new section part-way down.',
-          },
+          admin: { hidden: true },
           fields: [
             { name: 'label', type: 'text', required: true },
             { name: 'href', type: 'text', required: true, label: 'Link address' },
-            {
-              name: 'badge',
-              type: 'text',
-              label: 'Badge (optional)',
-              admin: { description: 'A short word such as NEW or API. Leave empty for no badge.' },
-            },
-            {
-              name: 'groupHeading',
-              type: 'text',
-              label: 'Group heading (optional)',
-              admin: {
-                description:
-                  'Starts a new group above this link. Leave empty to continue the group above.',
-              },
-            },
+            { name: 'badge', type: 'text', label: 'Badge (optional)' },
+            { name: 'groupHeading', type: 'text', label: 'Group heading (optional)' },
             { name: 'newTab', type: 'checkbox', label: 'Open in a new tab', defaultValue: false },
           ],
         },
         {
           name: 'columns',
           type: 'array',
-          label: 'Dropdown columns (old style)',
+          label: 'Dropdown columns (old)',
           maxRows: 4,
-          admin: {
-            initCollapsed: true,
-            condition: hasLegacyColumns,
-            description:
-              'Kept so the old menu still works. Move these links up into the dropdown links above, then clear this and it will disappear.',
-          },
+          admin: { hidden: true },
           fields: [
-            {
-              name: 'heading',
-              type: 'text',
-              label: 'Column heading',
-            },
+            { name: 'heading', type: 'text', label: 'Column heading' },
             {
               name: 'links',
               type: 'array',
@@ -159,17 +250,8 @@ export const Header: GlobalConfig = {
               maxRows: 8,
               fields: [
                 { name: 'label', type: 'text', required: true },
-                {
-                  name: 'href',
-                  type: 'text',
-                  required: true,
-                  admin: { description: 'For example /omnichannel-cx' },
-                },
-                {
-                  name: 'description',
-                  type: 'text',
-                  label: 'One line (optional)',
-                },
+                { name: 'href', type: 'text', required: true },
+                { name: 'description', type: 'text', label: 'One line (optional)' },
               ],
             },
           ],

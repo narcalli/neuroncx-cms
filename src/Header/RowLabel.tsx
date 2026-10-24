@@ -9,7 +9,7 @@ export const RowLabel: React.FC = () => {
 
   // Nav items carry `label` directly — they are no longer a nested link group.
   // The kind is shown too, so a collapsed menu says which rows open a panel.
-  const kind = data?.data?.type === 'dropdown' ? 'dropdown' : 'link'
+  const kind = data?.data?.type === 'megaMenu' ? 'mega menu' : 'link'
   const label = data?.data?.label
     ? `Nav item ${data.rowNumber !== undefined ? data.rowNumber + 1 : ''}: ${data.data.label} (${kind})`
     : 'Row'

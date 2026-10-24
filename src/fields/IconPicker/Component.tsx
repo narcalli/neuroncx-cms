@@ -15,7 +15,11 @@ import { IconGlyph } from './icons'
  * per block. Built on OptionPicker, with a search box and, for optional
  * fields, a "No icon" tile.
  */
-type Props = SelectFieldClientProps & { allowClear?: boolean }
+type Props = SelectFieldClientProps & {
+  allowClear?: boolean
+  /** Offer only these icons (iconField's `only`). All of them when left out. */
+  only?: string[]
+}
 
 const glyph = (name: string) => (
   <span style={{ width: 22, height: 22, display: 'block' }}>
@@ -25,10 +29,10 @@ const glyph = (name: string) => (
 
 const search = { noun: 'icons', noMatch: (query: string) => `No icon matches "${query}".` }
 
-export const IconPickerField: React.FC<Props> = ({ allowClear, ...props }) => (
+export const IconPickerField: React.FC<Props> = ({ allowClear, only, ...props }) => (
   <OptionPickerField
     {...props}
-    options={iconOptions}
+    options={only ? iconOptions.filter((o) => only.includes(o.value)) : iconOptions}
     renderImage={glyph}
     search={search}
     clearLabel={allowClear ? 'No icon' : undefined}

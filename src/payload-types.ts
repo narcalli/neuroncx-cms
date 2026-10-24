@@ -10470,47 +10470,138 @@ export interface Header {
     ctaHref?: string | null;
   };
   /**
-   * Each item is either a plain link or a dropdown. Only add links to pages that exist. A menu full of dead links is worse than a short menu.
+   * Each item is either a plain link or a mega menu. Only add links to pages that exist. A menu full of dead links is worse than a short menu.
    */
   navItems?:
     | {
         label: string;
-        type?: ('link' | 'dropdown') | null;
+        type: 'link' | 'megaMenu';
+        link?: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: string | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: string | Post;
+              } | null);
+          url?: string | null;
+        };
         /**
-         * Where this goes when clicked, e.g. /integrations.
+         * The menu panel sizes itself. A single group hides its label. Groups with 4 or more items wrap into 2 columns. The featured card only shows when the menu has 5 or more items in total.
          */
+        groups?:
+          | {
+              /**
+               * Such as Modules or Agents. Hidden when the menu has a single group.
+               */
+              label?: string | null;
+              items?:
+                | {
+                    icon?:
+                      | (
+                          | 'message'
+                          | 'chat'
+                          | 'bolt'
+                          | 'layers'
+                          | 'gauge'
+                          | 'plug'
+                          | 'shield'
+                          | 'shieldCheck'
+                          | 'lock'
+                          | 'globe'
+                          | 'users'
+                          | 'headphones'
+                          | 'stethoscope'
+                          | 'hospital'
+                          | 'graduationCap'
+                          | 'building'
+                          | 'database'
+                          | 'workflow'
+                          | 'bot'
+                          | 'sparkles'
+                          | 'search'
+                          | 'chart'
+                          | 'target'
+                          | 'rocket'
+                          | 'fileText'
+                          | 'clipboardList'
+                          | 'link'
+                          | 'settings'
+                          | 'puzzle'
+                          | 'briefcase'
+                        )
+                      | null;
+                    label: string;
+                    /**
+                     * One short line naming what this does
+                     */
+                    description?: string | null;
+                    link?: {
+                      type?: ('reference' | 'custom') | null;
+                      newTab?: boolean | null;
+                      reference?:
+                        | ({
+                            relationTo: 'pages';
+                            value: string | Page;
+                          } | null)
+                        | ({
+                            relationTo: 'posts';
+                            value: string | Post;
+                          } | null);
+                      url?: string | null;
+                    };
+                    badge?: ('none' | 'new' | 'beta') | null;
+                    id?: string | null;
+                  }[]
+                | null;
+              id?: string | null;
+            }[]
+          | null;
+        /**
+         * A card in the last column of the panel. It only shows when the menu has 5 or more items in total.
+         */
+        featured?: {
+          enabled?: boolean | null;
+          eyebrow?: string | null;
+          title?: string | null;
+          image?: (string | null) | Media;
+          link?: {
+            type?: ('reference' | 'custom') | null;
+            newTab?: boolean | null;
+            reference?:
+              | ({
+                  relationTo: 'pages';
+                  value: string | Page;
+                } | null)
+              | ({
+                  relationTo: 'posts';
+                  value: string | Post;
+                } | null);
+            url?: string | null;
+          };
+          linkLabel?: string | null;
+        };
         href?: string | null;
-        /**
-         * One flat list, top to bottom. Use a group heading to start a new section part-way down.
-         */
         items?:
           | {
               label: string;
               href: string;
-              /**
-               * A short word such as NEW or API. Leave empty for no badge.
-               */
               badge?: string | null;
-              /**
-               * Starts a new group above this link. Leave empty to continue the group above.
-               */
               groupHeading?: string | null;
               newTab?: boolean | null;
               id?: string | null;
             }[]
           | null;
-        /**
-         * Kept so the old menu still works. Move these links up into the dropdown links above, then clear this and it will disappear.
-         */
         columns?:
           | {
               heading?: string | null;
               links?:
                 | {
                     label: string;
-                    /**
-                     * For example /omnichannel-cx
-                     */
                     href: string;
                     description?: string | null;
                     id?: string | null;
@@ -10731,6 +10822,54 @@ export interface HeaderSelect<T extends boolean = true> {
     | {
         label?: T;
         type?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+            };
+        groups?:
+          | T
+          | {
+              label?: T;
+              items?:
+                | T
+                | {
+                    icon?: T;
+                    label?: T;
+                    description?: T;
+                    link?:
+                      | T
+                      | {
+                          type?: T;
+                          newTab?: T;
+                          reference?: T;
+                          url?: T;
+                        };
+                    badge?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
+        featured?:
+          | T
+          | {
+              enabled?: T;
+              eyebrow?: T;
+              title?: T;
+              image?: T;
+              link?:
+                | T
+                | {
+                    type?: T;
+                    newTab?: T;
+                    reference?: T;
+                    url?: T;
+                  };
+              linkLabel?: T;
+            };
         href?: T;
         items?:
           | T
