@@ -21,7 +21,6 @@ type Entry = {
   name: string
   order: number
   intro?: string
-  painLine?: string
   summary?: string
 }
 
@@ -54,7 +53,6 @@ const ENTRIES: Entry[] = [
     type: 'agentFamily',
     name: 'Book and get paid',
     order: 10,
-    painLine: 'Your team spends the day confirming slots and chasing payments.',
     summary:
       "One agent books the appointment in your system, the next sends the payment link and stays with it until it's settled.",
   },
@@ -62,7 +60,6 @@ const ENTRIES: Entry[] = [
     type: 'agentFamily',
     name: 'Read and match documents',
     order: 20,
-    painLine: 'Someone on your team retypes every prescription, marksheet and ID.',
     summary:
       'One agent reads the document from a photo, the next matches what it found to your own lists and fills the record.',
   },
@@ -70,7 +67,6 @@ const ENTRIES: Entry[] = [
     type: 'agentFamily',
     name: 'Check and coach your team',
     order: 30,
-    painLine: "Managers can't listen to every call, or tell who is actually improving.",
     summary:
       "One agent picks a fair sample of calls, the next scores them against your sheet, and the third shows each person's progress week by week.",
   },

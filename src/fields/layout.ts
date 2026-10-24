@@ -52,12 +52,27 @@ export const navyProblem = (layout: unknown): string | null => {
   return `Only the closing panel can use Highlight (navy). Set ${named} back to another background.`
 }
 
+/**
+ * A placement marker (such as Grouping sections) says where one thing goes,
+ * so a layout may hold it once. Returns the problem, or null.
+ */
+export const placementProblem = (layout: unknown): string | null => {
+  if (!Array.isArray(layout)) return null
+  const seen = new Map<string, number>()
+  for (const block of layout as LayoutBlock[]) {
+    const def = sectionForBlockType(block?.blockType)
+    if (def?.placement) seen.set(def.label, (seen.get(def.label) ?? 0) + 1)
+  }
+  const twice = [...seen].filter(([, n]) => n > 1).map(([label]) => label)
+  return twice.length ? `${twice.join(' and ')} can be in the layout once. Remove the extra one.` : null
+}
+
 export { layoutWarnings } from './LayoutField/warnings'
 
 const layoutRule: Validate = async (value, options) => {
   const builtIn = await validateBlocks(value as any, options as any)
   if (builtIn !== true) return builtIn
-  return navyProblem(value) ?? true
+  return navyProblem(value) ?? placementProblem(value) ?? true
 }
 
 /** Layout rows for a list of section keys, as a new entry starts with them. */

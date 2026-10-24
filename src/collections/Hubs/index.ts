@@ -247,7 +247,7 @@ export const buildHubs = (): CollectionConfig => {
           ...HUB_PAGE_BLOCKS.map((b) => b.slug),
         ],
         description:
-          'The hub page between the grouping sections and the FAQ, in order. Hub sections and every page block except the heroes and the plain FAQ block. The closing panel is fixed at the end.',
+          'The hub page between the hero and the FAQ, in order. Hub sections and every page block except the heroes and the plain FAQ block. Add "Grouping sections" to place the grouping sections; without it they come right after the hero. The closing panel is fixed at the end.',
         owner: 'hubs',
       }),
     ],

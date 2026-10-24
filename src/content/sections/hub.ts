@@ -237,7 +237,21 @@ export const hubArticlesSection = defineSection({
   ],
 })
 
+/**
+ * Where the hub's grouping sections go (the Grouping sections tab). A hub
+ * without it shows them right after the hero, as before it existed.
+ */
+export const hubGroupingsSection = defineSection({
+  key: 'hubGroupings',
+  label: 'Grouping sections',
+  reads: [],
+  requiredWhenOn: [],
+  headingDefault: '',
+  placement: true,
+})
+
 export const HUB_SECTION_KEYS = [
+  'hubGroupings',
   'hubIntro',
   'hubSteps',
   'hubLayers',

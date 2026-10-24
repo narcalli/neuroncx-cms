@@ -131,17 +131,27 @@ export const Lists: CollectionConfig = {
       },
     },
     {
-      name: 'intro',
+      // Was painLine. Its old values are not carried over.
+      name: 'heading',
       type: 'text',
-      maxLength: 140,
-      admin: { description: "One line under the grouping's heading on the hub page." },
+      label: 'Heading (optional)',
+      maxLength: 120,
+      admin: {
+        description: "The grouping's heading on the hub page, used when the hub's section leaves its heading empty.",
+      },
     },
     {
-      name: 'painLine',
+      name: 'intro',
       type: 'text',
-      label: 'Pain line (optional)',
-      maxLength: 120,
-      admin: { description: "The problem the grouping solves, in the team's words." },
+      maxLength: 200,
+      admin: { description: "One or two sentences under the grouping's heading on the hub page." },
+    },
+    {
+      name: 'primaryKeyword',
+      type: 'text',
+      label: 'Primary keyword (optional)',
+      maxLength: 60,
+      admin: { description: 'The search phrase the grouping\'s section is written for, such as whatsapp appointment booking.' },
     },
     {
       name: 'summary',

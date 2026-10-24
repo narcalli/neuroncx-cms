@@ -120,7 +120,7 @@ export const groupsMessage = (
     rows: groups.map((g) => ({
       id: `entries:${g.slug}`,
       title: first(g.waRowTitle, g.name),
-      description: first(g.waRowDescription, g.intro, g.painLine),
+      description: first(g.waRowDescription, g.intro, g.heading),
     })),
   })
 

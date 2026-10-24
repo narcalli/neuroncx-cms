@@ -35,6 +35,12 @@ export type SectionDefinition = {
   fields?: Field[] | (() => Field[])
   /** The one section that may use Highlight (navy). */
   navyAllowed?: boolean
+  /**
+   * A marker with no copy of its own: it only says where something the page
+   * draws anyway goes (the hub's grouping sections). No heading override and
+   * no appearance options, and a layout may hold it once.
+   */
+  placement?: boolean
 }
 
 const sections = new Map<string, SectionDefinition>()
@@ -76,6 +82,23 @@ export const buildSectionBlock = (
     `"${def.headingDefault}"`,
     ...collectionHeadings.map((c) => `"${c.heading}" for ${c.label}`),
   ].join(', ')
+  if (def.placement) {
+    return {
+      slug: sectionBlockSlug(def.key),
+      interfaceName: `${pascal(def.key)}Section`,
+      labels: { singular: def.label, plural: def.label },
+      admin: {
+        group: 'From this entry',
+        components: {
+          Label: {
+            path: '@/fields/LayoutField/RowLabel#LayoutRowLabel',
+            clientProps: { label: def.label, headingDefault: def.headingDefault },
+          },
+        },
+      },
+      fields: [],
+    }
+  }
   return withPresentation({
     slug: sectionBlockSlug(def.key),
     interfaceName: `${pascal(def.key)}Section`,

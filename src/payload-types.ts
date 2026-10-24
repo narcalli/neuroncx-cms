@@ -85,6 +85,7 @@ export interface Config {
     hubIndustriesSection: HubIndustriesSection;
     hubTrustSection: HubTrustSection;
     hubArticlesSection: HubArticlesSection;
+    hubGroupingsSection: HubGroupingsSection;
     testimonial: TestimonialBlock;
     mediaBlock: MediaBlock;
     productInAction: ProductInActionBlock;
@@ -5911,13 +5912,17 @@ export interface List {
    */
   order?: number | null;
   /**
-   * One line under the grouping's heading on the hub page.
+   * The grouping's heading on the hub page, used when the hub's section leaves its heading empty.
+   */
+  heading?: string | null;
+  /**
+   * One or two sentences under the grouping's heading on the hub page.
    */
   intro?: string | null;
   /**
-   * The problem the grouping solves, in the team's words.
+   * The search phrase the grouping's section is written for, such as whatsapp appointment booking.
    */
-  painLine?: string | null;
+  primaryKeyword?: string | null;
   /**
    * How the entries in the grouping work together.
    */
@@ -6687,6 +6692,15 @@ export interface HubArticlesSection {
   blockType: 'hubArticlesSection';
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HubGroupingsSection".
+ */
+export interface HubGroupingsSection {
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'hubGroupingsSection';
+}
+/**
  * Short product capability descriptions. These appear in the sections on the home page and on the platform pages.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -6926,10 +6940,11 @@ export interface Hub {
       }[]
     | null;
   /**
-   * The hub page between the grouping sections and the FAQ, in order. Hub sections and every page block except the heroes and the plain FAQ block. The closing panel is fixed at the end.
+   * The hub page between the hero and the FAQ, in order. Hub sections and every page block except the heroes and the plain FAQ block. Add "Grouping sections" to place the grouping sections; without it they come right after the hero. The closing panel is fixed at the end.
    */
   layout?:
     | (
+        | HubGroupingsSection
         | HubIntroSection
         | HubStepsSection
         | HubLayersSection
@@ -9807,8 +9822,9 @@ export interface ListsSelect<T extends boolean = true> {
   generateSlug?: T;
   slug?: T;
   order?: T;
+  heading?: T;
   intro?: T;
-  painLine?: T;
+  primaryKeyword?: T;
   summary?: T;
   icon?: T;
   cardDesign?: T;
