@@ -14,6 +14,7 @@ import { ProductInActionRowLabel as ProductInActionRowLabel_d7dd69772f9ce4c0396e
 import { BentoGridRowLabel as BentoGridRowLabel_9034f91f9a14222ac73beb8c9248a9e3 } from '@/blocks/BentoGrid/RowLabel'
 import { DetailedProductSuiteHighlightRowLabel as DetailedProductSuiteHighlightRowLabel_3a3e2c9b76634a20e9fc275d09b6cc82 } from '@/blocks/DetailedProductSuite/RowLabel'
 import { DetailedProductSuiteRowLabel as DetailedProductSuiteRowLabel_3a3e2c9b76634a20e9fc275d09b6cc82 } from '@/blocks/DetailedProductSuite/RowLabel'
+import { PastedLabelWarning as PastedLabelWarning_35f3fd548616dbae6bb302afdc801d3e } from '@/fields/PastedLabelWarning/Component'
 import { IntegrationsMarqueeRowLabel as IntegrationsMarqueeRowLabel_e40e127a1e15772294aa68668bfab915 } from '@/blocks/IntegrationsMarquee/RowLabel'
 import { CardDesignPickerField as CardDesignPickerField_54cd30ae39099e803142646c21b639ac } from '@/fields/CardDesignPicker/Component'
 import { UnorderedListFeatureClient as UnorderedListFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
@@ -62,6 +63,7 @@ export const importMap = {
   "@/blocks/BentoGrid/RowLabel#BentoGridRowLabel": BentoGridRowLabel_9034f91f9a14222ac73beb8c9248a9e3,
   "@/blocks/DetailedProductSuite/RowLabel#DetailedProductSuiteHighlightRowLabel": DetailedProductSuiteHighlightRowLabel_3a3e2c9b76634a20e9fc275d09b6cc82,
   "@/blocks/DetailedProductSuite/RowLabel#DetailedProductSuiteRowLabel": DetailedProductSuiteRowLabel_3a3e2c9b76634a20e9fc275d09b6cc82,
+  "@/fields/PastedLabelWarning/Component#PastedLabelWarning": PastedLabelWarning_35f3fd548616dbae6bb302afdc801d3e,
   "@/blocks/IntegrationsMarquee/RowLabel#IntegrationsMarqueeRowLabel": IntegrationsMarqueeRowLabel_e40e127a1e15772294aa68668bfab915,
   "@/fields/CardDesignPicker/Component#CardDesignPickerField": CardDesignPickerField_54cd30ae39099e803142646c21b639ac,
   "@payloadcms/richtext-lexical/client#UnorderedListFeatureClient": UnorderedListFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,

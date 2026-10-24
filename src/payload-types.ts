@@ -3112,10 +3112,78 @@ export interface AgenticFlowDemoBlock {
         handlers?: ('agent' | 'human')[] | null;
         resolveTitle: string;
         resolveText: string;
+        /**
+         * Shown only when it has both a text and somewhere to go.
+         */
+        link?: {
+          label?: string | null;
+          type?: ('reference' | 'custom') | null;
+          /**
+           * An agent links only once it has its own page.
+           */
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: string | Page;
+              } | null)
+            | ({
+                relationTo: 'microApps';
+                value: string | MicroApp;
+              } | null);
+          url?: string | null;
+          newTab?: boolean | null;
+        };
         id?: string | null;
       }[]
     | null;
   footnote?: string | null;
+  /**
+   * Empty hides it.
+   */
+  promptLabel?: string | null;
+  /**
+   * Empty uses Trigger, Route and Resolve, or in Agent features mode What it does, Features and Saves to your systems.
+   */
+  stageLabels?: {
+    trigger?: string | null;
+    route?: string | null;
+    resolve?: string | null;
+  };
+  handlerLabels?: {
+    agent?: string | null;
+    human?: string | null;
+  };
+  showFootnote?: boolean | null;
+  /**
+   * Each card's border, eyebrow and shadow.
+   */
+  accents: {
+    card1: 'crimson' | 'navy' | 'teal' | 'grey';
+    card2: 'crimson' | 'navy' | 'teal' | 'grey';
+    card3: 'crimson' | 'navy' | 'teal' | 'grey';
+  };
+  cardShadow?: boolean | null;
+  equalHeights?: boolean | null;
+  /**
+   * Empty: animated in Flow mode, still in Agent features mode.
+   */
+  lineStyle?: ('animated' | 'static' | 'none') | null;
+  /**
+   * Empty: grey in Flow mode, crimson in Agent features mode.
+   */
+  lineColor?: ('grey' | 'crimson' | 'navy') | null;
+  selectedStyle: 'solidCrimson' | 'solidNavy' | 'outline';
+  buttonSize: 'regular' | 'compact';
+  panelBackground: 'cloud' | 'white' | 'none';
+  panelBorder?: boolean | null;
+  /**
+   * Stops for good once a visitor clicks a button. Never runs for visitors who ask for reduced motion.
+   */
+  autoplay: 'off' | '6' | '8' | '10';
+  /**
+   * 1 is the first event. A number past the last event shows the first.
+   */
+  startEvent: number;
   /**
    * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
@@ -3262,2271 +3330,6 @@ export interface List {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "AgenticStatsBlock".
- */
-export interface AgenticStatsBlock {
-  eyebrow?: string | null;
-  heading?: string | null;
-  stats?:
-    | {
-        /**
-         * The number, without a % or + sign.
-         */
-        value?: number | null;
-        /**
-         * For example %, +, k or x.
-         */
-        suffix?: string | null;
-        label: string;
-        pending?: boolean | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
-   */
-  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'agenticStats';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "AgenticCartsDemoBlock".
- */
-export interface AgenticCartsDemoBlock {
-  heading: string;
-  intro?: string | null;
-  modelALabel?: string | null;
-  modelBLabel?: string | null;
-  /**
-   * The carts shown on load, in order. Visitors can add more up to six.
-   */
-  carts?:
-    | {
-        name: string;
-        historyCount?: number | null;
-        id?: string | null;
-      }[]
-    | null;
-  addLabel?: string | null;
-  noteB?: string | null;
-  noteA?: string | null;
-  /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
-   */
-  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'agenticCartsDemo';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "AgenticOrbitBlock".
- */
-export interface AgenticOrbitBlock {
-  heading: string;
-  intro?: string | null;
-  centreLabel?: string | null;
-  /**
-   * Each role orbits the centre. Hover or tap one to read its caption.
-   */
-  roles?:
-    | {
-        label: string;
-        subLabel?: string | null;
-        caption: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
-   */
-  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'agenticOrbit';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "AgenticEpisodeBlock".
- */
-export interface AgenticEpisodeBlock {
-  heading: string;
-  intro?:
-    | {
-        text: string;
-        id?: string | null;
-      }[]
-    | null;
-  startLabel?: string | null;
-  endLabel?: string | null;
-  /**
-   * Evenly spaced from start to end, in the order entered.
-   */
-  points?:
-    | {
-        label: string;
-        caption: string;
-        id?: string | null;
-      }[]
-    | null;
-  closing?: string | null;
-  /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
-   */
-  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'agenticEpisode';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "AgenticCasesBlock".
- */
-export interface AgenticCasesBlock {
-  heading: string;
-  hoverGlow?: boolean | null;
-  cases?:
-    | {
-        title: string;
-        text: string;
-        linkLabel?: string | null;
-        linkUrl?: string | null;
-        clientPending?: boolean | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
-   */
-  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'agenticCases';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "AgenticClosingBlock".
- */
-export interface AgenticClosingBlock {
-  heading: string;
-  ctaLabel: string;
-  ctaUrl: string;
-  /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
-   */
-  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'agenticClosing';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "IntegrationsMarqueeBlock".
- */
-export interface IntegrationsMarqueeBlock {
-  eyebrow?: string | null;
-  title?: string | null;
-  description?: string | null;
-  populateBy?: ('all' | 'filter' | 'selection' | 'manual') | null;
-  categories?: (string | IntegrationCategory)[] | null;
-  products?: (string | Product)[] | null;
-  featuredOnly?: boolean | null;
-  selectedDocs?: (string | Integration)[] | null;
-  limit?: number | null;
-  /**
-   * Order matters. Roughly the first half renders in the top row scrolling one direction, the rest in the bottom row scrolling the other direction.
-   */
-  logos?:
-    | {
-        /**
-         * If left empty, a plain colored monogram using the first letter of the name is shown instead, which is useful while real logos are still being collected.
-         */
-        logo?: (string | null) | Media;
-        name: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
-   */
-  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'integrationsMarquee';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "UseCasesBlock".
- */
-export interface UseCasesBlock {
-  label?: string | null;
-  heading?: string | null;
-  intro?: string | null;
-  cases?:
-    | {
-        /**
-         * For example Hospitals, Diagnostics, Universities.
-         */
-        sector?: string | null;
-        /**
-         * Name the job, e.g. "Appointment booking and rescheduling".
-         */
-        title: string;
-        description?: string | null;
-        /**
-         * A result, ideally measured. Leave empty rather than inventing one.
-         */
-        outcome?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
-   */
-  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'useCases';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "BenefitsBlock".
- */
-export interface BenefitsBlock {
-  label?: string | null;
-  heading?: string | null;
-  /**
-   * Say what changes for the customer, not what the software contains.
-   */
-  items?:
-    | {
-        title: string;
-        description?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
-   */
-  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'benefits';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "IntegrationsBlock".
- */
-export interface IntegrationsBlock {
-  label?: string | null;
-  heading?: string | null;
-  intro?: string | null;
-  /**
-   * For example: anything else connects over the NeuronCx REST API and webhooks.
-   */
-  footnote?: string | null;
-  populateBy?: ('all' | 'filter' | 'selection' | 'manual') | null;
-  categories?: (string | IntegrationCategory)[] | null;
-  products?: (string | Product)[] | null;
-  featuredOnly?: boolean | null;
-  selectedDocs?: (string | Integration)[] | null;
-  limit?: number | null;
-  items?:
-    | {
-        name: string;
-        /**
-         * What flows between the two systems, in plain words.
-         */
-        summary?: string | null;
-        /**
-         * Transparent PNG or SVG. Leave empty to show the name only.
-         */
-        logo?: (string | null) | Media;
-        id?: string | null;
-      }[]
-    | null;
-  cardDesign: {
-    design: 'grid' | 'logoCard' | 'directory' | 'feature' | 'story' | 'pill';
-    /**
-     * When off, every card uses the design above.
-     */
-    allowItemDesigns?: boolean | null;
-    /**
-     * Leave empty to fit as many as the width allows. If integrations use different designs and this is empty, every group shows 3 per row.
-     */
-    columns?: ('2' | '3' | '4') | null;
-    lastRow?: ('stretch' | 'center' | 'leave') | null;
-    /**
-     * Show a heading for each category.
-     */
-    groupByCategory?: boolean | null;
-    /**
-     * Used only for integrations that have their own page.
-     */
-    linkLabel?: string | null;
-    /**
-     * Lists the entry's key points under the description, up to 3.
-     */
-    showKeyPoints?: boolean | null;
-    look?: {
-      cardColor?: ('grey' | 'lavender' | 'white') | null;
-      border?: ('none' | 'solid' | 'gradient') | null;
-      borderColor?: ('blue' | 'violet' | 'crimson' | 'navy') | null;
-      /**
-       * A thin rule under the content, matches the border color.
-       */
-      accentLine?: boolean | null;
-    };
-  };
-  /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
-   */
-  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'integrations';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ContactFormBlock".
- */
-export interface ContactFormBlock {
-  label?: string | null;
-  heading?: string | null;
-  intro?: string | null;
-  buttonLabel?: string | null;
-  successMessage?: string | null;
-  showMessageField?: boolean | null;
-  /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
-   */
-  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'contactForm';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "HowItWorksBlock".
- */
-export interface HowItWorksBlock {
-  /**
-   * Small line above the heading.
-   */
-  label?: string | null;
-  /**
-   * The section heading.
-   */
-  heading: string;
-  intro?: string | null;
-  /**
-   * Numbered automatically. Three steps is the readable maximum for most visitors.
-   */
-  steps?:
-    | {
-        title: string;
-        description: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Leave empty to hide the button.
-   */
-  ctaLabel?: string | null;
-  ctaLink?: string | null;
-  /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
-   */
-  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'howItWorks';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "HowItWorks2Block".
- */
-export interface HowItWorks2Block {
-  /**
-   * Small line above the heading.
-   */
-  eyebrow?: string | null;
-  /**
-   * The section heading.
-   */
-  heading: string;
-  intro?: string | null;
-  /**
-   * 2 to 5 steps, in order. The numbers 01, 02 and so on come from the order, so leave them out of the titles.
-   */
-  steps?:
-    | {
-        title: string;
-        description: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
-   */
-  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'howItWorks2';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ClosingCTABlock".
- */
-export interface ClosingCTABlock {
-  /**
-   * The last thing a visitor reads. Make it a clear ask.
-   */
-  heading: string;
-  subhead?: string | null;
-  primaryLabel?: string | null;
-  primaryLink?: string | null;
-  secondaryLabel?: string | null;
-  secondaryLink?: string | null;
-  /**
-   * Optional, shown in italics. Keep it to a line, not a sentence.
-   */
-  tagline?: string | null;
-  /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
-   */
-  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'closingCta';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "FeatureThreadBlock".
- */
-export interface FeatureThreadBlock {
-  /**
-   * Optional. Leave empty to show the features with no heading.
-   */
-  heading?: string | null;
-  /**
-   * Leave empty to show all four. Pick one when this sits on a product page.
-   */
-  categories?: ('omnichannel-cx' | 'knowledge-base' | 'user-intelligence' | 'integrations')[] | null;
-  /**
-   * Only published features are shown, in the order set on each feature. One per category suits the home page; three or four suits a product page.
-   */
-  limitPerCategory?: number | null;
-  /**
-   * Tick this when the block is on the category page it would link to. Otherwise every entry links back to the page the visitor is already reading.
-   */
-  hideCategoryLinks?: boolean | null;
-  /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
-   */
-  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'featureThread';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ArticleGridBlock".
- */
-export interface ArticleGridBlock {
-  /**
-   * Heading above the articles.
-   */
-  heading?: string | null;
-  /**
-   * Optional line under the heading.
-   */
-  intro?: string | null;
-  /**
-   * How many articles to show. The most recently published appear first.
-   */
-  limit?: number | null;
-  /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
-   */
-  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'articleGrid';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "CallToActionBlock".
- */
-export interface CallToActionBlock {
-  richText?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  links?:
-    | {
-        link: {
-          type?: ('reference' | 'custom') | null;
-          newTab?: boolean | null;
-          reference?:
-            | ({
-                relationTo: 'pages';
-                value: string | Page;
-              } | null)
-            | ({
-                relationTo: 'posts';
-                value: string | Post;
-              } | null);
-          url?: string | null;
-          label: string;
-          /**
-           * Choose how the link should be rendered.
-           */
-          appearance?: ('default' | 'outline') | null;
-        };
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
-   */
-  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'cta';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ContentBlock".
- */
-export interface ContentBlock {
-  columns?:
-    | {
-        size?: ('oneThird' | 'half' | 'twoThirds' | 'full') | null;
-        richText?: {
-          root: {
-            type: string;
-            children: {
-              type: any;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        } | null;
-        enableLink?: boolean | null;
-        link?: {
-          type?: ('reference' | 'custom') | null;
-          newTab?: boolean | null;
-          reference?:
-            | ({
-                relationTo: 'pages';
-                value: string | Page;
-              } | null)
-            | ({
-                relationTo: 'posts';
-                value: string | Post;
-              } | null);
-          url?: string | null;
-          label: string;
-          /**
-           * Choose how the link should be rendered.
-           */
-          appearance?: ('default' | 'outline') | null;
-        };
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
-   */
-  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'content';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "MediaBlock".
- */
-export interface MediaBlock {
-  media: string | Media;
-  /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
-   */
-  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'mediaBlock';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ArchiveBlock".
- */
-export interface ArchiveBlock {
-  introContent?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  populateBy?: ('collection' | 'selection') | null;
-  relationTo?: 'posts' | null;
-  categories?: (string | Category)[] | null;
-  limit?: number | null;
-  selectedDocs?:
-    | {
-        relationTo: 'posts';
-        value: string | Post;
-      }[]
-    | null;
-  /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
-   */
-  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'archive';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "HeroFullBackgroundBlock".
- */
-export interface HeroFullBackgroundBlock {
-  /**
-   * Optional. Short, e.g. "AI automation for patient journeys".
-   */
-  eyebrow?: string | null;
-  /**
-   * This becomes the page’s main heading (the H1), so use it only once per page. Set the page hero above to "None" when this block is on the page.
-   */
-  headline: string;
-  /**
-   * One or two sentences under the headline. Optional.
-   */
-  subhead?: string | null;
-  /**
-   * Optional. Leave the label empty to hide this button.
-   */
-  primaryCta?: {
-    type?: ('reference' | 'custom') | null;
-    newTab?: boolean | null;
-    reference?:
-      | ({
-          relationTo: 'pages';
-          value: string | Page;
-        } | null)
-      | ({
-          relationTo: 'posts';
-          value: string | Post;
-        } | null);
-    url?: string | null;
-    label?: string | null;
-  };
-  /**
-   * Optional. Leave the label empty to hide this button.
-   */
-  secondaryCta?: {
-    type?: ('reference' | 'custom') | null;
-    newTab?: boolean | null;
-    reference?:
-      | ({
-          relationTo: 'pages';
-          value: string | Page;
-        } | null)
-      | ({
-          relationTo: 'posts';
-          value: string | Post;
-        } | null);
-    url?: string | null;
-    label?: string | null;
-  };
-  /**
-   * Optional. Up to three short lines, e.g. "New guide every two weeks". Shown with a small dot between them.
-   */
-  metaItems?:
-    | {
-        text: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Works best with photos, textures or abstract images that have a calm area on the left for the text. For diagrams or screenshots with their own text, set Media placement to Right. Use MP4 or WebM for moving backgrounds. GIFs work but load much slower, so keep them short and small.
-   */
-  media: string | Media;
-  /**
-   * Right suits a diagram, screenshot or infographic that already has its own text or busy detail.
-   */
-  mediaPlacement?: ('fullBleed' | 'right') | null;
-  /**
-   * Right placement only. Contain suits a diagram; Cover suits a photo.
-   */
-  mediaFit?: ('contain' | 'cover') | null;
-  /**
-   * Leave empty for a purely decorative background, the usual choice for a full-bleed hero. Fill this in only when the picture itself carries meaning a screen reader user needs to know.
-   */
-  mediaAlt?: string | null;
-  /**
-   * Only used when the background is a video. Shown while the video loads and when motion is off.
-   */
-  videoPoster?: (string | null) | Media;
-  /**
-   * Replaces the background above on phones and small tablets. Leave empty to use the same file on every screen size. Has no effect when Media placement is set to Right, because that layout already changes to a stacked image on phones.
-   */
-  mobileMedia?: (string | null) | Media;
-  /**
-   * Which part of the picture to keep in view when it gets cropped.
-   */
-  focalPoint?: ('center' | 'left' | 'right' | 'top' | 'bottom') | null;
-  /**
-   * Darkens the picture so the text stays readable. Strong is the safest default for a full-bleed photo.
-   */
-  overlayStrength?: ('light' | 'medium' | 'strong') | null;
-  /**
-   * How the text and background enter. Always off for a visitor whose device asks for reduced motion.
-   */
-  animation?: ('off' | 'subtle' | 'lively') | null;
-  /**
-   * On a phone the hero always fits its content.
-   */
-  height?: ('tall' | 'medium') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'heroFullBackground';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "HeroRightPlacementBlock".
- */
-export interface HeroRightPlacementBlock {
-  /**
-   * Optional. Short, e.g. "Bot swarm".
-   */
-  eyebrow?: string | null;
-  /**
-   * This becomes the page’s main heading (the H1), so use it only once per page. Set the page hero above to "None" when this block is on the page.
-   */
-  headline: string;
-  /**
-   * One or two sentences under the headline. Optional.
-   */
-  subhead?: string | null;
-  /**
-   * Optional. Leave the label empty to hide this button.
-   */
-  primaryCta?: {
-    type?: ('reference' | 'custom') | null;
-    newTab?: boolean | null;
-    reference?:
-      | ({
-          relationTo: 'pages';
-          value: string | Page;
-        } | null)
-      | ({
-          relationTo: 'posts';
-          value: string | Post;
-        } | null);
-    url?: string | null;
-    label?: string | null;
-  };
-  /**
-   * Optional. Leave the label empty to hide this button.
-   */
-  secondaryCta?: {
-    type?: ('reference' | 'custom') | null;
-    newTab?: boolean | null;
-    reference?:
-      | ({
-          relationTo: 'pages';
-          value: string | Page;
-        } | null)
-      | ({
-          relationTo: 'posts';
-          value: string | Post;
-        } | null);
-    url?: string | null;
-    label?: string | null;
-  };
-  /**
-   * Aim for 16:10. 2560 x 1600 is ideal. Nothing is ever cropped: the picture is fitted whole and pinned to the right, so a diagram or screenshot stays readable. But its left edge and its top and bottom edges fade out into the page, so keep labels and text clear of the left quarter and of the top and bottom tenth. Upload at least 2304 px wide so it stays sharp on a 2x screen; anything wider than 2560 px is scaled down to that width. WebP or PNG for diagrams and screenshots. For moving media use MP4 or WebM. A GIF is served at its original size with no resizing, so it looks soft when stretched across the panel and loads slowly.
-   */
-  media: string | Media;
-  /**
-   * Leave empty when the picture is purely illustrative. Fill this in when it carries meaning a screen reader user needs to know.
-   */
-  mediaAlt?: string | null;
-  /**
-   * Only used when the media above is a video. Shown while the video loads and when motion is off.
-   */
-  videoPoster?: (string | null) | Media;
-  /**
-   * The headline words fade in and the image slowly breathes. Always off for a visitor whose device asks for reduced motion.
-   */
-  animation?: ('on' | 'off') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'heroRightPlacement';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "HeroWorkforceGridBlock".
- */
-export interface HeroWorkforceGridBlock {
-  /**
-   * Optional. Short, e.g. "The workforce".
-   */
-  eyebrow?: string | null;
-  /**
-   * This becomes the page’s main heading (the H1), so use it only once per page. Set the page hero above to "None" when this block is on the page.
-   */
-  headline: string;
-  /**
-   * One or two sentences under the headline. Optional.
-   */
-  subhead?: string | null;
-  cta: {
-    type?: ('reference' | 'custom') | null;
-    newTab?: boolean | null;
-    reference?:
-      | ({
-          relationTo: 'pages';
-          value: string | Page;
-        } | null)
-      | ({
-          relationTo: 'posts';
-          value: string | Post;
-        } | null);
-    url?: string | null;
-    label: string;
-  };
-  /**
-   * Applies to every column.
-   */
-  speed?: ('slow' | 'medium' | 'fast') | null;
-  columns?: ('2' | '3' | '4') | null;
-  /**
-   * Distributed evenly across columns in the order you add them. Add at least 2 per column so the loop doesn’t feel short. Between 9 and 12 cards works well.
-   */
-  cards?:
-    | {
-        icon?:
-          | (
-              | 'message'
-              | 'chat'
-              | 'check'
-              | 'calendar'
-              | 'card'
-              | 'document'
-              | 'refresh'
-              | 'bolt'
-              | 'layers'
-              | 'gauge'
-              | 'plug'
-              | 'shield'
-              | 'shieldCheck'
-              | 'lock'
-              | 'globe'
-              | 'server'
-              | 'eye'
-              | 'users'
-              | 'user'
-              | 'phone'
-              | 'smartphone'
-              | 'mail'
-              | 'messageCircle'
-              | 'send'
-              | 'inbox'
-              | 'headphones'
-              | 'mic'
-              | 'video'
-              | 'bell'
-              | 'handshake'
-              | 'stethoscope'
-              | 'heartPulse'
-              | 'hospital'
-              | 'activity'
-              | 'flask'
-              | 'pill'
-              | 'graduationCap'
-              | 'building'
-              | 'mapPin'
-              | 'database'
-              | 'cloud'
-              | 'workflow'
-              | 'bot'
-              | 'sparkles'
-              | 'search'
-              | 'chart'
-              | 'trendingUp'
-              | 'target'
-              | 'rocket'
-              | 'key'
-              | 'fileText'
-              | 'clipboardList'
-              | 'link'
-              | 'settings'
-              | 'puzzle'
-              | 'timer'
-              | 'clock'
-              | 'badgeCheck'
-              | 'star'
-              | 'briefcase'
-            )
-          | null;
-        /**
-         * Short, e.g. "AI agent".
-         */
-        label?: string | null;
-        title: string;
-        /**
-         * One or two short lines.
-         */
-        description?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'heroWorkforceGrid';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "AgenticHeroBlock".
- */
-export interface AgenticHeroBlock {
-  /**
-   * Shown large across the top of the hero.
-   */
-  headline: string;
-  /**
-   * Comma-separated words from the headline to underline in the accent colour, e.g. "agentic, workflows".
-   */
-  accentWords?: string | null;
-  intro?: string | null;
-  ctaLabel?: string | null;
-  ctaUrl?: string | null;
-  /**
-   * Up to six nodes around the diagram. Leave empty to hide the diagram.
-   */
-  nodes?:
-    | {
-        label: string;
-        kind?: ('agent' | 'human' | 'system') | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'agenticHero';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ConversationHeroBlock".
- */
-export interface ConversationHeroBlock {
-  /**
-   * Optional. Short, e.g. "Omnichannel automation and reasoning".
-   */
-  eyebrow?: string | null;
-  /**
-   * Short and direct works best: around six to eight words.
-   */
-  headline: string;
-  /**
-   * One or two sentences explaining what the product does, in plain language.
-   */
-  subhead: string;
-  /**
-   * Sets the hero heading's font size in pixels. Keep it under about 48px for longer headlines so they don't wrap awkwardly.
-   */
-  headingSize?: number | null;
-  primaryButtonLabel?: string | null;
-  primaryButtonLink?: string | null;
-  secondaryButtonLabel?: string | null;
-  secondaryButtonLink?: string | null;
-  /**
-   * Short capability labels, e.g. "WhatsApp · Voice · Web". Two or three works best.
-   */
-  chips?:
-    | {
-        label: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * For example "WhatsApp · Ayurvaid Hospitals · 11:42".
-   */
-  conversationLabel?: string | null;
-  /**
-   * One message per line. Start a line with "them:" for the customer, "us:" for the agent, and "tag:" for a system note at the end.
-   */
-  conversation?: string | null;
-  /**
-   * Optional. What fires behind the scenes, e.g. Booked, Paid, Reminder sent.
-   */
-  workflowSteps?:
-    | {
-        label: string;
-        icon?:
-          | (
-              | 'message'
-              | 'chat'
-              | 'check'
-              | 'calendar'
-              | 'card'
-              | 'document'
-              | 'refresh'
-              | 'bolt'
-              | 'layers'
-              | 'gauge'
-              | 'plug'
-              | 'shield'
-              | 'shieldCheck'
-              | 'lock'
-              | 'globe'
-              | 'server'
-              | 'eye'
-              | 'users'
-              | 'user'
-              | 'phone'
-              | 'smartphone'
-              | 'mail'
-              | 'messageCircle'
-              | 'send'
-              | 'inbox'
-              | 'headphones'
-              | 'mic'
-              | 'video'
-              | 'bell'
-              | 'handshake'
-              | 'stethoscope'
-              | 'heartPulse'
-              | 'hospital'
-              | 'activity'
-              | 'flask'
-              | 'pill'
-              | 'graduationCap'
-              | 'building'
-              | 'mapPin'
-              | 'database'
-              | 'cloud'
-              | 'workflow'
-              | 'bot'
-              | 'sparkles'
-              | 'search'
-              | 'chart'
-              | 'trendingUp'
-              | 'target'
-              | 'rocket'
-              | 'key'
-              | 'fileText'
-              | 'clipboardList'
-              | 'link'
-              | 'settings'
-              | 'puzzle'
-              | 'timer'
-              | 'clock'
-              | 'badgeCheck'
-              | 'star'
-              | 'briefcase'
-            )
-          | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Optional. These sit directly under the hero, so use real, defensible figures only.
-   */
-  stats?:
-    | {
-        /**
-         * e.g. 40%, 2.5x, 14+
-         */
-        value: string;
-        /**
-         * What the number means, in three or four words.
-         */
-        label: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'conversationHero';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "HeroStackBlock".
- */
-export interface HeroStackBlock {
-  /**
-   * Optional. For example "Acquire · Engage · Retain".
-   */
-  eyebrow?: string | null;
-  heading: string;
-  /**
-   * Optional. One or two sentences under the heading. Hidden on phones to keep the hero short.
-   */
-  intro?: string | null;
-  primaryCta?: {
-    label?: string | null;
-    /**
-     * A full address, a page path such as /contact, or #section-id for a section on this page.
-     */
-    href?: string | null;
-  };
-  secondaryCta?: {
-    label?: string | null;
-    /**
-     * A full address, a page path such as /contact, or #section-id for a section on this page.
-     */
-    href?: string | null;
-  };
-  /**
-   * Each product is one screenshot card in the stack. The first one sits on top; scrolling deals them away in this order.
-   */
-  products: {
-    label: string;
-    caption?: string | null;
-    /**
-     * Shown in a 16:10 card. Upload at 1600 x 1000 (16:10) so nothing is trimmed. A taller image is trimmed at the bottom, a wider one at the right.
-     */
-    screenshot: string | Media;
-    id?: string | null;
-  }[];
-  showFrame?: boolean | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'heroStack';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "PlatformLayersBlock".
- */
-export interface PlatformLayersBlock {
-  /**
-   * e.g. The platform
-   */
-  eyebrow?: string | null;
-  heading: string;
-  /**
-   * e.g. Scroll to move through the stack. Each layer builds on the one before it.
-   */
-  intro?: string | null;
-  /**
-   * Each one takes a screen as the visitor scrolls, so keep the list short.
-   */
-  layers?:
-    | {
-        title: string;
-        description: string;
-        /**
-         * Optional, e.g. Core or Adjacent.
-         */
-        tag?: string | null;
-        icon?:
-          | (
-              | 'message'
-              | 'chat'
-              | 'check'
-              | 'calendar'
-              | 'card'
-              | 'document'
-              | 'refresh'
-              | 'bolt'
-              | 'layers'
-              | 'gauge'
-              | 'plug'
-              | 'shield'
-              | 'shieldCheck'
-              | 'lock'
-              | 'globe'
-              | 'server'
-              | 'eye'
-              | 'users'
-              | 'user'
-              | 'phone'
-              | 'smartphone'
-              | 'mail'
-              | 'messageCircle'
-              | 'send'
-              | 'inbox'
-              | 'headphones'
-              | 'mic'
-              | 'video'
-              | 'bell'
-              | 'handshake'
-              | 'stethoscope'
-              | 'heartPulse'
-              | 'hospital'
-              | 'activity'
-              | 'flask'
-              | 'pill'
-              | 'graduationCap'
-              | 'building'
-              | 'mapPin'
-              | 'database'
-              | 'cloud'
-              | 'workflow'
-              | 'bot'
-              | 'sparkles'
-              | 'search'
-              | 'chart'
-              | 'trendingUp'
-              | 'target'
-              | 'rocket'
-              | 'key'
-              | 'fileText'
-              | 'clipboardList'
-              | 'link'
-              | 'settings'
-              | 'puzzle'
-              | 'timer'
-              | 'clock'
-              | 'badgeCheck'
-              | 'star'
-              | 'briefcase'
-            )
-          | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'platformLayers';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "TrustPanelBlock".
- */
-export interface TrustPanelBlock {
-  /**
-   * e.g. Deployment & trust
-   */
-  eyebrow?: string | null;
-  heading: string;
-  intro?: string | null;
-  buttonLabel?: string | null;
-  buttonHref?: string | null;
-  /**
-   * Claims here are read closely during procurement, so only state what you can evidence.
-   */
-  cards?:
-    | {
-        title: string;
-        description: string;
-        icon?:
-          | (
-              | 'message'
-              | 'chat'
-              | 'check'
-              | 'calendar'
-              | 'card'
-              | 'document'
-              | 'refresh'
-              | 'bolt'
-              | 'layers'
-              | 'gauge'
-              | 'plug'
-              | 'shield'
-              | 'shieldCheck'
-              | 'lock'
-              | 'globe'
-              | 'server'
-              | 'eye'
-              | 'users'
-              | 'user'
-              | 'phone'
-              | 'smartphone'
-              | 'mail'
-              | 'messageCircle'
-              | 'send'
-              | 'inbox'
-              | 'headphones'
-              | 'mic'
-              | 'video'
-              | 'bell'
-              | 'handshake'
-              | 'stethoscope'
-              | 'heartPulse'
-              | 'hospital'
-              | 'activity'
-              | 'flask'
-              | 'pill'
-              | 'graduationCap'
-              | 'building'
-              | 'mapPin'
-              | 'database'
-              | 'cloud'
-              | 'workflow'
-              | 'bot'
-              | 'sparkles'
-              | 'search'
-              | 'chart'
-              | 'trendingUp'
-              | 'target'
-              | 'rocket'
-              | 'key'
-              | 'fileText'
-              | 'clipboardList'
-              | 'link'
-              | 'settings'
-              | 'puzzle'
-              | 'timer'
-              | 'clock'
-              | 'badgeCheck'
-              | 'star'
-              | 'briefcase'
-            )
-          | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'trustPanel';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "StatBandBlock".
- */
-export interface StatBandBlock {
-  /**
-   * Use figures you could defend if a prospect asked how you measured them. Three or four works best.
-   */
-  stats?:
-    | {
-        /**
-         * e.g. 4 industries, 1,300+
-         */
-        value: string;
-        /**
-         * What the number means.
-         */
-        label: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Optional. Use it to say how the figures are measured or over what period, not to disclaim them.
-   */
-  note?: string | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'statBand';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "IntegrationsLandingBlock".
- */
-export interface IntegrationsLandingBlock {
-  /**
-   * Leave empty to use the main record (the one with Is main on). The page shows its hero, the integrations by category, its sections, FAQ and closing. Set the page hero to None.
-   */
-  master?: (string | null) | IntegrationsMaster;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'integrationsLanding';
-}
-/**
- * Integration landing pages, and the wording shared by every integration item page.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "integrationsMaster".
- */
-export interface IntegrationsMaster {
-  id: string;
-  /**
-   * For editors, for example Main integrations page.
-   */
-  name: string;
-  /**
-   * Lowercase, dashes only. Cannot be the same as an integration item slug.
-   */
-  slug: string;
-  /**
-   * The main integrations page. Integration item pages take their section headings from this record. Only one record can have it on.
-   */
-  isMain?: boolean | null;
-  /**
-   * Leave both empty to list every live integration.
-   */
-  filter?: {
-    categories?: (string | IntegrationCategory)[] | null;
-    products?: (string | Product)[] | null;
-  };
-  /**
-   * The search phrase this page should rank for, for example whatsapp crm integration.
-   */
-  primaryKeyword?: string | null;
-  /**
-   * Up to 5 related phrases.
-   */
-  secondaryKeywords?:
-    | {
-        keyword: string;
-        id?: string | null;
-      }[]
-    | null;
-  meta?: {
-    title?: string | null;
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (string | null) | Media;
-    description?: string | null;
-  };
-  /**
-   * The small line above the heading, for example Integrations.
-   */
-  eyebrow?: string | null;
-  /**
-   * The page heading, for example: Connect NeuronCx to the systems you already run.
-   */
-  h1: string;
-  subheading?: string | null;
-  /**
-   * Centred has no image.
-   */
-  heroLayout?: ('left' | 'centred') | null;
-  /**
-   * Up to 7 integrations shown around the hero.
-   */
-  heroSystems?: (string | Integration)[] | null;
-  logoStripOn?: boolean | null;
-  logoStrip?: {
-    populateBy?: ('all' | 'filter' | 'selection') | null;
-    categories?: (string | IntegrationCategory)[] | null;
-    products?: (string | Product)[] | null;
-    featuredOnly?: boolean | null;
-    selectedDocs?: (string | Integration)[] | null;
-    limit?: number | null;
-  };
-  hero?: {
-    /**
-     * Optional, next to the main button, for example: See Omnichannel CX. Type a label to choose where it goes.
-     */
-    secondaryCta?: {
-      label?: string | null;
-      link?: {
-        type?: ('reference' | 'custom') | null;
-        newTab?: boolean | null;
-        reference?:
-          | ({
-              relationTo: 'pages';
-              value: string | Page;
-            } | null)
-          | ({
-              relationTo: 'posts';
-              value: string | Post;
-            } | null);
-        url?: string | null;
-      };
-    };
-    /**
-     * Optional. An illustration beside the hero, such as the hub diagram.
-     */
-    image?: (string | null) | Media;
-  };
-  integrationSections?:
-    | {
-        category: string | IntegrationCategory;
-        /**
-         * The small line above the heading, for example Telephony and dialers.
-         */
-        eyebrow?: string | null;
-        heading?: string | null;
-        /**
-         * Optional. Leave empty for no intro line.
-         */
-        intro?: string | null;
-        usePageDesign?: boolean | null;
-        cardDesign?: {
-          design: 'grid' | 'logoCard' | 'directory' | 'feature' | 'story' | 'pill';
-          /**
-           * When off, every card uses the design above.
-           */
-          allowItemDesigns?: boolean | null;
-          /**
-           * Leave empty to fit as many as the width allows. If integrations use different designs and this is empty, every group shows 3 per row.
-           */
-          columns?: ('2' | '3' | '4') | null;
-          lastRow?: ('stretch' | 'center' | 'leave') | null;
-          /**
-           * Show a heading for each category.
-           */
-          groupByCategory?: boolean | null;
-          /**
-           * Used only for integrations that have their own page.
-           */
-          linkLabel?: string | null;
-          /**
-           * Lists the entry's key points under the description, up to 3.
-           */
-          showKeyPoints?: boolean | null;
-          look?: {
-            cardColor?: ('grey' | 'lavender' | 'white') | null;
-            border?: ('none' | 'solid' | 'gradient') | null;
-            borderColor?: ('blue' | 'violet' | 'crimson' | 'navy') | null;
-            /**
-             * A thin rule under the content, matches the border color.
-             */
-            accentLine?: boolean | null;
-          };
-        };
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * The default look for every section on this page.
-   */
-  cardDesign: {
-    design: 'grid' | 'logoCard' | 'directory' | 'feature' | 'story' | 'pill';
-    /**
-     * When off, every card uses the design above.
-     */
-    allowItemDesigns?: boolean | null;
-    /**
-     * Leave empty to fit as many as the width allows. If integrations use different designs and this is empty, every group shows 3 per row.
-     */
-    columns?: ('2' | '3' | '4') | null;
-    lastRow?: ('stretch' | 'center' | 'leave') | null;
-    /**
-     * Show a heading for each category.
-     */
-    groupByCategory?: boolean | null;
-    /**
-     * Used only for integrations that have their own page.
-     */
-    linkLabel?: string | null;
-    /**
-     * Lists the entry's key points under the description, up to 3.
-     */
-    showKeyPoints?: boolean | null;
-    look?: {
-      cardColor?: ('grey' | 'lavender' | 'white') | null;
-      border?: ('none' | 'solid' | 'gradient') | null;
-      borderColor?: ('blue' | 'violet' | 'crimson' | 'navy') | null;
-      /**
-       * A thin rule under the content, matches the border color.
-       */
-      accentLine?: boolean | null;
-    };
-  };
-  /**
-   * Leave empty to show: What connecting your systems gives you
-   */
-  fiveThingsHeading?: string | null;
-  /**
-   * 3 to 5 points, each with a title and one line.
-   */
-  fiveThings?:
-    | {
-        title: string;
-        line: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Leave empty to show: When feeds go wrong
-   */
-  whenFeedsGoWrongHeading?: string | null;
-  /**
-   * Common failures and what NeuronCx does, for example: The vendor stops sending updates.
-   */
-  whenFeedsGoWrong?:
-    | {
-        problem: string;
-        whatHappens: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Type a heading to choose where the card links.
-   */
-  apiCard?: {
-    heading?: string | null;
-    line?: string | null;
-    /**
-     * Leave empty to show: Get in touch
-     */
-    buttonLabel?: string | null;
-    link?: {
-      type?: ('reference' | 'custom') | null;
-      newTab?: boolean | null;
-      reference?:
-        | ({
-            relationTo: 'pages';
-            value: string | Page;
-          } | null)
-        | ({
-            relationTo: 'posts';
-            value: string | Post;
-          } | null);
-      url?: string | null;
-    };
-  };
-  labels?: {
-    /**
-     * For example: What moves between {name} and NeuronCx
-     */
-    statusTable?: string | null;
-    /**
-     * For example: When things do not go to plan
-     */
-    edgeCases?: string | null;
-    /**
-     * For example: What it takes to connect {name}
-     */
-    setup?: string | null;
-    /**
-     * For example: Other systems like {name}
-     */
-    related?: string | null;
-  };
-  /**
-   * Leave empty to show: Questions about integrations
-   */
-  faqHeading?: string | null;
-  /**
-   * Up to 6. Questions phrased the way a buyer would ask them.
-   */
-  faqs?:
-    | {
-        question: string;
-        /**
-         * Plain text, no formatting.
-         */
-        answer: string;
-        id?: string | null;
-      }[]
-    | null;
-  closing?: {
-    /**
-     * The closing panel's heading, for example: Tell us what you're running.
-     */
-    heading?: string | null;
-    /**
-     * One or two sentences under the heading.
-     */
-    subheading?: string | null;
-  };
-  /**
-   * The closing button. Type a label to choose where it goes.
-   */
-  cta?: {
-    label?: string | null;
-    link?: {
-      type?: ('reference' | 'custom') | null;
-      newTab?: boolean | null;
-      reference?:
-        | ({
-            relationTo: 'pages';
-            value: string | Page;
-          } | null)
-        | ({
-            relationTo: 'posts';
-            value: string | Post;
-          } | null);
-      url?: string | null;
-    };
-  };
-  /**
-   * Sent before the list of integrations. Aim for 300 characters.
-   */
-  waIntro?: string | null;
-  /**
-   * The button that opens the list, for example See systems.
-   */
-  waListButton?: string | null;
-  /**
-   * The heading above the rows in the list.
-   */
-  waSectionTitle?: string | null;
-  /**
-   * Sent when someone asks about a system that is not listed, for example: We connect to most booking systems. Tell us which one you use.
-   */
-  waFallback?: string | null;
-  /**
-   * Only published entries with this on are sent to the knowledge base.
-   */
-  includeInKbase?: boolean | null;
-  /**
-   * A complete answer to "What is this?", written for the virtual agents.
-   */
-  kbAnswer?: string | null;
-  /**
-   * Short, checkable facts. One fact per line.
-   */
-  kbFacts?:
-    | {
-        fact: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * How a customer might ask about it.
-   */
-  kbQuestions?:
-    | {
-        question: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Other names people use for it.
-   */
-  kbSynonyms?:
-    | {
-        synonym: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * So answers that have gone stale can be found and fixed.
-   */
-  kbLastReviewed?: string | null;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "WhatsappWidgetBlock".
- */
-export interface WhatsappWidgetBlock {
-  enabled?: boolean | null;
-  /**
-   * In E.164 form, e.g. +919876543210. Used to build the chat link; the number itself is not shown on the page.
-   */
-  phone?: string | null;
-  label?: string | null;
-  /**
-   * What the visitor sends. The page reference is appended to it.
-   */
-  prefill?: string | null;
-  /**
-   * Appends [ref: page-slug] so the enquiry arrives already routed.
-   */
-  includeRef?: boolean | null;
-  /**
-   * For example "Mon–Sat, 9am–7pm IST". Not shown yet; reserved for a panel.
-   */
-  hoursNote?: string | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'whatsappWidget';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "FAQBlock".
- */
-export interface FAQBlock {
-  heading: string;
-  /**
-   * Optional. One short paragraph above the list.
-   */
-  intro?: string | null;
-  /**
-   * Keep answers short, roughly 40 to 60 words each. If one needs to run long, it should be the exception, not the pattern.
-   */
-  items: {
-    question: string;
-    answer: {
-      root: {
-        type: string;
-        children: {
-          type: any;
-          version: number;
-          [k: string]: unknown;
-        }[];
-        direction: ('ltr' | 'rtl') | null;
-        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-        indent: number;
-        version: number;
-      };
-      [k: string]: unknown;
-    };
-    defaultOpen?: boolean | null;
-    id?: string | null;
-  }[];
-  background?: ('white' | 'cloud') | null;
-  /**
-   * Optional id for deep linking, e.g. faq
-   */
-  anchorId?: string | null;
-  emitSchema?: boolean | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'faq';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "PlatformLayersTwoBlock".
- */
-export interface PlatformLayersTwoBlock {
-  /**
-   * Short uppercase label above the heading. Optional.
-   */
-  eyebrow?: string | null;
-  heading: string;
-  intro?: string | null;
-  /**
-   * Navy inverts the heading and body text. Cards stay light.
-   */
-  theme?: ('light' | 'navy') | null;
-  /**
-   * Shows the numbered list in the sticky left column on large screens
-   */
-  showIndicators?: boolean | null;
-  /**
-   * Optional. Lets a link such as #platform-stack jump to this block.
-   */
-  anchorId?: string | null;
-  /**
-   * Numbered in the order listed. Three to six layers.
-   */
-  layers: {
-    title: string;
-    /**
-     * Short pill label such as "Unified Ingestion". Optional.
-     */
-    tag?: string | null;
-    /**
-     * One or two sentences, roughly 20 to 35 words
-     */
-    description: string;
-    /**
-     * Small line with a tick icon under the description. Optional.
-     */
-    footnote?: string | null;
-    /**
-     * Optional link shown in the card foot.
-     */
-    link?: {
-      label?: string | null;
-      type?: ('internal' | 'external') | null;
-      page?: (string | null) | Page;
-      url?: string | null;
-    };
-    id?: string | null;
-  }[];
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'platformLayersTwo';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "HubLayersSection".
- */
-export interface HubLayersSection {
-  /**
-   * Leave empty to show the default heading: "What sits underneath". Words in braces, such as {name}, are filled in for each entry.
-   */
-  heading?: string | null;
-  /**
-   * The small line above the heading.
-   */
-  eyebrow?: string | null;
-  /**
-   * One or two sentences under the heading.
-   */
-  intro?: string | null;
-  layers?:
-    | {
-        title: string;
-        line?: string | null;
-        /**
-         * An entry in any content collection, or a page.
-         */
-        link?:
-          | ({
-              relationTo: 'microApps';
-              value: string | MicroApp;
-            } | null)
-          | ({
-              relationTo: 'pages';
-              value: string | Page;
-            } | null);
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
-   */
-  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'hubLayersSection';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -6447,6 +4250,2271 @@ export interface CrmFeature {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "MediaBlock".
+ */
+export interface MediaBlock {
+  media: string | Media;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'mediaBlock';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BenefitsBlock".
+ */
+export interface BenefitsBlock {
+  label?: string | null;
+  heading?: string | null;
+  /**
+   * Say what changes for the customer, not what the software contains.
+   */
+  items?:
+    | {
+        title: string;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'benefits';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CallToActionBlock".
+ */
+export interface CallToActionBlock {
+  richText?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  links?:
+    | {
+        link: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: string | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: string | Post;
+              } | null);
+          url?: string | null;
+          label: string;
+          /**
+           * Choose how the link should be rendered.
+           */
+          appearance?: ('default' | 'outline') | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'cta';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ContentBlock".
+ */
+export interface ContentBlock {
+  columns?:
+    | {
+        size?: ('oneThird' | 'half' | 'twoThirds' | 'full') | null;
+        richText?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        enableLink?: boolean | null;
+        link?: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: string | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: string | Post;
+              } | null);
+          url?: string | null;
+          label: string;
+          /**
+           * Choose how the link should be rendered.
+           */
+          appearance?: ('default' | 'outline') | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'content';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HowItWorks2Block".
+ */
+export interface HowItWorks2Block {
+  /**
+   * Small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * The section heading.
+   */
+  heading: string;
+  intro?: string | null;
+  /**
+   * 2 to 5 steps, in order. The numbers 01, 02 and so on come from the order, so leave them out of the titles.
+   */
+  steps?:
+    | {
+        title: string;
+        description: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'howItWorks2';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StatBandBlock".
+ */
+export interface StatBandBlock {
+  /**
+   * Use figures you could defend if a prospect asked how you measured them. Three or four works best.
+   */
+  stats?:
+    | {
+        /**
+         * e.g. 4 industries, 1,300+
+         */
+        value: string;
+        /**
+         * What the number means.
+         */
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Optional. Use it to say how the figures are measured or over what period, not to disclaim them.
+   */
+  note?: string | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'statBand';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TrustPanelBlock".
+ */
+export interface TrustPanelBlock {
+  /**
+   * e.g. Deployment & trust
+   */
+  eyebrow?: string | null;
+  heading: string;
+  intro?: string | null;
+  buttonLabel?: string | null;
+  buttonHref?: string | null;
+  /**
+   * Claims here are read closely during procurement, so only state what you can evidence.
+   */
+  cards?:
+    | {
+        title: string;
+        description: string;
+        icon?:
+          | (
+              | 'message'
+              | 'chat'
+              | 'check'
+              | 'calendar'
+              | 'card'
+              | 'document'
+              | 'refresh'
+              | 'bolt'
+              | 'layers'
+              | 'gauge'
+              | 'plug'
+              | 'shield'
+              | 'shieldCheck'
+              | 'lock'
+              | 'globe'
+              | 'server'
+              | 'eye'
+              | 'users'
+              | 'user'
+              | 'phone'
+              | 'smartphone'
+              | 'mail'
+              | 'messageCircle'
+              | 'send'
+              | 'inbox'
+              | 'headphones'
+              | 'mic'
+              | 'video'
+              | 'bell'
+              | 'handshake'
+              | 'stethoscope'
+              | 'heartPulse'
+              | 'hospital'
+              | 'activity'
+              | 'flask'
+              | 'pill'
+              | 'graduationCap'
+              | 'building'
+              | 'mapPin'
+              | 'database'
+              | 'cloud'
+              | 'workflow'
+              | 'bot'
+              | 'sparkles'
+              | 'search'
+              | 'chart'
+              | 'trendingUp'
+              | 'target'
+              | 'rocket'
+              | 'key'
+              | 'fileText'
+              | 'clipboardList'
+              | 'link'
+              | 'settings'
+              | 'puzzle'
+              | 'timer'
+              | 'clock'
+              | 'badgeCheck'
+              | 'star'
+              | 'briefcase'
+            )
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'trustPanel';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AgenticStatsBlock".
+ */
+export interface AgenticStatsBlock {
+  eyebrow?: string | null;
+  heading?: string | null;
+  stats?:
+    | {
+        /**
+         * The number, without a % or + sign.
+         */
+        value?: number | null;
+        /**
+         * For example %, +, k or x.
+         */
+        suffix?: string | null;
+        label: string;
+        pending?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'agenticStats';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AgenticCartsDemoBlock".
+ */
+export interface AgenticCartsDemoBlock {
+  heading: string;
+  intro?: string | null;
+  modelALabel?: string | null;
+  modelBLabel?: string | null;
+  /**
+   * The carts shown on load, in order. Visitors can add more up to six.
+   */
+  carts?:
+    | {
+        name: string;
+        historyCount?: number | null;
+        id?: string | null;
+      }[]
+    | null;
+  addLabel?: string | null;
+  noteB?: string | null;
+  noteA?: string | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'agenticCartsDemo';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AgenticOrbitBlock".
+ */
+export interface AgenticOrbitBlock {
+  heading: string;
+  intro?: string | null;
+  centreLabel?: string | null;
+  /**
+   * Each role orbits the centre. Hover or tap one to read its caption.
+   */
+  roles?:
+    | {
+        label: string;
+        subLabel?: string | null;
+        caption: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'agenticOrbit';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AgenticEpisodeBlock".
+ */
+export interface AgenticEpisodeBlock {
+  heading: string;
+  intro?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  startLabel?: string | null;
+  endLabel?: string | null;
+  /**
+   * Evenly spaced from start to end, in the order entered.
+   */
+  points?:
+    | {
+        label: string;
+        caption: string;
+        id?: string | null;
+      }[]
+    | null;
+  closing?: string | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'agenticEpisode';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AgenticCasesBlock".
+ */
+export interface AgenticCasesBlock {
+  heading: string;
+  hoverGlow?: boolean | null;
+  cases?:
+    | {
+        title: string;
+        text: string;
+        linkLabel?: string | null;
+        linkUrl?: string | null;
+        clientPending?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'agenticCases';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AgenticClosingBlock".
+ */
+export interface AgenticClosingBlock {
+  heading: string;
+  ctaLabel: string;
+  ctaUrl: string;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'agenticClosing';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IntegrationsMarqueeBlock".
+ */
+export interface IntegrationsMarqueeBlock {
+  eyebrow?: string | null;
+  title?: string | null;
+  description?: string | null;
+  populateBy?: ('all' | 'filter' | 'selection' | 'manual') | null;
+  categories?: (string | IntegrationCategory)[] | null;
+  products?: (string | Product)[] | null;
+  featuredOnly?: boolean | null;
+  selectedDocs?: (string | Integration)[] | null;
+  limit?: number | null;
+  /**
+   * Order matters. Roughly the first half renders in the top row scrolling one direction, the rest in the bottom row scrolling the other direction.
+   */
+  logos?:
+    | {
+        /**
+         * If left empty, a plain colored monogram using the first letter of the name is shown instead, which is useful while real logos are still being collected.
+         */
+        logo?: (string | null) | Media;
+        name: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'integrationsMarquee';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "UseCasesBlock".
+ */
+export interface UseCasesBlock {
+  label?: string | null;
+  heading?: string | null;
+  intro?: string | null;
+  cases?:
+    | {
+        /**
+         * For example Hospitals, Diagnostics, Universities.
+         */
+        sector?: string | null;
+        /**
+         * Name the job, e.g. "Appointment booking and rescheduling".
+         */
+        title: string;
+        description?: string | null;
+        /**
+         * A result, ideally measured. Leave empty rather than inventing one.
+         */
+        outcome?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'useCases';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IntegrationsBlock".
+ */
+export interface IntegrationsBlock {
+  label?: string | null;
+  heading?: string | null;
+  intro?: string | null;
+  /**
+   * For example: anything else connects over the NeuronCx REST API and webhooks.
+   */
+  footnote?: string | null;
+  populateBy?: ('all' | 'filter' | 'selection' | 'manual') | null;
+  categories?: (string | IntegrationCategory)[] | null;
+  products?: (string | Product)[] | null;
+  featuredOnly?: boolean | null;
+  selectedDocs?: (string | Integration)[] | null;
+  limit?: number | null;
+  items?:
+    | {
+        name: string;
+        /**
+         * What flows between the two systems, in plain words.
+         */
+        summary?: string | null;
+        /**
+         * Transparent PNG or SVG. Leave empty to show the name only.
+         */
+        logo?: (string | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  cardDesign: {
+    design: 'grid' | 'logoCard' | 'directory' | 'feature' | 'story' | 'pill';
+    /**
+     * When off, every card uses the design above.
+     */
+    allowItemDesigns?: boolean | null;
+    /**
+     * Leave empty to fit as many as the width allows. If integrations use different designs and this is empty, every group shows 3 per row.
+     */
+    columns?: ('2' | '3' | '4') | null;
+    lastRow?: ('stretch' | 'center' | 'leave') | null;
+    /**
+     * Show a heading for each category.
+     */
+    groupByCategory?: boolean | null;
+    /**
+     * Used only for integrations that have their own page.
+     */
+    linkLabel?: string | null;
+    /**
+     * Lists the entry's key points under the description, up to 3.
+     */
+    showKeyPoints?: boolean | null;
+    look?: {
+      cardColor?: ('grey' | 'lavender' | 'white') | null;
+      border?: ('none' | 'solid' | 'gradient') | null;
+      borderColor?: ('blue' | 'violet' | 'crimson' | 'navy') | null;
+      /**
+       * A thin rule under the content, matches the border color.
+       */
+      accentLine?: boolean | null;
+    };
+  };
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'integrations';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ContactFormBlock".
+ */
+export interface ContactFormBlock {
+  label?: string | null;
+  heading?: string | null;
+  intro?: string | null;
+  buttonLabel?: string | null;
+  successMessage?: string | null;
+  showMessageField?: boolean | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'contactForm';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HowItWorksBlock".
+ */
+export interface HowItWorksBlock {
+  /**
+   * Small line above the heading.
+   */
+  label?: string | null;
+  /**
+   * The section heading.
+   */
+  heading: string;
+  intro?: string | null;
+  /**
+   * Numbered automatically. Three steps is the readable maximum for most visitors.
+   */
+  steps?:
+    | {
+        title: string;
+        description: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Leave empty to hide the button.
+   */
+  ctaLabel?: string | null;
+  ctaLink?: string | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'howItWorks';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ClosingCTABlock".
+ */
+export interface ClosingCTABlock {
+  /**
+   * The last thing a visitor reads. Make it a clear ask.
+   */
+  heading: string;
+  subhead?: string | null;
+  primaryLabel?: string | null;
+  primaryLink?: string | null;
+  secondaryLabel?: string | null;
+  secondaryLink?: string | null;
+  /**
+   * Optional, shown in italics. Keep it to a line, not a sentence.
+   */
+  tagline?: string | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'closingCta';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FeatureThreadBlock".
+ */
+export interface FeatureThreadBlock {
+  /**
+   * Optional. Leave empty to show the features with no heading.
+   */
+  heading?: string | null;
+  /**
+   * Leave empty to show all four. Pick one when this sits on a product page.
+   */
+  categories?: ('omnichannel-cx' | 'knowledge-base' | 'user-intelligence' | 'integrations')[] | null;
+  /**
+   * Only published features are shown, in the order set on each feature. One per category suits the home page; three or four suits a product page.
+   */
+  limitPerCategory?: number | null;
+  /**
+   * Tick this when the block is on the category page it would link to. Otherwise every entry links back to the page the visitor is already reading.
+   */
+  hideCategoryLinks?: boolean | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'featureThread';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ArticleGridBlock".
+ */
+export interface ArticleGridBlock {
+  /**
+   * Heading above the articles.
+   */
+  heading?: string | null;
+  /**
+   * Optional line under the heading.
+   */
+  intro?: string | null;
+  /**
+   * How many articles to show. The most recently published appear first.
+   */
+  limit?: number | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'articleGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ArchiveBlock".
+ */
+export interface ArchiveBlock {
+  introContent?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  populateBy?: ('collection' | 'selection') | null;
+  relationTo?: 'posts' | null;
+  categories?: (string | Category)[] | null;
+  limit?: number | null;
+  selectedDocs?:
+    | {
+        relationTo: 'posts';
+        value: string | Post;
+      }[]
+    | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'archive';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroFullBackgroundBlock".
+ */
+export interface HeroFullBackgroundBlock {
+  /**
+   * Optional. Short, e.g. "AI automation for patient journeys".
+   */
+  eyebrow?: string | null;
+  /**
+   * This becomes the page’s main heading (the H1), so use it only once per page. Set the page hero above to "None" when this block is on the page.
+   */
+  headline: string;
+  /**
+   * One or two sentences under the headline. Optional.
+   */
+  subhead?: string | null;
+  /**
+   * Optional. Leave the label empty to hide this button.
+   */
+  primaryCta?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: string | Post;
+        } | null);
+    url?: string | null;
+    label?: string | null;
+  };
+  /**
+   * Optional. Leave the label empty to hide this button.
+   */
+  secondaryCta?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: string | Post;
+        } | null);
+    url?: string | null;
+    label?: string | null;
+  };
+  /**
+   * Optional. Up to three short lines, e.g. "New guide every two weeks". Shown with a small dot between them.
+   */
+  metaItems?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Works best with photos, textures or abstract images that have a calm area on the left for the text. For diagrams or screenshots with their own text, set Media placement to Right. Use MP4 or WebM for moving backgrounds. GIFs work but load much slower, so keep them short and small.
+   */
+  media: string | Media;
+  /**
+   * Right suits a diagram, screenshot or infographic that already has its own text or busy detail.
+   */
+  mediaPlacement?: ('fullBleed' | 'right') | null;
+  /**
+   * Right placement only. Contain suits a diagram; Cover suits a photo.
+   */
+  mediaFit?: ('contain' | 'cover') | null;
+  /**
+   * Leave empty for a purely decorative background, the usual choice for a full-bleed hero. Fill this in only when the picture itself carries meaning a screen reader user needs to know.
+   */
+  mediaAlt?: string | null;
+  /**
+   * Only used when the background is a video. Shown while the video loads and when motion is off.
+   */
+  videoPoster?: (string | null) | Media;
+  /**
+   * Replaces the background above on phones and small tablets. Leave empty to use the same file on every screen size. Has no effect when Media placement is set to Right, because that layout already changes to a stacked image on phones.
+   */
+  mobileMedia?: (string | null) | Media;
+  /**
+   * Which part of the picture to keep in view when it gets cropped.
+   */
+  focalPoint?: ('center' | 'left' | 'right' | 'top' | 'bottom') | null;
+  /**
+   * Darkens the picture so the text stays readable. Strong is the safest default for a full-bleed photo.
+   */
+  overlayStrength?: ('light' | 'medium' | 'strong') | null;
+  /**
+   * How the text and background enter. Always off for a visitor whose device asks for reduced motion.
+   */
+  animation?: ('off' | 'subtle' | 'lively') | null;
+  /**
+   * On a phone the hero always fits its content.
+   */
+  height?: ('tall' | 'medium') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'heroFullBackground';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroRightPlacementBlock".
+ */
+export interface HeroRightPlacementBlock {
+  /**
+   * Optional. Short, e.g. "Bot swarm".
+   */
+  eyebrow?: string | null;
+  /**
+   * This becomes the page’s main heading (the H1), so use it only once per page. Set the page hero above to "None" when this block is on the page.
+   */
+  headline: string;
+  /**
+   * One or two sentences under the headline. Optional.
+   */
+  subhead?: string | null;
+  /**
+   * Optional. Leave the label empty to hide this button.
+   */
+  primaryCta?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: string | Post;
+        } | null);
+    url?: string | null;
+    label?: string | null;
+  };
+  /**
+   * Optional. Leave the label empty to hide this button.
+   */
+  secondaryCta?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: string | Post;
+        } | null);
+    url?: string | null;
+    label?: string | null;
+  };
+  /**
+   * Aim for 16:10. 2560 x 1600 is ideal. Nothing is ever cropped: the picture is fitted whole and pinned to the right, so a diagram or screenshot stays readable. But its left edge and its top and bottom edges fade out into the page, so keep labels and text clear of the left quarter and of the top and bottom tenth. Upload at least 2304 px wide so it stays sharp on a 2x screen; anything wider than 2560 px is scaled down to that width. WebP or PNG for diagrams and screenshots. For moving media use MP4 or WebM. A GIF is served at its original size with no resizing, so it looks soft when stretched across the panel and loads slowly.
+   */
+  media: string | Media;
+  /**
+   * Leave empty when the picture is purely illustrative. Fill this in when it carries meaning a screen reader user needs to know.
+   */
+  mediaAlt?: string | null;
+  /**
+   * Only used when the media above is a video. Shown while the video loads and when motion is off.
+   */
+  videoPoster?: (string | null) | Media;
+  /**
+   * The headline words fade in and the image slowly breathes. Always off for a visitor whose device asks for reduced motion.
+   */
+  animation?: ('on' | 'off') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'heroRightPlacement';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroWorkforceGridBlock".
+ */
+export interface HeroWorkforceGridBlock {
+  /**
+   * Optional. Short, e.g. "The workforce".
+   */
+  eyebrow?: string | null;
+  /**
+   * This becomes the page’s main heading (the H1), so use it only once per page. Set the page hero above to "None" when this block is on the page.
+   */
+  headline: string;
+  /**
+   * One or two sentences under the headline. Optional.
+   */
+  subhead?: string | null;
+  cta: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: string | Post;
+        } | null);
+    url?: string | null;
+    label: string;
+  };
+  /**
+   * Applies to every column.
+   */
+  speed?: ('slow' | 'medium' | 'fast') | null;
+  columns?: ('2' | '3' | '4') | null;
+  /**
+   * Distributed evenly across columns in the order you add them. Add at least 2 per column so the loop doesn’t feel short. Between 9 and 12 cards works well.
+   */
+  cards?:
+    | {
+        icon?:
+          | (
+              | 'message'
+              | 'chat'
+              | 'check'
+              | 'calendar'
+              | 'card'
+              | 'document'
+              | 'refresh'
+              | 'bolt'
+              | 'layers'
+              | 'gauge'
+              | 'plug'
+              | 'shield'
+              | 'shieldCheck'
+              | 'lock'
+              | 'globe'
+              | 'server'
+              | 'eye'
+              | 'users'
+              | 'user'
+              | 'phone'
+              | 'smartphone'
+              | 'mail'
+              | 'messageCircle'
+              | 'send'
+              | 'inbox'
+              | 'headphones'
+              | 'mic'
+              | 'video'
+              | 'bell'
+              | 'handshake'
+              | 'stethoscope'
+              | 'heartPulse'
+              | 'hospital'
+              | 'activity'
+              | 'flask'
+              | 'pill'
+              | 'graduationCap'
+              | 'building'
+              | 'mapPin'
+              | 'database'
+              | 'cloud'
+              | 'workflow'
+              | 'bot'
+              | 'sparkles'
+              | 'search'
+              | 'chart'
+              | 'trendingUp'
+              | 'target'
+              | 'rocket'
+              | 'key'
+              | 'fileText'
+              | 'clipboardList'
+              | 'link'
+              | 'settings'
+              | 'puzzle'
+              | 'timer'
+              | 'clock'
+              | 'badgeCheck'
+              | 'star'
+              | 'briefcase'
+            )
+          | null;
+        /**
+         * Short, e.g. "AI agent".
+         */
+        label?: string | null;
+        title: string;
+        /**
+         * One or two short lines.
+         */
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'heroWorkforceGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AgenticHeroBlock".
+ */
+export interface AgenticHeroBlock {
+  /**
+   * Shown large across the top of the hero.
+   */
+  headline: string;
+  /**
+   * Comma-separated words from the headline to underline in the accent colour, e.g. "agentic, workflows".
+   */
+  accentWords?: string | null;
+  intro?: string | null;
+  ctaLabel?: string | null;
+  ctaUrl?: string | null;
+  /**
+   * Up to six nodes around the diagram. Leave empty to hide the diagram.
+   */
+  nodes?:
+    | {
+        label: string;
+        kind?: ('agent' | 'human' | 'system') | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'agenticHero';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ConversationHeroBlock".
+ */
+export interface ConversationHeroBlock {
+  /**
+   * Optional. Short, e.g. "Omnichannel automation and reasoning".
+   */
+  eyebrow?: string | null;
+  /**
+   * Short and direct works best: around six to eight words.
+   */
+  headline: string;
+  /**
+   * One or two sentences explaining what the product does, in plain language.
+   */
+  subhead: string;
+  /**
+   * Sets the hero heading's font size in pixels. Keep it under about 48px for longer headlines so they don't wrap awkwardly.
+   */
+  headingSize?: number | null;
+  primaryButtonLabel?: string | null;
+  primaryButtonLink?: string | null;
+  secondaryButtonLabel?: string | null;
+  secondaryButtonLink?: string | null;
+  /**
+   * Short capability labels, e.g. "WhatsApp · Voice · Web". Two or three works best.
+   */
+  chips?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * For example "WhatsApp · Ayurvaid Hospitals · 11:42".
+   */
+  conversationLabel?: string | null;
+  /**
+   * One message per line. Start a line with "them:" for the customer, "us:" for the agent, and "tag:" for a system note at the end.
+   */
+  conversation?: string | null;
+  /**
+   * Optional. What fires behind the scenes, e.g. Booked, Paid, Reminder sent.
+   */
+  workflowSteps?:
+    | {
+        label: string;
+        icon?:
+          | (
+              | 'message'
+              | 'chat'
+              | 'check'
+              | 'calendar'
+              | 'card'
+              | 'document'
+              | 'refresh'
+              | 'bolt'
+              | 'layers'
+              | 'gauge'
+              | 'plug'
+              | 'shield'
+              | 'shieldCheck'
+              | 'lock'
+              | 'globe'
+              | 'server'
+              | 'eye'
+              | 'users'
+              | 'user'
+              | 'phone'
+              | 'smartphone'
+              | 'mail'
+              | 'messageCircle'
+              | 'send'
+              | 'inbox'
+              | 'headphones'
+              | 'mic'
+              | 'video'
+              | 'bell'
+              | 'handshake'
+              | 'stethoscope'
+              | 'heartPulse'
+              | 'hospital'
+              | 'activity'
+              | 'flask'
+              | 'pill'
+              | 'graduationCap'
+              | 'building'
+              | 'mapPin'
+              | 'database'
+              | 'cloud'
+              | 'workflow'
+              | 'bot'
+              | 'sparkles'
+              | 'search'
+              | 'chart'
+              | 'trendingUp'
+              | 'target'
+              | 'rocket'
+              | 'key'
+              | 'fileText'
+              | 'clipboardList'
+              | 'link'
+              | 'settings'
+              | 'puzzle'
+              | 'timer'
+              | 'clock'
+              | 'badgeCheck'
+              | 'star'
+              | 'briefcase'
+            )
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Optional. These sit directly under the hero, so use real, defensible figures only.
+   */
+  stats?:
+    | {
+        /**
+         * e.g. 40%, 2.5x, 14+
+         */
+        value: string;
+        /**
+         * What the number means, in three or four words.
+         */
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'conversationHero';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroStackBlock".
+ */
+export interface HeroStackBlock {
+  /**
+   * Optional. For example "Acquire · Engage · Retain".
+   */
+  eyebrow?: string | null;
+  heading: string;
+  /**
+   * Optional. One or two sentences under the heading. Hidden on phones to keep the hero short.
+   */
+  intro?: string | null;
+  primaryCta?: {
+    label?: string | null;
+    /**
+     * A full address, a page path such as /contact, or #section-id for a section on this page.
+     */
+    href?: string | null;
+  };
+  secondaryCta?: {
+    label?: string | null;
+    /**
+     * A full address, a page path such as /contact, or #section-id for a section on this page.
+     */
+    href?: string | null;
+  };
+  /**
+   * Each product is one screenshot card in the stack. The first one sits on top; scrolling deals them away in this order.
+   */
+  products: {
+    label: string;
+    caption?: string | null;
+    /**
+     * Shown in a 16:10 card. Upload at 1600 x 1000 (16:10) so nothing is trimmed. A taller image is trimmed at the bottom, a wider one at the right.
+     */
+    screenshot: string | Media;
+    id?: string | null;
+  }[];
+  showFrame?: boolean | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'heroStack';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PlatformLayersBlock".
+ */
+export interface PlatformLayersBlock {
+  /**
+   * e.g. The platform
+   */
+  eyebrow?: string | null;
+  heading: string;
+  /**
+   * e.g. Scroll to move through the stack. Each layer builds on the one before it.
+   */
+  intro?: string | null;
+  /**
+   * Each one takes a screen as the visitor scrolls, so keep the list short.
+   */
+  layers?:
+    | {
+        title: string;
+        description: string;
+        /**
+         * Optional, e.g. Core or Adjacent.
+         */
+        tag?: string | null;
+        icon?:
+          | (
+              | 'message'
+              | 'chat'
+              | 'check'
+              | 'calendar'
+              | 'card'
+              | 'document'
+              | 'refresh'
+              | 'bolt'
+              | 'layers'
+              | 'gauge'
+              | 'plug'
+              | 'shield'
+              | 'shieldCheck'
+              | 'lock'
+              | 'globe'
+              | 'server'
+              | 'eye'
+              | 'users'
+              | 'user'
+              | 'phone'
+              | 'smartphone'
+              | 'mail'
+              | 'messageCircle'
+              | 'send'
+              | 'inbox'
+              | 'headphones'
+              | 'mic'
+              | 'video'
+              | 'bell'
+              | 'handshake'
+              | 'stethoscope'
+              | 'heartPulse'
+              | 'hospital'
+              | 'activity'
+              | 'flask'
+              | 'pill'
+              | 'graduationCap'
+              | 'building'
+              | 'mapPin'
+              | 'database'
+              | 'cloud'
+              | 'workflow'
+              | 'bot'
+              | 'sparkles'
+              | 'search'
+              | 'chart'
+              | 'trendingUp'
+              | 'target'
+              | 'rocket'
+              | 'key'
+              | 'fileText'
+              | 'clipboardList'
+              | 'link'
+              | 'settings'
+              | 'puzzle'
+              | 'timer'
+              | 'clock'
+              | 'badgeCheck'
+              | 'star'
+              | 'briefcase'
+            )
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'platformLayers';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IntegrationsLandingBlock".
+ */
+export interface IntegrationsLandingBlock {
+  /**
+   * Leave empty to use the main record (the one with Is main on). The page shows its hero, the integrations by category, its sections, FAQ and closing. Set the page hero to None.
+   */
+  master?: (string | null) | IntegrationsMaster;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'integrationsLanding';
+}
+/**
+ * Integration landing pages, and the wording shared by every integration item page.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "integrationsMaster".
+ */
+export interface IntegrationsMaster {
+  id: string;
+  /**
+   * For editors, for example Main integrations page.
+   */
+  name: string;
+  /**
+   * Lowercase, dashes only. Cannot be the same as an integration item slug.
+   */
+  slug: string;
+  /**
+   * The main integrations page. Integration item pages take their section headings from this record. Only one record can have it on.
+   */
+  isMain?: boolean | null;
+  /**
+   * Leave both empty to list every live integration.
+   */
+  filter?: {
+    categories?: (string | IntegrationCategory)[] | null;
+    products?: (string | Product)[] | null;
+  };
+  /**
+   * The search phrase this page should rank for, for example whatsapp crm integration.
+   */
+  primaryKeyword?: string | null;
+  /**
+   * Up to 5 related phrases.
+   */
+  secondaryKeywords?:
+    | {
+        keyword: string;
+        id?: string | null;
+      }[]
+    | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (string | null) | Media;
+    description?: string | null;
+  };
+  /**
+   * The small line above the heading, for example Integrations.
+   */
+  eyebrow?: string | null;
+  /**
+   * The page heading, for example: Connect NeuronCx to the systems you already run.
+   */
+  h1: string;
+  subheading?: string | null;
+  /**
+   * Centred has no image.
+   */
+  heroLayout?: ('left' | 'centred') | null;
+  /**
+   * Up to 7 integrations shown around the hero.
+   */
+  heroSystems?: (string | Integration)[] | null;
+  logoStripOn?: boolean | null;
+  logoStrip?: {
+    populateBy?: ('all' | 'filter' | 'selection') | null;
+    categories?: (string | IntegrationCategory)[] | null;
+    products?: (string | Product)[] | null;
+    featuredOnly?: boolean | null;
+    selectedDocs?: (string | Integration)[] | null;
+    limit?: number | null;
+  };
+  hero?: {
+    /**
+     * Optional, next to the main button, for example: See Omnichannel CX. Type a label to choose where it goes.
+     */
+    secondaryCta?: {
+      label?: string | null;
+      link?: {
+        type?: ('reference' | 'custom') | null;
+        newTab?: boolean | null;
+        reference?:
+          | ({
+              relationTo: 'pages';
+              value: string | Page;
+            } | null)
+          | ({
+              relationTo: 'posts';
+              value: string | Post;
+            } | null);
+        url?: string | null;
+      };
+    };
+    /**
+     * Optional. An illustration beside the hero, such as the hub diagram.
+     */
+    image?: (string | null) | Media;
+  };
+  integrationSections?:
+    | {
+        category: string | IntegrationCategory;
+        /**
+         * The small line above the heading, for example Telephony and dialers.
+         */
+        eyebrow?: string | null;
+        heading?: string | null;
+        /**
+         * Optional. Leave empty for no intro line.
+         */
+        intro?: string | null;
+        usePageDesign?: boolean | null;
+        cardDesign?: {
+          design: 'grid' | 'logoCard' | 'directory' | 'feature' | 'story' | 'pill';
+          /**
+           * When off, every card uses the design above.
+           */
+          allowItemDesigns?: boolean | null;
+          /**
+           * Leave empty to fit as many as the width allows. If integrations use different designs and this is empty, every group shows 3 per row.
+           */
+          columns?: ('2' | '3' | '4') | null;
+          lastRow?: ('stretch' | 'center' | 'leave') | null;
+          /**
+           * Show a heading for each category.
+           */
+          groupByCategory?: boolean | null;
+          /**
+           * Used only for integrations that have their own page.
+           */
+          linkLabel?: string | null;
+          /**
+           * Lists the entry's key points under the description, up to 3.
+           */
+          showKeyPoints?: boolean | null;
+          look?: {
+            cardColor?: ('grey' | 'lavender' | 'white') | null;
+            border?: ('none' | 'solid' | 'gradient') | null;
+            borderColor?: ('blue' | 'violet' | 'crimson' | 'navy') | null;
+            /**
+             * A thin rule under the content, matches the border color.
+             */
+            accentLine?: boolean | null;
+          };
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * The default look for every section on this page.
+   */
+  cardDesign: {
+    design: 'grid' | 'logoCard' | 'directory' | 'feature' | 'story' | 'pill';
+    /**
+     * When off, every card uses the design above.
+     */
+    allowItemDesigns?: boolean | null;
+    /**
+     * Leave empty to fit as many as the width allows. If integrations use different designs and this is empty, every group shows 3 per row.
+     */
+    columns?: ('2' | '3' | '4') | null;
+    lastRow?: ('stretch' | 'center' | 'leave') | null;
+    /**
+     * Show a heading for each category.
+     */
+    groupByCategory?: boolean | null;
+    /**
+     * Used only for integrations that have their own page.
+     */
+    linkLabel?: string | null;
+    /**
+     * Lists the entry's key points under the description, up to 3.
+     */
+    showKeyPoints?: boolean | null;
+    look?: {
+      cardColor?: ('grey' | 'lavender' | 'white') | null;
+      border?: ('none' | 'solid' | 'gradient') | null;
+      borderColor?: ('blue' | 'violet' | 'crimson' | 'navy') | null;
+      /**
+       * A thin rule under the content, matches the border color.
+       */
+      accentLine?: boolean | null;
+    };
+  };
+  /**
+   * Leave empty to show: What connecting your systems gives you
+   */
+  fiveThingsHeading?: string | null;
+  /**
+   * 3 to 5 points, each with a title and one line.
+   */
+  fiveThings?:
+    | {
+        title: string;
+        line: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Leave empty to show: When feeds go wrong
+   */
+  whenFeedsGoWrongHeading?: string | null;
+  /**
+   * Common failures and what NeuronCx does, for example: The vendor stops sending updates.
+   */
+  whenFeedsGoWrong?:
+    | {
+        problem: string;
+        whatHappens: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Type a heading to choose where the card links.
+   */
+  apiCard?: {
+    heading?: string | null;
+    line?: string | null;
+    /**
+     * Leave empty to show: Get in touch
+     */
+    buttonLabel?: string | null;
+    link?: {
+      type?: ('reference' | 'custom') | null;
+      newTab?: boolean | null;
+      reference?:
+        | ({
+            relationTo: 'pages';
+            value: string | Page;
+          } | null)
+        | ({
+            relationTo: 'posts';
+            value: string | Post;
+          } | null);
+      url?: string | null;
+    };
+  };
+  labels?: {
+    /**
+     * For example: What moves between {name} and NeuronCx
+     */
+    statusTable?: string | null;
+    /**
+     * For example: When things do not go to plan
+     */
+    edgeCases?: string | null;
+    /**
+     * For example: What it takes to connect {name}
+     */
+    setup?: string | null;
+    /**
+     * For example: Other systems like {name}
+     */
+    related?: string | null;
+  };
+  /**
+   * Leave empty to show: Questions about integrations
+   */
+  faqHeading?: string | null;
+  /**
+   * Up to 6. Questions phrased the way a buyer would ask them.
+   */
+  faqs?:
+    | {
+        question: string;
+        /**
+         * Plain text, no formatting.
+         */
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  closing?: {
+    /**
+     * The closing panel's heading, for example: Tell us what you're running.
+     */
+    heading?: string | null;
+    /**
+     * One or two sentences under the heading.
+     */
+    subheading?: string | null;
+  };
+  /**
+   * The closing button. Type a label to choose where it goes.
+   */
+  cta?: {
+    label?: string | null;
+    link?: {
+      type?: ('reference' | 'custom') | null;
+      newTab?: boolean | null;
+      reference?:
+        | ({
+            relationTo: 'pages';
+            value: string | Page;
+          } | null)
+        | ({
+            relationTo: 'posts';
+            value: string | Post;
+          } | null);
+      url?: string | null;
+    };
+  };
+  /**
+   * Sent before the list of integrations. Aim for 300 characters.
+   */
+  waIntro?: string | null;
+  /**
+   * The button that opens the list, for example See systems.
+   */
+  waListButton?: string | null;
+  /**
+   * The heading above the rows in the list.
+   */
+  waSectionTitle?: string | null;
+  /**
+   * Sent when someone asks about a system that is not listed, for example: We connect to most booking systems. Tell us which one you use.
+   */
+  waFallback?: string | null;
+  /**
+   * Only published entries with this on are sent to the knowledge base.
+   */
+  includeInKbase?: boolean | null;
+  /**
+   * A complete answer to "What is this?", written for the virtual agents.
+   */
+  kbAnswer?: string | null;
+  /**
+   * Short, checkable facts. One fact per line.
+   */
+  kbFacts?:
+    | {
+        fact: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * How a customer might ask about it.
+   */
+  kbQuestions?:
+    | {
+        question: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Other names people use for it.
+   */
+  kbSynonyms?:
+    | {
+        synonym: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * So answers that have gone stale can be found and fixed.
+   */
+  kbLastReviewed?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "WhatsappWidgetBlock".
+ */
+export interface WhatsappWidgetBlock {
+  enabled?: boolean | null;
+  /**
+   * In E.164 form, e.g. +919876543210. Used to build the chat link; the number itself is not shown on the page.
+   */
+  phone?: string | null;
+  label?: string | null;
+  /**
+   * What the visitor sends. The page reference is appended to it.
+   */
+  prefill?: string | null;
+  /**
+   * Appends [ref: page-slug] so the enquiry arrives already routed.
+   */
+  includeRef?: boolean | null;
+  /**
+   * For example "Mon–Sat, 9am–7pm IST". Not shown yet; reserved for a panel.
+   */
+  hoursNote?: string | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'whatsappWidget';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FAQBlock".
+ */
+export interface FAQBlock {
+  heading: string;
+  /**
+   * Optional. One short paragraph above the list.
+   */
+  intro?: string | null;
+  /**
+   * Keep answers short, roughly 40 to 60 words each. If one needs to run long, it should be the exception, not the pattern.
+   */
+  items: {
+    question: string;
+    answer: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    };
+    defaultOpen?: boolean | null;
+    id?: string | null;
+  }[];
+  background?: ('white' | 'cloud') | null;
+  /**
+   * Optional id for deep linking, e.g. faq
+   */
+  anchorId?: string | null;
+  emitSchema?: boolean | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'faq';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PlatformLayersTwoBlock".
+ */
+export interface PlatformLayersTwoBlock {
+  /**
+   * Short uppercase label above the heading. Optional.
+   */
+  eyebrow?: string | null;
+  heading: string;
+  intro?: string | null;
+  /**
+   * Navy inverts the heading and body text. Cards stay light.
+   */
+  theme?: ('light' | 'navy') | null;
+  /**
+   * Shows the numbered list in the sticky left column on large screens
+   */
+  showIndicators?: boolean | null;
+  /**
+   * Optional. Lets a link such as #platform-stack jump to this block.
+   */
+  anchorId?: string | null;
+  /**
+   * Numbered in the order listed. Three to six layers.
+   */
+  layers: {
+    title: string;
+    /**
+     * Short pill label such as "Unified Ingestion". Optional.
+     */
+    tag?: string | null;
+    /**
+     * One or two sentences, roughly 20 to 35 words
+     */
+    description: string;
+    /**
+     * Small line with a tick icon under the description. Optional.
+     */
+    footnote?: string | null;
+    /**
+     * Optional link shown in the card foot.
+     */
+    link?: {
+      label?: string | null;
+      type?: ('internal' | 'external') | null;
+      page?: (string | null) | Page;
+      url?: string | null;
+    };
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'platformLayersTwo';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HubLayersSection".
+ */
+export interface HubLayersSection {
+  /**
+   * Leave empty to show the default heading: "What sits underneath". Words in braces, such as {name}, are filled in for each entry.
+   */
+  heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
+  layers?:
+    | {
+        title: string;
+        line?: string | null;
+        /**
+         * An entry in any content collection, or a page.
+         */
+        link?:
+          | ({
+              relationTo: 'microApps';
+              value: string | MicroApp;
+            } | null)
+          | ({
+              relationTo: 'pages';
+              value: string | Page;
+            } | null);
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'hubLayersSection';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -8191,9 +8259,50 @@ export interface AgenticFlowDemoBlockSelect<T extends boolean = true> {
         handlers?: T;
         resolveTitle?: T;
         resolveText?: T;
+        link?:
+          | T
+          | {
+              label?: T;
+              type?: T;
+              reference?: T;
+              url?: T;
+              newTab?: T;
+            };
         id?: T;
       };
   footnote?: T;
+  promptLabel?: T;
+  stageLabels?:
+    | T
+    | {
+        trigger?: T;
+        route?: T;
+        resolve?: T;
+      };
+  handlerLabels?:
+    | T
+    | {
+        agent?: T;
+        human?: T;
+      };
+  showFootnote?: T;
+  accents?:
+    | T
+    | {
+        card1?: T;
+        card2?: T;
+        card3?: T;
+      };
+  cardShadow?: T;
+  equalHeights?: T;
+  lineStyle?: T;
+  lineColor?: T;
+  selectedStyle?: T;
+  buttonSize?: T;
+  panelBackground?: T;
+  panelBorder?: T;
+  autoplay?: T;
+  startEvent?: T;
   background?: T;
   width?: T;
   spacingTop?: T;
