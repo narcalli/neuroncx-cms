@@ -15,9 +15,10 @@
  * the hub is written.
  *
  * Usage (from neuroncx-cms):
- *   NODE_OPTIONS="--no-deprecation --import=tsx/esm" node --env-file=.env scripts/update-bot-swarm-hub.ts [--dry-run]
+ *   NODE_OPTIONS="--no-deprecation --import=tsx/esm" node --env-file=.env scripts/update-bot-swarm-hub.ts [--dry-run] [--remote]
  *
- * Local only; refuses any other database.
+ * Runs only against a database on this machine; add --remote to run it
+ * anywhere else, after a backup.
  */
 import fs from 'fs'
 import { getPayload, ValidationError } from 'payload'
@@ -25,11 +26,13 @@ import { getPayload, ValidationError } from 'payload'
 import config from '../src/payload.config'
 
 const say = (s = '') => fs.writeSync(1, s + '\n')
-if (!/^mongodb:\/\/(127\.0\.0\.1|localhost)(:\d+)?\//.test(process.env.DATABASE_URL || '')) {
-  say('Refusing to run: this database is not on this machine.')
+const DRY = process.argv.includes('--dry-run')
+const local = /^mongodb:\/\/(127\.0\.0\.1|localhost)(:\d+)?\//.test(process.env.DATABASE_URL || '')
+if (!local && !process.argv.includes('--remote')) {
+  say('Refusing to run: this database is not on this machine. Add --remote to run it anyway, after a backup.')
   process.exit(1)
 }
-const DRY = process.argv.includes('--dry-run')
+say(`${local ? 'Local' : 'Remote'} database${DRY ? ', dry run: nothing is written' : ''}.`)
 
 const FAMILIES = [
   {
