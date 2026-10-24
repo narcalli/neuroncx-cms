@@ -1,4 +1,9 @@
-import type { CollectionBeforeOperationHook, CollectionAfterOperationHook, CollectionConfig } from 'payload'
+import type {
+  CollectionAfterOperationHook,
+  CollectionBeforeOperationHook,
+  CollectionConfig,
+  ImageSize as UploadImageSize,
+} from 'payload'
 
 import {
   FixedToolbarFeature,
@@ -17,6 +22,84 @@ const dirname = path.dirname(filename)
 const webp = { format: 'webp', options: { quality: 80 } } as const
 const mainFileResize = { width: 1600, withoutEnlargement: true } as const
 
+/** The named sizes every upload gets, except a GIF (see skipResizeForGifs). */
+const IMAGE_SIZES: UploadImageSize[] = [
+  {
+    name: 'thumbnail',
+    width: 300,
+  },
+  {
+    name: 'square',
+    width: 500,
+    height: 500,
+  },
+  {
+    name: 'small',
+    width: 600,
+  },
+  {
+    name: 'medium',
+    width: 900,
+  },
+  {
+    name: 'large',
+    width: 1400,
+  },
+  {
+    name: 'xlarge',
+    width: 1920,
+  },
+  {
+    name: 'og',
+    width: 1200,
+    height: 630,
+    crop: 'center',
+  },
+  // Sizes for the Product Suite cards, also saved as WebP.
+  {
+    name: 'card',
+    width: 800,
+    formatOptions: webp,
+  },
+  {
+    name: 'wide',
+    width: 1000,
+    formatOptions: webp,
+  },
+  {
+    name: 'tall',
+    width: 800,
+    height: 1100,
+    formatOptions: webp,
+  },
+  // For full-bleed hero backgrounds, which fill the whole viewport width.
+  // Width-only, same as card/wide, so tall and wide source photos both
+  // scale sensibly.
+  {
+    name: 'hero',
+    width: 2560,
+    formatOptions: webp,
+  },
+  // Screenshot sizes for Product in Action. Payload gives each size one
+  // output format, so these are WebP. Only new uploads (and re-uploads)
+  // get these sizes.
+  {
+    name: 'stack768',
+    width: 768,
+    formatOptions: webp,
+  },
+  {
+    name: 'stack1200',
+    width: 1200,
+    formatOptions: webp,
+  },
+  {
+    name: 'stack1600',
+    width: 1600,
+    formatOptions: webp,
+  },
+]
+
 /**
  * GIFs must stay GIFs. Converting one to WebP (even an animated WebP) loses
  * the ability to tell it apart from a normal photo once it is saved — the
@@ -26,39 +109,62 @@ const mainFileResize = { width: 1600, withoutEnlargement: true } as const
  * sidesteps that, and it is also the simplest way to guarantee the
  * animation survives.
  *
+ * A GIF also gets none of the named sizes below. Each size re-encodes every
+ * frame: a 180-frame, 960 by 600 GIF took about 100 seconds for the 14
+ * sizes, longer than the hosting allows a request to run, so the upload
+ * failed. The website never uses a GIF's sizes anyway (pickMedia in the
+ * website repo always shows the original), so a GIF is stored as it is.
+ *
  * Payload has no per-file "skip resizing this one" option, so these two
- * hooks turn resizing off for just the current request when the upload is
- * a GIF, then turn it back on once that request's processing has run.
+ * hooks turn resizing, conversion and the sizes off for just the current
+ * request when the upload is a GIF, then turn them back on once that
+ * request's processing has run. Every other upload also turns them back on
+ * first, so a GIF upload that failed part-way never leaves them off.
  * `collection` here is the same config object every request reads from, so
  * there is a brief window - only for the duration of processing that one
  * GIF - where a second upload landing at the exact same moment could also
  * be affected. Acceptable for a CMS with a handful of editors; would need a
  * different approach for a public, high-traffic upload endpoint.
- *
- * Only the main file is affected. The named sizes below (thumbnail, card,
- * hero, ...) are generated separately by Payload and already keep an
- * animated file's frames on their own — they are simply never picked for a
- * GIF on the website side (see pickMedia in the website repo), so it does
- * not matter that they still get created.
  */
-const skipResizeForGifs: CollectionBeforeOperationHook = ({ collection, context, operation, req }) => {
+const uploadOf = (collection: { upload?: unknown }) =>
+  collection.upload && typeof collection.upload === 'object' ? (collection.upload as Record<string, unknown>) : null
+
+const processAsUsual = (upload: Record<string, unknown> | null) => {
+  if (!upload) return
+  upload.formatOptions = webp
+  upload.resizeOptions = mainFileResize
+  upload.imageSizes = IMAGE_SIZES
+}
+
+export const skipResizeForGifs: CollectionBeforeOperationHook = ({ collection, context, operation, req }) => {
   if (operation !== 'create' && operation !== 'update') return
-  if (req.file?.mimetype !== 'image/gif') return
+  const upload = uploadOf(collection)
+  if (req.file?.mimetype !== 'image/gif') {
+    processAsUsual(upload)
+    return
+  }
 
   context.skippedGifResize = true
-  if (collection.upload && typeof collection.upload === 'object') {
-    collection.upload.formatOptions = undefined
-    collection.upload.resizeOptions = undefined
+  if (upload) {
+    upload.formatOptions = undefined
+    upload.resizeOptions = undefined
+    upload.imageSizes = []
   }
 }
 
-const restoreResizeAfterGif: CollectionAfterOperationHook = ({ collection, req, result }) => {
-  if (req.context?.skippedGifResize && collection.upload && typeof collection.upload === 'object') {
-    collection.upload.formatOptions = webp
-    collection.upload.resizeOptions = mainFileResize
+export const restoreResizeAfterGif: CollectionAfterOperationHook = ({ collection, req, result }) => {
+  if (req.context?.skippedGifResize) {
+    processAsUsual(uploadOf(collection))
     req.context.skippedGifResize = false
   }
   return result
+}
+
+/** The admin's small picture: the thumbnail size, or the original file for a GIF, which has no sizes. */
+export const mediaAdminThumbnail = ({ doc }: { doc: Record<string, unknown> }): string | null => {
+  const thumbnail = (doc.sizes as { thumbnail?: { url?: string | null } } | undefined)?.thumbnail?.url
+  if (thumbnail) return thumbnail
+  return doc.mimeType === 'image/gif' && typeof doc.url === 'string' ? doc.url : null
 }
 
 export const Media: CollectionConfig = {
@@ -93,7 +199,7 @@ export const Media: CollectionConfig = {
   upload: {
     // Upload to the public/media directory in Next.js making them publicly accessible even outside of Payload
     staticDir: path.resolve(dirname, '../../public/media'),
-    adminThumbnail: 'thumbnail',
+    adminThumbnail: mediaAdminThumbnail,
     focalPoint: true,
     // Images and video only. SVG is allowed for logos and diagrams. GIF is
     // allowed for animated illustrations - see skipResizeForGifs above for
@@ -111,81 +217,6 @@ export const Media: CollectionConfig = {
     // never wider than 1600px. Small images are not made bigger.
     formatOptions: webp,
     resizeOptions: mainFileResize,
-    imageSizes: [
-      {
-        name: 'thumbnail',
-        width: 300,
-      },
-      {
-        name: 'square',
-        width: 500,
-        height: 500,
-      },
-      {
-        name: 'small',
-        width: 600,
-      },
-      {
-        name: 'medium',
-        width: 900,
-      },
-      {
-        name: 'large',
-        width: 1400,
-      },
-      {
-        name: 'xlarge',
-        width: 1920,
-      },
-      {
-        name: 'og',
-        width: 1200,
-        height: 630,
-        crop: 'center',
-      },
-      // Sizes for the Product Suite cards, also saved as WebP.
-      {
-        name: 'card',
-        width: 800,
-        formatOptions: webp,
-      },
-      {
-        name: 'wide',
-        width: 1000,
-        formatOptions: webp,
-      },
-      {
-        name: 'tall',
-        width: 800,
-        height: 1100,
-        formatOptions: webp,
-      },
-      // For full-bleed hero backgrounds, which fill the whole viewport width.
-      // Width-only, same as card/wide, so tall and wide source photos both
-      // scale sensibly.
-      {
-        name: 'hero',
-        width: 2560,
-        formatOptions: webp,
-      },
-      // Screenshot sizes for Product in Action. Payload gives each size one
-      // output format, so these are WebP. Only new uploads (and re-uploads)
-      // get these sizes.
-      {
-        name: 'stack768',
-        width: 768,
-        formatOptions: webp,
-      },
-      {
-        name: 'stack1200',
-        width: 1200,
-        formatOptions: webp,
-      },
-      {
-        name: 'stack1600',
-        width: 1600,
-        formatOptions: webp,
-      },
-    ],
+    imageSizes: IMAGE_SIZES,
   },
 }
