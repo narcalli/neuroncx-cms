@@ -3091,6 +3091,16 @@ export interface AgenticFlowDemoBlock {
   heading: string;
   intro?: string | null;
   /**
+   * Flow walks an event through trigger, route and resolve. Agent features shows what each bot swarm agent does, read from the agents.
+   */
+  mode: 'flow' | 'agentFeatures';
+  /**
+   * The families to offer, in this order. Leave empty for every family, by their order.
+   */
+  families?: (string | List)[] | null;
+  pickFamilyLabel?: string | null;
+  pickAgentLabel?: string | null;
+  /**
    * Each event is one button a visitor can pick. The first one is shown on load.
    */
   events?:
@@ -3125,6 +3135,133 @@ export interface AgenticFlowDemoBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'agenticFlowDemo';
+}
+/**
+ * Short lists other collections group their entries by, such as CRM areas and agent families.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lists".
+ */
+export interface List {
+  id: string;
+  name: string;
+  /**
+   * Which list this entry belongs to.
+   */
+  type: 'crmArea' | 'agentFamily';
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  /**
+   * Lower shows first, on hub pages and in WhatsApp menus.
+   */
+  order?: number | null;
+  /**
+   * The grouping's heading on the hub page, used when the hub's section leaves its heading empty.
+   */
+  heading?: string | null;
+  /**
+   * One or two sentences under the grouping's heading on the hub page.
+   */
+  intro?: string | null;
+  /**
+   * The search phrase the grouping's section is written for, such as whatsapp appointment booking.
+   */
+  primaryKeyword?: string | null;
+  /**
+   * How the entries in the grouping work together.
+   */
+  summary?: string | null;
+  /**
+   * Shown with the grouping heading on the hub page.
+   */
+  icon?:
+    | (
+        | 'message'
+        | 'chat'
+        | 'check'
+        | 'calendar'
+        | 'card'
+        | 'document'
+        | 'refresh'
+        | 'bolt'
+        | 'layers'
+        | 'gauge'
+        | 'plug'
+        | 'shield'
+        | 'shieldCheck'
+        | 'lock'
+        | 'globe'
+        | 'server'
+        | 'eye'
+        | 'users'
+        | 'user'
+        | 'phone'
+        | 'smartphone'
+        | 'mail'
+        | 'messageCircle'
+        | 'send'
+        | 'inbox'
+        | 'headphones'
+        | 'mic'
+        | 'video'
+        | 'bell'
+        | 'handshake'
+        | 'stethoscope'
+        | 'heartPulse'
+        | 'hospital'
+        | 'activity'
+        | 'flask'
+        | 'pill'
+        | 'graduationCap'
+        | 'building'
+        | 'mapPin'
+        | 'database'
+        | 'cloud'
+        | 'workflow'
+        | 'bot'
+        | 'sparkles'
+        | 'search'
+        | 'chart'
+        | 'trendingUp'
+        | 'target'
+        | 'rocket'
+        | 'key'
+        | 'fileText'
+        | 'clipboardList'
+        | 'link'
+        | 'settings'
+        | 'puzzle'
+        | 'timer'
+        | 'clock'
+        | 'badgeCheck'
+        | 'star'
+        | 'briefcase'
+      )
+    | null;
+  /**
+   * Every entry in this grouping uses it, unless the entry has its own. Leave empty to follow the section. Used only where the section allows it. The Product suite designs, Detailed product suite and Bento grid draw the grouping's whole section on the hub page, unless the hub's section chooses its own design.
+   */
+  cardDesign?:
+    | ('grid' | 'logoCard' | 'feature' | 'story' | 'suite' | 'suiteSteps' | 'suite2' | 'detailedSuite' | 'bento')
+    | null;
+  /**
+   * Lists the entry's key points under the description, up to 3.
+   */
+  showKeyPoints?: boolean | null;
+  /**
+   * The grouping as a row in a WhatsApp list menu. Plain text.
+   */
+  waRowTitle?: string | null;
+  /**
+   * The line under the row title. Aim for 60 characters. Plain text.
+   */
+  waRowDescription?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -5890,133 +6027,6 @@ export interface MicroApp {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Short lists other collections group their entries by, such as CRM areas and agent families.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "lists".
- */
-export interface List {
-  id: string;
-  name: string;
-  /**
-   * Which list this entry belongs to.
-   */
-  type: 'crmArea' | 'agentFamily';
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
-  /**
-   * Lower shows first, on hub pages and in WhatsApp menus.
-   */
-  order?: number | null;
-  /**
-   * The grouping's heading on the hub page, used when the hub's section leaves its heading empty.
-   */
-  heading?: string | null;
-  /**
-   * One or two sentences under the grouping's heading on the hub page.
-   */
-  intro?: string | null;
-  /**
-   * The search phrase the grouping's section is written for, such as whatsapp appointment booking.
-   */
-  primaryKeyword?: string | null;
-  /**
-   * How the entries in the grouping work together.
-   */
-  summary?: string | null;
-  /**
-   * Shown with the grouping heading on the hub page.
-   */
-  icon?:
-    | (
-        | 'message'
-        | 'chat'
-        | 'check'
-        | 'calendar'
-        | 'card'
-        | 'document'
-        | 'refresh'
-        | 'bolt'
-        | 'layers'
-        | 'gauge'
-        | 'plug'
-        | 'shield'
-        | 'shieldCheck'
-        | 'lock'
-        | 'globe'
-        | 'server'
-        | 'eye'
-        | 'users'
-        | 'user'
-        | 'phone'
-        | 'smartphone'
-        | 'mail'
-        | 'messageCircle'
-        | 'send'
-        | 'inbox'
-        | 'headphones'
-        | 'mic'
-        | 'video'
-        | 'bell'
-        | 'handshake'
-        | 'stethoscope'
-        | 'heartPulse'
-        | 'hospital'
-        | 'activity'
-        | 'flask'
-        | 'pill'
-        | 'graduationCap'
-        | 'building'
-        | 'mapPin'
-        | 'database'
-        | 'cloud'
-        | 'workflow'
-        | 'bot'
-        | 'sparkles'
-        | 'search'
-        | 'chart'
-        | 'trendingUp'
-        | 'target'
-        | 'rocket'
-        | 'key'
-        | 'fileText'
-        | 'clipboardList'
-        | 'link'
-        | 'settings'
-        | 'puzzle'
-        | 'timer'
-        | 'clock'
-        | 'badgeCheck'
-        | 'star'
-        | 'briefcase'
-      )
-    | null;
-  /**
-   * Every entry in this grouping uses it, unless the entry has its own. Leave empty to follow the section. Used only where the section allows it. The Product suite designs, Detailed product suite and Bento grid draw the grouping's whole section on the hub page, unless the hub's section chooses its own design.
-   */
-  cardDesign?:
-    | ('grid' | 'logoCard' | 'feature' | 'story' | 'suite' | 'suiteSteps' | 'suite2' | 'detailedSuite' | 'bento')
-    | null;
-  /**
-   * Lists the entry's key points under the description, up to 3.
-   */
-  showKeyPoints?: boolean | null;
-  /**
-   * The grouping as a row in a WhatsApp list menu. Plain text.
-   */
-  waRowTitle?: string | null;
-  /**
-   * The line under the row title. Aim for 60 characters. Plain text.
-   */
-  waRowDescription?: string | null;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
  * Capabilities of the NeuronCx CRM, such as Customer 360. Only Live and Pilot entries reach the website, WhatsApp and the knowledge base.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -8167,6 +8177,10 @@ export interface DetailedProductSuiteBlockSelect<T extends boolean = true> {
 export interface AgenticFlowDemoBlockSelect<T extends boolean = true> {
   heading?: T;
   intro?: T;
+  mode?: T;
+  families?: T;
+  pickFamilyLabel?: T;
+  pickAgentLabel?: T;
   events?:
     | T
     | {
