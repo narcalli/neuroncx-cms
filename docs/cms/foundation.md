@@ -207,7 +207,7 @@ One collection for every hub page, one record per content collection. Replaces b
 | Hub layout | A `layout` field for the hub page itself, using hub sections (how it works, layers, works with, by industry, trust, articles) and site blocks |
 | Entry defaults | `defaultLayout` for entry pages, and `labels` (section headings with `{name}`) |
 | FAQ | `faqHeading`, `faqs` |
-| Closing | `showClosing` (default on), `closing.heading` (70), `closing.subheading` (200), `cta`, `secondaryCta` |
+| Closing | `showClosing` (default off: on shows the panel on the hub page), `closing.heading` (70), `closing.subheading` (200), `cta`, `secondaryCta` |
 | WhatsApp | `waIntro` (1024), `waListButton` (20), `waSectionTitle` (24), `waFallback` (300) |
 | Knowledge base | `kbAnswer` (answers "What is [hub]?"), `kbFacts`, `kbQuestions`, `kbSynonyms`, `includeInKbase` |
 

@@ -8,6 +8,7 @@ import { entryHeroPatch, hubHeroPatch, versionPatch } from '@/content/heroMigrat
 import { heroDesignProblems, ownPageProblems } from '@/content/publishCheck'
 import { getContentCollection } from '@/content/registry'
 import { CHAT_SENDERS } from '@/fields/chatExample'
+import { closingOffPatch } from '@/content/closingMigration'
 import { showsClosing } from '@/fields/closing'
 import { heroDesignOf } from '@/fields/heroDesign'
 import { ownPage } from '@/fields/ownPage'
@@ -127,29 +128,35 @@ describe('publish check, per hero design', () => {
 })
 
 describe('optional closing', () => {
-  it('is on by default on entries and on hubs', () => {
+  it('is off by default on entries and on hubs', () => {
     for (const fields of [ownPage('microApps').tab.fields, buildHubs().fields]) {
       const f = find(fields, 'showClosing') as CheckboxField
       expect(f.type).toBe('checkbox')
-      expect(f.defaultValue).toBe(true)
+      expect(f.defaultValue).toBe(false)
     }
   })
 
-  it('is hidden only when switched off; a page saved before the switch existed shows it', () => {
-    expect(showsClosing({ showClosing: false })).toBe(false)
+  it('is shown only when switched on; a page with no setting has none', () => {
     expect(showsClosing({ showClosing: true })).toBe(true)
-    expect(showsClosing({})).toBe(true)
-    expect(showsClosing(null)).toBe(true)
+    expect(showsClosing({ showClosing: false })).toBe(false)
+    expect(showsClosing({})).toBe(false)
+    expect(showsClosing(null)).toBe(false)
+  })
+
+  it('migration: a closing switched on is turned off; off or unset needs nothing', () => {
+    expect(closingOffPatch({ showClosing: true })).toEqual({ showClosing: false })
+    expect(closingOffPatch({ showClosing: false })).toEqual({})
+    expect(closingOffPatch({})).toEqual({})
   })
 })
 
 describe('migration', () => {
   it('moves the old picture to heroMedia, keeping it, and picks Picture on the right for it', () => {
-    expect(entryHeroPatch({ media: 'media-1' })).toEqual({ heroMedia: 'media-1', heroDesign: 'rightPlacement', showClosing: true })
+    expect(entryHeroPatch({ media: 'media-1' })).toEqual({ heroMedia: 'media-1', heroDesign: 'rightPlacement' })
   })
 
-  it('gives an agent without a picture the conversation design and the closing', () => {
-    expect(entryHeroPatch({ slug: 'qualify' })).toEqual({ heroDesign: 'conversation', showClosing: true })
+  it('gives an agent without a picture the conversation design', () => {
+    expect(entryHeroPatch({ slug: 'qualify' })).toEqual({ heroDesign: 'conversation' })
   })
 
   it('keeps what is already set, so a second run changes nothing', () => {
@@ -158,19 +165,18 @@ describe('migration', () => {
     expect(entryHeroPatch({ heroMedia: 'new', media: 'old', heroDesign: 'stats', showClosing: false })).toEqual({})
   })
 
-  it('moves hub chat senders to business, rounds square brackets and turns the closing on', () => {
+  it('moves hub chat senders to business and rounds square brackets', () => {
     const patch = hubHeroPatch({
       heroChat: [
         { id: 'a', sender: 'customer', text: '[Photo of a prescription]' },
         { id: 'b', sender: 'entry', entry: { relationTo: 'microApps', value: 'x' }, text: 'Your total at the [branch] is [amount].' },
       ],
     })
-    expect(patch.showClosing).toBe(true)
     expect(patch.heroChat).toEqual([
       { id: 'a', sender: 'customer', text: '(Photo of a prescription)' },
       { id: 'b', sender: 'business', entry: { relationTo: 'microApps', value: 'x' }, text: 'Your total at the (branch) is (amount).' },
     ])
-    expect(hubHeroPatch({ showClosing: true, heroChat: patch.heroChat })).toEqual({})
+    expect(hubHeroPatch({ heroChat: patch.heroChat })).toEqual({})
   })
 
   it('patches a saved version under version', () => {

@@ -223,7 +223,7 @@ export const ownPage = (
         description: 'Up to 3. Leave empty to show other entries from this collection, by order.',
       },
     },
-    showClosingField('Ends this page with the closing panel. Off hides it on this page only.'),
+    showClosingField('Ends this page with the closing panel. Off by default.'),
   ]
 
   const tab: Tab = {

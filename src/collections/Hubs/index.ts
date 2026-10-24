@@ -304,7 +304,7 @@ export const buildHubs = (): CollectionConfig => {
   const closing: Tab = {
     label: 'Closing',
     fields: [
-      showClosingField('Shows the closing panel at the end of the hub page. Entry pages each have their own switch.'),
+      showClosingField('Ends the hub page with the closing panel. Off by default. Entry pages each have their own switch.'),
       {
         name: 'closing',
         type: 'group',

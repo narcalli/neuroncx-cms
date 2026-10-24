@@ -5734,7 +5734,7 @@ export interface MicroApp {
    */
   related?: (string | MicroApp)[] | null;
   /**
-   * Ends this page with the closing panel. Off hides it on this page only.
+   * Ends this page with the closing panel. Off by default.
    */
   showClosing?: boolean | null;
   /**
@@ -6302,7 +6302,7 @@ export interface CrmFeature {
    */
   related?: (string | CrmFeature)[] | null;
   /**
-   * Ends this page with the closing panel. Off hides it on this page only.
+   * Ends this page with the closing panel. Off by default.
    */
   showClosing?: boolean | null;
   /**
@@ -7026,7 +7026,7 @@ export interface Hub {
       }[]
     | null;
   /**
-   * Shows the closing panel at the end of the hub page. Entry pages each have their own switch.
+   * Ends the hub page with the closing panel. Off by default. Entry pages each have their own switch.
    */
   showClosing?: boolean | null;
   /**
