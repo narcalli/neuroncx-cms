@@ -3,7 +3,11 @@ import type { Block } from 'payload'
 /**
  * An interactive trigger -> route -> resolve walkthrough. Editors define a
  * handful of events; the page lets a visitor pick one and watch it travel
- * through the three stages. Below it, three static step cards.
+ * through the three stages.
+ *
+ * It also had up to three static step cards below the demo; the field was
+ * removed on 24 Oct 2026. A page saved before then keeps its cards in the
+ * database, unused, until it is next saved.
  */
 export const AgenticFlowDemo: Block = {
   slug: 'agenticFlowDemo',
@@ -40,18 +44,6 @@ export const AgenticFlowDemo: Block = {
         },
         { name: 'resolveTitle', type: 'text', label: 'Resolve title', required: true, maxLength: 60 },
         { name: 'resolveText', type: 'text', label: 'Resolve text', required: true, maxLength: 180 },
-      ],
-    },
-    {
-      name: 'steps',
-      type: 'array',
-      label: 'Step cards',
-      minRows: 0,
-      maxRows: 3,
-      admin: { initCollapsed: true, description: 'Three cards below the demo: trigger, route, resolve.' },
-      fields: [
-        { name: 'title', type: 'text', label: 'Title', required: true, maxLength: 40 },
-        { name: 'text', type: 'textarea', label: 'Text', required: true, maxLength: 260 },
       ],
     },
     {

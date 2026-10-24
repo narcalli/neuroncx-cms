@@ -3104,16 +3104,6 @@ export interface AgenticFlowDemoBlock {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Three cards below the demo: trigger, route, resolve.
-   */
-  steps?:
-    | {
-        title: string;
-        text: string;
-        id?: string | null;
-      }[]
-    | null;
   footnote?: string | null;
   /**
    * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
@@ -8152,13 +8142,6 @@ export interface AgenticFlowDemoBlockSelect<T extends boolean = true> {
         handlers?: T;
         resolveTitle?: T;
         resolveText?: T;
-        id?: T;
-      };
-  steps?:
-    | T
-    | {
-        title?: T;
-        text?: T;
         id?: T;
       };
   footnote?: T;
