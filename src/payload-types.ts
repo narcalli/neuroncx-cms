@@ -93,6 +93,7 @@ export interface Config {
     cta: CallToActionBlock;
     content: ContentBlock;
     logoWall: LogoWallBlock;
+    howItWorks2: HowItWorks2Block;
     statBand: StatBandBlock;
     trustPanel: TrustPanelBlock;
   };
@@ -732,6 +733,7 @@ export interface Page {
     | IntegrationsBlock
     | ContactFormBlock
     | HowItWorksBlock
+    | HowItWorks2Block
     | ClosingCTABlock
     | FeatureThreadBlock
     | ArticleGridBlock
@@ -3630,6 +3632,50 @@ export interface HowItWorksBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HowItWorks2Block".
+ */
+export interface HowItWorks2Block {
+  /**
+   * Small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * The section heading.
+   */
+  heading: string;
+  intro?: string | null;
+  /**
+   * 2 to 5 steps, in order. The numbers 01, 02 and so on come from the order, so leave them out of the titles.
+   */
+  steps?:
+    | {
+        title: string;
+        description: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'howItWorks2';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "ClosingCTABlock".
  */
 export interface ClosingCTABlock {
@@ -5699,6 +5745,7 @@ export interface MicroApp {
         | CallToActionBlock
         | ContentBlock
         | LogoWallBlock
+        | HowItWorks2Block
         | StatBandBlock
         | TrustPanelBlock
       )[]
@@ -6859,6 +6906,7 @@ export interface Hub {
         | CallToActionBlock
         | ContentBlock
         | LogoWallBlock
+        | HowItWorks2Block
         | StatBandBlock
         | TrustPanelBlock
       )[]
@@ -7443,6 +7491,7 @@ export interface PagesSelect<T extends boolean = true> {
         integrations?: T | IntegrationsBlockSelect<T>;
         contactForm?: T | ContactFormBlockSelect<T>;
         howItWorks?: T | HowItWorksBlockSelect<T>;
+        howItWorks2?: T | HowItWorks2BlockSelect<T>;
         closingCta?: T | ClosingCTABlockSelect<T>;
         featureThread?: T | FeatureThreadBlockSelect<T>;
         articleGrid?: T | ArticleGridBlockSelect<T>;
@@ -8394,6 +8443,31 @@ export interface HowItWorksBlockSelect<T extends boolean = true> {
       };
   ctaLabel?: T;
   ctaLink?: T;
+  background?: T;
+  width?: T;
+  spacingTop?: T;
+  spacingBottom?: T;
+  align?: T;
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HowItWorks2Block_select".
+ */
+export interface HowItWorks2BlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  intro?: T;
+  steps?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        id?: T;
+      };
   background?: T;
   width?: T;
   spacingTop?: T;

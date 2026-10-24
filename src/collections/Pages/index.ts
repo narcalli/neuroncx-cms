@@ -21,6 +21,7 @@ import { revalidateDelete, revalidatePage } from './hooks/revalidatePage'
 import { validateHighlight } from './hooks/validateHighlight'
 import { ClosingCTA } from '../../blocks/ClosingCTA/config'
 import { HowItWorks } from '../../blocks/HowItWorks/config'
+import { HowItWorks2 } from '../../blocks/HowItWorks2/config'
 import { LogoWall } from '../../blocks/LogoWall/config'
 import { StatHero } from '../../blocks/StatHero/config'
 import { Benefits } from '../../blocks/Benefits/config'
@@ -150,6 +151,7 @@ export const Pages: CollectionConfig<'pages'> = {
                   Integrations,
                   ContactForm,
                   HowItWorks,
+                  HowItWorks2,
                   ClosingCTA,
                   FeatureThread,
                   ArticleGrid,

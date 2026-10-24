@@ -4,6 +4,7 @@ import { Benefits } from '../../blocks/Benefits/config'
 import { CallToAction } from '../../blocks/CallToAction/config'
 import { CaseStudyGrid } from '../../blocks/CaseStudyGrid/config'
 import { Content } from '../../blocks/Content/config'
+import { HowItWorks2 } from '../../blocks/HowItWorks2/config'
 import { LogoWall } from '../../blocks/LogoWall/config'
 import { MediaBlock } from '../../blocks/MediaBlock/config'
 import { ProductInAction } from '../../blocks/ProductInAction/config'
@@ -40,7 +41,7 @@ const withRowLabel = (block: Block): Block => ({
 })
 
 export const SITE_BLOCKS: Block[] = [
-  ...[Testimonial, MediaBlock, ProductInAction, CaseStudyGrid, Benefits, CallToAction, Content, LogoWall].map(
+  ...[Testimonial, MediaBlock, ProductInAction, CaseStudyGrid, Benefits, CallToAction, Content, LogoWall, HowItWorks2].map(
     withPresentation,
   ),
   ...[StatBand, TrustPanel].map(withMinimalPresentation),
