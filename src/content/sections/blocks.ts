@@ -4,7 +4,7 @@ import { contentCollections } from '../registry'
 import { allSections, buildSectionBlock } from './defineSection'
 import './hub'
 import './shared'
-import { SITE_BLOCKS } from './siteBlocks'
+import { HUB_PAGE_BLOCKS, SITE_BLOCKS } from './siteBlocks'
 
 /**
  * Every block a layout field can reference, for the config's top-level
@@ -24,4 +24,5 @@ export const contentBlocks = (): Block[] => [
     ),
   ),
   ...SITE_BLOCKS,
+  ...HUB_PAGE_BLOCKS,
 ]

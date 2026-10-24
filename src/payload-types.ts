@@ -96,6 +96,35 @@ export interface Config {
     howItWorks2: HowItWorks2Block;
     statBand: StatBandBlock;
     trustPanel: TrustPanelBlock;
+    partnerStrip: PartnerStripBlock;
+    problemStatement: ProblemStatementBlock;
+    journeyEngine: JourneyEngineBlock;
+    contextEngine: ContextEngineBlock;
+    solutionGrid: SolutionGridBlock;
+    productSuite: ProductSuiteBlock;
+    productSuite2: ProductSuite2Block;
+    customerDirectory: CustomerDirectoryBlock;
+    bentoGrid: BentoGridBlock;
+    detailedProductSuite: DetailedProductSuiteBlock;
+    agenticFlowDemo: AgenticFlowDemoBlock;
+    agenticStats: AgenticStatsBlock;
+    agenticCartsDemo: AgenticCartsDemoBlock;
+    agenticOrbit: AgenticOrbitBlock;
+    agenticEpisode: AgenticEpisodeBlock;
+    agenticCases: AgenticCasesBlock;
+    agenticClosing: AgenticClosingBlock;
+    integrationsMarquee: IntegrationsMarqueeBlock;
+    useCases: UseCasesBlock;
+    integrations: IntegrationsBlock;
+    contactForm: ContactFormBlock;
+    howItWorks: HowItWorksBlock;
+    closingCta: ClosingCTABlock;
+    featureThread: FeatureThreadBlock;
+    articleGrid: ArticleGridBlock;
+    archive: ArchiveBlock;
+    platformLayers: PlatformLayersBlock;
+    whatsappWidget: WhatsappWidgetBlock;
+    platformLayersTwo: PlatformLayersTwoBlock;
   };
   collections: {
     pages: Page;
@@ -6887,7 +6916,7 @@ export interface Hub {
       }[]
     | null;
   /**
-   * The hub page between the grouping sections and the FAQ, in order. The closing panel is fixed at the end.
+   * The hub page between the grouping sections and the FAQ, in order. Hub sections and every page block except the heroes and the plain FAQ block. The closing panel is fixed at the end.
    */
   layout?:
     | (
@@ -6909,6 +6938,35 @@ export interface Hub {
         | HowItWorks2Block
         | StatBandBlock
         | TrustPanelBlock
+        | PartnerStripBlock
+        | ProblemStatementBlock
+        | JourneyEngineBlock
+        | ContextEngineBlock
+        | SolutionGridBlock
+        | ProductSuiteBlock
+        | ProductSuite2Block
+        | CustomerDirectoryBlock
+        | BentoGridBlock
+        | DetailedProductSuiteBlock
+        | AgenticFlowDemoBlock
+        | AgenticStatsBlock
+        | AgenticCartsDemoBlock
+        | AgenticOrbitBlock
+        | AgenticEpisodeBlock
+        | AgenticCasesBlock
+        | AgenticClosingBlock
+        | IntegrationsMarqueeBlock
+        | UseCasesBlock
+        | IntegrationsBlock
+        | ContactFormBlock
+        | HowItWorksBlock
+        | ClosingCTABlock
+        | FeatureThreadBlock
+        | ArticleGridBlock
+        | ArchiveBlock
+        | PlatformLayersBlock
+        | WhatsappWidgetBlock
+        | PlatformLayersTwoBlock
       )[]
     | null;
   /**

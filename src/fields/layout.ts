@@ -6,7 +6,7 @@ import {
   sectionBlockSlug,
   sectionForBlockType,
 } from '../content/sections/defineSection'
-import { NEVER_IN_LAYOUT, SITE_BLOCKS } from '../content/sections/siteBlocks'
+import { HUB_PAGE_BLOCKS, NEVER_IN_LAYOUT, SITE_BLOCKS } from '../content/sections/siteBlocks'
 
 /**
  * The layout of an entry page (foundation.md section 5): the sections and
@@ -29,7 +29,11 @@ type LayoutBlock = {
 
 const labelOf = (block: LayoutBlock): string =>
   sectionForBlockType(block.blockType)?.label ??
-  String(SITE_BLOCKS.find((b) => b.slug === block.blockType)?.labels?.singular ?? block.blockType ?? 'block')
+  String(
+    [...SITE_BLOCKS, ...HUB_PAGE_BLOCKS].find((b) => b.slug === block.blockType)?.labels?.singular ??
+      block.blockType ??
+      'block',
+  )
 
 /**
  * Only the closing section may use Highlight (navy): the page's one navy
