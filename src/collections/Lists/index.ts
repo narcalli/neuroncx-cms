@@ -5,7 +5,7 @@ import { text as validateText } from 'payload/shared'
 import { authenticated } from '../../access/authenticated'
 import { collectionForListType, hubPagePath } from '../../content/registry'
 import { publishedOrBeforeDrafts } from '../../access/publishedOrBeforeDrafts'
-import { GROUPING_CARD_DESIGNS, itemCardDesignField } from '../../fields/cardDesign'
+import { GROUPING_CARD_DESIGNS, itemCardDesignField, showKeyPointsField } from '../../fields/cardDesign'
 import { slugRule, toSlug } from '../../fields/core'
 import { iconField } from '../../fields/icons'
 import { plainText } from '../../fields/validators/plainText'
@@ -156,6 +156,7 @@ export const Lists: CollectionConfig = {
       description:
         "Every entry in this grouping uses it, unless the entry has its own. Leave empty to follow the section. Used only where the section allows it. The Product suite designs, Detailed product suite and Bento grid draw the grouping's whole section on the hub page, unless the hub's section chooses its own design.",
     }),
+    showKeyPointsField(),
     {
       name: 'waRowTitle',
       type: 'text',

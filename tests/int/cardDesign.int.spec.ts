@@ -13,6 +13,7 @@ import {
   CARD_DESIGN_NAMES,
   cardDesignFields,
   ITEM_CARD_DESIGNS,
+  KEY_POINT_DESIGNS,
   type CardDesignValue,
 } from '@/fields/cardDesign'
 import type { IntegrationsBlock } from '@/payload-types'
@@ -85,19 +86,20 @@ describe('cardDesignFields', () => {
   it('builds the same fields with no argument as with allowItemDesigns off, and no switch', () => {
     const plain = cardDesignFields()
     const off = cardDesignFields({ allowItemDesigns: false })
-    expect(names(plain)).toEqual(['design', 'columns', 'lastRow', 'groupByCategory', 'linkLabel', 'look'])
+    expect(names(plain)).toEqual(['design', 'columns', 'lastRow', 'groupByCategory', 'linkLabel', 'showKeyPoints', 'look'])
     expect(JSON.stringify(off)).toBe(JSON.stringify(plain))
     expect(conditions(off)).toEqual(conditions(plain))
     // Without the switch, the settings follow the block's own design only.
     for (const d of CARD_DESIGN_NAMES) {
       expect(shownFor(plain, 'look', d, true)).toBe(d === 'feature')
       expect(shownFor(plain, 'linkLabel', d, true)).toBe(d === 'feature' || d === 'story')
+      expect(shownFor(plain, 'showKeyPoints', d, true)).toBe(d === 'feature' || d === 'logoCard' || d === 'story')
     }
   })
 
   it('adds the switch with allowItemDesigns, on by default, hidden for directory and pill', () => {
     const field = cardDesignFields({ allowItemDesigns: true })
-    expect(names(field)).toEqual(['design', 'allowItemDesigns', 'columns', 'lastRow', 'groupByCategory', 'linkLabel', 'look'])
+    expect(names(field)).toEqual(['design', 'allowItemDesigns', 'columns', 'lastRow', 'groupByCategory', 'linkLabel', 'showKeyPoints', 'look'])
     const toggle = child(field, 'allowItemDesigns') as { defaultValue?: unknown; label?: unknown }
     expect(toggle.defaultValue).toBe(true)
     expect(toggle.label).toBe('Let integrations and categories use their own design')
@@ -129,10 +131,32 @@ describe('cardDesignFields', () => {
       lastRow: 'leave',
       groupByCategory: false,
       allowItemDesigns: true,
+      showKeyPoints: false,
     })
     expect((child(field, 'columns') as SelectField).defaultValue).toBeUndefined()
     expect((child(field, 'lastRow') as SelectField).defaultValue).toBe(CARD_DESIGN_DEFAULTS.lastRow)
     expect((child(field, 'groupByCategory') as { defaultValue?: unknown }).defaultValue).toBe(false)
+    expect((child(field, 'showKeyPoints') as { defaultValue?: unknown }).defaultValue).toBe(false)
+  })
+
+  it('offers "Show key points" for the feature, logo card and story designs, off by default', () => {
+    const field = cardDesignFields()
+    const toggle = child(field, 'showKeyPoints') as { type?: string; label?: unknown; admin?: { description?: unknown } }
+    expect(toggle.type).toBe('checkbox')
+    expect(toggle.label).toBe('Show key points')
+    expect(toggle.admin?.description).toBe("Lists the entry's key points under the description, up to 3.")
+    expect(KEY_POINT_DESIGNS).toEqual(['feature', 'logoCard', 'story'])
+    for (const d of CARD_DESIGN_NAMES) {
+      expect(shownFor(field, 'showKeyPoints', d), d).toBe((KEY_POINT_DESIGNS as readonly string[]).includes(d))
+    }
+    // An unset block counts as the grid, which has no room for them.
+    expect(shownFor(field, 'showKeyPoints', undefined)).toBe(false)
+    // With the item designs switch on, an integration may bring a design that shows them.
+    const items = cardDesignFields({ allowItemDesigns: true })
+    for (const d of CARD_DESIGN_NAMES) {
+      expect(shownFor(items, 'showKeyPoints', d, true), d).toBe(d !== 'directory' && d !== 'pill')
+      expect(shownFor(items, 'showKeyPoints', d, false), d).toBe((KEY_POINT_DESIGNS as readonly string[]).includes(d))
+    }
   })
 
   it("has no 'All integrations' card option, with or without the switch", () => {
@@ -242,8 +266,33 @@ describe('section designs, for hub grouping sections and groupings only', () => 
       expect(shown('bento')).toBe(true)
       for (const d of [undefined, 'grid', 'suite', 'detailedSuite']) expect(shown(d), String(d)).toBe(false)
     })
+
+    it('shows "Show key points" right after the card design, for feature, logo card and story only', () => {
+      expect(rows.fields.map((f) => ('name' in f ? f.name : f.type)).indexOf('showKeyPoints')).toBe(
+        rows.fields.findIndex((f) => 'name' in f && f.name === 'cardDesign') + 1,
+      )
+      expectKeyPointsSwitch(row('showKeyPoints'), [...CARD_DESIGN_NAMES, ...SECTION])
+    })
+  })
+
+  it('a grouping has "Show key points" too, for feature, logo card and story only', () => {
+    expectKeyPointsSwitch(findField(Lists.fields, 'showKeyPoints'), [...ITEM_CARD_DESIGNS, ...SECTION])
   })
 })
+
+// The switch beside a single Card design choice: a checkbox, off, with the
+// spec's label and description, shown only while that choice can list key
+// points (bento shows its own, so it is left out).
+function expectKeyPointsSwitch(field: Field | undefined, designs: string[]) {
+  const f = field as Field & { type?: string; label?: unknown; defaultValue?: unknown; admin?: { description?: unknown } }
+  expect(f?.type).toBe('checkbox')
+  expect(f.label).toBe('Show key points')
+  expect(f.defaultValue).toBe(false)
+  expect(f.admin?.description).toBe("Lists the entry's key points under the description, up to 3.")
+  const shown = (cardDesign?: string) => f.admin?.condition?.({}, { cardDesign }, {} as never)
+  for (const d of designs) expect(shown(d), d).toBe(['feature', 'logoCard', 'story'].includes(d))
+  expect(shown(undefined)).toBe(false)
+}
 
 describe('hero design', () => {
   const hubs = buildHubs()

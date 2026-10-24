@@ -63,6 +63,37 @@ export const GROUPING_CARD_DESIGNS = [...ITEM_CARD_DESIGNS, ...SECTION_CARD_DESI
 
 export type GroupingCardDesignName = (typeof GROUPING_CARD_DESIGNS)[number]
 
+/**
+ * The designs that can list an entry's key points under its description.
+ * Bento and Detailed product suite show key points on their own; grid,
+ * directory and pill have no room for them.
+ */
+export const KEY_POINT_DESIGNS = ['feature', 'logoCard', 'story'] as const satisfies readonly CardDesignName[]
+
+const SHOW_KEY_POINTS = {
+  label: 'Show key points',
+  description: "Lists the entry's key points under the description, up to 3.",
+}
+
+const designShowsKeyPoints = (design: unknown) => (KEY_POINT_DESIGNS as readonly unknown[]).includes(design)
+
+/**
+ * "Show key points" beside a single Card design choice (a hub's grouping
+ * section, a grouping), shown while that choice is one of KEY_POINT_DESIGNS.
+ * The website reads the section's switch when the section chose such a
+ * design, else the grouping's.
+ */
+export const showKeyPointsField = (): Field => ({
+  name: 'showKeyPoints',
+  type: 'checkbox',
+  label: SHOW_KEY_POINTS.label,
+  defaultValue: false,
+  admin: {
+    description: SHOW_KEY_POINTS.description,
+    condition: (_data, siblingData) => designShowsKeyPoints(siblingData?.cardDesign),
+  },
+})
+
 /** Select options for the given designs, in the usual order, with their labels. */
 export const cardDesignOptions = (names: readonly AnyCardDesignName[]) =>
   (Object.keys(DESIGNS) as AnyCardDesignName[])
@@ -119,6 +150,7 @@ export type CardDesignValue = {
   }
   /** Only on groups built with allowItemDesigns. */
   allowItemDesigns?: boolean | null
+  showKeyPoints?: boolean | null
 }
 
 /**
@@ -132,6 +164,7 @@ export const CARD_DESIGN_DEFAULTS = {
   lastRow: 'leave',
   groupByCategory: false,
   allowItemDesigns: true,
+  showKeyPoints: false,
 } as const satisfies Omit<CardDesignValue, 'linkLabel' | 'look'>
 
 export type CardDesignOptions = {
@@ -256,6 +289,16 @@ export const cardDesignFields = ({
         admin: {
           condition: orForItems(designIs('feature', 'story')),
           description: 'Used only for integrations that have their own page.',
+        },
+      },
+      {
+        name: 'showKeyPoints',
+        type: 'checkbox',
+        label: SHOW_KEY_POINTS.label,
+        defaultValue: CARD_DESIGN_DEFAULTS.showKeyPoints,
+        admin: {
+          condition: orForItems(designIs(...KEY_POINT_DESIGNS)),
+          description: SHOW_KEY_POINTS.description,
         },
       },
       {

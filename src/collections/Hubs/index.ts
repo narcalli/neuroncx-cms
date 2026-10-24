@@ -16,7 +16,7 @@ import { revalidateContent } from '../../content/revalidate'
 import { allSections, sectionBlockSlug } from '../../content/sections/defineSection'
 import { HUB_SECTION_KEYS, hubEntries } from '../../content/sections/hub'
 import { HUB_PAGE_BLOCKS, SITE_BLOCKS } from '../../content/sections/siteBlocks'
-import { GROUPING_SECTION_CARD_DESIGNS, itemCardDesignField } from '../../fields/cardDesign'
+import { GROUPING_SECTION_CARD_DESIGNS, itemCardDesignField, showKeyPointsField } from '../../fields/cardDesign'
 import { slugRule } from '../../fields/core'
 import { chatExampleFields } from '../../fields/chatExample'
 import { showClosingField } from '../../fields/closing'
@@ -211,6 +211,7 @@ export const buildHubs = (): CollectionConfig => {
             description:
               "Leave empty to use the grouping's design, else the grid. The Product suite designs, Detailed product suite and Bento grid draw the whole section, and win over the grouping's choice. With a card grid design, an entry's or a grouping's own card design still wins where the design allows it.",
           }),
+          showKeyPointsField(),
           {
             name: 'bentoPattern',
             type: 'select',

@@ -3539,6 +3539,10 @@ export interface IntegrationsBlock {
      * Used only for integrations that have their own page.
      */
     linkLabel?: string | null;
+    /**
+     * Lists the entry's key points under the description, up to 3.
+     */
+    showKeyPoints?: boolean | null;
     look?: {
       cardColor?: ('grey' | 'lavender' | 'white') | null;
       border?: ('none' | 'solid' | 'gradient') | null;
@@ -4967,6 +4971,10 @@ export interface IntegrationsMaster {
            * Used only for integrations that have their own page.
            */
           linkLabel?: string | null;
+          /**
+           * Lists the entry's key points under the description, up to 3.
+           */
+          showKeyPoints?: boolean | null;
           look?: {
             cardColor?: ('grey' | 'lavender' | 'white') | null;
             border?: ('none' | 'solid' | 'gradient') | null;
@@ -5002,6 +5010,10 @@ export interface IntegrationsMaster {
      * Used only for integrations that have their own page.
      */
     linkLabel?: string | null;
+    /**
+     * Lists the entry's key points under the description, up to 3.
+     */
+    showKeyPoints?: boolean | null;
     look?: {
       cardColor?: ('grey' | 'lavender' | 'white') | null;
       border?: ('none' | 'solid' | 'gradient') | null;
@@ -5984,6 +5996,10 @@ export interface List {
     | ('grid' | 'logoCard' | 'feature' | 'story' | 'suite' | 'suiteSteps' | 'suite2' | 'detailedSuite' | 'bento')
     | null;
   /**
+   * Lists the entry's key points under the description, up to 3.
+   */
+  showKeyPoints?: boolean | null;
+  /**
    * The grouping as a row in a WhatsApp list menu. Plain text.
    */
   waRowTitle?: string | null;
@@ -6889,6 +6905,10 @@ export interface Hub {
               | 'bento'
             )
           | null;
+        /**
+         * Lists the entry's key points under the description, up to 3.
+         */
+        showKeyPoints?: boolean | null;
         /**
          * How the cards share the width. The order follows the entries.
          */
@@ -8427,6 +8447,7 @@ export interface IntegrationsBlockSelect<T extends boolean = true> {
         lastRow?: T;
         groupByCategory?: T;
         linkLabel?: T;
+        showKeyPoints?: T;
         look?:
           | T
           | {
@@ -9444,6 +9465,7 @@ export interface IntegrationsMasterSelect<T extends boolean = true> {
               lastRow?: T;
               groupByCategory?: T;
               linkLabel?: T;
+              showKeyPoints?: T;
               look?:
                 | T
                 | {
@@ -9464,6 +9486,7 @@ export interface IntegrationsMasterSelect<T extends boolean = true> {
         lastRow?: T;
         groupByCategory?: T;
         linkLabel?: T;
+        showKeyPoints?: T;
         look?:
           | T
           | {
@@ -9789,6 +9812,7 @@ export interface ListsSelect<T extends boolean = true> {
   summary?: T;
   icon?: T;
   cardDesign?: T;
+  showKeyPoints?: T;
   waRowTitle?: T;
   waRowDescription?: T;
   updatedAt?: T;
@@ -10208,6 +10232,7 @@ export interface HubsSelect<T extends boolean = true> {
         heading?: T;
         intro?: T;
         cardDesign?: T;
+        showKeyPoints?: T;
         bentoPattern?: T;
         entries?: T;
         id?: T;
