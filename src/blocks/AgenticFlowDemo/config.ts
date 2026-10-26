@@ -1,7 +1,10 @@
 import type { Block, Condition, Field, SelectField } from 'payload'
+import { VERTICAL_OPTIONS } from '../../fields/verticals'
 
 const isFlow: Condition = (_data, siblingData) => siblingData?.mode !== 'agentFeatures'
 const isAgentFeatures: Condition = (_data, siblingData) => siblingData?.mode === 'agentFeatures'
+const showsIndustries: Condition = (_data, siblingData) =>
+  siblingData?.mode === 'agentFeatures' && siblingData?.agentsFor === 'industries'
 
 /** Warns while a text ends with a pasted field label (pastedLabel.ts). */
 const WARN = '@/fields/PastedLabelWarning/Component#PastedLabelWarning'
@@ -332,6 +335,33 @@ export const AgenticFlowDemo: Block = {
       admin: {
         description:
           'Flow walks an event through trigger, route and resolve. Agent features shows what each bot swarm agent does, read from the agents.',
+      },
+    },
+    {
+      name: 'agentsFor',
+      type: 'select',
+      label: 'Show agents for',
+      defaultValue: 'all',
+      options: [
+        { label: 'All agents', value: 'all' },
+        { label: 'Chosen industries', value: 'industries' },
+      ],
+      admin: {
+        condition: isAgentFeatures,
+        description: 'Chosen industries shows only the agents used in at least one of them.',
+      },
+    },
+    {
+      // The same list as an agent's Verticals (fields/verticals.ts).
+      name: 'industries',
+      type: 'select',
+      label: 'Industries',
+      hasMany: true,
+      required: true,
+      options: [...VERTICAL_OPTIONS],
+      admin: {
+        condition: showsIndustries,
+        description: "An agent shows when its Verticals include at least one of these. Families with no such agent are left out.",
       },
     },
     {

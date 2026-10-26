@@ -4,6 +4,8 @@ import { defineContentCollection } from '../../content/defineContentCollection'
 import { countedText } from '../../fields/counted'
 import { plainText } from '../../fields/validators/plainText'
 import './sections'
+import { VERTICAL_OPTIONS } from '../../fields/verticals'
+import { revalidateFlowDemoPages } from './flowDemoPages'
 
 /**
  * Bot swarm: one entry per small agent with one job, such as Payment
@@ -31,12 +33,8 @@ const sidebar: Field[] = [
     name: 'verticals',
     type: 'select',
     hasMany: true,
-    options: [
-      { label: 'Healthcare', value: 'healthcare' },
-      { label: 'Diagnostics', value: 'diagnostics' },
-      { label: 'Education', value: 'education' },
-      { label: 'Hospitality', value: 'hospitality' },
-    ],
+    // Shared with the Agentic Flow Demo's industry filter.
+    options: [...VERTICAL_OPTIONS],
     admin: { description: 'Where it is used today.' },
   },
 ]
@@ -215,6 +213,8 @@ export const MicroApps = defineContentCollection({
     'related',
   ],
   kb: { resolve: ['family', 'integrations', 'passesTo', 'customers'] },
+  // Pages whose Agentic Flow Demo shows this agent (flowDemoPages.ts).
+  hooks: { afterChange: [revalidateFlowDemoPages] },
   admin: {
     defaultColumns: ['name', 'family', 'status', 'channel', 'hasOwnPage', 'updatedAt'],
     // Family by its own order, then the agent's order within it.

@@ -17,6 +17,7 @@ import { MediaBlock } from './MediaBlock/config'
 import { ClosingCTA } from './ClosingCTA/config'
 import { AudienceTabs } from './AudienceTabs/config'
 import { RecordAnatomy } from './RecordAnatomy/config'
+import { ClusterLinks } from './ClusterLinks/config'
 import { ComparisonTable } from './ComparisonTable/config'
 import { HowItWorks } from './HowItWorks/config'
 import { HowItWorks2 } from './HowItWorks2/config'
@@ -99,6 +100,7 @@ export const PAGE_LAYOUT_BLOCKS: Block[] = [
     ComparisonTable,
     AudienceTabs,
     RecordAnatomy,
+    ClusterLinks,
     ClosingCTA,
     FeatureThread,
     ArticleGrid,

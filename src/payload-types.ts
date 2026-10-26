@@ -770,6 +770,7 @@ export interface Page {
     | ComparisonTableBlock
     | AudienceTabsBlock
     | RecordAnatomyBlock
+    | ClusterLinksBlock
     | ClosingCTABlock
     | FeatureThreadBlock
     | ArticleGridBlock
@@ -799,6 +800,10 @@ export interface Page {
      */
     image?: (string | null) | Media;
     description?: string | null;
+    /**
+     * The one search phrase this page is written for. No two pages share a primary keyword.
+     */
+    primaryKeyword?: string | null;
   };
   publishedAt?: string | null;
   /**
@@ -806,6 +811,33 @@ export interface Page {
    */
   generateSlug?: boolean | null;
   slug: string;
+  /**
+   * Optional. Makes this a cluster page under a pillar page, at /pillar-slug/page-slug. One level only.
+   */
+  parent?: (string | null) | Page;
+  /**
+   * The stage this page covers, such as Qualification.
+   */
+  stage?: string | null;
+  /**
+   * This stage's place in the episode. Sets the order of the pillar page's list and the next-stage link.
+   */
+  stageOrder?: number | null;
+  /**
+   * The links back to the pillar page and on to the next stage, shown at the foot of every cluster page.
+   */
+  hideClusterFooter?: boolean | null;
+  /**
+   * Built from the parent page on save. The last row is this page and its path.
+   */
+  breadcrumbs?:
+    | {
+        doc?: (string | null) | Page;
+        url?: string | null;
+        label?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   breadcrumbParent?: {
     kind?: ('none' | 'page' | 'label') | null;
     page?: (string | null) | Page;
@@ -3102,6 +3134,14 @@ export interface AgenticFlowDemoBlock {
    */
   mode: 'flow' | 'agentFeatures';
   /**
+   * Chosen industries shows only the agents used in at least one of them.
+   */
+  agentsFor?: ('all' | 'industries') | null;
+  /**
+   * An agent shows when its Verticals include at least one of these. Families with no such agent are left out.
+   */
+  industries?: ('healthcare' | 'diagnostics' | 'education' | 'hospitality')[] | null;
+  /**
    * The families to offer, in this order. Leave empty for every family, by their order.
    */
   families?: (string | List)[] | null;
@@ -5378,6 +5418,83 @@ export interface RecordAnatomyBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'recordAnatomy';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ClusterLinksBlock".
+ */
+export interface ClusterLinksBlock {
+  /**
+   * Optional. The small line above the heading.
+   */
+  eyebrow?: string | null;
+  heading?: string | null;
+  /**
+   * Optional. One or two sentences under the heading.
+   */
+  intro?: string | null;
+  /**
+   * Optional. Pages that belong to this cluster but keep their own address. The pages under this page are listed without being added here.
+   */
+  extraPages?:
+    | {
+        page: string | Page;
+        /**
+         * Such as Qualification.
+         */
+        stage?: string | null;
+        stageOrder?: number | null;
+        id?: string | null;
+      }[]
+    | null;
+  cardDesign: {
+    design: 'grid' | 'logoCard' | 'directory' | 'feature' | 'story' | 'pill';
+    /**
+     * Leave empty to fit as many as the width allows.
+     */
+    columns?: ('2' | '3' | '4') | null;
+    lastRow?: ('stretch' | 'center' | 'leave') | null;
+    /**
+     * Show a heading for each category.
+     */
+    groupByCategory?: boolean | null;
+    /**
+     * Used only for integrations that have their own page.
+     */
+    linkLabel?: string | null;
+    /**
+     * Lists the entry's key points under the description, up to 3.
+     */
+    showKeyPoints?: boolean | null;
+    look?: {
+      cardColor?: ('grey' | 'lavender' | 'white') | null;
+      border?: ('none' | 'solid' | 'gradient') | null;
+      borderColor?: ('blue' | 'violet' | 'crimson' | 'navy') | null;
+      /**
+       * A thin rule under the content, matches the border color.
+       */
+      accentLine?: boolean | null;
+    };
+  };
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'clusterLinks';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -8016,6 +8133,7 @@ export interface PagesSelect<T extends boolean = true> {
         comparisonTable?: T | ComparisonTableBlockSelect<T>;
         audienceTabs?: T | AudienceTabsBlockSelect<T>;
         recordAnatomy?: T | RecordAnatomyBlockSelect<T>;
+        clusterLinks?: T | ClusterLinksBlockSelect<T>;
         closingCta?: T | ClosingCTABlockSelect<T>;
         featureThread?: T | FeatureThreadBlockSelect<T>;
         articleGrid?: T | ArticleGridBlockSelect<T>;
@@ -8044,10 +8162,23 @@ export interface PagesSelect<T extends boolean = true> {
         title?: T;
         image?: T;
         description?: T;
+        primaryKeyword?: T;
       };
   publishedAt?: T;
   generateSlug?: T;
   slug?: T;
+  parent?: T;
+  stage?: T;
+  stageOrder?: T;
+  hideClusterFooter?: T;
+  breadcrumbs?:
+    | T
+    | {
+        doc?: T;
+        url?: T;
+        label?: T;
+        id?: T;
+      };
   breadcrumbParent?:
     | T
     | {
@@ -8610,6 +8741,8 @@ export interface AgenticFlowDemoBlockSelect<T extends boolean = true> {
   heading?: T;
   intro?: T;
   mode?: T;
+  agentsFor?: T;
+  industries?: T;
   families?: T;
   pickFamilyLabel?: T;
   pickAgentLabel?: T;
@@ -9144,6 +9277,50 @@ export interface RecordAnatomyBlockSelect<T extends boolean = true> {
               id?: T;
             };
         id?: T;
+      };
+  background?: T;
+  width?: T;
+  spacingTop?: T;
+  spacingBottom?: T;
+  align?: T;
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ClusterLinksBlock_select".
+ */
+export interface ClusterLinksBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  intro?: T;
+  extraPages?:
+    | T
+    | {
+        page?: T;
+        stage?: T;
+        stageOrder?: T;
+        id?: T;
+      };
+  cardDesign?:
+    | T
+    | {
+        design?: T;
+        columns?: T;
+        lastRow?: T;
+        groupByCategory?: T;
+        linkLabel?: T;
+        showKeyPoints?: T;
+        look?:
+          | T
+          | {
+              cardColor?: T;
+              border?: T;
+              borderColor?: T;
+              accentLine?: T;
+            };
       };
   background?: T;
   width?: T;

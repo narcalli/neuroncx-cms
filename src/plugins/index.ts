@@ -1,3 +1,4 @@
+import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
 import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { mcpPlugin } from '@payloadcms/plugin-mcp'
@@ -7,6 +8,7 @@ import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 
 import { Page, Post } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
+import { pagePath } from '@/collections/Pages/nesting'
 
 const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
   return doc?.title ? `${doc.title} | Blog` : 'Blog'
@@ -19,6 +21,13 @@ const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
 }
 
 export const plugins: Plugin[] = [
+  // Pillar and cluster pages: each page's parent and stored breadcrumbs
+  // (src/collections/Pages/nesting.ts). The fields are defined in Pages.
+  nestedDocsPlugin({
+    collections: ['pages'],
+    generateLabel: (_, doc) => String(doc.breadcrumbLabel || doc.title || ''),
+    generateURL: (docs) => pagePath(docs),
+  }),
   redirectsPlugin({
     collections: ['pages', 'posts'],
     overrides: {

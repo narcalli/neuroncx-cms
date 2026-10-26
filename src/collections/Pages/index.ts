@@ -1,4 +1,4 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, Where } from 'payload'
 
 import { authenticated } from '../../access/authenticated'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
@@ -9,6 +9,17 @@ import { populatePublishedAt } from '../../hooks/populatePublishedAt'
 import { generatePreviewPath } from '../../utilities/generatePreviewPath'
 import { revalidateDelete, revalidatePage } from './hooks/revalidatePage'
 import { validateHighlight } from './hooks/validateHighlight'
+import { createBreadcrumbsField, createParentField } from '@payloadcms/plugin-nested-docs'
+import {
+  notePublishedPath,
+  redirectMovedPage,
+  revalidateDeletedPageOnSite,
+  revalidatePageOnSite,
+  validateParent,
+  validatePrimaryKeyword,
+} from './nesting'
+
+const hasParent = (data: { parent?: unknown } | undefined) => Boolean(data?.parent)
 
 import {
   MetaDescriptionField,
@@ -95,6 +106,16 @@ export const Pages: CollectionConfig<'pages'> = {
             }),
 
             MetaDescriptionField({}),
+            {
+              name: 'primaryKeyword',
+              type: 'text',
+              label: 'Primary keyword',
+              maxLength: 60,
+              validate: validatePrimaryKeyword,
+              admin: {
+                description: 'The one search phrase this page is written for. No two pages share a primary keyword.',
+              },
+            },
             PreviewField({
               // if the `generateUrl` function is configured
               hasGenerateFn: true,
@@ -115,7 +136,72 @@ export const Pages: CollectionConfig<'pages'> = {
       },
     },
     slugField(),
-    // Breadcrumb trail only. URLs stay flat (/{slug}); nothing here changes routing.
+    // Pillar and cluster pages (./nesting.ts): the parent page sets the path,
+    // /{parent slug}/{slug}. The nested docs plugin finds these two fields by
+    // name and keeps the breadcrumbs up to date.
+    createParentField('pages', {
+      label: 'Parent page (pillar)',
+      validate: validateParent,
+      // Not the home page, the page itself, or a page under it.
+      filterOptions: ({ id }): Where => ({
+        and: [
+          { slug: { not_equals: 'home' } },
+          ...(id ? [{ id: { not_equals: id } }, { 'breadcrumbs.doc': { not_in: [id] } }] : []),
+        ],
+      }),
+      admin: {
+        position: 'sidebar',
+        description:
+          'Optional. Makes this a cluster page under a pillar page, at /pillar-slug/page-slug. One level only.',
+      },
+    }),
+    {
+      name: 'stage',
+      type: 'text',
+      label: 'Stage (cluster pages)',
+      maxLength: 30,
+      admin: {
+        position: 'sidebar',
+        condition: hasParent,
+        description: 'The stage this page covers, such as Qualification.',
+      },
+    },
+    {
+      name: 'stageOrder',
+      type: 'number',
+      label: 'Stage order (cluster pages)',
+      min: 1,
+      admin: {
+        position: 'sidebar',
+        condition: hasParent,
+        step: 1,
+        description: "This stage's place in the episode. Sets the order of the pillar page's list and the next-stage link.",
+      },
+    },
+    {
+      name: 'hideClusterFooter',
+      type: 'checkbox',
+      label: 'Hide cluster footer',
+      defaultValue: false,
+      admin: {
+        position: 'sidebar',
+        condition: hasParent,
+        description: 'The links back to the pillar page and on to the next stage, shown at the foot of every cluster page.',
+      },
+    },
+    createBreadcrumbsField('pages', {
+      label: 'Breadcrumbs (set on save)',
+      localized: false,
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+        initCollapsed: true,
+        condition: hasParent,
+        description: 'Built from the parent page on save. The last row is this page and its path.',
+      },
+    }),
+    // Breadcrumb trail only, for pages without a parent page; nothing here
+    // changes routing. The parent page above is what sets a cluster's path.
     {
       name: 'breadcrumbParent',
       type: 'group',
@@ -169,10 +255,10 @@ export const Pages: CollectionConfig<'pages'> = {
     },
   ],
   hooks: {
-    afterChange: [revalidatePage],
+    afterChange: [revalidatePage, redirectMovedPage, revalidatePageOnSite],
     beforeValidate: [validateHighlight],
-    beforeChange: [populatePublishedAt],
-    afterDelete: [revalidateDelete],
+    beforeChange: [populatePublishedAt, notePublishedPath],
+    afterDelete: [revalidateDelete, revalidateDeletedPageOnSite],
   },
   versions: {
     drafts: {

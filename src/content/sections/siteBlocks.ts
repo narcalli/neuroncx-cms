@@ -68,12 +68,20 @@ export const NEVER_IN_LAYOUT = [
 ] as const
 
 /**
+ * Page blocks that only make sense on a CMS page: cluster links lists the
+ * pages under the page it sits on, and a hub has none.
+ */
+export const PAGES_ONLY = ['clusterLinks'] as const
+
+/**
  * The other page blocks a hub's layout offers, beyond SITE_BLOCKS: every
  * block a Page's layout has, defined once in src/blocks/pageLayoutBlocks.ts
  * with the same Appearance options, except those that can never be in a
- * layout. Entry layouts keep SITE_BLOCKS only.
+ * layout and those for pages only. Entry layouts keep SITE_BLOCKS only.
  */
 export const HUB_PAGE_BLOCKS: Block[] = PAGE_LAYOUT_BLOCKS.filter(
   (b) =>
-    !(NEVER_IN_LAYOUT as readonly string[]).includes(b.slug) && !SITE_BLOCKS.some((s) => s.slug === b.slug),
+    !(NEVER_IN_LAYOUT as readonly string[]).includes(b.slug) &&
+    !(PAGES_ONLY as readonly string[]).includes(b.slug) &&
+    !SITE_BLOCKS.some((s) => s.slug === b.slug),
 ).map(withRowLabel)

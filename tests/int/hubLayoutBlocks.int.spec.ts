@@ -6,11 +6,12 @@ import { buildHubs } from '@/collections/Hubs'
 import { MicroApps } from '@/collections/MicroApps'
 import { Pages } from '@/collections/Pages'
 import { contentBlocks } from '@/content/sections/blocks'
-import { HUB_PAGE_BLOCKS, NEVER_IN_LAYOUT, SITE_BLOCKS } from '@/content/sections/siteBlocks'
+import { HUB_PAGE_BLOCKS, NEVER_IN_LAYOUT, PAGES_ONLY, SITE_BLOCKS } from '@/content/sections/siteBlocks'
 
 /**
- * A hub's layout offers every page block except the heroes and the plain
- * faq block; Pages keeps its own list; entry layouts keep the site blocks.
+ * A hub's layout offers every page block except the heroes, the plain faq
+ * block and the blocks for pages only; Pages keeps its own list; entry
+ * layouts keep the site blocks.
  */
 
 const findField = (fields: Field[], name: string): any => {
@@ -24,10 +25,13 @@ const pageSlugs = PAGE_LAYOUT_BLOCKS.map((b) => b.slug)
 const hubRefs: string[] = findField(buildHubs().fields, 'layout').blockReferences
 
 describe('hub layout blocks', () => {
-  it('offers every page block except the heroes and the plain faq block', () => {
-    const allowed = pageSlugs.filter((s) => !(NEVER_IN_LAYOUT as readonly string[]).includes(s))
+  it('offers every page block except the heroes, the plain faq block and the blocks for pages only', () => {
+    const left = [...NEVER_IN_LAYOUT, ...PAGES_ONLY] as readonly string[]
+    const allowed = pageSlugs.filter((s) => !left.includes(s))
     for (const slug of allowed) expect(hubRefs, slug).toContain(slug)
-    for (const slug of NEVER_IN_LAYOUT) expect(hubRefs, slug).not.toContain(slug)
+    for (const slug of left) expect(hubRefs, slug).not.toContain(slug)
+    // Cluster links lists the pages under the page it sits on; a hub has none.
+    expect(PAGES_ONLY).toContain('clusterLinks')
     expect(hubRefs).toEqual(expect.arrayContaining(['agenticCartsDemo', 'bentoGrid', 'productSuite2', 'useCases', 'howItWorks2']))
   })
 
