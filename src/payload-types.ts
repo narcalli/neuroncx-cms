@@ -119,6 +119,9 @@ export interface Config {
     integrations: IntegrationsBlock;
     contactForm: ContactFormBlock;
     howItWorks: HowItWorksBlock;
+    comparisonTable: ComparisonTableBlock;
+    audienceTabs: AudienceTabsBlock;
+    recordAnatomy: RecordAnatomyBlock;
     closingCta: ClosingCTABlock;
     featureThread: FeatureThreadBlock;
     articleGrid: ArticleGridBlock;
@@ -764,6 +767,9 @@ export interface Page {
     | ContactFormBlock
     | HowItWorksBlock
     | HowItWorks2Block
+    | ComparisonTableBlock
+    | AudienceTabsBlock
+    | RecordAnatomyBlock
     | ClosingCTABlock
     | FeatureThreadBlock
     | ArticleGridBlock
@@ -5118,6 +5124,263 @@ export interface HowItWorksBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ComparisonTableBlock".
+ */
+export interface ComparisonTableBlock {
+  /**
+   * Optional. The small line above the heading.
+   */
+  eyebrow?: string | null;
+  heading: string;
+  /**
+   * Optional. One or two sentences under the heading.
+   */
+  intro?: string | null;
+  /**
+   * The systems being compared, left to right. Highlight one column at most, usually NeuronCx.
+   */
+  columns: {
+    label: string;
+    highlight?: boolean | null;
+    id?: string | null;
+  }[];
+  /**
+   * Describe what each system typically covers, in plain words. No ticks or crosses, and no claims about a named product.
+   */
+  rows: {
+    label: string;
+    /**
+     * One cell per column, in the same order as the columns.
+     */
+    cells?:
+      | {
+          text?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    id?: string | null;
+  }[];
+  /**
+   * Optional. A short note under the table.
+   */
+  footnote?: string | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'comparisonTable';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AudienceTabsBlock".
+ */
+export interface AudienceTabsBlock {
+  /**
+   * Optional. The small line above the heading.
+   */
+  eyebrow?: string | null;
+  heading: string;
+  /**
+   * Optional. One or two sentences under the heading.
+   */
+  intro?: string | null;
+  /**
+   * One tab per reader group, left to right. The first tab is shown when the page opens.
+   */
+  tabs: {
+    /**
+     * The reader group, for example Leadership, Operations or IT.
+     */
+    label: string;
+    /**
+     * Optional. The heading inside the panel.
+     */
+    title?: string | null;
+    /**
+     * Optional. A short summary for this group.
+     */
+    intro?: string | null;
+    /**
+     * One capability per line, stated as what the platform does. No stories or invented figures.
+     */
+    points: {
+      text: string;
+      id?: string | null;
+    }[];
+    /**
+     * Optional. Shown under the intro.
+     */
+    links?:
+      | {
+          label: string;
+          url: string;
+          id?: string | null;
+        }[]
+      | null;
+    id?: string | null;
+  }[];
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'audienceTabs';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "RecordAnatomyBlock".
+ */
+export interface RecordAnatomyBlock {
+  /**
+   * Optional. The small line above the heading.
+   */
+  eyebrow?: string | null;
+  heading: string;
+  /**
+   * Optional. One or two sentences under the heading.
+   */
+  intro?: string | null;
+  /**
+   * Shown before the entity name in the panel, such as "Student record › Fees".
+   */
+  recordLabel?: string | null;
+  fieldColumnLabel?: string | null;
+  sourceColumnLabel?: string | null;
+  /**
+   * The parts of the record, such as Contacts, Admissions or Fees. The first one is shown when the page opens.
+   */
+  entities: {
+    label: string;
+    /**
+     * Optional. Shown beside the entity name.
+     */
+    icon?:
+      | (
+          | 'message'
+          | 'chat'
+          | 'check'
+          | 'calendar'
+          | 'card'
+          | 'document'
+          | 'refresh'
+          | 'bolt'
+          | 'layers'
+          | 'gauge'
+          | 'plug'
+          | 'shield'
+          | 'shieldCheck'
+          | 'lock'
+          | 'globe'
+          | 'server'
+          | 'eye'
+          | 'users'
+          | 'user'
+          | 'phone'
+          | 'smartphone'
+          | 'mail'
+          | 'messageCircle'
+          | 'send'
+          | 'inbox'
+          | 'headphones'
+          | 'mic'
+          | 'video'
+          | 'bell'
+          | 'handshake'
+          | 'stethoscope'
+          | 'heartPulse'
+          | 'hospital'
+          | 'activity'
+          | 'flask'
+          | 'pill'
+          | 'graduationCap'
+          | 'building'
+          | 'mapPin'
+          | 'database'
+          | 'cloud'
+          | 'workflow'
+          | 'bot'
+          | 'sparkles'
+          | 'search'
+          | 'chart'
+          | 'trendingUp'
+          | 'target'
+          | 'rocket'
+          | 'key'
+          | 'fileText'
+          | 'clipboardList'
+          | 'link'
+          | 'settings'
+          | 'puzzle'
+          | 'timer'
+          | 'clock'
+          | 'badgeCheck'
+          | 'star'
+          | 'briefcase'
+        )
+      | null;
+    /**
+     * Optional. One line on what this part of the record is for.
+     */
+    description?: string | null;
+    fields: {
+      name: string;
+      /**
+       * The system or step that fills the field, such as Lead management system, ERP or Qualification form. Only sources that are live.
+       */
+      source: string;
+      id?: string | null;
+    }[];
+    id?: string | null;
+  }[];
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'recordAnatomy';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "ClosingCTABlock".
  */
 export interface ClosingCTABlock {
@@ -7157,6 +7420,9 @@ export interface Hub {
         | IntegrationsBlock
         | ContactFormBlock
         | HowItWorksBlock
+        | ComparisonTableBlock
+        | AudienceTabsBlock
+        | RecordAnatomyBlock
         | ClosingCTABlock
         | FeatureThreadBlock
         | ArticleGridBlock
@@ -7747,6 +8013,9 @@ export interface PagesSelect<T extends boolean = true> {
         contactForm?: T | ContactFormBlockSelect<T>;
         howItWorks?: T | HowItWorksBlockSelect<T>;
         howItWorks2?: T | HowItWorks2BlockSelect<T>;
+        comparisonTable?: T | ComparisonTableBlockSelect<T>;
+        audienceTabs?: T | AudienceTabsBlockSelect<T>;
+        recordAnatomy?: T | RecordAnatomyBlockSelect<T>;
         closingCta?: T | ClosingCTABlockSelect<T>;
         featureThread?: T | FeatureThreadBlockSelect<T>;
         articleGrid?: T | ArticleGridBlockSelect<T>;
@@ -8761,6 +9030,119 @@ export interface HowItWorks2BlockSelect<T extends boolean = true> {
     | {
         title?: T;
         description?: T;
+        id?: T;
+      };
+  background?: T;
+  width?: T;
+  spacingTop?: T;
+  spacingBottom?: T;
+  align?: T;
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ComparisonTableBlock_select".
+ */
+export interface ComparisonTableBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  intro?: T;
+  columns?:
+    | T
+    | {
+        label?: T;
+        highlight?: T;
+        id?: T;
+      };
+  rows?:
+    | T
+    | {
+        label?: T;
+        cells?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  footnote?: T;
+  background?: T;
+  width?: T;
+  spacingTop?: T;
+  spacingBottom?: T;
+  align?: T;
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AudienceTabsBlock_select".
+ */
+export interface AudienceTabsBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  intro?: T;
+  tabs?:
+    | T
+    | {
+        label?: T;
+        title?: T;
+        intro?: T;
+        points?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        links?:
+          | T
+          | {
+              label?: T;
+              url?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  background?: T;
+  width?: T;
+  spacingTop?: T;
+  spacingBottom?: T;
+  align?: T;
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "RecordAnatomyBlock_select".
+ */
+export interface RecordAnatomyBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  intro?: T;
+  recordLabel?: T;
+  fieldColumnLabel?: T;
+  sourceColumnLabel?: T;
+  entities?:
+    | T
+    | {
+        label?: T;
+        icon?: T;
+        description?: T;
+        fields?:
+          | T
+          | {
+              name?: T;
+              source?: T;
+              id?: T;
+            };
         id?: T;
       };
   background?: T;

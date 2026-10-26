@@ -15,6 +15,9 @@ import { HeroRightPlacement } from './HeroRightPlacement/config'
 import { HeroWorkforceGrid } from './HeroWorkforceGrid/config'
 import { MediaBlock } from './MediaBlock/config'
 import { ClosingCTA } from './ClosingCTA/config'
+import { AudienceTabs } from './AudienceTabs/config'
+import { RecordAnatomy } from './RecordAnatomy/config'
+import { ComparisonTable } from './ComparisonTable/config'
 import { HowItWorks } from './HowItWorks/config'
 import { HowItWorks2 } from './HowItWorks2/config'
 import { LogoWall } from './LogoWall/config'
@@ -93,6 +96,9 @@ export const PAGE_LAYOUT_BLOCKS: Block[] = [
     ContactForm,
     HowItWorks,
     HowItWorks2,
+    ComparisonTable,
+    AudienceTabs,
+    RecordAnatomy,
     ClosingCTA,
     FeatureThread,
     ArticleGrid,
