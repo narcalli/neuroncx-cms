@@ -10,6 +10,7 @@ import { Content } from './Content/config'
 import { ConversationHero } from './ConversationHero/config'
 import { HeroStack } from './HeroStack/config'
 import { HeroFullBackground } from './HeroFullBackground/config'
+import { HeroCustom } from './HeroCustom/config'
 import { HeroRightPlacement } from './HeroRightPlacement/config'
 import { HeroWorkforceGrid } from './HeroWorkforceGrid/config'
 import { MediaBlock } from './MediaBlock/config'
@@ -116,6 +117,7 @@ export const PAGE_LAYOUT_BLOCKS: Block[] = [
   // a background the highlight cannot reach counts.
   withMinimalPresentation(HeroFullBackground),
   withMinimalPresentation(HeroRightPlacement),
+  withMinimalPresentation(HeroCustom), // test 1: its own background, edge to edge
   withMinimalPresentation(HeroWorkforceGrid),
   withMinimalPresentation(AgenticHero),
   withMinimalPresentation(ConversationHero), // test 2: navy hero

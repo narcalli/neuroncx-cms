@@ -773,6 +773,7 @@ export interface Page {
     | ArchiveBlock
     | HeroFullBackgroundBlock
     | HeroRightPlacementBlock
+    | HeroCustomBlock
     | HeroWorkforceGridBlock
     | AgenticHeroBlock
     | ConversationHeroBlock
@@ -5478,6 +5479,99 @@ export interface HeroRightPlacementBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroCustomBlock".
+ */
+export interface HeroCustomBlock {
+  /**
+   * Optional.
+   */
+  eyebrow?: string | null;
+  /**
+   * This becomes the page's main heading (the H1), so use it only once per page. Set the page hero above to None when this block is on the page.
+   */
+  headline: string;
+  /**
+   * One or two sentences under the headline. Optional.
+   */
+  subhead?: string | null;
+  /**
+   * Optional. Leave the label empty to hide this button.
+   */
+  primaryCta?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: string | Post;
+        } | null);
+    url?: string | null;
+    label?: string | null;
+  };
+  /**
+   * Optional. Leave the label empty to hide this button.
+   */
+  secondaryCta?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: string | Post;
+        } | null);
+    url?: string | null;
+    label?: string | null;
+  };
+  visualPosition: 'right' | 'left' | 'below' | 'background';
+  split?: ('50' | '40') | null;
+  height: 'natural' | 'tall';
+  /**
+   * Phones and small tablets, below 900px wide.
+   */
+  phoneVisual: 'below' | 'hide';
+  /**
+   * Navy switches the text to light colours.
+   */
+  background: 'cloud' | 'white' | 'navy';
+  /**
+   * The markup only, no <style> or <script>. Text in it is read by search engines.
+   */
+  visualHtml?: string | null;
+  /**
+   * Styles for the HTML above. Use @media or @container visual (max-width: 480px) for small screens. Images and fonts must come from the media library.
+   */
+  visualCss?: string | null;
+  /**
+   * What the visual shows, in a sentence. Leave empty if it is only decoration.
+   */
+  visualAlt?: string | null;
+  aspect?: ('auto' | '16/9' | '4/3' | '1/1' | '3/4') | null;
+  /**
+   * Empty fills its column.
+   */
+  maxWidth?: number | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'heroCustom';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "HeroWorkforceGridBlock".
  */
 export interface HeroWorkforceGridBlock {
@@ -7662,6 +7756,7 @@ export interface PagesSelect<T extends boolean = true> {
         archive?: T | ArchiveBlockSelect<T>;
         heroFullBackground?: T | HeroFullBackgroundBlockSelect<T>;
         heroRightPlacement?: T | HeroRightPlacementBlockSelect<T>;
+        heroCustom?: T | HeroCustomBlockSelect<T>;
         heroWorkforceGrid?: T | HeroWorkforceGridBlockSelect<T>;
         agenticHero?: T | AgenticHeroBlockSelect<T>;
         conversationHero?: T | ConversationHeroBlockSelect<T>;
@@ -8915,6 +9010,47 @@ export interface HeroRightPlacementBlockSelect<T extends boolean = true> {
   mediaAlt?: T;
   videoPoster?: T;
   animation?: T;
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroCustomBlock_select".
+ */
+export interface HeroCustomBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  headline?: T;
+  subhead?: T;
+  primaryCta?:
+    | T
+    | {
+        type?: T;
+        newTab?: T;
+        reference?: T;
+        url?: T;
+        label?: T;
+      };
+  secondaryCta?:
+    | T
+    | {
+        type?: T;
+        newTab?: T;
+        reference?: T;
+        url?: T;
+        label?: T;
+      };
+  visualPosition?: T;
+  split?: T;
+  height?: T;
+  phoneVisual?: T;
+  background?: T;
+  visualHtml?: T;
+  visualCss?: T;
+  visualAlt?: T;
+  aspect?: T;
+  maxWidth?: T;
   hidden?: T;
   htmlId?: T;
   id?: T;

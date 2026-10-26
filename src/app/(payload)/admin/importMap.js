@@ -17,6 +17,7 @@ import { DetailedProductSuiteRowLabel as DetailedProductSuiteRowLabel_3a3e2c9b76
 import { PastedLabelWarning as PastedLabelWarning_35f3fd548616dbae6bb302afdc801d3e } from '@/fields/PastedLabelWarning/Component'
 import { IntegrationsMarqueeRowLabel as IntegrationsMarqueeRowLabel_e40e127a1e15772294aa68668bfab915 } from '@/blocks/IntegrationsMarquee/RowLabel'
 import { CardDesignPickerField as CardDesignPickerField_54cd30ae39099e803142646c21b639ac } from '@/fields/CardDesignPicker/Component'
+import { HeroCustomPreview as HeroCustomPreview_fe3c5f93d0a9e37e96ae2d56fd2f16ed } from '@/blocks/HeroCustom/Preview'
 import { UnorderedListFeatureClient as UnorderedListFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { FAQRowLabel as FAQRowLabel_7a0a1ede3caede510531ae1d1981b8cd } from '@/blocks/FAQ/RowLabel'
 import { PlatformLayersTwoRowLabel as PlatformLayersTwoRowLabel_19120e38fe7d436094c242d081cf8d0b } from '@/blocks/PlatformLayersTwo/RowLabel'
@@ -66,6 +67,7 @@ export const importMap = {
   "@/fields/PastedLabelWarning/Component#PastedLabelWarning": PastedLabelWarning_35f3fd548616dbae6bb302afdc801d3e,
   "@/blocks/IntegrationsMarquee/RowLabel#IntegrationsMarqueeRowLabel": IntegrationsMarqueeRowLabel_e40e127a1e15772294aa68668bfab915,
   "@/fields/CardDesignPicker/Component#CardDesignPickerField": CardDesignPickerField_54cd30ae39099e803142646c21b639ac,
+  "@/blocks/HeroCustom/Preview#HeroCustomPreview": HeroCustomPreview_fe3c5f93d0a9e37e96ae2d56fd2f16ed,
   "@payloadcms/richtext-lexical/client#UnorderedListFeatureClient": UnorderedListFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@/blocks/FAQ/RowLabel#FAQRowLabel": FAQRowLabel_7a0a1ede3caede510531ae1d1981b8cd,
   "@/blocks/PlatformLayersTwo/RowLabel#PlatformLayersTwoRowLabel": PlatformLayersTwoRowLabel_19120e38fe7d436094c242d081cf8d0b,

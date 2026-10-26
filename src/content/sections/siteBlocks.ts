@@ -60,6 +60,7 @@ export const NEVER_IN_LAYOUT = [
   'heroStack',
   'heroFullBackground',
   'heroRightPlacement',
+  'heroCustom',
   'heroWorkforceGrid',
   'agenticHero',
   'integrationsLanding',
