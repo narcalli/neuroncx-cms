@@ -14,7 +14,7 @@ import { countedText } from '../../fields/counted'
 import { iconField } from '../../fields/icons'
 import { blockGroupFields, copyField } from '../../fields/reuseBlock'
 import { VERTICAL_OPTIONS } from '../../fields/verticals'
-import { INDUSTRY_DEFAULT_LAYOUT, INDUSTRY_SECTION_KEYS } from './sections'
+import { INDUSTRY_DEFAULT_LAYOUT, INDUSTRY_SECTION_KEYS, INTERIM_SECTION_KEYS } from './sections'
 
 /**
  * Industries (Payload slug `sectors`, kept so customers.sectors and the case
@@ -229,12 +229,15 @@ export const Sectors = defineContentCollection({
       },
     ],
   },
+  // Edited like a Page: each field tab shows only while a section that reads it is in the layout.
+  tabs: 'page',
+  defaultHeroDesign: 'blockHero',
   extraTabs: [
-    { after: 'page', tab: industry },
-    { after: 'page', tab: byTeam },
-    { after: 'page', tab: record },
-    { after: 'page', tab: comparison },
-    { after: 'page', tab: platformSections },
+    { after: 'page', tab: industry, readBy: ['industryProblems', 'industryEpisode', 'industryRoles'] },
+    { after: 'page', tab: byTeam, readBy: ['industryAudiences'] },
+    { after: 'page', tab: record, readBy: ['industryRecord'] },
+    { after: 'page', tab: comparison, readBy: ['industryComparison'] },
+    { after: 'page', tab: platformSections, readBy: INTERIM_SECTION_KEYS },
   ],
   kb: { resolve: [] },
   hooks: { afterRead: [hidePendingRowsFromVisitors] },

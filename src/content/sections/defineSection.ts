@@ -50,14 +50,23 @@ export type SectionDefinition = {
 }
 
 /**
- * One row of a collection's default layout: a section key, or a Shared
- * content section that places the shared content record with this key
- * (such as hosting), looked up when an entry is created or saved.
+ * One row of a collection's default layout: a section key; a Shared content
+ * section that places the shared content record with this key (such as
+ * hosting), looked up when an entry is created or saved; or a page block,
+ * by slug, with any starting values.
  */
-export type DefaultLayoutRow = string | { key: 'shared'; sharedContent: string }
+export type DefaultLayoutRow =
+  | string
+  | { key: 'shared'; sharedContent: string }
+  | { block: string; fields?: Record<string, unknown> }
 
-/** The section key of a default layout row. */
-export const defaultRowKey = (row: DefaultLayoutRow): string => (typeof row === 'string' ? row : row.key)
+/** The section key of a default layout row, or null for a page block. */
+export const defaultRowKey = (row: DefaultLayoutRow): string | null =>
+  typeof row === 'string' ? row : 'key' in row ? row.key : null
+
+/** The page block slug of a default layout row, or null for a section. */
+export const defaultRowBlock = (row: DefaultLayoutRow): string | null =>
+  typeof row === 'object' && 'block' in row ? row.block : null
 
 const sections = new Map<string, SectionDefinition>()
 

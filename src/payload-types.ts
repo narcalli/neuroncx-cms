@@ -2763,7 +2763,7 @@ export interface Sector {
    */
   hasOwnPage?: boolean | null;
   /**
-   * On: the page follows the default layout, and changes to the default reach it. Off: the layout on the Page tab is this page's own.
+   * Off (as a new page starts): the layout on the Page tab is this page's own, starting from the default. On: the page follows the default layout, and its blocks start empty again on the next save.
    */
   usePageDefaults?: boolean | null;
   /**
@@ -2778,111 +2778,6 @@ export interface Sector {
    * This page on the site. Updated on save. Empty while Own page is off.
    */
   path?: string | null;
-  /**
-   * A short line under the name. Aim for 45 characters.
-   */
-  tagline?: string | null;
-  /**
-   * One line on what it does. Aim for 120 characters.
-   */
-  summary: string;
-  /**
-   * From the shared icon library.
-   */
-  icon?:
-    | (
-        | 'message'
-        | 'chat'
-        | 'check'
-        | 'calendar'
-        | 'card'
-        | 'document'
-        | 'refresh'
-        | 'bolt'
-        | 'layers'
-        | 'gauge'
-        | 'plug'
-        | 'shield'
-        | 'shieldCheck'
-        | 'lock'
-        | 'globe'
-        | 'server'
-        | 'eye'
-        | 'users'
-        | 'user'
-        | 'phone'
-        | 'smartphone'
-        | 'mail'
-        | 'messageCircle'
-        | 'send'
-        | 'inbox'
-        | 'headphones'
-        | 'mic'
-        | 'video'
-        | 'bell'
-        | 'handshake'
-        | 'stethoscope'
-        | 'heartPulse'
-        | 'hospital'
-        | 'activity'
-        | 'flask'
-        | 'pill'
-        | 'graduationCap'
-        | 'building'
-        | 'mapPin'
-        | 'database'
-        | 'cloud'
-        | 'workflow'
-        | 'bot'
-        | 'sparkles'
-        | 'search'
-        | 'chart'
-        | 'trendingUp'
-        | 'target'
-        | 'rocket'
-        | 'key'
-        | 'fileText'
-        | 'clipboardList'
-        | 'link'
-        | 'settings'
-        | 'puzzle'
-        | 'timer'
-        | 'clock'
-        | 'badgeCheck'
-        | 'star'
-        | 'briefcase'
-      )
-    | null;
-  /**
-   * Optional. Logos go here for integrations.
-   */
-  image?: (string | null) | Media;
-  /**
-   * Leave empty to use the section's design.
-   */
-  cardDesign?: ('grid' | 'logoCard' | 'feature' | 'story') | null;
-  /**
-   * The full description. Also indexed for the knowledge base.
-   */
-  description?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  /**
-   * The teams or roles that use it, such as front desk or call centre.
-   */
-  whoItsFor?: string | null;
   /**
    * Every design reads the hero fields below; the fields only one design uses show when it is picked. Conversation needs at least 2 chat messages, Picture on the right needs a picture, Stats needs at least 2 stats, Custom CSS visual needs its HTML and a screen reader description. Hero block from the layout hides the hero fields: the first row of the page sections must be a hero block instead.
    */
@@ -4030,6 +3925,123 @@ export interface Sector {
         id?: string | null;
       }[]
     | null;
+  /**
+   * A short line under the name. Aim for 45 characters.
+   */
+  tagline?: string | null;
+  /**
+   * One line on what it does. Aim for 120 characters.
+   */
+  summary: string;
+  /**
+   * From the shared icon library.
+   */
+  icon?:
+    | (
+        | 'message'
+        | 'chat'
+        | 'check'
+        | 'calendar'
+        | 'card'
+        | 'document'
+        | 'refresh'
+        | 'bolt'
+        | 'layers'
+        | 'gauge'
+        | 'plug'
+        | 'shield'
+        | 'shieldCheck'
+        | 'lock'
+        | 'globe'
+        | 'server'
+        | 'eye'
+        | 'users'
+        | 'user'
+        | 'phone'
+        | 'smartphone'
+        | 'mail'
+        | 'messageCircle'
+        | 'send'
+        | 'inbox'
+        | 'headphones'
+        | 'mic'
+        | 'video'
+        | 'bell'
+        | 'handshake'
+        | 'stethoscope'
+        | 'heartPulse'
+        | 'hospital'
+        | 'activity'
+        | 'flask'
+        | 'pill'
+        | 'graduationCap'
+        | 'building'
+        | 'mapPin'
+        | 'database'
+        | 'cloud'
+        | 'workflow'
+        | 'bot'
+        | 'sparkles'
+        | 'search'
+        | 'chart'
+        | 'trendingUp'
+        | 'target'
+        | 'rocket'
+        | 'key'
+        | 'fileText'
+        | 'clipboardList'
+        | 'link'
+        | 'settings'
+        | 'puzzle'
+        | 'timer'
+        | 'clock'
+        | 'badgeCheck'
+        | 'star'
+        | 'briefcase'
+      )
+    | null;
+  /**
+   * Optional. Logos go here for integrations.
+   */
+  image?: (string | null) | Media;
+  /**
+   * Leave empty to use the section's design.
+   */
+  cardDesign?: ('grid' | 'logoCard' | 'feature' | 'story') | null;
+  /**
+   * The full description. Also indexed for the knowledge base.
+   */
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * The teams or roles that use it, such as front desk or call centre.
+   */
+  whoItsFor?: string | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (string | null) | Media;
+    description?: string | null;
+    /**
+     * The one search phrase this page is written for. No page or entry shares a primary keyword with another.
+     */
+    primaryKeyword?: string | null;
+  };
   waRowTitle?: string | null;
   /**
    * Aim for 60 characters.
@@ -4112,18 +4124,6 @@ export interface Sector {
    * So answers that have gone stale can be found and fixed.
    */
   kbLastReviewed?: string | null;
-  meta?: {
-    title?: string | null;
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (string | null) | Media;
-    description?: string | null;
-    /**
-     * The one search phrase this page is written for. No page or entry shares a primary keyword with another.
-     */
-    primaryKeyword?: string | null;
-  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -9059,7 +9059,7 @@ export interface IndustryTopic {
    */
   hasOwnPage?: boolean | null;
   /**
-   * On: the page follows the default layout, and changes to the default reach it. Off: the layout on the Page tab is this page's own.
+   * Off (as a new page starts): the layout on the Page tab is this page's own, starting from the default. On: the page follows the default layout, and its blocks start empty again on the next save.
    */
   usePageDefaults?: boolean | null;
   /**
@@ -9082,111 +9082,6 @@ export interface IndustryTopic {
    * This page on the site: the parent entry, then this slug. Updated on save and when the parent is renamed.
    */
   path?: string | null;
-  /**
-   * A short line under the name. Aim for 45 characters.
-   */
-  tagline?: string | null;
-  /**
-   * One line on what it does. Aim for 120 characters.
-   */
-  summary: string;
-  /**
-   * From the shared icon library.
-   */
-  icon?:
-    | (
-        | 'message'
-        | 'chat'
-        | 'check'
-        | 'calendar'
-        | 'card'
-        | 'document'
-        | 'refresh'
-        | 'bolt'
-        | 'layers'
-        | 'gauge'
-        | 'plug'
-        | 'shield'
-        | 'shieldCheck'
-        | 'lock'
-        | 'globe'
-        | 'server'
-        | 'eye'
-        | 'users'
-        | 'user'
-        | 'phone'
-        | 'smartphone'
-        | 'mail'
-        | 'messageCircle'
-        | 'send'
-        | 'inbox'
-        | 'headphones'
-        | 'mic'
-        | 'video'
-        | 'bell'
-        | 'handshake'
-        | 'stethoscope'
-        | 'heartPulse'
-        | 'hospital'
-        | 'activity'
-        | 'flask'
-        | 'pill'
-        | 'graduationCap'
-        | 'building'
-        | 'mapPin'
-        | 'database'
-        | 'cloud'
-        | 'workflow'
-        | 'bot'
-        | 'sparkles'
-        | 'search'
-        | 'chart'
-        | 'trendingUp'
-        | 'target'
-        | 'rocket'
-        | 'key'
-        | 'fileText'
-        | 'clipboardList'
-        | 'link'
-        | 'settings'
-        | 'puzzle'
-        | 'timer'
-        | 'clock'
-        | 'badgeCheck'
-        | 'star'
-        | 'briefcase'
-      )
-    | null;
-  /**
-   * Optional. Logos go here for integrations.
-   */
-  image?: (string | null) | Media;
-  /**
-   * Leave empty to use the section's design.
-   */
-  cardDesign?: ('grid' | 'logoCard' | 'feature' | 'story') | null;
-  /**
-   * The full description. Also indexed for the knowledge base.
-   */
-  description?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  /**
-   * The teams or roles that use it, such as front desk or call centre.
-   */
-  whoItsFor?: string | null;
   /**
    * Every design reads the hero fields below; the fields only one design uses show when it is picked. Conversation needs at least 2 chat messages, Picture on the right needs a picture, Stats needs at least 2 stats, Custom CSS visual needs its HTML and a screen reader description. Hero block from the layout hides the hero fields: the first row of the page sections must be a hero block instead.
    */
@@ -9523,6 +9418,123 @@ export interface IndustryTopic {
         id?: string | null;
       }[]
     | null;
+  /**
+   * A short line under the name. Aim for 45 characters.
+   */
+  tagline?: string | null;
+  /**
+   * One line on what it does. Aim for 120 characters.
+   */
+  summary: string;
+  /**
+   * From the shared icon library.
+   */
+  icon?:
+    | (
+        | 'message'
+        | 'chat'
+        | 'check'
+        | 'calendar'
+        | 'card'
+        | 'document'
+        | 'refresh'
+        | 'bolt'
+        | 'layers'
+        | 'gauge'
+        | 'plug'
+        | 'shield'
+        | 'shieldCheck'
+        | 'lock'
+        | 'globe'
+        | 'server'
+        | 'eye'
+        | 'users'
+        | 'user'
+        | 'phone'
+        | 'smartphone'
+        | 'mail'
+        | 'messageCircle'
+        | 'send'
+        | 'inbox'
+        | 'headphones'
+        | 'mic'
+        | 'video'
+        | 'bell'
+        | 'handshake'
+        | 'stethoscope'
+        | 'heartPulse'
+        | 'hospital'
+        | 'activity'
+        | 'flask'
+        | 'pill'
+        | 'graduationCap'
+        | 'building'
+        | 'mapPin'
+        | 'database'
+        | 'cloud'
+        | 'workflow'
+        | 'bot'
+        | 'sparkles'
+        | 'search'
+        | 'chart'
+        | 'trendingUp'
+        | 'target'
+        | 'rocket'
+        | 'key'
+        | 'fileText'
+        | 'clipboardList'
+        | 'link'
+        | 'settings'
+        | 'puzzle'
+        | 'timer'
+        | 'clock'
+        | 'badgeCheck'
+        | 'star'
+        | 'briefcase'
+      )
+    | null;
+  /**
+   * Optional. Logos go here for integrations.
+   */
+  image?: (string | null) | Media;
+  /**
+   * Leave empty to use the section's design.
+   */
+  cardDesign?: ('grid' | 'logoCard' | 'feature' | 'story') | null;
+  /**
+   * The full description. Also indexed for the knowledge base.
+   */
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * The teams or roles that use it, such as front desk or call centre.
+   */
+  whoItsFor?: string | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (string | null) | Media;
+    description?: string | null;
+    /**
+     * The one search phrase this page is written for. No page or entry shares a primary keyword with another.
+     */
+    primaryKeyword?: string | null;
+  };
   waRowTitle?: string | null;
   /**
    * Aim for 60 characters.
@@ -9605,18 +9617,6 @@ export interface IndustryTopic {
    * So answers that have gone stale can be found and fixed.
    */
   kbLastReviewed?: string | null;
-  meta?: {
-    title?: string | null;
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (string | null) | Media;
-    description?: string | null;
-    /**
-     * The one search phrase this page is written for. No page or entry shares a primary keyword with another.
-     */
-    primaryKeyword?: string | null;
-  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -13057,13 +13057,6 @@ export interface SectorsSelect<T extends boolean = true> {
   menuLabel?: T;
   verticals?: T;
   path?: T;
-  tagline?: T;
-  summary?: T;
-  icon?: T;
-  image?: T;
-  cardDesign?: T;
-  description?: T;
-  whoItsFor?: T;
   heroDesign?: T;
   heroEyebrow?: T;
   heroHeading?: T;
@@ -13481,6 +13474,21 @@ export interface SectorsSelect<T extends boolean = true> {
         answer?: T;
         id?: T;
       };
+  tagline?: T;
+  summary?: T;
+  icon?: T;
+  image?: T;
+  cardDesign?: T;
+  description?: T;
+  whoItsFor?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+        primaryKeyword?: T;
+      };
   waRowTitle?: T;
   waRowDescription?: T;
   waHeader?: T;
@@ -13521,14 +13529,6 @@ export interface SectorsSelect<T extends boolean = true> {
         id?: T;
       };
   kbLastReviewed?: T;
-  meta?:
-    | T
-    | {
-        title?: T;
-        image?: T;
-        description?: T;
-        primaryKeyword?: T;
-      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -13552,13 +13552,6 @@ export interface IndustryTopicsSelect<T extends boolean = true> {
   stageOrder?: T;
   hideClusterFooter?: T;
   path?: T;
-  tagline?: T;
-  summary?: T;
-  icon?: T;
-  image?: T;
-  cardDesign?: T;
-  description?: T;
-  whoItsFor?: T;
   heroDesign?: T;
   heroEyebrow?: T;
   heroHeading?: T;
@@ -13696,6 +13689,21 @@ export interface IndustryTopicsSelect<T extends boolean = true> {
         answer?: T;
         id?: T;
       };
+  tagline?: T;
+  summary?: T;
+  icon?: T;
+  image?: T;
+  cardDesign?: T;
+  description?: T;
+  whoItsFor?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+        primaryKeyword?: T;
+      };
   waRowTitle?: T;
   waRowDescription?: T;
   waHeader?: T;
@@ -13736,14 +13744,6 @@ export interface IndustryTopicsSelect<T extends boolean = true> {
         id?: T;
       };
   kbLastReviewed?: T;
-  meta?:
-    | T
-    | {
-        title?: T;
-        image?: T;
-        description?: T;
-        primaryKeyword?: T;
-      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;

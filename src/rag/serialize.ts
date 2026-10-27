@@ -1,6 +1,7 @@
 import type { Block, Field, Tab } from 'payload'
 
 import type { RagSection } from './types'
+import { isLayoutCondition } from '../fields/layoutTabs'
 
 /**
  * Turns a Payload document into sections of plain text for NCX post content.
@@ -77,11 +78,15 @@ type Ctx = {
 /**
  * Hidden fields, and fields whose admin.condition is false for this document
  * (a Story tab when Own page is off), are not on the site, so they are not sent.
+ * A field tab hidden only because no section reading it is in the layout
+ * (whileLayoutHas) is still sent: until block text reaches the bot, the
+ * entry's fields are what it knows.
  */
 const visible = (field: any, siblingData: any, ctx: Ctx): boolean => {
   if (field?.hidden || field?.admin?.hidden) return false
   const condition = field?.admin?.condition
   if (typeof condition !== 'function') return true
+  if (isLayoutCondition(condition)) return true
   try {
     return Boolean(
       condition(ctx.root, siblingData ?? {}, { user: null, path: [], operation: 'update', blockData: undefined }),

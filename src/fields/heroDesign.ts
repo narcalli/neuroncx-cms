@@ -44,14 +44,18 @@ export const heroDesignOf = (
   return own && (allowed as readonly string[]).includes(own) ? (own as HeroDesignName) : defaultHeroDesign(allowed)
 }
 
-export const heroDesignField = (allowed: readonly HeroDesignName[] = FIELD_HERO_DESIGNS): SelectField => {
+export const heroDesignField = (
+  allowed: readonly HeroDesignName[] = FIELD_HERO_DESIGNS,
+  /** What a new entry starts with; the usual default when left out. */
+  initial?: HeroDesignName,
+): SelectField => {
   if (!allowed.length) throw new Error('heroDesignField: allow at least one design.')
   return {
     name: 'heroDesign',
     type: 'select',
     label: 'Hero design',
     required: true,
-    defaultValue: defaultHeroDesign(allowed),
+    defaultValue: initial ?? defaultHeroDesign(allowed),
     options: HERO_DESIGN_NAMES.filter((d) => allowed.includes(d)).map((value) => ({ label: DESIGNS[value], value })),
     admin: {
       description:

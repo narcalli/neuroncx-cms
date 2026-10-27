@@ -23,14 +23,17 @@ describe('the sections', () => {
     expect(getContentCollection('sectors')).toMatchObject({ sections: INDUSTRY_SECTION_KEYS })
   })
 
-  it('give every industry the default page, placing the hosting and implementation shared content', () => {
+  it('start a new industry with blocks and the pulled sections, placing the hosting and implementation shared content', () => {
     expect(getContentCollection('sectors')?.defaultLayout).toEqual([
-      'industryProblems', 'industryAudiences', 'industryEpisode', 'industryRoles', 'industryRecord', 'industryCarts', 'industryEnquiry',
-      'industryAgents', 'industryAnswers', 'industryCampaigns', 'industryReporting', 'industryCallQuality', 'industryComparison',
-      'industryCampusSystems', 'industryIntegrations',
+      { block: 'heroCustom' },
+      'industryAgents',
+      'industryIntegrations',
       { key: 'shared', sharedContent: 'hosting' },
       { key: 'shared', sharedContent: 'implementation' },
-      'industryTopics', 'industryCustomers', 'faq', 'closing',
+      'industryTopics',
+      'industryCustomers',
+      { block: 'faq' },
+      { block: 'closingCta' },
     ])
   })
 
@@ -75,7 +78,8 @@ describe('the default layout', () => {
     const field = flat((Sectors.fields.find((f: any) => f.type === 'tabs') as any).tabs.flatMap((t: any) => t.fields)).find((f: any) => f.name === 'layout')
     const rows = await field.defaultValue({ req: req([{ id: 'h', key: 'hosting' }, { id: 'i', key: 'implementation' }]) })
     expect(rows.filter((r: any) => r.blockType === 'sharedSection').map((r: any) => r.item)).toEqual(['h', 'i'])
-    expect(rows.at(-1)).toEqual({ blockType: 'closingSection' })
+    expect(rows[0]).toEqual({ blockType: 'heroCustom' })
+    expect(rows.at(-1)).toEqual({ blockType: 'closingCta' })
   })
 })
 

@@ -113,32 +113,33 @@ export const INDUSTRY_SECTIONS = [
 /** The industry sections, then the FAQ and the closing panel every content collection may use. */
 export const INDUSTRY_SECTION_KEYS = [...INDUSTRY_SECTIONS.map((s) => s.key), 'faq', 'closing']
 
-/**
- * The page every industry follows while Use page defaults is on. The two
- * Shared content rows place the hosting and implementation records
- * (src/collections/SharedContent), once they exist. The closing panel is
- * drawn only while Show the closing panel is on.
- */
-export const INDUSTRY_DEFAULT_LAYOUT: DefaultLayoutRow[] = [
-  'industryProblems',
-  'industryAudiences',
-  'industryEpisode',
-  'industryRoles',
-  'industryRecord',
+/** The interim platform sections, which read the Platform sections (interim) tab. */
+export const INTERIM_SECTION_KEYS = [
   'industryCarts',
   'industryEnquiry',
-  'industryAgents',
   'industryAnswers',
   'industryCampaigns',
   'industryReporting',
   'industryCallQuality',
-  'industryComparison',
   'industryCampusSystems',
+]
+
+/**
+ * The page a new industry starts with: page blocks for its own content
+ * (the hero, the FAQ and the closing panel), and the sections that pull
+ * from other collections. None reads a field tab, so a new industry opens
+ * with none. The two Shared content rows place the hosting and
+ * implementation records (src/collections/SharedContent), once they exist.
+ * The field sections stay in the picker.
+ */
+export const INDUSTRY_DEFAULT_LAYOUT: DefaultLayoutRow[] = [
+  { block: 'heroCustom' },
+  'industryAgents',
   'industryIntegrations',
   { key: 'shared', sharedContent: 'hosting' },
   { key: 'shared', sharedContent: 'implementation' },
   'industryTopics',
   'industryCustomers',
-  'faq',
-  'closing',
+  { block: 'faq' },
+  { block: 'closingCta' },
 ]

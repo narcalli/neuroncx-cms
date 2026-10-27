@@ -252,7 +252,7 @@ describe('with the local database', () => {
   it('stores /{slug} for an industry with its own page, and nothing without one', async () => {
     const own = await payload.create({ ...quiet, collection: 'sectors', draft: true, data: { name: 'ZZ SEC own', slug: 'zz-sec-own', hasOwnPage: true, _status: 'draft' } as any })
     sectors.push(String(own.id))
-    const off = await payload.create({ ...quiet, collection: 'sectors', draft: true, data: { name: 'ZZ SEC off', slug: 'zz-sec-off', _status: 'draft' } as any })
+    const off = await payload.create({ ...quiet, collection: 'sectors', draft: true, data: { name: 'ZZ SEC off', slug: 'zz-sec-off', hasOwnPage: false, _status: 'draft' } as any })
     sectors.push(String(off.id))
     expect((await payload.findByID({ ...quiet, collection: 'sectors', id: own.id, draft: true })).path).toBe('/zz-sec-own')
     expect((await payload.findByID({ ...quiet, collection: 'sectors', id: off.id, draft: true })).path ?? null).toBeNull()

@@ -95,7 +95,16 @@ const button = (name: string, label: string, description: string): GroupField =>
 
 export const ownPage = (
   collection: CollectionSlug,
-  { heroDesigns = FIELD_HERO_DESIGNS }: { heroDesigns?: readonly HeroDesignName[] } = {},
+  {
+    heroDesigns = FIELD_HERO_DESIGNS,
+    defaultHeroDesign,
+    startsWithPage = false,
+  }: {
+    heroDesigns?: readonly HeroDesignName[]
+    defaultHeroDesign?: HeroDesignName
+    /** A new entry starts with Own page on, so the Page tab is the one that opens. */
+    startsWithPage?: boolean
+  } = {},
 ): { sidebar: CheckboxField; tab: Tab } => {
   // Shown only while the entry's design (or the collection's default) is one of these.
   const forDesign =
@@ -107,7 +116,7 @@ export const ownPage = (
     name: 'hasOwnPage',
     type: 'checkbox',
     label: 'Own page',
-    defaultValue: false,
+    defaultValue: startsWithPage,
     admin: {
       position: 'sidebar',
       description:
@@ -116,7 +125,7 @@ export const ownPage = (
   }
 
   const fields: Field[] = [
-    heroDesignField(heroDesigns),
+    heroDesignField(heroDesigns, defaultHeroDesign),
     countedText({
       name: 'heroEyebrow',
       label: 'Eyebrow (optional)',

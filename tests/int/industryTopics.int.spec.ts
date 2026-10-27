@@ -111,6 +111,8 @@ describe('with the local database', () => {
         keyPoints: [{ line: 'One' }, { line: 'Two' }, { line: 'Three' }],
         waBody: 'Temporary.',
         waButtons: [{ label: 'Book a demo', action: 'bookDemo' }],
+        // No page of its own: a new industry starts with one, and its blocks to fill.
+        hasOwnPage: false,
         _status: 'published',
       } as any,
     })

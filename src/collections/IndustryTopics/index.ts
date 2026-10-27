@@ -145,9 +145,12 @@ export const IndustryTopics = defineContentCollection({
       },
     ],
   },
+  // Edited like a Page: each field tab shows only while a section that reads it is in the layout.
+  tabs: 'page',
+  defaultHeroDesign: 'blockHero',
   extraTabs: [
-    { after: 'page', tab: topic },
-    { after: 'page', tab: links },
+    { after: 'page', tab: topic, readBy: ['topicOverview', 'topicSteps', 'topicRecorded', 'topicComparison'] },
+    { after: 'page', tab: links, readBy: ['topicAgents', 'topicIntegrations'] },
   ],
   kb: { resolve: ['industry', 'agents', 'integrations'] },
   // Its industry's page and its sibling topics, before and after a move (./revalidate.ts).

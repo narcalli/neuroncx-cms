@@ -25,6 +25,7 @@ import {
 } from '../fields/shared'
 import { withRag } from '../rag/with-rag'
 import { layoutField } from '../fields/layout'
+import { whileLayoutHas } from '../fields/layoutTabs'
 import { contentFallbacks, contentPublishCheck, followPageDefaults } from './fallbacks'
 import { previewUrl } from '../utilities/generatePreviewPath'
 import { entryPath, hubPagePath, registerContentCollection, type ContentCollectionEntry, type ContentRouting } from './registry'
@@ -107,7 +108,27 @@ export type ContentCollectionOptions = {
   /** Extra Payload hooks, run after the factory's own. */
   hooks?: CollectionConfig['hooks']
   /** Tabs only this collection has, each placed straight after one of the fixed tabs. */
-  extraTabs?: { after: ContentTab; tab: Tab }[]
+  extraTabs?: {
+    after: ContentTab
+    tab: Tab
+    /**
+     * With tabs 'page': the sections that read this tab's fields. The tab
+     * shows only while one of them is in the entry's layout, and keeps its
+     * data while hidden. Left out, the tab always shows.
+     */
+    readBy?: string[]
+  }[]
+  /**
+   * The order of the tabs. 'fixed' (the default): Card, Detail, Page, FAQ,
+   * WhatsApp, Knowledge base, SEO, each extra tab after the one it names.
+   * 'page': edited like a Page. The Page tab first (the hero design and the
+   * layout), then the extra tabs and the FAQ tab, each only while a section
+   * reading it is in the layout, then Listing (the Card and Detail fields),
+   * SEO, WhatsApp and Knowledge base. Needs the ownPage group and sections.
+   */
+  tabs?: 'fixed' | 'page'
+  /** The hero design a new entry starts with. Conversation where allowed, else the first allowed, when left out. */
+  defaultHeroDesign?: HeroDesignName
   /** Own page fields this collection leaves out, such as howItWorks when a panel replaces it. */
   ownPage?: { omit?: ('benefits' | 'howItWorks' | 'useCases')[] }
   /** List view columns and sort. The defaults suit most collections. */
@@ -204,6 +225,9 @@ export const defineContentCollection = (opts: ContentCollectionOptions): Collect
   if (!heroDesigns.length || heroDesigns.some((d) => !HERO_DESIGN_NAMES.includes(d))) {
     throw new Error(`${slug}: heroDesigns must be one or more of ${HERO_DESIGN_NAMES.join(', ')}.`)
   }
+  if (opts.defaultHeroDesign && !heroDesigns.includes(opts.defaultHeroDesign)) {
+    throw new Error(`${slug}: defaultHeroDesign ${opts.defaultHeroDesign} is not one of its hero designs.`)
+  }
   if (heroDesigns.includes(BLOCK_HERO) && !freeLayout) {
     throw new Error(`${slug}: the ${BLOCK_HERO} hero design needs siteBlocks: 'all', which offers the hero blocks.`)
   }
@@ -261,7 +285,14 @@ export const defineContentCollection = (opts: ContentCollectionOptions): Collect
     throw new Error(`${slug}: ownPage.omit needs the ownPage group.`)
   }
   const omit = new Set<string>(opts.ownPage?.omit ?? [])
-  const shared = groups.has('ownPage') ? ownPage(slug as CollectionSlug, { heroDesigns }) : null
+  const shared = groups.has('ownPage')
+    ? ownPage(slug as CollectionSlug, {
+        heroDesigns,
+        defaultHeroDesign: opts.defaultHeroDesign,
+        // Edited like a Page: a new entry opens on its Page tab.
+        startsWithPage: opts.tabs === 'page',
+      })
+    : null
   const page = shared && {
     sidebar: shared.sidebar,
     tab: {
@@ -359,11 +390,29 @@ export const defineContentCollection = (opts: ContentCollectionOptions): Collect
   for (const { after, tab } of opts.extraTabs ?? []) {
     if (!hasTab(after)) throw new Error(`${slug}: an extra tab follows ${after}, which this collection does not have.`)
   }
-  const shownTabs = SITE_TAB_ORDER.flatMap((key) =>
-    hasTab(key)
-      ? [tabs[key], ...(opts.extraTabs ?? []).filter((t) => t.after === key).map((t) => t.tab)]
-      : [],
-  )
+  const fixedTabs = () =>
+    SITE_TAB_ORDER.flatMap((key) =>
+      hasTab(key) ? [tabs[key], ...(opts.extraTabs ?? []).filter((t) => t.after === key).map((t) => t.tab)] : [],
+    )
+  // Edited like a Page: the layout first, the field tabs only while a section reads them.
+  const pageTabs = () => {
+    if (!page || !layout) throw new Error(`${slug}: tabs 'page' needs the ownPage group and sections.`)
+    const whileRead = (tab: Tab, readBy?: string[]): Tab =>
+      readBy?.length ? ({ ...tab, admin: { ...tab.admin, condition: whileLayoutHas(readBy) } } as Tab) : tab
+    const listing: Tab = {
+      label: 'Listing',
+      description: 'How this entry is listed on cards and hub pages.',
+      fields: [...tabs.card.fields, ...(hasTab('detail') ? tabs.detail.fields : [])],
+    }
+    return [
+      tabs.page,
+      ...(opts.extraTabs ?? []).map((t) => whileRead(t.tab, t.readBy)),
+      ...(hasTab('faq') ? [whileRead(tabs.faq, ['faq'])] : []),
+      listing,
+      ...(['seo', 'whatsapp', 'kbase'] as const).filter(hasTab).map((key) => tabs[key]),
+    ]
+  }
+  const shownTabs = opts.tabs === 'page' ? pageTabs() : fixedTabs()
 
   const config: CollectionConfig = {
     slug,

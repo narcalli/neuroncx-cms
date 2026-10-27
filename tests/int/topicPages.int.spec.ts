@@ -22,7 +22,7 @@ const block = (slug: string) => contentBlocks().find((b) => b.slug === slug)!
 const fieldNames = (slug: string) => flat(block(slug).fields).map((f: any) => f.name)
 
 describe('the sections', () => {
-  it('are the topic sections, Shared content, the FAQ and the closing panel; the default page has all but Shared content', () => {
+  it('are the topic sections, Shared content, the FAQ and the closing panel; a new topic starts with blocks and its links', () => {
     expect(TOPIC_SECTION_KEYS).toEqual([
       'topicOverview',
       'topicSteps',
@@ -34,7 +34,15 @@ describe('the sections', () => {
       'faq',
       'closing',
     ])
-    expect(TOPIC_DEFAULT_LAYOUT).toEqual(['topicOverview', 'topicSteps', 'topicRecorded', 'topicAgents', 'topicIntegrations', 'topicComparison', 'faq', 'closing'])
+    expect(TOPIC_DEFAULT_LAYOUT).toEqual([
+      { block: 'heroCustom' },
+      { block: 'content' },
+      { block: 'howItWorks2' },
+      'topicAgents',
+      'topicIntegrations',
+      { block: 'faq' },
+      { block: 'closingCta' },
+    ])
     expect(getContentCollection('industryTopics')).toMatchObject({ sections: TOPIC_SECTION_KEYS, defaultLayout: TOPIC_DEFAULT_LAYOUT })
   })
 

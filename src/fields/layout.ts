@@ -4,6 +4,7 @@ import { blocks as validateBlocks } from 'payload/shared'
 import type { PayloadRequest } from 'payload'
 
 import {
+  defaultRowBlock,
   defaultRowKey,
   getSection,
   sectionBlockSlug,
@@ -199,6 +200,8 @@ const layoutRule: Validate = async (value, options) => {
   )
 }
 
+export { isLayoutCondition, whileLayoutHas } from './layoutTabs'
+
 /** Layout rows for a list of section keys, as a new entry starts with them. */
 export const layoutBlocksFor = (keys: string[]): { blockType: string }[] =>
   keys.map((key) => ({ blockType: sectionBlockSlug(key) }))
@@ -213,7 +216,7 @@ export const resolveDefaultLayout = async (
   rows: DefaultLayoutRow[],
   req: Partial<PayloadRequest> | undefined,
 ): Promise<Record<string, unknown>[]> => {
-  const wanted = [...new Set(rows.flatMap((r) => (typeof r === 'string' ? [] : [r.sharedContent])))]
+  const wanted = [...new Set(rows.flatMap((r) => (typeof r === 'object' && 'sharedContent' in r ? [r.sharedContent] : [])))]
   const ids = new Map<string, string>()
   if (wanted.length && req?.payload) {
     const { docs } = await req.payload.find({
@@ -230,6 +233,7 @@ export const resolveDefaultLayout = async (
   }
   return rows.flatMap((row) => {
     if (typeof row === 'string') return [{ blockType: sectionBlockSlug(row) }]
+    if ('block' in row) return [{ ...row.fields, blockType: row.block }]
     const item = ids.get(row.sharedContent)
     return item ? [{ blockType: sectionBlockSlug(row.key), item }] : []
   })
@@ -297,22 +301,31 @@ export const layoutField = ({
   for (const key of sections) {
     if (!getSection(key)) throw new Error(`${collection}: no section is registered as ${key}.`)
   }
-  for (const key of defaultLayout.map(defaultRowKey)) {
-    if (!sections.includes(key)) {
+  for (const row of defaultLayout) {
+    const key = defaultRowKey(row)
+    const block = defaultRowBlock(row)
+    if (key && !sections.includes(key)) {
       throw new Error(`${collection}: the default layout uses ${key}, which is not an allowed section.`)
     }
+    if (block && !siteBlocks.includes(block)) {
+      throw new Error(`${collection}: the default layout uses the ${block} block, which its layout does not offer.`)
+    }
   }
+  // A default holding page blocks is a starting point: their content is the
+  // entry's own, so an entry does not follow the default unless switched on.
+  const startsFromDefault = defaultLayout.some((row) => defaultRowBlock(row))
 
   const sidebar: CheckboxField = {
     name: 'usePageDefaults',
     type: 'checkbox',
     label: 'Use page defaults',
-    defaultValue: true,
+    defaultValue: !startsFromDefault,
     admin: {
       position: 'sidebar',
       condition: (data) => Boolean(data?.hasOwnPage),
-      description:
-        'On: the page follows the default layout, and changes to the default reach it. Off: the layout on the Page tab is this page\'s own.',
+      description: startsFromDefault
+        ? 'Off (as a new page starts): the layout on the Page tab is this page\'s own, starting from the default. On: the page follows the default layout, and its blocks start empty again on the next save.'
+        : 'On: the page follows the default layout, and changes to the default reach it. Off: the layout on the Page tab is this page\'s own.',
     },
   }
 

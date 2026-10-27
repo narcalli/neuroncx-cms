@@ -1,3 +1,4 @@
+import type { DefaultLayoutRow } from '../../content/sections/defineSection'
 import { industrySection } from '../Sectors/sections'
 
 /**
@@ -25,17 +26,17 @@ export const TOPIC_SECTIONS = [
 export const TOPIC_SECTION_KEYS = [...TOPIC_SECTIONS.map((s) => s.key), 'shared', 'faq', 'closing']
 
 /**
- * The page every topic follows while Use page defaults is on. Shared
- * content is placed by hand. The closing panel is drawn only while Show the
- * closing panel is on.
+ * The page a new topic starts with: page blocks for its own content (the
+ * hero, the overview, the steps, the FAQ and the closing panel), and the
+ * agents and integrations it links to. The Links tab shows for those two;
+ * no other field tab does. The field sections stay in the picker.
  */
-export const TOPIC_DEFAULT_LAYOUT = [
-  'topicOverview',
-  'topicSteps',
-  'topicRecorded',
+export const TOPIC_DEFAULT_LAYOUT: DefaultLayoutRow[] = [
+  { block: 'heroCustom' },
+  { block: 'content' },
+  { block: 'howItWorks2' },
   'topicAgents',
   'topicIntegrations',
-  'topicComparison',
-  'faq',
-  'closing',
+  { block: 'faq' },
+  { block: 'closingCta' },
 ]
