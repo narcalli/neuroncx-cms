@@ -10,7 +10,14 @@ import {
   sectionForBlockType,
   type DefaultLayoutRow,
 } from '../content/sections/defineSection'
-import { HUB_PAGE_BLOCKS, NEVER_IN_LAYOUT, SITE_BLOCKS } from '../content/sections/siteBlocks'
+import {
+  ENTRY_EXTRA_BLOCKS,
+  HERO_BLOCKS,
+  HUB_PAGE_BLOCKS,
+  LAYOUT_HERO_BLOCKS,
+  NEVER_IN_LAYOUT,
+  SITE_BLOCKS,
+} from '../content/sections/siteBlocks'
 import { getContentCollection } from '../content/registry'
 
 /**
@@ -35,7 +42,7 @@ type LayoutBlock = {
 const labelOf = (block: LayoutBlock): string =>
   sectionForBlockType(block.blockType)?.label ??
   String(
-    [...SITE_BLOCKS, ...HUB_PAGE_BLOCKS].find((b) => b.slug === block.blockType)?.labels?.singular ??
+    [...SITE_BLOCKS, ...HUB_PAGE_BLOCKS, ...ENTRY_EXTRA_BLOCKS].find((b) => b.slug === block.blockType)?.labels?.singular ??
       block.blockType ??
       'block',
   )
@@ -47,26 +54,47 @@ const labelOf = (block: LayoutBlock): string =>
  * sections this layout's collection allows (the closing panel when unknown).
  * A page that shows the closing panel already has its navy panel, so no
  * section above it may be navy as well. Returns the problem, or null.
+ *
+ * `freeBlocks` (a layout with every page block, siteBlocks 'all'): page
+ * blocks may use navy as on a Page, the closing CTA block counts as navy (it
+ * is a navy panel by design), and the one-navy rule covers sections and
+ * blocks together.
  */
 export const navyProblem = (
   layout: unknown,
-  { allowed = ['closing panel'], showsClosing = false }: { allowed?: string[]; showsClosing?: boolean } = {},
+  {
+    allowed = ['closing panel'],
+    showsClosing = false,
+    freeBlocks = false,
+  }: { allowed?: string[]; showsClosing?: boolean; freeBlocks?: boolean } = {},
 ): string | null => {
   if (!Array.isArray(layout)) return null
+  const byDesign = (block: LayoutBlock) => freeBlocks && block?.blockType === 'closingCta'
   const navy = (layout as LayoutBlock[])
     .map((block, index) => ({ block, index, def: sectionForBlockType(block?.blockType) }))
-    .filter(({ block }) => block?.background === 'navy')
-  const name = ({ block, index }: { block: LayoutBlock; index: number }) => `#${index + 1} ${labelOf(block)}`
+    .filter(({ block }) => block?.background === 'navy' || byDesign(block))
+  const name = ({ block, index }: { block: LayoutBlock; index: number }) =>
+    `#${index + 1} ${labelOf(block)}${byDesign(block) ? ' (navy by design)' : ''}`
 
-  const offenders = navy.filter(({ def }) => !def?.navyAllowed)
+  // Sections may use navy only where allowed; page blocks only in a free layout.
+  const offenders = navy.filter(({ def }) => (def ? !def.navyAllowed : !freeBlocks))
   if (offenders.length) {
     const who = allowed.map((a) => `the ${a}`).join(' or ')
+    if (freeBlocks) {
+      return `Of the sections, only ${who} can use Highlight (navy); any page block can. Set ${offenders.map(name).join(', ')} back to another background.`
+    }
     return `Only ${who} can use Highlight (navy). Set ${offenders.map(name).join(', ')} back to another background.`
+  }
+  if (freeBlocks && navy.length > 1) {
+    return `Highlight (navy) marks the one part of the page most wanted read, so a page has one, across sections and blocks. ${navy.map(name).join(' and ')} use it: keep one and set the others back to another background, or remove the extra closing call to action.`
   }
   if (navy.length > 1) {
     return `Highlight (navy) marks the one section the page most wants read, so a page has one. ${navy.map(name).join(' and ')} both use it: keep it on one and set the other back to another background.`
   }
   const above = navy.find(({ def }) => def?.key !== 'closing')
+  if (showsClosing && above && byDesign(above.block)) {
+    return `This page shows the closing panel, and ${name(above)} is a second one. Remove it, or turn off Show the closing panel on the Page tab.`
+  }
   if (showsClosing && above) {
     return `This page shows the closing panel, which is navy, and a page has one navy section. Set ${name(above)} back to another background, or turn off Show the closing panel on the Page tab.`
   }
@@ -90,6 +118,67 @@ export const placementProblem = (layout: unknown): string | null => {
 
 export { layoutWarnings } from './LayoutField/warnings'
 
+type Row = { block: LayoutBlock; index: number }
+
+const rowsShown = (layout: unknown): Row[] =>
+  Array.isArray(layout)
+    ? (layout as LayoutBlock[]).map((block, index) => ({ block, index })).filter(({ block }) => block && !block.hidden)
+    : []
+
+const rowName = ({ block, index }: Row) => `#${index + 1} ${labelOf(block)}`
+
+const listed = (names: string[]) => (names.length > 1 ? `${names.slice(0, -1).join(', ')} and ${names.at(-1)}` : names.join(''))
+
+const heroLabels = () => LAYOUT_HERO_BLOCKS.map((slug) => labelOf({ blockType: slug }))
+
+/**
+ * A page has one hero, its one H1 (siteBlocks 'all'). With Hero design set
+ * to Hero block from the layout, the first row shown is a hero block and no
+ * other row is; with any other design the entry's own hero fields draw the
+ * hero, so no row is a hero block. Hidden rows are not drawn, so they do not
+ * count. Returns the problem, or null.
+ */
+export const heroProblem = (
+  layout: unknown,
+  { blockHero = false, usesDefaults = false }: { blockHero?: boolean; usesDefaults?: boolean } = {},
+): string | null => {
+  const rows = rowsShown(layout)
+  const heroes = rows.filter(({ block }) => (HERO_BLOCKS as readonly string[]).includes(String(block.blockType)))
+  if (!blockHero) {
+    if (!heroes.length) return null
+    const many = heroes.length > 1
+    return `${listed(heroes.map(rowName))} ${many ? 'are hero blocks' : 'is a hero block'}, but Hero design draws this page's hero from the hero fields, and a page has one hero, its one H1. Remove ${many ? 'them' : 'it'}, or set Hero design to Hero block from the layout.`
+  }
+  const first = rows[0]
+  if (!first || !(LAYOUT_HERO_BLOCKS as readonly string[]).includes(String(first.block.blockType))) {
+    const fix = usesDefaults ? 'Turn off Use page defaults, then add one at the top' : 'Add one at the top'
+    return `Hero design is Hero block from the layout, so the first row must be a hero block: ${listed(heroLabels())}. ${fix}, or pick another hero design.`
+  }
+  const extra = heroes.filter((r) => r !== first)
+  return extra.length ? `A page has one hero, its one H1, and the first row holds it. Remove ${listed(extra.map(rowName))}.` : null
+}
+
+/**
+ * The plain FAQ block and the FAQ section both send FAQPage data, and the
+ * closing CTA block and the closing panel section both end the page, so a
+ * layout holds one of each pair at most (siteBlocks 'all'). Returns the
+ * problem, or null.
+ */
+export const doublesProblem = (layout: unknown): string | null => {
+  const rows = rowsShown(layout)
+  const pairs: [string, string, string][] = [
+    ['faq', 'faqSection', 'The FAQ block and the FAQ section both send FAQ data to search engines, so a page has one FAQ.'],
+    ['closingCta', 'closingSection', 'The closing call to action block and the closing panel section both end the page, so a page has one closing panel.'],
+  ]
+  for (const [blockType, sectionType, why] of pairs) {
+    const found = rows.filter(({ block }) => block.blockType === blockType || block.blockType === sectionType)
+    if (found.length > 1 && found.some(({ block }) => block.blockType === blockType)) {
+      return `${why} Keep one: remove ${listed(found.slice(1).map(rowName))}, or ${rowName(found[0])}.`
+    }
+  }
+  return null
+}
+
 const layoutRule: Validate = async (value, options) => {
   const builtIn = await validateBlocks(value as any, options as any)
   if (builtIn !== true) return builtIn
@@ -99,8 +188,15 @@ const layoutRule: Validate = async (value, options) => {
     .map((key) => getSection(key))
     .filter((d) => d?.navyAllowed)
     .map((d) => (d!.key === 'closing' ? 'closing panel' : d!.label.toLowerCase()))
-  const data = (options as { data?: { showClosing?: unknown } }).data
-  return navyProblem(value, { allowed: allowed.length ? allowed : undefined, showsClosing: data?.showClosing === true }) ?? placementProblem(value) ?? true
+  const data = (options as { data?: { showClosing?: unknown; heroDesign?: unknown; usePageDefaults?: unknown } }).data
+  const freeBlocks = Boolean(entry?.freeLayout)
+  return (
+    navyProblem(value, { allowed: allowed.length ? allowed : undefined, showsClosing: data?.showClosing === true, freeBlocks }) ??
+    placementProblem(value) ??
+    (freeBlocks ? heroProblem(value, { blockHero: data?.heroDesign === 'blockHero', usesDefaults: data?.usePageDefaults !== false }) : null) ??
+    (freeBlocks ? doublesProblem(value) : null) ??
+    true
+  )
 }
 
 /** Layout rows for a list of section keys, as a new entry starts with them. */
@@ -159,6 +255,7 @@ export const sectionBlocksField = ({
   references,
   description,
   owner,
+  allow = [],
 }: {
   name: string
   label: string
@@ -166,8 +263,10 @@ export const sectionBlocksField = ({
   description: string
   /** Named in config errors. */
   owner: string
+  /** Blocks of NEVER_IN_LAYOUT this layout offers anyway, under its own rules (siteBlocks 'all'). */
+  allow?: readonly string[]
 }): BlocksField => {
-  const banned = references.filter((slug) => (NEVER_IN_LAYOUT as readonly string[]).includes(slug))
+  const banned = references.filter((slug) => (NEVER_IN_LAYOUT as readonly string[]).includes(slug) && !allow.includes(slug))
   if (banned.length) throw new Error(`${owner}: ${banned.join(', ')} can never be in a layout.`)
   return {
     name,
@@ -185,12 +284,15 @@ export const layoutField = ({
   collection,
   sections,
   defaultLayout,
+  siteBlocks = SITE_BLOCKS.map((b) => b.slug),
 }: {
   collection: string
   /** Section keys editors may add, from the section registry. */
   sections: string[]
   /** The rows a new entry starts with, in order. */
   defaultLayout: DefaultLayoutRow[]
+  /** The page blocks editors may add, by slug (the collection's siteBlocks). */
+  siteBlocks?: string[]
 }): { sidebar: CheckboxField; fields: Field[] } => {
   for (const key of sections) {
     if (!getSection(key)) throw new Error(`${collection}: no section is registered as ${key}.`)
@@ -223,10 +325,13 @@ export const layoutField = ({
   const base = sectionBlocksField({
     name: 'layout',
     label: 'Page sections',
-    references: [...sections.map(sectionBlockSlug), ...SITE_BLOCKS.map((b) => b.slug)],
-    description:
-      'The sections between the page hero and the end of the page, in order. Drag to reorder. Read-only while Use page defaults is on.',
+    references: [...sections.map(sectionBlockSlug), ...siteBlocks],
+    description: siteBlocks.some((slug) => (HERO_BLOCKS as readonly string[]).includes(slug))
+      ? "The page's sections and page blocks, in order. Drag to reorder, add any page block, remove any row. A hero block may only be the first row, with Hero design set to Hero block from the layout. Read-only while Use page defaults is on."
+      : 'The sections between the page hero and the end of the page, in order. Drag to reorder. Read-only while Use page defaults is on.',
     owner: collection,
+    // A free layout offers the layout heroes and the plain faq block, under its own rules.
+    allow: [...LAYOUT_HERO_BLOCKS, 'faq'],
   })
   const layout: BlocksField = {
     ...base,

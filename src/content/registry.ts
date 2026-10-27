@@ -63,6 +63,14 @@ export type ContentCollectionEntry = {
   kbase: boolean
   /** The hero designs an entry's own page may use (heroDesign). Empty without the ownPage group. */
   heroDesigns: HeroDesignName[]
+  /** The page blocks the layout offers besides its sections, by slug. */
+  siteBlocks: string[]
+  /**
+   * siteBlocks 'all': every page block, the layout heroes and the plain faq
+   * block included, with the rules that keep one H1, one FAQ and one
+   * closing panel (src/fields/layout.ts).
+   */
+  freeLayout: boolean
   kb: ContentKbOptions
 }
 

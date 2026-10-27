@@ -108,7 +108,7 @@ export const buildSectionBlock = (
         components: {
           Label: {
             path: '@/fields/LayoutField/RowLabel#LayoutRowLabel',
-            clientProps: { label: def.label, headingDefault: def.headingDefault },
+            clientProps: { kind: 'section', label: def.label, headingDefault: def.headingDefault },
           },
         },
       },
@@ -125,7 +125,7 @@ export const buildSectionBlock = (
       components: {
         Label: {
           path: '@/fields/LayoutField/RowLabel#LayoutRowLabel',
-          clientProps: { label: def.label, headingDefault: def.headingDefault },
+          clientProps: { kind: 'section', label: def.label, headingDefault: def.headingDefault },
         },
       },
     },

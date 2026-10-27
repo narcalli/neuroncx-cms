@@ -9,12 +9,13 @@ import conversation from './thumbs/conversation.svg'
 import rightPlacement from './thumbs/rightPlacement.svg'
 import stats from './thumbs/stats.svg'
 import customCss from './thumbs/customCss.svg'
+import blockHero from './thumbs/blockHero.svg'
 
 /**
  * The hero design choice (fields/heroDesign.ts) as small pictures, like the
  * card design picker. The stored value is the select value.
  */
-const THUMBS: Record<string, { src: string }> = { conversation, rightPlacement, stats, customCss }
+const THUMBS: Record<string, { src: string }> = { conversation, rightPlacement, stats, customCss, blockHero }
 
 const thumb = (value: string) => {
   const src = THUMBS[value]?.src

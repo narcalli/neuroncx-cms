@@ -15,7 +15,7 @@ import { previewUrl } from '../../utilities/generatePreviewPath'
 import { revalidateContent } from '../../content/revalidate'
 import { allSections, sectionBlockSlug } from '../../content/sections/defineSection'
 import { HUB_SECTION_KEYS, hubEntries } from '../../content/sections/hub'
-import { HUB_PAGE_BLOCKS, SITE_BLOCKS } from '../../content/sections/siteBlocks'
+import { HUB_LAYOUT_BLOCK_SLUGS, SITE_BLOCKS } from '../../content/sections/siteBlocks'
 import { GROUPING_SECTION_CARD_DESIGNS, itemCardDesignField, showKeyPointsField } from '../../fields/cardDesign'
 import { slugRule } from '../../fields/core'
 import { chatExampleFields } from '../../fields/chatExample'
@@ -243,8 +243,7 @@ export const buildHubs = (): CollectionConfig => {
         label: 'Hub sections',
         references: [
           ...HUB_SECTION_KEYS.map(sectionBlockSlug),
-          ...SITE_BLOCKS.map((b) => b.slug),
-          ...HUB_PAGE_BLOCKS.map((b) => b.slug),
+          ...HUB_LAYOUT_BLOCK_SLUGS,
         ],
         description:
           'The hub page between the hero and the FAQ, in order. Hub sections and every page block except the heroes and the plain FAQ block. Add "Grouping sections" to place the grouping sections; without it they come right after the hero. The closing panel is fixed at the end.',

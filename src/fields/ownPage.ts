@@ -4,7 +4,7 @@ import { text as validateText } from 'payload/shared'
 import { chatExampleFields } from './chatExample'
 import { showClosingField } from './closing'
 import { countedText } from './counted'
-import { heroDesignField, heroDesignOf, HERO_DESIGN_NAMES, type HeroDesignName } from './heroDesign'
+import { BLOCK_HERO, FIELD_HERO_DESIGNS, heroDesignField, heroDesignOf, type HeroDesignName } from './heroDesign'
 import { link } from './link'
 import { heroCustomVisualFields } from '../blocks/HeroCustom/config'
 
@@ -27,9 +27,9 @@ import { heroCustomVisualFields } from '../blocks/HeroCustom/config'
 const heroHeadingRule: Validate = (value, options) => {
   const builtIn = validateText(value, options as any)
   if (builtIn !== true) return builtIn
-  const data = options.data as { hasOwnPage?: boolean; _status?: string } | undefined
+  const data = options.data as { hasOwnPage?: boolean; _status?: string; heroDesign?: string } | undefined
   const empty = typeof value !== 'string' || !value.trim()
-  if (data?.hasOwnPage && data?._status === 'published' && empty) {
+  if (data?.hasOwnPage && data?._status === 'published' && data?.heroDesign !== BLOCK_HERO && empty) {
     return 'Add a hero heading before publishing with Own page on.'
   }
   return true
@@ -55,6 +55,22 @@ const titleAndLine = (
   ],
 })
 
+/** The entry's own hero fields, hidden while the hero is a block from the layout. */
+const HERO_FIELDS = [
+  'heroEyebrow',
+  'heroHeading',
+  'heroSubheading',
+  'heroChips',
+  'heroSecondaryCta',
+  'heroChat',
+  'heroChatCaption',
+  'heroMedia',
+  'heroMediaAlt',
+  'heroWorkflowFromChain',
+  'heroMotion',
+  'heroStats',
+]
+
 /** A field at a share of its row, keeping its other admin settings (the counter). */
 const withWidth = <T extends { admin?: object }>(field: T, width: string): T => ({ ...field, admin: { ...field.admin, width } })
 
@@ -79,7 +95,7 @@ const button = (name: string, label: string, description: string): GroupField =>
 
 export const ownPage = (
   collection: CollectionSlug,
-  { heroDesigns = HERO_DESIGN_NAMES }: { heroDesigns?: readonly HeroDesignName[] } = {},
+  { heroDesigns = FIELD_HERO_DESIGNS }: { heroDesigns?: readonly HeroDesignName[] } = {},
 ): { sidebar: CheckboxField; tab: Tab } => {
   // Shown only while the entry's design (or the collection's default) is one of these.
   const forDesign =
@@ -239,10 +255,24 @@ export const ownPage = (
     showClosingField('Ends this page with the closing panel. Off by default.'),
   ]
 
+  // Hero block from the layout draws the hero from the layout's first row,
+  // so the entry's own hero fields are hidden (and, hidden, not validated).
+  const ownHero = (field: Field): Field => {
+    if (!('name' in field) || !HERO_FIELDS.includes(field.name)) return field
+    const shown = field.admin?.condition
+    return {
+      ...field,
+      admin: {
+        ...field.admin,
+        condition: (data, siblingData, ctx) => data?.heroDesign !== BLOCK_HERO && (shown ? shown(data, siblingData, ctx) : true),
+      },
+    } as Field
+  }
+
   const tab: Tab = {
     label: 'Page',
     admin: { condition: (data) => Boolean(data?.hasOwnPage) },
-    fields,
+    fields: fields.map(ownHero),
   }
 
   return { sidebar, tab }

@@ -5,17 +5,29 @@ import type { SelectField } from 'payload'
  * of the site's light hero blocks draws the page's hero, fed from the shared
  * hero fields. The values match the website's hero adapters
  * (neuroncx-website src/components/sections/EntryHero.tsx).
+ *
+ * Hero block from the layout draws none of them: the first row of the page
+ * sections is a hero block instead (src/fields/layout.ts), and the hero
+ * fields are hidden. Only collections whose layout offers every page block
+ * (siteBlocks 'all') have it.
  */
 const DESIGNS = {
   conversation: 'Conversation',
   rightPlacement: 'Picture on the right',
   stats: 'Stats',
   customCss: 'Custom CSS visual',
+  blockHero: 'Hero block from the layout',
 } as const
 
 export type HeroDesignName = keyof typeof DESIGNS
 
 export const HERO_DESIGN_NAMES = Object.keys(DESIGNS) as HeroDesignName[]
+
+/** The design whose hero is the layout's first row. */
+export const BLOCK_HERO: HeroDesignName = 'blockHero'
+
+/** The designs drawn from the entry's own hero fields: every design but Hero block from the layout. */
+export const FIELD_HERO_DESIGNS = HERO_DESIGN_NAMES.filter((d) => d !== BLOCK_HERO)
 
 export const DEFAULT_HERO_DESIGN: HeroDesignName = 'conversation'
 
@@ -32,7 +44,7 @@ export const heroDesignOf = (
   return own && (allowed as readonly string[]).includes(own) ? (own as HeroDesignName) : defaultHeroDesign(allowed)
 }
 
-export const heroDesignField = (allowed: readonly HeroDesignName[] = HERO_DESIGN_NAMES): SelectField => {
+export const heroDesignField = (allowed: readonly HeroDesignName[] = FIELD_HERO_DESIGNS): SelectField => {
   if (!allowed.length) throw new Error('heroDesignField: allow at least one design.')
   return {
     name: 'heroDesign',
@@ -43,7 +55,7 @@ export const heroDesignField = (allowed: readonly HeroDesignName[] = HERO_DESIGN
     options: HERO_DESIGN_NAMES.filter((d) => allowed.includes(d)).map((value) => ({ label: DESIGNS[value], value })),
     admin: {
       description:
-        'Every design reads the hero fields below; the fields only one design uses show when it is picked. Conversation needs at least 2 chat messages, Picture on the right needs a picture, Stats needs at least 2 stats, Custom CSS visual needs its HTML and a screen reader description.',
+        `Every design reads the hero fields below; the fields only one design uses show when it is picked. Conversation needs at least 2 chat messages, Picture on the right needs a picture, Stats needs at least 2 stats, Custom CSS visual needs its HTML and a screen reader description.${allowed.includes(BLOCK_HERO) ? ' Hero block from the layout hides the hero fields: the first row of the page sections must be a hero block instead.' : ''}`,
       components: { Field: '@/fields/HeroDesignPicker/Component#HeroDesignPickerField' },
     },
   }

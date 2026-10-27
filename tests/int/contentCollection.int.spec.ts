@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { defineContentCollection } from '../../src/content/defineContentCollection'
 import { getContentCollection } from '../../src/content/registry'
+import { SITE_BLOCKS } from '../../src/content/sections/siteBlocks'
 import { ragAfterChange } from '../../src/rag/hooks'
 
 /**
@@ -456,6 +457,8 @@ describe('knowledge base, revalidation and registry', () => {
       headings: {},
       kbase: true,
       heroDesigns: ['conversation', 'rightPlacement', 'stats', 'customCss'],
+      siteBlocks: SITE_BLOCKS.map((b) => b.slug),
+      freeLayout: false,
       kb: { resolve: ['family'], exclude: [] },
     })
     cardsOnly('zzRegistryCards')

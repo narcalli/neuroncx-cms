@@ -10,7 +10,8 @@ import { authenticated } from '../access/authenticated'
 import { publicLiveOrPilot } from '../access/publicLiveOrPilot'
 import type { ListType } from '../collections/Lists'
 import { ITEM_CARD_DESIGNS, itemCardDesignField, type ItemCardDesignName } from '../fields/cardDesign'
-import { HERO_DESIGN_NAMES, type HeroDesignName } from '../fields/heroDesign'
+import { BLOCK_HERO, FIELD_HERO_DESIGNS, HERO_DESIGN_NAMES, type HeroDesignName } from '../fields/heroDesign'
+import { ALL_LAYOUT_BLOCK_SLUGS, SITE_BLOCKS } from './sections/siteBlocks'
 import {
   cardTab,
   coreFields,
@@ -89,6 +90,15 @@ export type ContentCollectionOptions = {
    * places by key: { key: 'shared', sharedContent: 'hosting' }.
    */
   defaultLayout?: DefaultLayoutRow[]
+  /**
+   * The page blocks an entry's layout offers besides its sections. Left out:
+   * the shared set (SITE_BLOCKS). A list: that fixed set, by slug. 'all':
+   * every block a Page's layout offers, from the same list a hub's layout
+   * uses (src/content/sections/siteBlocks.ts), with the hero blocks for the
+   * Hero block from the layout design and the plain faq block, each refused
+   * where it would double the page's H1, FAQ data or closing panel.
+   */
+  siteBlocks?: 'all' | string[]
   /** The card designs an entry may pick. All item designs when left out. */
   cardDesigns?: ItemCardDesignName[]
   /** The hero designs an entry's own page may use. All of them when left out. Needs the ownPage group. */
@@ -183,9 +193,19 @@ export const defineContentCollection = (opts: ContentCollectionOptions): Collect
   if (opts.heroDesigns && !groups.has('ownPage')) {
     throw new Error(`${slug}: heroDesigns needs the ownPage group.`)
   }
-  const heroDesigns = opts.heroDesigns ?? [...HERO_DESIGN_NAMES]
+  const siteBlocks = opts.siteBlocks ?? SITE_BLOCKS.map((b) => b.slug)
+  if (Array.isArray(siteBlocks)) {
+    const unknown = siteBlocks.filter((b) => !ALL_LAYOUT_BLOCK_SLUGS.includes(b))
+    if (unknown.length) throw new Error(`${slug}: siteBlocks has blocks no layout may offer: ${unknown.join(', ')}.`)
+  }
+  const freeLayout = siteBlocks === 'all'
+  // Hero block from the layout needs the hero blocks, which only 'all' offers.
+  const heroDesigns = opts.heroDesigns ?? [...(freeLayout ? HERO_DESIGN_NAMES : FIELD_HERO_DESIGNS)]
   if (!heroDesigns.length || heroDesigns.some((d) => !HERO_DESIGN_NAMES.includes(d))) {
     throw new Error(`${slug}: heroDesigns must be one or more of ${HERO_DESIGN_NAMES.join(', ')}.`)
+  }
+  if (heroDesigns.includes(BLOCK_HERO) && !freeLayout) {
+    throw new Error(`${slug}: the ${BLOCK_HERO} hero design needs siteBlocks: 'all', which offers the hero blocks.`)
   }
 
   const sectionKeys = (opts.sections ?? []).map((s) => (typeof s === 'string' ? s : s.key))
@@ -211,10 +231,12 @@ export const defineContentCollection = (opts: ContentCollectionOptions): Collect
     ),
     kbase: groups.has('kbase'),
     heroDesigns: groups.has('ownPage') ? heroDesigns : [],
+    siteBlocks: freeLayout ? [...ALL_LAYOUT_BLOCK_SLUGS] : siteBlocks,
+    freeLayout,
     kb: { resolve: opts.kb?.resolve ?? [], exclude: opts.kb?.exclude ?? [] },
   }
   const layout = sectionKeys.length
-    ? layoutField({ collection: slug, sections: sectionKeys, defaultLayout: entry.defaultLayout })
+    ? layoutField({ collection: slug, sections: sectionKeys, defaultLayout: entry.defaultLayout, siteBlocks: entry.siteBlocks })
     : null
 
   /* Sidebar: name, slug, status, grouping, featured, order, isUSP, hasOwnPage, then the collection's own. */

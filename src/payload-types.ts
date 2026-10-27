@@ -153,6 +153,15 @@ export interface Config {
     platformLayers: PlatformLayersBlock;
     whatsappWidget: WhatsappWidgetBlock;
     platformLayersTwo: PlatformLayersTwoBlock;
+    statHero: StatHeroBlock;
+    clusterLinks: ClusterLinksBlock;
+    heroFullBackground: HeroFullBackgroundBlock;
+    heroRightPlacement: HeroRightPlacementBlock;
+    heroCustom: HeroCustomBlock;
+    heroWorkforceGrid: HeroWorkforceGridBlock;
+    agenticHero: AgenticHeroBlock;
+    conversationHero: ConversationHeroBlock;
+    faq: FAQBlock;
   };
   collections: {
     pages: Page;
@@ -2875,9 +2884,9 @@ export interface Sector {
    */
   whoItsFor?: string | null;
   /**
-   * Every design reads the hero fields below; the fields only one design uses show when it is picked. Conversation needs at least 2 chat messages, Picture on the right needs a picture, Stats needs at least 2 stats, Custom CSS visual needs its HTML and a screen reader description.
+   * Every design reads the hero fields below; the fields only one design uses show when it is picked. Conversation needs at least 2 chat messages, Picture on the right needs a picture, Stats needs at least 2 stats, Custom CSS visual needs its HTML and a screen reader description. Hero block from the layout hides the hero fields: the first row of the page sections must be a hero block instead.
    */
-  heroDesign: 'conversation' | 'rightPlacement' | 'stats' | 'customCss';
+  heroDesign: 'conversation' | 'rightPlacement' | 'stats' | 'customCss' | 'blockHero';
   /**
    * The small line above the heading. Leave empty to use the grouping's name.
    */
@@ -3045,7 +3054,7 @@ export interface Sector {
    */
   showClosing?: boolean | null;
   /**
-   * The sections between the page hero and the end of the page, in order. Drag to reorder. Read-only while Use page defaults is on.
+   * The page's sections and page blocks, in order. Drag to reorder, add any page block, remove any row. A hero block may only be the first row, with Hero design set to Hero block from the layout. Read-only while Use page defaults is on.
    */
   layout?:
     | (
@@ -3080,6 +3089,47 @@ export interface Sector {
         | HowItWorks2Block
         | StatBandBlock
         | TrustPanelBlock
+        | PartnerStripBlock
+        | ProblemStatementBlock
+        | JourneyEngineBlock
+        | ContextEngineBlock
+        | SolutionGridBlock
+        | ProductSuiteBlock
+        | ProductSuite2Block
+        | CustomerDirectoryBlock
+        | BentoGridBlock
+        | DetailedProductSuiteBlock
+        | AgenticFlowDemoBlock
+        | AgenticStatsBlock
+        | AgenticCartsDemoBlock
+        | AgenticOrbitBlock
+        | AgenticEpisodeBlock
+        | AgenticCasesBlock
+        | AgenticClosingBlock
+        | IntegrationsMarqueeBlock
+        | UseCasesBlock
+        | IntegrationsBlock
+        | ContactFormBlock
+        | HowItWorksBlock
+        | ComparisonTableBlock
+        | AudienceTabsBlock
+        | RecordAnatomyBlock
+        | ClosingCTABlock
+        | FeatureThreadBlock
+        | ArticleGridBlock
+        | ArchiveBlock
+        | PlatformLayersBlock
+        | WhatsappWidgetBlock
+        | PlatformLayersTwoBlock
+        | StatHeroBlock
+        | ClusterLinksBlock
+        | HeroFullBackgroundBlock
+        | HeroRightPlacementBlock
+        | HeroCustomBlock
+        | HeroWorkforceGridBlock
+        | AgenticHeroBlock
+        | ConversationHeroBlock
+        | FAQBlock
       )[]
     | null;
   /**
@@ -7399,83 +7449,6 @@ export interface RecordAnatomyBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ClusterLinksBlock".
- */
-export interface ClusterLinksBlock {
-  /**
-   * Optional. The small line above the heading.
-   */
-  eyebrow?: string | null;
-  heading?: string | null;
-  /**
-   * Optional. One or two sentences under the heading.
-   */
-  intro?: string | null;
-  /**
-   * Optional. Pages that belong to this cluster but keep their own address. The pages under this page are listed without being added here.
-   */
-  extraPages?:
-    | {
-        page: string | Page;
-        /**
-         * Such as Qualification.
-         */
-        stage?: string | null;
-        stageOrder?: number | null;
-        id?: string | null;
-      }[]
-    | null;
-  cardDesign: {
-    design: 'grid' | 'logoCard' | 'directory' | 'feature' | 'story' | 'pill';
-    /**
-     * Leave empty to fit as many as the width allows.
-     */
-    columns?: ('2' | '3' | '4') | null;
-    lastRow?: ('stretch' | 'center' | 'leave') | null;
-    /**
-     * Show a heading for each category.
-     */
-    groupByCategory?: boolean | null;
-    /**
-     * Used only for integrations that have their own page.
-     */
-    linkLabel?: string | null;
-    /**
-     * Lists the entry's key points under the description, up to 3.
-     */
-    showKeyPoints?: boolean | null;
-    look?: {
-      cardColor?: ('grey' | 'lavender' | 'white') | null;
-      border?: ('none' | 'solid' | 'gradient') | null;
-      borderColor?: ('blue' | 'violet' | 'crimson' | 'navy') | null;
-      /**
-       * A thin rule under the content, matches the border color.
-       */
-      accentLine?: boolean | null;
-    };
-  };
-  /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
-   */
-  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'clusterLinks';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "ClosingCTABlock".
  */
 export interface ClosingCTABlock {
@@ -7639,6 +7612,277 @@ export interface ArchiveBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'archive';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PlatformLayersBlock".
+ */
+export interface PlatformLayersBlock {
+  /**
+   * e.g. The platform
+   */
+  eyebrow?: string | null;
+  heading: string;
+  /**
+   * e.g. Scroll to move through the stack. Each layer builds on the one before it.
+   */
+  intro?: string | null;
+  /**
+   * Each one takes a screen as the visitor scrolls, so keep the list short.
+   */
+  layers?:
+    | {
+        title: string;
+        description: string;
+        /**
+         * Optional, e.g. Core or Adjacent.
+         */
+        tag?: string | null;
+        icon?:
+          | (
+              | 'message'
+              | 'chat'
+              | 'check'
+              | 'calendar'
+              | 'card'
+              | 'document'
+              | 'refresh'
+              | 'bolt'
+              | 'layers'
+              | 'gauge'
+              | 'plug'
+              | 'shield'
+              | 'shieldCheck'
+              | 'lock'
+              | 'globe'
+              | 'server'
+              | 'eye'
+              | 'users'
+              | 'user'
+              | 'phone'
+              | 'smartphone'
+              | 'mail'
+              | 'messageCircle'
+              | 'send'
+              | 'inbox'
+              | 'headphones'
+              | 'mic'
+              | 'video'
+              | 'bell'
+              | 'handshake'
+              | 'stethoscope'
+              | 'heartPulse'
+              | 'hospital'
+              | 'activity'
+              | 'flask'
+              | 'pill'
+              | 'graduationCap'
+              | 'building'
+              | 'mapPin'
+              | 'database'
+              | 'cloud'
+              | 'workflow'
+              | 'bot'
+              | 'sparkles'
+              | 'search'
+              | 'chart'
+              | 'trendingUp'
+              | 'target'
+              | 'rocket'
+              | 'key'
+              | 'fileText'
+              | 'clipboardList'
+              | 'link'
+              | 'settings'
+              | 'puzzle'
+              | 'timer'
+              | 'clock'
+              | 'badgeCheck'
+              | 'star'
+              | 'briefcase'
+            )
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'platformLayers';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "WhatsappWidgetBlock".
+ */
+export interface WhatsappWidgetBlock {
+  enabled?: boolean | null;
+  /**
+   * In E.164 form, e.g. +919876543210. Used to build the chat link; the number itself is not shown on the page.
+   */
+  phone?: string | null;
+  label?: string | null;
+  /**
+   * What the visitor sends. The page reference is appended to it.
+   */
+  prefill?: string | null;
+  /**
+   * Appends [ref: page-slug] so the enquiry arrives already routed.
+   */
+  includeRef?: boolean | null;
+  /**
+   * For example "Mon–Sat, 9am–7pm IST". Not shown yet; reserved for a panel.
+   */
+  hoursNote?: string | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'whatsappWidget';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PlatformLayersTwoBlock".
+ */
+export interface PlatformLayersTwoBlock {
+  /**
+   * Short uppercase label above the heading. Optional.
+   */
+  eyebrow?: string | null;
+  heading: string;
+  intro?: string | null;
+  /**
+   * Navy inverts the heading and body text. Cards stay light.
+   */
+  theme?: ('light' | 'navy') | null;
+  /**
+   * Shows the numbered list in the sticky left column on large screens
+   */
+  showIndicators?: boolean | null;
+  /**
+   * Optional. Lets a link such as #platform-stack jump to this block.
+   */
+  anchorId?: string | null;
+  /**
+   * Numbered in the order listed. Three to six layers.
+   */
+  layers: {
+    title: string;
+    /**
+     * Short pill label such as "Unified Ingestion". Optional.
+     */
+    tag?: string | null;
+    /**
+     * One or two sentences, roughly 20 to 35 words
+     */
+    description: string;
+    /**
+     * Small line with a tick icon under the description. Optional.
+     */
+    footnote?: string | null;
+    /**
+     * Optional link shown in the card foot.
+     */
+    link?: {
+      label?: string | null;
+      type?: ('internal' | 'external') | null;
+      page?: (string | null) | Page;
+      url?: string | null;
+    };
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'platformLayersTwo';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ClusterLinksBlock".
+ */
+export interface ClusterLinksBlock {
+  /**
+   * Optional. The small line above the heading.
+   */
+  eyebrow?: string | null;
+  heading?: string | null;
+  /**
+   * Optional. One or two sentences under the heading.
+   */
+  intro?: string | null;
+  /**
+   * Optional. Pages that belong to this cluster but keep their own address. The pages under this page are listed without being added here.
+   */
+  extraPages?:
+    | {
+        page: string | Page;
+        /**
+         * Such as Qualification.
+         */
+        stage?: string | null;
+        stageOrder?: number | null;
+        id?: string | null;
+      }[]
+    | null;
+  cardDesign: {
+    design: 'grid' | 'logoCard' | 'directory' | 'feature' | 'story' | 'pill';
+    /**
+     * Leave empty to fit as many as the width allows.
+     */
+    columns?: ('2' | '3' | '4') | null;
+    lastRow?: ('stretch' | 'center' | 'leave') | null;
+    /**
+     * Show a heading for each category.
+     */
+    groupByCategory?: boolean | null;
+    /**
+     * Used only for integrations that have their own page.
+     */
+    linkLabel?: string | null;
+    /**
+     * Lists the entry's key points under the description, up to 3.
+     */
+    showKeyPoints?: boolean | null;
+    look?: {
+      cardColor?: ('grey' | 'lavender' | 'white') | null;
+      border?: ('none' | 'solid' | 'gradient') | null;
+      borderColor?: ('blue' | 'violet' | 'crimson' | 'navy') | null;
+      /**
+       * A thin rule under the content, matches the border color.
+       */
+      accentLine?: boolean | null;
+    };
+  };
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'clusterLinks';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -8241,6 +8485,49 @@ export interface ConversationHeroBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FAQBlock".
+ */
+export interface FAQBlock {
+  heading: string;
+  /**
+   * Optional. One short paragraph above the list.
+   */
+  intro?: string | null;
+  /**
+   * Keep answers short, roughly 40 to 60 words each. If one needs to run long, it should be the exception, not the pattern.
+   */
+  items: {
+    question: string;
+    answer: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    };
+    defaultOpen?: boolean | null;
+    id?: string | null;
+  }[];
+  background?: ('white' | 'cloud') | null;
+  /**
+   * Optional id for deep linking, e.g. faq
+   */
+  anchorId?: string | null;
+  emitSchema?: boolean | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'faq';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "HeroStackBlock".
  */
 export interface HeroStackBlock {
@@ -8291,110 +8578,6 @@ export interface HeroStackBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'heroStack';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "PlatformLayersBlock".
- */
-export interface PlatformLayersBlock {
-  /**
-   * e.g. The platform
-   */
-  eyebrow?: string | null;
-  heading: string;
-  /**
-   * e.g. Scroll to move through the stack. Each layer builds on the one before it.
-   */
-  intro?: string | null;
-  /**
-   * Each one takes a screen as the visitor scrolls, so keep the list short.
-   */
-  layers?:
-    | {
-        title: string;
-        description: string;
-        /**
-         * Optional, e.g. Core or Adjacent.
-         */
-        tag?: string | null;
-        icon?:
-          | (
-              | 'message'
-              | 'chat'
-              | 'check'
-              | 'calendar'
-              | 'card'
-              | 'document'
-              | 'refresh'
-              | 'bolt'
-              | 'layers'
-              | 'gauge'
-              | 'plug'
-              | 'shield'
-              | 'shieldCheck'
-              | 'lock'
-              | 'globe'
-              | 'server'
-              | 'eye'
-              | 'users'
-              | 'user'
-              | 'phone'
-              | 'smartphone'
-              | 'mail'
-              | 'messageCircle'
-              | 'send'
-              | 'inbox'
-              | 'headphones'
-              | 'mic'
-              | 'video'
-              | 'bell'
-              | 'handshake'
-              | 'stethoscope'
-              | 'heartPulse'
-              | 'hospital'
-              | 'activity'
-              | 'flask'
-              | 'pill'
-              | 'graduationCap'
-              | 'building'
-              | 'mapPin'
-              | 'database'
-              | 'cloud'
-              | 'workflow'
-              | 'bot'
-              | 'sparkles'
-              | 'search'
-              | 'chart'
-              | 'trendingUp'
-              | 'target'
-              | 'rocket'
-              | 'key'
-              | 'fileText'
-              | 'clipboardList'
-              | 'link'
-              | 'settings'
-              | 'puzzle'
-              | 'timer'
-              | 'clock'
-              | 'badgeCheck'
-              | 'star'
-              | 'briefcase'
-            )
-          | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'platformLayers';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -8781,139 +8964,6 @@ export interface IntegrationsMaster {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "WhatsappWidgetBlock".
- */
-export interface WhatsappWidgetBlock {
-  enabled?: boolean | null;
-  /**
-   * In E.164 form, e.g. +919876543210. Used to build the chat link; the number itself is not shown on the page.
-   */
-  phone?: string | null;
-  label?: string | null;
-  /**
-   * What the visitor sends. The page reference is appended to it.
-   */
-  prefill?: string | null;
-  /**
-   * Appends [ref: page-slug] so the enquiry arrives already routed.
-   */
-  includeRef?: boolean | null;
-  /**
-   * For example "Mon–Sat, 9am–7pm IST". Not shown yet; reserved for a panel.
-   */
-  hoursNote?: string | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'whatsappWidget';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "FAQBlock".
- */
-export interface FAQBlock {
-  heading: string;
-  /**
-   * Optional. One short paragraph above the list.
-   */
-  intro?: string | null;
-  /**
-   * Keep answers short, roughly 40 to 60 words each. If one needs to run long, it should be the exception, not the pattern.
-   */
-  items: {
-    question: string;
-    answer: {
-      root: {
-        type: string;
-        children: {
-          type: any;
-          version: number;
-          [k: string]: unknown;
-        }[];
-        direction: ('ltr' | 'rtl') | null;
-        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-        indent: number;
-        version: number;
-      };
-      [k: string]: unknown;
-    };
-    defaultOpen?: boolean | null;
-    id?: string | null;
-  }[];
-  background?: ('white' | 'cloud') | null;
-  /**
-   * Optional id for deep linking, e.g. faq
-   */
-  anchorId?: string | null;
-  emitSchema?: boolean | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'faq';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "PlatformLayersTwoBlock".
- */
-export interface PlatformLayersTwoBlock {
-  /**
-   * Short uppercase label above the heading. Optional.
-   */
-  eyebrow?: string | null;
-  heading: string;
-  intro?: string | null;
-  /**
-   * Navy inverts the heading and body text. Cards stay light.
-   */
-  theme?: ('light' | 'navy') | null;
-  /**
-   * Shows the numbered list in the sticky left column on large screens
-   */
-  showIndicators?: boolean | null;
-  /**
-   * Optional. Lets a link such as #platform-stack jump to this block.
-   */
-  anchorId?: string | null;
-  /**
-   * Numbered in the order listed. Three to six layers.
-   */
-  layers: {
-    title: string;
-    /**
-     * Short pill label such as "Unified Ingestion". Optional.
-     */
-    tag?: string | null;
-    /**
-     * One or two sentences, roughly 20 to 35 words
-     */
-    description: string;
-    /**
-     * Small line with a tick icon under the description. Optional.
-     */
-    footnote?: string | null;
-    /**
-     * Optional link shown in the card foot.
-     */
-    link?: {
-      label?: string | null;
-      type?: ('internal' | 'external') | null;
-      page?: (string | null) | Page;
-      url?: string | null;
-    };
-    id?: string | null;
-  }[];
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'platformLayersTwo';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "HubLayersSection".
  */
 export interface HubLayersSection {
@@ -9138,9 +9188,9 @@ export interface IndustryTopic {
    */
   whoItsFor?: string | null;
   /**
-   * Every design reads the hero fields below; the fields only one design uses show when it is picked. Conversation needs at least 2 chat messages, Picture on the right needs a picture, Stats needs at least 2 stats, Custom CSS visual needs its HTML and a screen reader description.
+   * Every design reads the hero fields below; the fields only one design uses show when it is picked. Conversation needs at least 2 chat messages, Picture on the right needs a picture, Stats needs at least 2 stats, Custom CSS visual needs its HTML and a screen reader description. Hero block from the layout hides the hero fields: the first row of the page sections must be a hero block instead.
    */
-  heroDesign: 'conversation' | 'rightPlacement' | 'stats' | 'customCss';
+  heroDesign: 'conversation' | 'rightPlacement' | 'stats' | 'customCss' | 'blockHero';
   /**
    * The small line above the heading. Leave empty to use the grouping's name.
    */
@@ -9308,7 +9358,7 @@ export interface IndustryTopic {
    */
   showClosing?: boolean | null;
   /**
-   * The sections between the page hero and the end of the page, in order. Drag to reorder. Read-only while Use page defaults is on.
+   * The page's sections and page blocks, in order. Drag to reorder, add any page block, remove any row. A hero block may only be the first row, with Hero design set to Hero block from the layout. Read-only while Use page defaults is on.
    */
   layout?:
     | (
@@ -9332,6 +9382,47 @@ export interface IndustryTopic {
         | HowItWorks2Block
         | StatBandBlock
         | TrustPanelBlock
+        | PartnerStripBlock
+        | ProblemStatementBlock
+        | JourneyEngineBlock
+        | ContextEngineBlock
+        | SolutionGridBlock
+        | ProductSuiteBlock
+        | ProductSuite2Block
+        | CustomerDirectoryBlock
+        | BentoGridBlock
+        | DetailedProductSuiteBlock
+        | AgenticFlowDemoBlock
+        | AgenticStatsBlock
+        | AgenticCartsDemoBlock
+        | AgenticOrbitBlock
+        | AgenticEpisodeBlock
+        | AgenticCasesBlock
+        | AgenticClosingBlock
+        | IntegrationsMarqueeBlock
+        | UseCasesBlock
+        | IntegrationsBlock
+        | ContactFormBlock
+        | HowItWorksBlock
+        | ComparisonTableBlock
+        | AudienceTabsBlock
+        | RecordAnatomyBlock
+        | ClosingCTABlock
+        | FeatureThreadBlock
+        | ArticleGridBlock
+        | ArchiveBlock
+        | PlatformLayersBlock
+        | WhatsappWidgetBlock
+        | PlatformLayersTwoBlock
+        | StatHeroBlock
+        | ClusterLinksBlock
+        | HeroFullBackgroundBlock
+        | HeroRightPlacementBlock
+        | HeroCustomBlock
+        | HeroWorkforceGridBlock
+        | AgenticHeroBlock
+        | ConversationHeroBlock
+        | FAQBlock
       )[]
     | null;
   /**

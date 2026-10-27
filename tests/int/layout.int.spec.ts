@@ -176,13 +176,11 @@ describe('required fields follow the layout', () => {
 describe('block picker', () => {
   const heroes = [StatHero, ConversationHero, HeroStack, HeroFullBackground, HeroRightPlacement, HeroWorkforceGrid, AgenticHero]
 
-  it('never offers a hero block or the plain faq block', () => {
+  it('never offers a hero block or the plain faq block on agent pages', () => {
     const offered = layoutOf(MicroApps).blockReferences as string[]
-    const defined = contentBlocks().map((b) => b.slug)
-    for (const block of [...heroes, FAQ]) {
-      expect(offered).not.toContain(block.slug)
-      expect(defined).not.toContain(block.slug)
-    }
+    for (const block of [...heroes, FAQ]) expect(offered).not.toContain(block.slug)
+    // Defined for the layouts that offer every page block; the hero stack holds an H1 and no layout offers it.
+    expect(contentBlocks().map((b) => b.slug)).not.toContain(HeroStack.slug)
   })
 
   it('offers the allowed sections and the shared page blocks, by reference', () => {

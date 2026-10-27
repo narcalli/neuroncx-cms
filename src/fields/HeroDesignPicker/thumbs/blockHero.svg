@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="100" viewBox="0 0 160 100" fill="none">
+  <!-- Hero block from the layout: the first of the page's rows is a hero block, the rows below it the page. -->
+  <rect width="160" height="100" rx="6" fill="#e9eef6"/>
+  <rect x="14.5" y="10.5" width="131" height="38" rx="4" fill="#ffffff" stroke="#c62828" stroke-dasharray="4 3"/>
+  <rect x="24" y="19" width="56" height="7" rx="3.5" fill="#1a2035"/>
+  <rect x="24" y="31" width="42" height="2.5" rx="1.25" fill="#8a92a6"/>
+  <rect x="24" y="38" width="20" height="6" rx="2" fill="#c62828"/>
+  <rect x="96" y="17" width="40" height="25" rx="3" fill="#e2e6ef"/>
+  <rect x="14.5" y="56.5" width="131" height="14" rx="3" fill="#ffffff" stroke="#e2e6ef"/>
+  <rect x="22" y="61" width="44" height="4" rx="2" fill="#1a2035"/>
+  <rect x="14.5" y="75.5" width="131" height="14" rx="3" fill="#ffffff" stroke="#e2e6ef"/>
+  <rect x="22" y="80" width="36" height="4" rx="2" fill="#1a2035"/>
+</svg>

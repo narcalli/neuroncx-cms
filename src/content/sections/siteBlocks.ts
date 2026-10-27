@@ -35,7 +35,7 @@ const withRowLabel = (block: Block): Block => ({
       ...block.admin?.components,
       Label: {
         path: '@/fields/LayoutField/RowLabel#LayoutRowLabel',
-        clientProps: { label: String(block.labels?.singular ?? block.slug) },
+        clientProps: { kind: 'block', label: String(block.labels?.singular ?? block.slug) },
       },
     },
   },
@@ -85,3 +85,47 @@ export const HUB_PAGE_BLOCKS: Block[] = PAGE_LAYOUT_BLOCKS.filter(
     !(PAGES_ONLY as readonly string[]).includes(b.slug) &&
     !SITE_BLOCKS.some((s) => s.slug === b.slug),
 ).map(withRowLabel)
+
+/**
+ * The hero blocks an entry page may start with when its Hero design is Hero
+ * block from the layout (src/fields/heroDesign.ts). The first row holds one;
+ * no other row may (src/fields/layout.ts).
+ */
+export const LAYOUT_HERO_BLOCKS = [
+  'heroCustom',
+  'conversationHero',
+  'statHero',
+  'heroFullBackground',
+  'heroRightPlacement',
+  'heroWorkforceGrid',
+  'agenticHero',
+] as const
+
+/** Every block that draws a page's H1: the layout heroes, and two that only their own pages use. */
+export const HERO_BLOCKS = NEVER_IN_LAYOUT.filter((slug) => slug !== 'faq')
+
+/**
+ * The blocks an entry layout with siteBlocks 'all' adds to the hub's list:
+ * the layout heroes, the plain faq block and the Pages-only blocks, each
+ * refused where it would double the page's H1, FAQ data or closing panel
+ * (src/fields/layout.ts). The integrations landing hero and the hero stack
+ * are left out: they hold an H1 and are not layout heroes, so no row could
+ * hold them.
+ */
+export const ENTRY_EXTRA_BLOCKS: Block[] = PAGE_LAYOUT_BLOCKS.filter(
+  (b) =>
+    !SITE_BLOCKS.some((s) => s.slug === b.slug) &&
+    !HUB_PAGE_BLOCKS.some((s) => s.slug === b.slug) &&
+    !(HERO_BLOCKS as readonly string[]).filter((h) => !(LAYOUT_HERO_BLOCKS as readonly string[]).includes(h)).includes(b.slug),
+).map(withRowLabel)
+
+/** The page blocks a hub's layout offers, by slug. */
+export const HUB_LAYOUT_BLOCK_SLUGS: string[] = [...SITE_BLOCKS, ...HUB_PAGE_BLOCKS].map((b) => b.slug)
+
+/**
+ * The page blocks of an entry layout with siteBlocks 'all': the hub's list
+ * and ENTRY_EXTRA_BLOCKS, so every block a Page's layout offers. All are
+ * derived from src/blocks/pageLayoutBlocks.ts, so a new page block reaches
+ * Pages, hubs and these entries without further wiring.
+ */
+export const ALL_LAYOUT_BLOCK_SLUGS: string[] = [...HUB_LAYOUT_BLOCK_SLUGS, ...ENTRY_EXTRA_BLOCKS.map((b) => b.slug)]

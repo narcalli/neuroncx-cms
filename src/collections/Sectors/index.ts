@@ -208,6 +208,8 @@ export const Sectors = defineContentCollection({
   // The industry page sections (./sections.ts), all of them by default.
   sections: INDUSTRY_SECTION_KEYS,
   defaultLayout: INDUSTRY_DEFAULT_LAYOUT,
+  // Every page block, as on a Page, and a hero block as the hero if chosen.
+  siteBlocks: 'all',
   fields: {
     sidebar: [
       countedText({

@@ -113,6 +113,8 @@ export const IndustryTopics = defineContentCollection({
   // The topic page sections (./sections.ts), with the shared FAQ and closing panel.
   sections: TOPIC_SECTION_KEYS,
   defaultLayout: TOPIC_DEFAULT_LAYOUT,
+  // Every page block, as on a Page, and a hero block as the hero if chosen.
+  siteBlocks: 'all',
   fields: {
     sidebar: [
       {

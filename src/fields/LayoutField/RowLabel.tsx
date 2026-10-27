@@ -6,16 +6,16 @@ import React from 'react'
 type Row = { heading?: string | null; title?: string | null; headline?: string | null }
 
 /**
- * A layout row named by its block and heading, such as "Testimonial: What
- * changed at the front desk". A section with no heading of its own shows
- * its default heading.
+ * A layout row named by its kind, its name and its own heading, such as
+ * "Section: Industry problems" or "Block: Bento Grid, Result-day campaigns".
+ * A row without a heading of its own shows its kind and name only.
  */
-export const LayoutRowLabel: React.FC<{ label?: string; headingDefault?: string }> = ({
+export const LayoutRowLabel: React.FC<{ kind?: 'section' | 'block'; label?: string; headingDefault?: string }> = ({
+  kind,
   label = 'Block',
-  headingDefault,
 }) => {
   const row = useRowLabel<Row>()
-  const own = row?.data?.heading || row?.data?.title || row?.data?.headline
-  const heading = own || (headingDefault ? `${headingDefault} (default)` : '')
-  return <span>{heading ? `${label}: ${heading}` : label}</span>
+  const own = (row?.data?.heading || row?.data?.title || row?.data?.headline || '').trim()
+  const name = kind ? `${kind === 'section' ? 'Section' : 'Block'}: ${label}` : label
+  return <span>{own ? `${name}, ${own}` : name}</span>
 }

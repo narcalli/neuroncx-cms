@@ -1,6 +1,6 @@
 import type { PayloadRequest } from 'payload'
 
-import { heroDesignOf, HERO_DESIGN_NAMES, type HeroDesignName } from '../fields/heroDesign'
+import { BLOCK_HERO, FIELD_HERO_DESIGNS, heroDesignOf, type HeroDesignName } from '../fields/heroDesign'
 import { sectionKeysIn } from '../fields/layout'
 import { defaultLayoutBlocks } from './hubs'
 import type { ContentCollectionEntry } from './registry'
@@ -25,9 +25,11 @@ const filledRows = (rows: unknown, keys: string[]): number =>
  */
 export const heroDesignProblems = (
   doc: Doc,
-  allowed: readonly HeroDesignName[] = HERO_DESIGN_NAMES,
+  allowed: readonly HeroDesignName[] = FIELD_HERO_DESIGNS,
 ): PublishProblem[] => {
   const design = heroDesignOf(doc, allowed)
+  // The layout's first row is the hero; the layout field checks it.
+  if (design === BLOCK_HERO) return []
   if (design === 'conversation' && filledRows(doc.heroChat, ['text']) < 2) {
     return [{ path: 'heroChat', message: 'Add at least 2 chat messages for the Conversation hero, or pick another hero design.' }]
   }
@@ -58,10 +60,10 @@ export const heroDesignProblems = (
  */
 export const ownPageProblems = (
   doc: Doc,
-  heroDesigns: readonly HeroDesignName[] = HERO_DESIGN_NAMES,
+  heroDesigns: readonly HeroDesignName[] = FIELD_HERO_DESIGNS,
 ): PublishProblem[] => {
   const problems: PublishProblem[] = [...heroDesignProblems(doc, heroDesigns)]
-  if (empty(doc.heroHeading)) {
+  if (empty(doc.heroHeading) && heroDesignOf(doc, heroDesigns) !== BLOCK_HERO) {
     problems.push({ path: 'heroHeading', message: 'Add a hero heading before publishing with Own page on.' })
   }
   if (empty(doc.meta?.title)) {
