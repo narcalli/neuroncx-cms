@@ -1,6 +1,6 @@
 import type { Block, Field } from 'payload'
 
-import { withPresentation } from '../../fields/presentation'
+import { withBackgroundAndId, withPresentation } from '../../fields/presentation'
 import { plainText } from '../../fields/validators/plainText'
 
 /**
@@ -33,8 +33,14 @@ export type SectionDefinition = {
    * registered, for fields that point at registered collections.
    */
   fields?: Field[] | (() => Field[])
-  /** The one section that may use Highlight (navy). */
+  /** A section that may use Highlight (navy), one per page (src/fields/layout.ts). */
   navyAllowed?: boolean
+  /**
+   * The Appearance options it offers: the full set (the default), or only
+   * the background and anchor ID, for sections whose width and spacing are
+   * fixed by their design.
+   */
+  appearance?: 'full' | 'backgroundAndId'
   /**
    * A marker with no copy of its own: it only says where something the page
    * draws anyway goes (the hub's grouping sections). No heading override and
@@ -42,6 +48,16 @@ export type SectionDefinition = {
    */
   placement?: boolean
 }
+
+/**
+ * One row of a collection's default layout: a section key, or a Shared
+ * content section that places the shared content record with this key
+ * (such as hosting), looked up when an entry is created or saved.
+ */
+export type DefaultLayoutRow = string | { key: 'shared'; sharedContent: string }
+
+/** The section key of a default layout row. */
+export const defaultRowKey = (row: DefaultLayoutRow): string => (typeof row === 'string' ? row : row.key)
 
 const sections = new Map<string, SectionDefinition>()
 
@@ -99,7 +115,8 @@ export const buildSectionBlock = (
       fields: [],
     }
   }
-  return withPresentation({
+  const present = def.appearance === 'backgroundAndId' ? withBackgroundAndId : withPresentation
+  return present({
     slug: sectionBlockSlug(def.key),
     interfaceName: `${pascal(def.key)}Section`,
     labels: { singular: def.label, plural: def.label },

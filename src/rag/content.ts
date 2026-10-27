@@ -4,6 +4,7 @@ import { stripForVisitors } from '../collections/Customers'
 import { entryPath, getContentCollection, hubPath, type ContentCollectionEntry } from '../content/registry'
 import { projectDoc } from './serialize'
 import type { RagSection, RagSource } from './types'
+import { withoutPendingRows } from '../content/pending'
 
 /**
  * Knowledge base sources for content collections built on the factory and
@@ -160,6 +161,8 @@ export const serializeEntry = async (
   doc: any,
 ): Promise<RagSection[]> => {
   const fields = (payload.collections as any)[entry.slug].config.fields as Field[]
+  // Pending rows (src/content/pending.ts) never reach the knowledge base.
+  doc = withoutPendingRows(doc)
   const sections = weighAndName(
     projectDoc(fields, doc, {
       getBlock: (slug) => (payload.blocks as any)?.[slug],

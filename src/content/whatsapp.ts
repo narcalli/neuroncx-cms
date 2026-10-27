@@ -1,6 +1,7 @@
 import type { BasePayload, CollectionSlug, Where } from 'payload'
 
 import { cutOnWord } from '../collections/integrations/hooks'
+import { withoutPendingRows } from './pending'
 import type { ContentCollectionEntry } from './registry'
 
 /**
@@ -206,6 +207,8 @@ const PUBLIC_ENTRY: Where = {
   and: [{ _status: { equals: 'published' } }, { status: { in: ['live', 'pilot'] } }],
 }
 
+// Pending rows (src/content/pending.ts) never reach WhatsApp. The Local API
+// reads them all, so they are dropped here.
 const read = async (payload: BasePayload, collection: string, where: Where, limit = 100) =>
   (
     await payload.find({
@@ -218,7 +221,7 @@ const read = async (payload: BasePayload, collection: string, where: Where, limi
       sort: 'order',
       pagination: false,
     })
-  ).docs as Doc[]
+  ).docs.map((d) => withoutPendingRows(d)) as Doc[]
 
 const byOrderThenName = (a: Doc, b: Doc) =>
   (a.order ?? 100) - (b.order ?? 100) || String(a.name).localeCompare(String(b.name))

@@ -2,6 +2,7 @@ import type { CollectionSlug } from 'payload'
 
 import type { ListType } from '../collections/Lists'
 import type { HeroDesignName } from '../fields/heroDesign'
+import type { DefaultLayoutRow } from './sections/defineSection'
 
 /**
  * Every content collection built with defineContentCollection(), keyed by
@@ -20,12 +21,32 @@ export type ContentKbOptions = {
   exclude: string[]
 }
 
+/**
+ * How a collection's entries get their address (defineContentCollection's
+ * route option): under a route base (/crm/{slug}), at the root of the site
+ * (/{slug}), or under the entry a field links to (/{parent slug}/{slug}).
+ */
+export type ContentRouting =
+  | { kind: 'none' }
+  | { kind: 'base'; base: string }
+  | { kind: 'root' }
+  | { kind: 'parent'; collection: string; field: string }
+
 export type ContentCollectionEntry = {
   slug: string
   label: { singular: string; plural: string }
-  /** Route base for entry pages and the hub, such as /crm. Null for cards-only collections. */
+  /**
+   * Route base for entry pages and the hub, such as /crm. Null for cards-only
+   * collections and for entries served at the root or under a parent entry.
+   */
   route: string | null
+  /** True when entries have an address of any kind (see routing). */
   hasRoute: boolean
+  routing: ContentRouting
+  /** Whether entries can have their own page (the ownPage group, with hasOwnPage). */
+  ownPage: boolean
+  /** Whether entries have the SEO tab, with meta.primaryKeyword. */
+  seo: boolean
   /** The Lists type entries are grouped by, and the field that holds it. */
   grouping: { listType: ListType; field: string; required: boolean } | null
   /** Section keys editors may add to the layout field. */
@@ -35,7 +56,7 @@ export type ContentCollectionEntry = {
    * when the collection's hub has no published default layout
    * (src/content/hubs.ts).
    */
-  defaultLayout: string[]
+  defaultLayout: DefaultLayoutRow[]
   /** This collection's default heading for a section, by key, where it differs from the section's own. */
   headings: Record<string, string>
   /** Whether entries go to the knowledge base (the kbase group). */
@@ -84,11 +105,17 @@ export const collectionForListType = (listType: unknown): ContentCollectionEntry
 /** The hub page of a collection: its route base, or null without a route. */
 export const hubPath = (entry: Pick<ContentCollectionEntry, 'route'>): string | null => entry.route
 
-/** An entry's own page, or null when it has none. */
+/**
+ * An entry's own page, or null when it has none. Under a route base it is
+ * {route}/{slug}; at the root or under a parent entry it is the path stored
+ * on the entry, set on save (src/content/paths.ts).
+ */
 export const entryPath = (
-  entry: Pick<ContentCollectionEntry, 'route'>,
-  doc: { slug?: unknown; hasOwnPage?: unknown } | null | undefined,
-): string | null =>
-  entry.route && doc?.hasOwnPage && typeof doc.slug === 'string' && doc.slug
-    ? `${entry.route}/${doc.slug}`
-    : null
+  entry: Pick<ContentCollectionEntry, 'route'> & { routing?: ContentRouting },
+  doc: { slug?: unknown; hasOwnPage?: unknown; path?: unknown } | null | undefined,
+): string | null => {
+  if (!doc?.hasOwnPage) return null
+  const kind = entry.routing?.kind
+  if (kind === 'root' || kind === 'parent') return typeof doc.path === 'string' && doc.path ? doc.path : null
+  return entry.route && typeof doc.slug === 'string' && doc.slug ? `${entry.route}/${doc.slug}` : null
+}

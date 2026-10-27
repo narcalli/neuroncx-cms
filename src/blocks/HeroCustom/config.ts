@@ -1,4 +1,4 @@
-import type { Block, Condition, Validate } from 'payload'
+import type { Block, Condition, Field, Validate } from 'payload'
 
 import { optionalCta } from '@/fields/optionalCta'
 
@@ -13,6 +13,78 @@ const checked =
     const found = problems(value)
     return found.length ? found.join(' ') : true
   }
+
+/**
+ * The custom visual: HTML, CSS, a live preview, a screen reader description,
+ * shape and widest size. Shared with the Custom CSS visual hero design of a
+ * content collection entry's own page (src/fields/ownPage.ts), so both are
+ * checked by the same rules.
+ */
+export const heroCustomVisualFields: Field[] = [
+  {
+    name: 'visualHtml',
+    type: 'code',
+    label: 'HTML',
+    admin: {
+      language: 'html',
+      description: 'The markup only, no <style> or <script>. Text in it is read by search engines.',
+    },
+    validate: checked(htmlProblems),
+  },
+  {
+    name: 'visualCss',
+    type: 'code',
+    label: 'CSS',
+    admin: {
+      language: 'css',
+      description:
+        'Styles for the HTML above. Use @media or @container visual (max-width: 480px) for small screens. Images and fonts must come from the media library.',
+    },
+    validate: checked(cssProblems),
+  },
+  {
+    name: 'visualPreview',
+    type: 'ui',
+    admin: {
+      components: { Field: '@/blocks/HeroCustom/Preview#HeroCustomPreview' },
+    },
+  },
+  {
+    name: 'visualAlt',
+    type: 'text',
+    label: 'Description for screen readers',
+    maxLength: 200,
+    admin: { description: 'What the visual shows, in a sentence. Leave empty if it is only decoration.' },
+  },
+  {
+    type: 'row',
+    fields: [
+      {
+        name: 'aspect',
+        type: 'select',
+        label: 'Shape',
+        required: true,
+        defaultValue: 'auto',
+        options: [
+          { label: 'As tall as its content', value: 'auto' },
+          { label: 'Wide (16:9)', value: '16/9' },
+          { label: 'Landscape (4:3)', value: '4/3' },
+          { label: 'Square (1:1)', value: '1/1' },
+          { label: 'Portrait (3:4)', value: '3/4' },
+        ],
+        admin: { width: '50%', condition: notBackground },
+      },
+      {
+        name: 'maxWidth',
+        type: 'number',
+        label: 'Widest it gets (px, optional)',
+        min: 120,
+        max: 1440,
+        admin: { width: '50%', condition: notBackground, description: 'Empty fills its column.' },
+      },
+    ],
+  },
+]
 
 /**
  * A hero whose visual is your own HTML and CSS. Everything else is fixed and
@@ -147,71 +219,7 @@ export const HeroCustom: Block = {
           label: 'Custom visual',
           description:
             "Your own HTML and CSS, drawn in a sealed box: its CSS only styles the visual, never the rest of the page. The site's colours and fonts are available, such as var(--ncx-crimson) and var(--font-display). Animations stop for visitors who ask for reduced motion, so make the first frame look right on its own.",
-          fields: [
-            {
-              name: 'visualHtml',
-              type: 'code',
-              label: 'HTML',
-              admin: {
-                language: 'html',
-                description: 'The markup only, no <style> or <script>. Text in it is read by search engines.',
-              },
-              validate: checked(htmlProblems),
-            },
-            {
-              name: 'visualCss',
-              type: 'code',
-              label: 'CSS',
-              admin: {
-                language: 'css',
-                description:
-                  'Styles for the HTML above. Use @media or @container visual (max-width: 480px) for small screens. Images and fonts must come from the media library.',
-              },
-              validate: checked(cssProblems),
-            },
-            {
-              name: 'visualPreview',
-              type: 'ui',
-              admin: {
-                components: { Field: '@/blocks/HeroCustom/Preview#HeroCustomPreview' },
-              },
-            },
-            {
-              name: 'visualAlt',
-              type: 'text',
-              label: 'Description for screen readers',
-              maxLength: 200,
-              admin: { description: 'What the visual shows, in a sentence. Leave empty if it is only decoration.' },
-            },
-            {
-              type: 'row',
-              fields: [
-                {
-                  name: 'aspect',
-                  type: 'select',
-                  label: 'Shape',
-                  required: true,
-                  defaultValue: 'auto',
-                  options: [
-                    { label: 'As tall as its content', value: 'auto' },
-                    { label: 'Wide (16:9)', value: '16/9' },
-                    { label: 'Landscape (4:3)', value: '4/3' },
-                    { label: 'Square (1:1)', value: '1/1' },
-                    { label: 'Portrait (3:4)', value: '3/4' },
-                  ],
-                  admin: { width: '50%', condition: notBackground },
-                },
-                {
-                  name: 'maxWidth',
-                  type: 'number',
-                  label: 'Widest it gets (px, optional)',
-                  min: 120,
-                  max: 1440,
-                  admin: { width: '50%', condition: notBackground, description: 'Empty fills its column.' },
-                },
-              ],
-            },
-          ],
+          fields: heroCustomVisualFields,
         },
       ],
     },

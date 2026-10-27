@@ -1,6 +1,6 @@
 /**
- * Creates the starting sectors, in this order, if they are missing. Matched
- * by slug, so running it twice changes nothing.
+ * Creates the starting sectors, in this order, if they are missing, as
+ * planned drafts. Matched by slug, so running it twice changes nothing.
  *
  * Usage (from neuroncx-cms):
  *   NODE_OPTIONS="--no-deprecation --import=tsx/esm" node --env-file=.env scripts/seed-sectors.ts
@@ -32,7 +32,15 @@ for (const name of SECTORS) {
   const slug = slugify(name)
   if (have.has(slug)) out.push(`  ${name}: exists, skipped`)
   else {
-    await payload.create({ collection: 'sectors', data: { name, slug, order }, overrideAccess: true, context: { disableRevalidate: true } })
+    // Sectors are industries now (src/collections/Sectors): new ones start as
+    // planned drafts, to be filled in and published from the admin.
+    await payload.create({
+      collection: 'sectors',
+      draft: true,
+      data: { name, slug, order, status: 'planned', _status: 'draft' },
+      overrideAccess: true,
+      context: { disableRevalidate: true },
+    })
     out.push(`  ${name}: created (slug ${slug}, order ${order})`)
   }
   order += 10

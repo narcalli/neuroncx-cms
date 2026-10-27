@@ -26,8 +26,10 @@ import { withRag } from '../rag/with-rag'
 import { layoutField } from '../fields/layout'
 import { contentFallbacks, contentPublishCheck, followPageDefaults } from './fallbacks'
 import { previewUrl } from '../utilities/generatePreviewPath'
-import { entryPath, hubPagePath, registerContentCollection, type ContentCollectionEntry } from './registry'
+import { entryPath, hubPagePath, registerContentCollection, type ContentCollectionEntry, type ContentRouting } from './registry'
+import { entryPathField, noteEntryLivePath, redirectMovedEntry, refreshChildPaths } from './paths'
 import './sections/shared'
+import type { DefaultLayoutRow } from './sections/defineSection'
 import { revalidateAfterChange, revalidateAfterDelete } from './revalidate'
 
 /**
@@ -60,10 +62,17 @@ export type ContentCollectionOptions = {
   /** Sidebar group in the admin. Defaults to the plural label. */
   adminGroup?: string
   /**
-   * Route base for entry pages and the hub, such as /crm. Without one,
-   * entries are cards only and the ownPage group is not allowed.
+   * Where entry pages live. Without one, entries are cards only and the
+   * ownPage group is not allowed.
+   * - A route base, such as '/crm': entries at /crm/{slug}, the hub at /crm.
+   * - { entries: 'root' }: entries at /{slug}, with no hub address.
+   * - { parent: { collection, field } }: entries at /{parent slug}/{slug},
+   *   where the parent is the entry in `collection` that `field` links to.
+   *   The field is added to the sidebar unless the collection defines it.
+   * Root and parent routes store each entry's address in a read-only path
+   * field; every route form is checked against all other site addresses.
    */
-  route?: string
+  route?: string | { entries: 'root' } | { parent: { collection: string; field: string } }
   /** The grouping: which Lists type, the field name, and whether it is required. */
   groupBy?: { listType: ListType; field: string; required?: boolean }
   groups: ContentGroup[]
@@ -74,8 +83,12 @@ export type ContentCollectionOptions = {
    * the layout is on the Page tab.
    */
   sections?: (string | { key: string; headingDefault: string })[]
-  /** The sections an entry page follows by default, in order. All of `sections` when left out. */
-  defaultLayout?: string[]
+  /**
+   * The sections an entry page follows by default, in order. All of
+   * `sections` when left out. A Shared content row names the record it
+   * places by key: { key: 'shared', sharedContent: 'hosting' }.
+   */
+  defaultLayout?: DefaultLayoutRow[]
   /** The card designs an entry may pick. All item designs when left out. */
   cardDesigns?: ItemCardDesignName[]
   /** The hero designs an entry's own page may use. All of them when left out. Needs the ownPage group. */
@@ -132,14 +145,32 @@ export const defineContentCollection = (opts: ContentCollectionOptions): Collect
   const groups = new Set<ContentGroup>(['core', 'card', ...opts.groups])
   const labels =
     typeof opts.label === 'string' ? { singular: opts.label, plural: opts.label } : opts.label
-  const route = opts.route ?? null
+  const routing: ContentRouting =
+    typeof opts.route === 'string'
+      ? { kind: 'base', base: opts.route }
+      : opts.route && 'entries' in opts.route
+        ? { kind: 'root' }
+        : opts.route && 'parent' in opts.route
+          ? { kind: 'parent', collection: opts.route.parent.collection, field: opts.route.parent.field }
+          : { kind: 'none' }
+  // The hub's address and the base of entry addresses; only a route base has one.
+  const route = routing.kind === 'base' ? routing.base : null
 
   // Mistakes in a config fail when the config loads, not on an editor's save.
   if (route !== null && !ROUTE_PATTERN.test(route)) {
     throw new Error(`${slug}: route must look like /crm or /bot-swarm, without a trailing slash.`)
   }
-  if (groups.has('ownPage') && !route) {
+  if (groups.has('ownPage') && routing.kind === 'none') {
     throw new Error(`${slug}: the ownPage group needs a route.`)
+  }
+  if ((routing.kind === 'root' || routing.kind === 'parent') && !groups.has('ownPage')) {
+    throw new Error(`${slug}: a root or parent route needs the ownPage group, since only own pages have an address.`)
+  }
+  if (routing.kind === 'parent') {
+    if (routing.collection === slug) throw new Error(`${slug}: the parent collection must be another collection.`)
+    if (!/^[a-z][a-zA-Z0-9]*$/.test(routing.collection) || !/^[a-z][a-zA-Z0-9]*$/.test(routing.field)) {
+      throw new Error(`${slug}: route.parent needs a collection slug and a field name, in camelCase.`)
+    }
   }
   if (extra.page?.length && !groups.has('ownPage')) {
     throw new Error(`${slug}: fields.page needs the ownPage group.`)
@@ -166,7 +197,10 @@ export const defineContentCollection = (opts: ContentCollectionOptions): Collect
     slug,
     label: labels,
     route,
-    hasRoute: route !== null,
+    hasRoute: routing.kind !== 'none',
+    routing,
+    ownPage: groups.has('ownPage'),
+    seo: groups.has('detail') || groups.has('ownPage'),
     grouping: groupBy
       ? { listType: groupBy.listType, field: groupBy.field, required: groupBy.required ?? false }
       : null,
@@ -214,6 +248,41 @@ export const defineContentCollection = (opts: ContentCollectionOptions): Collect
     },
   }
 
+  // A parent route links each entry to its parent: the collection's own field
+  // when it defines one (a single relationship to the parent collection),
+  // else one added to the sidebar.
+  const parentLink = routing.kind === 'parent' ? routing : null
+  const ownParentField = parentLink
+    ? Object.values(extra)
+        .flatMap((list) => list ?? [])
+        .find((f) => 'name' in f && f.name === parentLink.field)
+    : undefined
+  if (parentLink && ownParentField) {
+    const ok =
+      ownParentField.type === 'relationship' &&
+      ownParentField.relationTo === parentLink.collection &&
+      !ownParentField.hasMany
+    if (!ok) {
+      throw new Error(`${slug}: ${parentLink.field} must be a single relationship to ${parentLink.collection}.`)
+    }
+  }
+  const parentField: RelationshipField | null =
+    parentLink && !ownParentField
+      ? {
+          name: parentLink.field,
+          type: 'relationship',
+          label: 'Parent (sets the address)',
+          relationTo: parentLink.collection as CollectionSlug,
+          required: true,
+          admin: {
+            position: 'sidebar',
+            description: 'The entry this page sits under. Its address is the parent slug, then this slug.',
+          },
+        }
+      : null
+  // The stored address, after everything it is worked out from.
+  const pathField = page && routing.kind !== 'none' ? entryPathField(entry) : null
+
   const sidebar: Field[] = [
     ...core.slice(0, afterSlug),
     statusField(),
@@ -221,7 +290,9 @@ export const defineContentCollection = (opts: ContentCollectionOptions): Collect
     ...core.slice(afterSlug),
     ...(page ? [page.sidebar] : []),
     ...(layout ? [layout.sidebar] : []),
+    ...(parentField ? [parentField] : []),
     ...(extra.sidebar ?? []).map(inSidebar),
+    ...(pathField ? [pathField] : []),
   ]
 
   /* Tabs, in the fixed order. A tab with no fields is left out. */
@@ -247,7 +318,9 @@ export const defineContentCollection = (opts: ContentCollectionOptions): Collect
         ? whatsappTab({
             linkSetByHook: route
               ? `Set on save: the entry's own page when Own page is on, otherwise its place on ${route}.`
-              : 'Left empty: entries in this collection have no page to link to.',
+              : entry.hasRoute
+                ? "Set on save: the entry's own page when Own page is on, otherwise left empty."
+                : 'Left empty: entries in this collection have no page to link to.',
           })
         : { label: 'WhatsApp', fields: [] },
       extra.whatsapp,
@@ -292,7 +365,7 @@ export const defineContentCollection = (opts: ContentCollectionOptions): Collect
       listSearchableFields: ['name', 'slug'],
       // Preview button and live preview (foundation.md section 5.4): the
       // entry's own page, else its card on the hub page, in draft mode.
-      ...(route
+      ...(entry.hasRoute
         ? {
             livePreview: { url: ({ data }: { data: Record<string, any> }) => previewPathFor(entry, data) },
             preview: (doc: Record<string, unknown>) => previewPathFor(entry, doc),
@@ -308,8 +381,13 @@ export const defineContentCollection = (opts: ContentCollectionOptions): Collect
           ...(layout ? [followPageDefaults(entry)] : []),
           contentFallbacks(entry, { seo: hasTab('seo'), whatsapp: groups.has('whatsapp') }),
           contentPublishCheck(entry),
+          ...(entry.hasRoute ? [noteEntryLivePath(entry)] : []),
         ],
-        afterChange: [revalidateAfterChange(entry)],
+        afterChange: [
+          revalidateAfterChange(entry),
+          ...(entry.hasRoute ? [redirectMovedEntry(entry)] : []),
+          refreshChildPaths(entry),
+        ],
         afterDelete: [revalidateAfterDelete(entry)],
       },
       opts.hooks,

@@ -86,6 +86,30 @@ export interface Config {
     hubTrustSection: HubTrustSection;
     hubArticlesSection: HubArticlesSection;
     hubGroupingsSection: HubGroupingsSection;
+    industryProblemsSection: IndustryProblemsSection;
+    industryAudiencesSection: IndustryAudiencesSection;
+    industryEpisodeSection: IndustryEpisodeSection;
+    industryRolesSection: IndustryRolesSection;
+    industryRecordSection: IndustryRecordSection;
+    industryComparisonSection: IndustryComparisonSection;
+    industryCartsSection: IndustryCartsSection;
+    industryEnquirySection: IndustryEnquirySection;
+    industryAnswersSection: IndustryAnswersSection;
+    industryCampaignsSection: IndustryCampaignsSection;
+    industryReportingSection: IndustryReportingSection;
+    industryCallQualitySection: IndustryCallQualitySection;
+    industryCampusSystemsSection: IndustryCampusSystemsSection;
+    industryAgentsSection: IndustryAgentsSection;
+    industryIntegrationsSection: IndustryIntegrationsSection;
+    industryCustomersSection: IndustryCustomersSection;
+    industryTopicsSection: IndustryTopicsSection;
+    sharedSection: SharedSection;
+    topicOverviewSection: TopicOverviewSection;
+    topicStepsSection: TopicStepsSection;
+    topicRecordedSection: TopicRecordedSection;
+    topicComparisonSection: TopicComparisonSection;
+    topicAgentsSection: TopicAgentsSection;
+    topicIntegrationsSection: TopicIntegrationsSection;
     testimonial: TestimonialBlock;
     mediaBlock: MediaBlock;
     productInAction: ProductInActionBlock;
@@ -139,6 +163,8 @@ export interface Config {
     users: User;
     enquiries: Enquiry;
     sectors: Sector;
+    industryTopics: IndustryTopic;
+    sharedContent: SharedContent;
     customers: Customer;
     integrationsMaster: IntegrationsMaster;
     integrations: Integration;
@@ -173,6 +199,8 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     enquiries: EnquiriesSelect<false> | EnquiriesSelect<true>;
     sectors: SectorsSelect<false> | SectorsSelect<true>;
+    industryTopics: IndustryTopicsSelect<false> | IndustryTopicsSelect<true>;
+    sharedContent: SharedContentSelect<false> | SharedContentSelect<true>;
     customers: CustomersSelect<false> | CustomersSelect<true>;
     integrationsMaster: IntegrationsMasterSelect<false> | IntegrationsMasterSelect<true>;
     integrations: IntegrationsSelect<false> | IntegrationsSelect<true>;
@@ -1393,6 +1421,10 @@ export interface Integration {
   category: string | IntegrationCategory;
   connection?: (string | null) | ConnectionType;
   products?: (string | Product)[] | null;
+  /**
+   * The industries this integration is used in.
+   */
+  verticals?: ('healthcare' | 'diagnostics' | 'education' | 'hospitality')[] | null;
   /**
    * Tick to include in the short list on the home page.
    */
@@ -2696,30 +2728,2037 @@ export interface Customer {
 export interface Sector {
   id: string;
   name: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
   slug: string;
   /**
-   * Lower numbers come first.
+   * Only Live and Pilot entries appear on the website, WhatsApp and the knowledge base.
+   */
+  status: 'live' | 'pilot' | 'planned';
+  /**
+   * Shown first wherever this collection is listed.
+   */
+  featured?: boolean | null;
+  /**
+   * Lower shows first, on grids and in WhatsApp lists.
    */
   order?: number | null;
+  /**
+   * Lets blocks pull out the entries that most set NeuronCx apart.
+   */
+  isUSP?: boolean | null;
+  /**
+   * Gives this entry a page of its own and adds it to the sitemap. The Page tab appears while this is on.
+   */
+  hasOwnPage?: boolean | null;
+  /**
+   * On: the page follows the default layout, and changes to the default reach it. Off: the layout on the Page tab is this page's own.
+   */
+  usePageDefaults?: boolean | null;
+  /**
+   * A shorter name for menus, such as Education. Empty uses the name.
+   */
+  menuLabel?: string | null;
+  /**
+   * Which agents and integrations this industry pulls in.
+   */
+  verticals?: ('healthcare' | 'diagnostics' | 'education' | 'hospitality')[] | null;
+  /**
+   * This page on the site. Updated on save. Empty while Own page is off.
+   */
+  path?: string | null;
+  /**
+   * A short line under the name. Aim for 45 characters.
+   */
+  tagline?: string | null;
+  /**
+   * One line on what it does. Aim for 120 characters.
+   */
+  summary: string;
+  /**
+   * From the shared icon library.
+   */
+  icon?:
+    | (
+        | 'message'
+        | 'chat'
+        | 'check'
+        | 'calendar'
+        | 'card'
+        | 'document'
+        | 'refresh'
+        | 'bolt'
+        | 'layers'
+        | 'gauge'
+        | 'plug'
+        | 'shield'
+        | 'shieldCheck'
+        | 'lock'
+        | 'globe'
+        | 'server'
+        | 'eye'
+        | 'users'
+        | 'user'
+        | 'phone'
+        | 'smartphone'
+        | 'mail'
+        | 'messageCircle'
+        | 'send'
+        | 'inbox'
+        | 'headphones'
+        | 'mic'
+        | 'video'
+        | 'bell'
+        | 'handshake'
+        | 'stethoscope'
+        | 'heartPulse'
+        | 'hospital'
+        | 'activity'
+        | 'flask'
+        | 'pill'
+        | 'graduationCap'
+        | 'building'
+        | 'mapPin'
+        | 'database'
+        | 'cloud'
+        | 'workflow'
+        | 'bot'
+        | 'sparkles'
+        | 'search'
+        | 'chart'
+        | 'trendingUp'
+        | 'target'
+        | 'rocket'
+        | 'key'
+        | 'fileText'
+        | 'clipboardList'
+        | 'link'
+        | 'settings'
+        | 'puzzle'
+        | 'timer'
+        | 'clock'
+        | 'badgeCheck'
+        | 'star'
+        | 'briefcase'
+      )
+    | null;
+  /**
+   * Optional. Logos go here for integrations.
+   */
+  image?: (string | null) | Media;
+  /**
+   * Leave empty to use the section's design.
+   */
+  cardDesign?: ('grid' | 'logoCard' | 'feature' | 'story') | null;
+  /**
+   * The full description. Also indexed for the knowledge base.
+   */
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * The teams or roles that use it, such as front desk or call centre.
+   */
+  whoItsFor?: string | null;
+  /**
+   * Every design reads the hero fields below; the fields only one design uses show when it is picked. Conversation needs at least 2 chat messages, Picture on the right needs a picture, Stats needs at least 2 stats, Custom CSS visual needs its HTML and a screen reader description.
+   */
+  heroDesign: 'conversation' | 'rightPlacement' | 'stats' | 'customCss';
+  /**
+   * The small line above the heading. Leave empty to use the grouping's name.
+   */
+  heroEyebrow?: string | null;
+  /**
+   * The page heading. Needed to publish with Own page on.
+   */
+  heroHeading?: string | null;
+  heroSubheading?: string | null;
+  /**
+   * Up to 4 short labels in the hero. Leave empty to use the card's key points.
+   */
+  heroChips?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * The main button, in the hero and the closing panel. Type a label to choose where it goes.
+   */
+  cta?: {
+    label?: string | null;
+    link?: {
+      type?: ('reference' | 'custom') | null;
+      newTab?: boolean | null;
+      reference?:
+        | ({
+            relationTo: 'pages';
+            value: string | Page;
+          } | null)
+        | ({
+            relationTo: 'posts';
+            value: string | Post;
+          } | null);
+      url?: string | null;
+    };
+  };
+  /**
+   * A second button in the hero. Type a label to choose where it goes.
+   */
+  heroSecondaryCta?: {
+    label?: string | null;
+    link?: {
+      type?: ('reference' | 'custom') | null;
+      newTab?: boolean | null;
+      reference?:
+        | ({
+            relationTo: 'pages';
+            value: string | Page;
+          } | null)
+        | ({
+            relationTo: 'posts';
+            value: string | Post;
+          } | null);
+      url?: string | null;
+    };
+  };
+  /**
+   * Up to 8 messages, in order. Demo details only, no real customer names or figures.
+   */
+  heroChat?:
+    | {
+        sender: 'customer' | 'business' | 'team';
+        /**
+         * The entry that sends this message, named under the chat.
+         */
+        entry?: {
+          relationTo: 'sectors';
+          value: string | Sector;
+        } | null;
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * A line at the top of the chat, such as where it takes place.
+   */
+  heroChatCaption?: string | null;
+  /**
+   * A flow graphic or screenshot. Needed for Picture on the right.
+   */
+  heroMedia?: (string | null) | Media;
+  /**
+   * What the picture shows, for screen readers. Leave empty to use the picture's own alt text.
+   */
+  heroMediaAlt?: string | null;
+  /**
+   * Lists this entry and the entries in its chain (Passes to), by name and card icon, under the chat.
+   */
+  heroWorkflowFromChain?: boolean | null;
+  /**
+   * The picture drifts in gently. Off keeps it still.
+   */
+  heroMotion?: ('on' | 'off') | null;
+  /**
+   * Real, defensible figures only. Stats needs 2 to 4; Conversation shows any under the hero.
+   */
+  heroStats?:
+    | {
+        /**
+         * Such as 40% or 2x.
+         */
+        value: string;
+        /**
+         * What the number means.
+         */
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * The markup only, no <style> or <script>. Text in it is read by search engines.
+   */
+  visualHtml?: string | null;
+  /**
+   * Styles for the HTML above. Use @media or @container visual (max-width: 480px) for small screens. Images and fonts must come from the media library.
+   */
+  visualCss?: string | null;
+  /**
+   * What the visual shows, in a sentence. Leave empty if it is only decoration.
+   */
+  visualAlt?: string | null;
+  aspect?: ('auto' | '16/9' | '4/3' | '1/1' | '3/4') | null;
+  /**
+   * Empty fills its column.
+   */
+  maxWidth?: number | null;
+  /**
+   * 3 to 6 outcomes, each with a short line.
+   */
+  benefits?:
+    | {
+        title: string;
+        line: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * 3 to 5 steps, in order.
+   */
+  howItWorks?:
+    | {
+        title: string;
+        line: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Up to 4, one per vertical where possible.
+   */
+  useCases?:
+    | {
+        title: string;
+        line: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Up to 3. Leave empty to show other entries from this collection, by order.
+   */
+  related?: (string | Sector)[] | null;
+  /**
+   * Ends this page with the closing panel. Off by default.
+   */
+  showClosing?: boolean | null;
+  /**
+   * The sections between the page hero and the end of the page, in order. Drag to reorder. Read-only while Use page defaults is on.
+   */
+  layout?:
+    | (
+        | IndustryProblemsSection
+        | IndustryAudiencesSection
+        | IndustryEpisodeSection
+        | IndustryRolesSection
+        | IndustryRecordSection
+        | IndustryComparisonSection
+        | IndustryCartsSection
+        | IndustryEnquirySection
+        | IndustryAnswersSection
+        | IndustryCampaignsSection
+        | IndustryReportingSection
+        | IndustryCallQualitySection
+        | IndustryCampusSystemsSection
+        | IndustryAgentsSection
+        | IndustryIntegrationsSection
+        | IndustryCustomersSection
+        | IndustryTopicsSection
+        | SharedSection
+        | FaqSection
+        | ClosingSection
+        | TestimonialBlock
+        | MediaBlock
+        | ProductInActionBlock
+        | CaseStudyGridBlock
+        | BenefitsBlock
+        | CallToActionBlock
+        | ContentBlock
+        | LogoWallBlock
+        | HowItWorks2Block
+        | StatBandBlock
+        | TrustPanelBlock
+      )[]
+    | null;
+  /**
+   * 2 to 4 problems this industry has, in its own words.
+   */
+  problems?:
+    | {
+        title: string;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * What one episode is called here, such as Admission or Patient visit.
+   */
+  episodeName?: string | null;
+  /**
+   * 3 to 10 points in the episode, in order.
+   */
+  episodePoints?:
+    | {
+        title: string;
+        caption?: string | null;
+        /**
+         * Not confirmed yet: kept here, tagged Pending in draft preview, and left out of the page, WhatsApp and the knowledge base.
+         */
+        pending?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Up to 6, such as Applications open.
+   */
+  keyDates?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Up to 4. Real, defensible figures only; mark one Pending until it is confirmed.
+   */
+  stats?:
+    | {
+        /**
+         * Such as 40% or 2x.
+         */
+        value: string;
+        label: string;
+        /**
+         * Not confirmed yet: kept here, tagged Pending in draft preview, and left out of the page, WhatsApp and the knowledge base.
+         */
+        pending?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * 2 to 6 people involved, such as Counsellor or Front desk.
+   */
+  roles?:
+    | {
+        name: string;
+        caption?: string | null;
+        /**
+         * Optional. From the shared icon library.
+         */
+        icon?:
+          | (
+              | 'message'
+              | 'chat'
+              | 'check'
+              | 'calendar'
+              | 'card'
+              | 'document'
+              | 'refresh'
+              | 'bolt'
+              | 'layers'
+              | 'gauge'
+              | 'plug'
+              | 'shield'
+              | 'shieldCheck'
+              | 'lock'
+              | 'globe'
+              | 'server'
+              | 'eye'
+              | 'users'
+              | 'user'
+              | 'phone'
+              | 'smartphone'
+              | 'mail'
+              | 'messageCircle'
+              | 'send'
+              | 'inbox'
+              | 'headphones'
+              | 'mic'
+              | 'video'
+              | 'bell'
+              | 'handshake'
+              | 'stethoscope'
+              | 'heartPulse'
+              | 'hospital'
+              | 'activity'
+              | 'flask'
+              | 'pill'
+              | 'graduationCap'
+              | 'building'
+              | 'mapPin'
+              | 'database'
+              | 'cloud'
+              | 'workflow'
+              | 'bot'
+              | 'sparkles'
+              | 'search'
+              | 'chart'
+              | 'trendingUp'
+              | 'target'
+              | 'rocket'
+              | 'key'
+              | 'fileText'
+              | 'clipboardList'
+              | 'link'
+              | 'settings'
+              | 'puzzle'
+              | 'timer'
+              | 'clock'
+              | 'badgeCheck'
+              | 'star'
+              | 'briefcase'
+            )
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * One tab per reader group, left to right. The first tab is shown when the page opens.
+   */
+  audiences?:
+    | {
+        /**
+         * The reader group, for example Leadership, Operations or IT.
+         */
+        label: string;
+        /**
+         * Optional. The heading inside the panel.
+         */
+        title?: string | null;
+        /**
+         * Optional. A short summary for this group.
+         */
+        intro?: string | null;
+        /**
+         * One capability per line, stated as what the platform does. No stories or invented figures.
+         */
+        points: {
+          text: string;
+          id?: string | null;
+        }[];
+        /**
+         * Optional. Shown under the intro.
+         */
+        links?:
+          | {
+              label: string;
+              url: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Shown before the entity name in the panel, such as "Student record › Fees".
+   */
+  recordLabel?: string | null;
+  fieldColumnLabel?: string | null;
+  sourceColumnLabel?: string | null;
+  /**
+   * The parts of the record, such as Contacts, Admissions or Fees. The first one is shown when the page opens.
+   */
+  entities?:
+    | {
+        label: string;
+        /**
+         * Optional. Shown beside the entity name.
+         */
+        icon?:
+          | (
+              | 'message'
+              | 'chat'
+              | 'check'
+              | 'calendar'
+              | 'card'
+              | 'document'
+              | 'refresh'
+              | 'bolt'
+              | 'layers'
+              | 'gauge'
+              | 'plug'
+              | 'shield'
+              | 'shieldCheck'
+              | 'lock'
+              | 'globe'
+              | 'server'
+              | 'eye'
+              | 'users'
+              | 'user'
+              | 'phone'
+              | 'smartphone'
+              | 'mail'
+              | 'messageCircle'
+              | 'send'
+              | 'inbox'
+              | 'headphones'
+              | 'mic'
+              | 'video'
+              | 'bell'
+              | 'handshake'
+              | 'stethoscope'
+              | 'heartPulse'
+              | 'hospital'
+              | 'activity'
+              | 'flask'
+              | 'pill'
+              | 'graduationCap'
+              | 'building'
+              | 'mapPin'
+              | 'database'
+              | 'cloud'
+              | 'workflow'
+              | 'bot'
+              | 'sparkles'
+              | 'search'
+              | 'chart'
+              | 'trendingUp'
+              | 'target'
+              | 'rocket'
+              | 'key'
+              | 'fileText'
+              | 'clipboardList'
+              | 'link'
+              | 'settings'
+              | 'puzzle'
+              | 'timer'
+              | 'clock'
+              | 'badgeCheck'
+              | 'star'
+              | 'briefcase'
+            )
+          | null;
+        /**
+         * Optional. One line on what this part of the record is for.
+         */
+        description?: string | null;
+        fields: {
+          name: string;
+          /**
+           * The system or step that fills the field, such as Lead management system, ERP or Qualification form. Only sources that are live.
+           */
+          source: string;
+          id?: string | null;
+        }[];
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * The systems being compared, left to right. Highlight one column at most, usually NeuronCx.
+   */
+  columns?:
+    | {
+        label: string;
+        highlight?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Describe what each system typically covers, in plain words. No ticks or crosses, and no claims about a named product.
+   */
+  rows?:
+    | {
+        label: string;
+        /**
+         * One cell per column, in the same order as the columns.
+         */
+        cells?:
+          | {
+              text?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Optional. A short note under the table.
+   */
+  footnote?: string | null;
+  /**
+   * Drawn with the Carts Demo block.
+   */
+  carts?: {
+    heading?: string | null;
+    intro?: string | null;
+    modelALabel?: string | null;
+    modelBLabel?: string | null;
+    /**
+     * The carts shown on load, in order. Visitors can add more up to six.
+     */
+    carts?:
+      | {
+          name: string;
+          historyCount?: number | null;
+          id?: string | null;
+        }[]
+      | null;
+    addLabel?: string | null;
+    noteB?: string | null;
+    noteA?: string | null;
+  };
+  /**
+   * Drawn with the Context Engine block.
+   */
+  enquiryCapture?: {
+    /**
+     * e.g. Why NeuronCx
+     */
+    eyebrow?: string | null;
+    heading?: string | null;
+    intro?: string | null;
+    points?:
+      | {
+          /**
+           * e.g. Grounded, not scripted.
+           */
+          title: string;
+          description: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * e.g. Customer 360
+     */
+    calloutTerm?: string | null;
+    /**
+     * e.g. is the shared memory every agent and channel reads from.
+     */
+    calloutText?: string | null;
+    centreLabel?: string | null;
+    /**
+     * Spaced evenly around the centre automatically. Six to eight looks best; more than that and the labels crowd.
+     */
+    satellites?:
+      | {
+          label: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * Drawn with the Card Grid (Product Suite 2) block.
+   */
+  answersFromContent?: {
+    /**
+     * Optional. Short, e.g. "Reports and prescriptions".
+     */
+    eyebrow?: string | null;
+    heading?: string | null;
+    intro?: string | null;
+    cards?:
+      | {
+          cardColor?: ('grey' | 'lavender' | 'white') | null;
+          border?: ('none' | 'solid' | 'gradient') | null;
+          borderColor?: ('blue' | 'violet' | 'crimson' | 'navy') | null;
+          /**
+           * A thin rule under the content, matches the border color.
+           */
+          accentLine?: boolean | null;
+          icon?:
+            | (
+                | 'message'
+                | 'chat'
+                | 'check'
+                | 'calendar'
+                | 'card'
+                | 'document'
+                | 'refresh'
+                | 'bolt'
+                | 'layers'
+                | 'gauge'
+                | 'plug'
+                | 'shield'
+                | 'shieldCheck'
+                | 'lock'
+                | 'globe'
+                | 'server'
+                | 'eye'
+                | 'users'
+                | 'user'
+                | 'phone'
+                | 'smartphone'
+                | 'mail'
+                | 'messageCircle'
+                | 'send'
+                | 'inbox'
+                | 'headphones'
+                | 'mic'
+                | 'video'
+                | 'bell'
+                | 'handshake'
+                | 'stethoscope'
+                | 'heartPulse'
+                | 'hospital'
+                | 'activity'
+                | 'flask'
+                | 'pill'
+                | 'graduationCap'
+                | 'building'
+                | 'mapPin'
+                | 'database'
+                | 'cloud'
+                | 'workflow'
+                | 'bot'
+                | 'sparkles'
+                | 'search'
+                | 'chart'
+                | 'trendingUp'
+                | 'target'
+                | 'rocket'
+                | 'key'
+                | 'fileText'
+                | 'clipboardList'
+                | 'link'
+                | 'settings'
+                | 'puzzle'
+                | 'timer'
+                | 'clock'
+                | 'badgeCheck'
+                | 'star'
+                | 'briefcase'
+              )
+            | null;
+          showNumber?: boolean | null;
+          showEyebrow?: boolean | null;
+          showPoints?: boolean | null;
+          /**
+           * Leave empty to count automatically (01, 02, ...) across the cards that show a number. Fill in to show your own, e.g. "A" or "Step 1"; that card is then skipped in the count.
+           */
+          numberText?: string | null;
+          /**
+           * Small pill label above the title, e.g. "Tier 1 core".
+           */
+          tag?: string | null;
+          title: string;
+          description?: string | null;
+          /**
+           * Short lines shown under the text, as pills or as a bulleted list.
+           */
+          points?:
+            | {
+                text: string;
+                id?: string | null;
+              }[]
+            | null;
+          listStyle?: ('pills' | 'bullets') | null;
+          /**
+           * Optional. Leave the address empty to show the card with no link.
+           */
+          link?: {
+            label?: string | null;
+            url?: string | null;
+            newTab?: boolean | null;
+          };
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * Drawn with the Bento Grid block.
+   */
+  campaigns?: {
+    gap?: ('small' | 'medium' | 'large') | null;
+    /**
+     * The height of one grid row on desktop.
+     */
+    rowHeight?: number | null;
+    /**
+     * Lets smaller cards move up into gaps. Visual order may differ from the list order.
+     */
+    dense?: boolean | null;
+    framed?: boolean | null;
+    eyebrow?: string | null;
+    title?: string | null;
+    description?: string | null;
+    cards?:
+      | {
+          colSpan?: ('3' | '4' | '6' | '8' | '9' | '12') | null;
+          rowSpan?: ('1' | '2' | '3') | null;
+          /**
+           * Auto uses half width for cards up to 1/2, full width otherwise.
+           */
+          tabletColSpan?: ('auto' | '6' | '12') | null;
+          cardColor?: ('grey' | 'lavender' | 'white' | 'red') | null;
+          border?: ('none' | 'solid' | 'gradient') | null;
+          borderColor?: ('blue' | 'violet' | 'crimson' | 'navy') | null;
+          /**
+           * A thin rule under the content, matches the border color.
+           */
+          accentLine?: boolean | null;
+          icon?:
+            | (
+                | 'message'
+                | 'chat'
+                | 'check'
+                | 'calendar'
+                | 'card'
+                | 'document'
+                | 'refresh'
+                | 'bolt'
+                | 'layers'
+                | 'gauge'
+                | 'plug'
+                | 'shield'
+                | 'shieldCheck'
+                | 'lock'
+                | 'globe'
+                | 'server'
+                | 'eye'
+                | 'users'
+                | 'user'
+                | 'phone'
+                | 'smartphone'
+                | 'mail'
+                | 'messageCircle'
+                | 'send'
+                | 'inbox'
+                | 'headphones'
+                | 'mic'
+                | 'video'
+                | 'bell'
+                | 'handshake'
+                | 'stethoscope'
+                | 'heartPulse'
+                | 'hospital'
+                | 'activity'
+                | 'flask'
+                | 'pill'
+                | 'graduationCap'
+                | 'building'
+                | 'mapPin'
+                | 'database'
+                | 'cloud'
+                | 'workflow'
+                | 'bot'
+                | 'sparkles'
+                | 'search'
+                | 'chart'
+                | 'trendingUp'
+                | 'target'
+                | 'rocket'
+                | 'key'
+                | 'fileText'
+                | 'clipboardList'
+                | 'link'
+                | 'settings'
+                | 'puzzle'
+                | 'timer'
+                | 'clock'
+                | 'badgeCheck'
+                | 'star'
+                | 'briefcase'
+              )
+            | null;
+          showNumber?: boolean | null;
+          showEyebrow?: boolean | null;
+          showPoints?: boolean | null;
+          /**
+           * Leave empty to count automatically (01, 02, ...) across the cards that show a number. Fill in to show your own, e.g. "A" or "Step 1"; that card is then skipped in the count.
+           */
+          numberText?: string | null;
+          /**
+           * Small pill label above the title, e.g. "Tier 1 core".
+           */
+          tag?: string | null;
+          title: string;
+          titleSize?: ('large' | 'regular') | null;
+          body?: string | null;
+          /**
+           * Short lines shown under the text, as pills or as a bulleted list.
+           */
+          points?:
+            | {
+                text: string;
+                id?: string | null;
+              }[]
+            | null;
+          listStyle?: ('pills' | 'bullets') | null;
+          image?: (string | null) | Media;
+          imagePosition?: ('middle' | 'top' | 'bottom' | 'background') | null;
+          link?: {
+            label?: string | null;
+            url?: string | null;
+            newTab?: boolean | null;
+          };
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * Drawn with the Card Grid (Product Suite 2) block.
+   */
+  reporting?: {
+    /**
+     * Optional. Short, e.g. "Reports and prescriptions".
+     */
+    eyebrow?: string | null;
+    heading?: string | null;
+    intro?: string | null;
+    cards?:
+      | {
+          cardColor?: ('grey' | 'lavender' | 'white') | null;
+          border?: ('none' | 'solid' | 'gradient') | null;
+          borderColor?: ('blue' | 'violet' | 'crimson' | 'navy') | null;
+          /**
+           * A thin rule under the content, matches the border color.
+           */
+          accentLine?: boolean | null;
+          icon?:
+            | (
+                | 'message'
+                | 'chat'
+                | 'check'
+                | 'calendar'
+                | 'card'
+                | 'document'
+                | 'refresh'
+                | 'bolt'
+                | 'layers'
+                | 'gauge'
+                | 'plug'
+                | 'shield'
+                | 'shieldCheck'
+                | 'lock'
+                | 'globe'
+                | 'server'
+                | 'eye'
+                | 'users'
+                | 'user'
+                | 'phone'
+                | 'smartphone'
+                | 'mail'
+                | 'messageCircle'
+                | 'send'
+                | 'inbox'
+                | 'headphones'
+                | 'mic'
+                | 'video'
+                | 'bell'
+                | 'handshake'
+                | 'stethoscope'
+                | 'heartPulse'
+                | 'hospital'
+                | 'activity'
+                | 'flask'
+                | 'pill'
+                | 'graduationCap'
+                | 'building'
+                | 'mapPin'
+                | 'database'
+                | 'cloud'
+                | 'workflow'
+                | 'bot'
+                | 'sparkles'
+                | 'search'
+                | 'chart'
+                | 'trendingUp'
+                | 'target'
+                | 'rocket'
+                | 'key'
+                | 'fileText'
+                | 'clipboardList'
+                | 'link'
+                | 'settings'
+                | 'puzzle'
+                | 'timer'
+                | 'clock'
+                | 'badgeCheck'
+                | 'star'
+                | 'briefcase'
+              )
+            | null;
+          showNumber?: boolean | null;
+          showEyebrow?: boolean | null;
+          showPoints?: boolean | null;
+          /**
+           * Leave empty to count automatically (01, 02, ...) across the cards that show a number. Fill in to show your own, e.g. "A" or "Step 1"; that card is then skipped in the count.
+           */
+          numberText?: string | null;
+          /**
+           * Small pill label above the title, e.g. "Tier 1 core".
+           */
+          tag?: string | null;
+          title: string;
+          description?: string | null;
+          /**
+           * Short lines shown under the text, as pills or as a bulleted list.
+           */
+          points?:
+            | {
+                text: string;
+                id?: string | null;
+              }[]
+            | null;
+          listStyle?: ('pills' | 'bullets') | null;
+          /**
+           * Optional. Leave the address empty to show the card with no link.
+           */
+          link?: {
+            label?: string | null;
+            url?: string | null;
+            newTab?: boolean | null;
+          };
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * Drawn with the Platform Layers 2 (Scroll Stack) block.
+   */
+  callQuality?: {
+    /**
+     * Short uppercase label above the heading. Optional.
+     */
+    eyebrow?: string | null;
+    heading?: string | null;
+    intro?: string | null;
+    /**
+     * Shows the numbered list in the sticky left column on large screens
+     */
+    showIndicators?: boolean | null;
+    /**
+     * Numbered in the order listed. Three to six layers.
+     */
+    layers?:
+      | {
+          title: string;
+          /**
+           * Short pill label such as "Unified Ingestion". Optional.
+           */
+          tag?: string | null;
+          /**
+           * One or two sentences, roughly 20 to 35 words
+           */
+          description: string;
+          /**
+           * Small line with a tick icon under the description. Optional.
+           */
+          footnote?: string | null;
+          /**
+           * Optional link shown in the card foot.
+           */
+          link?: {
+            label?: string | null;
+            type?: ('internal' | 'external') | null;
+            page?: (string | null) | Page;
+            url?: string | null;
+          };
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * Drawn with the Card Grid (Product Suite 2) block.
+   */
+  campusSystems?: {
+    /**
+     * Optional. Short, e.g. "Reports and prescriptions".
+     */
+    eyebrow?: string | null;
+    heading?: string | null;
+    intro?: string | null;
+    cards?:
+      | {
+          cardColor?: ('grey' | 'lavender' | 'white') | null;
+          border?: ('none' | 'solid' | 'gradient') | null;
+          borderColor?: ('blue' | 'violet' | 'crimson' | 'navy') | null;
+          /**
+           * A thin rule under the content, matches the border color.
+           */
+          accentLine?: boolean | null;
+          icon?:
+            | (
+                | 'message'
+                | 'chat'
+                | 'check'
+                | 'calendar'
+                | 'card'
+                | 'document'
+                | 'refresh'
+                | 'bolt'
+                | 'layers'
+                | 'gauge'
+                | 'plug'
+                | 'shield'
+                | 'shieldCheck'
+                | 'lock'
+                | 'globe'
+                | 'server'
+                | 'eye'
+                | 'users'
+                | 'user'
+                | 'phone'
+                | 'smartphone'
+                | 'mail'
+                | 'messageCircle'
+                | 'send'
+                | 'inbox'
+                | 'headphones'
+                | 'mic'
+                | 'video'
+                | 'bell'
+                | 'handshake'
+                | 'stethoscope'
+                | 'heartPulse'
+                | 'hospital'
+                | 'activity'
+                | 'flask'
+                | 'pill'
+                | 'graduationCap'
+                | 'building'
+                | 'mapPin'
+                | 'database'
+                | 'cloud'
+                | 'workflow'
+                | 'bot'
+                | 'sparkles'
+                | 'search'
+                | 'chart'
+                | 'trendingUp'
+                | 'target'
+                | 'rocket'
+                | 'key'
+                | 'fileText'
+                | 'clipboardList'
+                | 'link'
+                | 'settings'
+                | 'puzzle'
+                | 'timer'
+                | 'clock'
+                | 'badgeCheck'
+                | 'star'
+                | 'briefcase'
+              )
+            | null;
+          showNumber?: boolean | null;
+          showEyebrow?: boolean | null;
+          showPoints?: boolean | null;
+          /**
+           * Leave empty to count automatically (01, 02, ...) across the cards that show a number. Fill in to show your own, e.g. "A" or "Step 1"; that card is then skipped in the count.
+           */
+          numberText?: string | null;
+          /**
+           * Small pill label above the title, e.g. "Tier 1 core".
+           */
+          tag?: string | null;
+          title: string;
+          description?: string | null;
+          /**
+           * Short lines shown under the text, as pills or as a bulleted list.
+           */
+          points?:
+            | {
+                text: string;
+                id?: string | null;
+              }[]
+            | null;
+          listStyle?: ('pills' | 'bullets') | null;
+          /**
+           * Optional. Leave the address empty to show the card with no link.
+           */
+          link?: {
+            label?: string | null;
+            url?: string | null;
+            newTab?: boolean | null;
+          };
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * Up to 6. Questions phrased the way a buyer would ask them.
+   */
+  faqs?:
+    | {
+        question: string;
+        /**
+         * Plain text, no formatting.
+         */
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  waRowTitle?: string | null;
+  /**
+   * Aim for 60 characters.
+   */
+  waRowDescription?: string | null;
+  /**
+   * Aim for 30 characters.
+   */
+  waHeader?: string | null;
+  /**
+   * Aim for 300 characters.
+   */
+  waBody?: string | null;
+  /**
+   * 3 to 5 short lines, sent inside the body.
+   */
+  waKeyPoints?:
+    | {
+        line: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Aim for 30 characters.
+   */
+  waFooter?: string | null;
+  /**
+   * Up to 3, which is the WhatsApp limit.
+   */
+  waButtons?:
+    | {
+        label: string;
+        /**
+         * The reply the assistant receives when the button is tapped, for example book-demo.
+         */
+        action: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Set on save: the entry's own page when Own page is on, otherwise left empty.
+   */
+  waLink?: string | null;
+  /**
+   * Only published entries with this on are sent to the knowledge base.
+   */
+  includeInKbase?: boolean | null;
+  /**
+   * A complete answer to "What is this?", written for the virtual agents.
+   */
+  kbAnswer?: string | null;
+  /**
+   * Short, checkable facts. One fact per line.
+   */
+  kbFacts?:
+    | {
+        fact: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * How a customer might ask about it.
+   */
+  kbQuestions?:
+    | {
+        question: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Other names people use for it.
+   */
+  kbSynonyms?:
+    | {
+        synonym: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * So answers that have gone stale can be found and fixed.
+   */
+  kbLastReviewed?: string | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (string | null) | Media;
+    description?: string | null;
+    /**
+     * The one search phrase this page is written for. No page or entry shares a primary keyword with another.
+     */
+    primaryKeyword?: string | null;
+  };
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "CaseStudyGridBlock".
+ * via the `definition` "IndustryProblemsSection".
  */
-export interface CaseStudyGridBlock {
-  eyebrow?: string | null;
-  heading?: string | null;
-  intro?: string | null;
-  populateBy?: ('collection' | 'selection') | null;
+export interface IndustryProblemsSection {
   /**
-   * Leave empty to show all sectors.
+   * Leave empty to show the default heading: "What gets in the way". Words in braces, such as {name}, are filled in for each entry.
    */
-  sectors?: (string | Sector)[] | null;
-  limit?: number | null;
-  selectedDocs?: (string | Customer)[] | null;
-  cardStyle?: ('tilt' | 'plain') | null;
+  heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'industryProblemsSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IndustryAudiencesSection".
+ */
+export interface IndustryAudiencesSection {
+  /**
+   * Leave empty to show the default heading: "What each team gets". Words in braces, such as {name}, are filled in for each entry.
+   */
+  heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'industryAudiencesSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IndustryEpisodeSection".
+ */
+export interface IndustryEpisodeSection {
+  /**
+   * Leave empty to show the default heading: "One episode, start to finish". Words in braces, such as {name}, are filled in for each entry.
+   */
+  heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'industryEpisodeSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IndustryRolesSection".
+ */
+export interface IndustryRolesSection {
+  /**
+   * Leave empty to show the default heading: "Who takes part". Words in braces, such as {name}, are filled in for each entry.
+   */
+  heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'industryRolesSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IndustryRecordSection".
+ */
+export interface IndustryRecordSection {
+  /**
+   * Leave empty to show the default heading: "What the record holds". Words in braces, such as {name}, are filled in for each entry.
+   */
+  heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'industryRecordSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IndustryComparisonSection".
+ */
+export interface IndustryComparisonSection {
+  /**
+   * Leave empty to show the default heading: "How it compares". Words in braces, such as {name}, are filled in for each entry.
+   */
+  heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'industryComparisonSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IndustryCartsSection".
+ */
+export interface IndustryCartsSection {
+  /**
+   * Leave empty to show the default heading: "Every course in one cart". Words in braces, such as {name}, are filled in for each entry.
+   */
+  heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'industryCartsSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IndustryEnquirySection".
+ */
+export interface IndustryEnquirySection {
+  /**
+   * Leave empty to show the default heading: "Every enquiry captured". Words in braces, such as {name}, are filled in for each entry.
+   */
+  heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'industryEnquirySection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IndustryAnswersSection".
+ */
+export interface IndustryAnswersSection {
+  /**
+   * Leave empty to show the default heading: "Answers from your own content". Words in braces, such as {name}, are filled in for each entry.
+   */
+  heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'industryAnswersSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IndustryCampaignsSection".
+ */
+export interface IndustryCampaignsSection {
+  /**
+   * Leave empty to show the default heading: "Campaigns". Words in braces, such as {name}, are filled in for each entry.
+   */
+  heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'industryCampaignsSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IndustryReportingSection".
+ */
+export interface IndustryReportingSection {
+  /**
+   * Leave empty to show the default heading: "Reporting". Words in braces, such as {name}, are filled in for each entry.
+   */
+  heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'industryReportingSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IndustryCallQualitySection".
+ */
+export interface IndustryCallQualitySection {
+  /**
+   * Leave empty to show the default heading: "Call quality". Words in braces, such as {name}, are filled in for each entry.
+   */
+  heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'industryCallQualitySection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IndustryCampusSystemsSection".
+ */
+export interface IndustryCampusSystemsSection {
+  /**
+   * Leave empty to show the default heading: "Works with your campus systems". Words in braces, such as {name}, are filled in for each entry.
+   */
+  heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'industryCampusSystemsSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IndustryAgentsSection".
+ */
+export interface IndustryAgentsSection {
+  /**
+   * Leave empty to show the default heading: "The agents that work here". Words in braces, such as {name}, are filled in for each entry.
+   */
+  heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'industryAgentsSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IndustryIntegrationsSection".
+ */
+export interface IndustryIntegrationsSection {
+  /**
+   * Leave empty to show the default heading: "Works with the systems you run". Words in braces, such as {name}, are filled in for each entry.
+   */
+  heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'industryIntegrationsSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IndustryCustomersSection".
+ */
+export interface IndustryCustomersSection {
+  /**
+   * Leave empty to show the default heading: "Who uses it". Words in braces, such as {name}, are filled in for each entry.
+   */
+  heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'industryCustomersSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IndustryTopicsSection".
+ */
+export interface IndustryTopicsSection {
+  /**
+   * Leave empty to show the default heading: "Every stage, page by page". Words in braces, such as {name}, are filled in for each entry.
+   */
+  heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
+  /**
+   * Optional. Pages that belong with these topics but keep their own address. The topics under this industry are listed without being added here.
+   */
+  extraPages?:
+    | {
+        page: string | Page;
+        stage?: string | null;
+        stageOrder?: number | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'industryTopicsSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SharedSection".
+ */
+export interface SharedSection {
+  /**
+   * Leave empty to show the default heading: "". Words in braces, such as {name}, are filled in for each entry.
+   */
+  heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
+  /**
+   * One shared block, such as the trust panel every industry shows. A change to it reaches every page that places it.
+   */
+  item: string | SharedContent;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'sharedSection';
+}
+/**
+ * One block written once and placed on several pages. A change here reaches every page that places it.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sharedContent".
+ */
+export interface SharedContent {
+  id: string;
+  name: string;
+  /**
+   * How code and other records refer to it. Lowercase letters, numbers and dashes, such as industry-trust.
+   */
+  key: string;
+  /**
+   * Exactly one: a trust panel, how it works, card grid, bento grid or stat band.
+   */
+  block: (TrustPanelBlock | HowItWorks2Block | ProductSuite2Block | BentoGridBlock | StatBandBlock)[];
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TrustPanelBlock".
+ */
+export interface TrustPanelBlock {
+  /**
+   * e.g. Deployment & trust
+   */
+  eyebrow?: string | null;
+  heading: string;
+  intro?: string | null;
+  buttonLabel?: string | null;
+  buttonHref?: string | null;
+  /**
+   * Claims here are read closely during procurement, so only state what you can evidence.
+   */
+  cards?:
+    | {
+        title: string;
+        description: string;
+        icon?:
+          | (
+              | 'message'
+              | 'chat'
+              | 'check'
+              | 'calendar'
+              | 'card'
+              | 'document'
+              | 'refresh'
+              | 'bolt'
+              | 'layers'
+              | 'gauge'
+              | 'plug'
+              | 'shield'
+              | 'shieldCheck'
+              | 'lock'
+              | 'globe'
+              | 'server'
+              | 'eye'
+              | 'users'
+              | 'user'
+              | 'phone'
+              | 'smartphone'
+              | 'mail'
+              | 'messageCircle'
+              | 'send'
+              | 'inbox'
+              | 'headphones'
+              | 'mic'
+              | 'video'
+              | 'bell'
+              | 'handshake'
+              | 'stethoscope'
+              | 'heartPulse'
+              | 'hospital'
+              | 'activity'
+              | 'flask'
+              | 'pill'
+              | 'graduationCap'
+              | 'building'
+              | 'mapPin'
+              | 'database'
+              | 'cloud'
+              | 'workflow'
+              | 'bot'
+              | 'sparkles'
+              | 'search'
+              | 'chart'
+              | 'trendingUp'
+              | 'target'
+              | 'rocket'
+              | 'key'
+              | 'fileText'
+              | 'clipboardList'
+              | 'link'
+              | 'settings'
+              | 'puzzle'
+              | 'timer'
+              | 'clock'
+              | 'badgeCheck'
+              | 'star'
+              | 'briefcase'
+            )
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'trustPanel';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HowItWorks2Block".
+ */
+export interface HowItWorks2Block {
+  /**
+   * Small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * The section heading.
+   */
+  heading: string;
+  intro?: string | null;
+  /**
+   * 2 to 5 steps, in order. The numbers 01, 02 and so on come from the order, so leave them out of the titles.
+   */
+  steps?:
+    | {
+        title: string;
+        description: string;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
@@ -2738,42 +4777,7 @@ export interface CaseStudyGridBlock {
   htmlId?: string | null;
   id?: string | null;
   blockName?: string | null;
-  blockType: 'caseStudyGrid';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "CustomerDirectoryBlock".
- */
-export interface CustomerDirectoryBlock {
-  eyebrow?: string | null;
-  heading?: string | null;
-  intro?: string | null;
-  /**
-   * Leave empty to show every sector.
-   */
-  sectors?: (string | Sector)[] | null;
-  showFilters?: boolean | null;
-  layout?: ('list' | 'grid') | null;
-  emptyStateText?: string | null;
-  /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
-   */
-  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'customerDirectory';
+  blockType: 'howItWorks2';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2925,6 +4929,307 @@ export interface BentoGridBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'bentoGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StatBandBlock".
+ */
+export interface StatBandBlock {
+  /**
+   * Use figures you could defend if a prospect asked how you measured them. Three or four works best.
+   */
+  stats?:
+    | {
+        /**
+         * e.g. 4 industries, 1,300+
+         */
+        value: string;
+        /**
+         * What the number means.
+         */
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Optional. Use it to say how the figures are measured or over what period, not to disclaim them.
+   */
+  note?: string | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'statBand';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "MediaBlock".
+ */
+export interface MediaBlock {
+  media: string | Media;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'mediaBlock';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CaseStudyGridBlock".
+ */
+export interface CaseStudyGridBlock {
+  eyebrow?: string | null;
+  heading?: string | null;
+  intro?: string | null;
+  populateBy?: ('collection' | 'selection') | null;
+  /**
+   * Leave empty to show all sectors.
+   */
+  sectors?: (string | Sector)[] | null;
+  limit?: number | null;
+  selectedDocs?: (string | Customer)[] | null;
+  cardStyle?: ('tilt' | 'plain') | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'caseStudyGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BenefitsBlock".
+ */
+export interface BenefitsBlock {
+  label?: string | null;
+  heading?: string | null;
+  /**
+   * Say what changes for the customer, not what the software contains.
+   */
+  items?:
+    | {
+        title: string;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'benefits';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CallToActionBlock".
+ */
+export interface CallToActionBlock {
+  richText?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  links?:
+    | {
+        link: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: string | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: string | Post;
+              } | null);
+          url?: string | null;
+          label: string;
+          /**
+           * Choose how the link should be rendered.
+           */
+          appearance?: ('default' | 'outline') | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'cta';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ContentBlock".
+ */
+export interface ContentBlock {
+  columns?:
+    | {
+        size?: ('oneThird' | 'half' | 'twoThirds' | 'full') | null;
+        richText?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        enableLink?: boolean | null;
+        link?: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: string | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: string | Post;
+              } | null);
+          url?: string | null;
+          label: string;
+          /**
+           * Choose how the link should be rendered.
+           */
+          appearance?: ('default' | 'outline') | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'content';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CustomerDirectoryBlock".
+ */
+export interface CustomerDirectoryBlock {
+  eyebrow?: string | null;
+  heading?: string | null;
+  intro?: string | null;
+  /**
+   * Leave empty to show every sector.
+   */
+  sectors?: (string | Sector)[] | null;
+  showFilters?: boolean | null;
+  layout?: ('list' | 'grid') | null;
+  emptyStateText?: string | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'customerDirectory';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -3427,6 +5732,10 @@ export interface MicroApp {
    */
   verticals?: ('healthcare' | 'diagnostics' | 'education' | 'hospitality')[] | null;
   /**
+   * This page on the site. Updated on save. Empty while Own page is off.
+   */
+  path?: string | null;
+  /**
    * A short line under the name. Aim for 45 characters.
    */
   tagline?: string | null;
@@ -3585,9 +5894,9 @@ export interface MicroApp {
    */
   passesTo?: (string | MicroApp)[] | null;
   /**
-   * Every design reads the hero fields below; the fields only one design uses show when it is picked. Conversation needs at least 2 chat messages, Picture on the right needs a picture, Stats needs at least 2 stats.
+   * Every design reads the hero fields below; the fields only one design uses show when it is picked. Conversation needs at least 2 chat messages, Picture on the right needs a picture, Stats needs at least 2 stats, Custom CSS visual needs its HTML and a screen reader description.
    */
-  heroDesign: 'conversation' | 'rightPlacement' | 'stats';
+  heroDesign: 'conversation' | 'rightPlacement' | 'stats' | 'customCss';
   /**
    * The small line above the heading. Leave empty to use the grouping's name.
    */
@@ -3699,6 +6008,23 @@ export interface MicroApp {
         id?: string | null;
       }[]
     | null;
+  /**
+   * The markup only, no <style> or <script>. Text in it is read by search engines.
+   */
+  visualHtml?: string | null;
+  /**
+   * Styles for the HTML above. Use @media or @container visual (max-width: 480px) for small screens. Images and fonts must come from the media library.
+   */
+  visualCss?: string | null;
+  /**
+   * What the visual shows, in a sentence. Leave empty if it is only decoration.
+   */
+  visualAlt?: string | null;
+  aspect?: ('auto' | '16/9' | '4/3' | '1/1' | '3/4') | null;
+  /**
+   * Empty fills its column.
+   */
+  maxWidth?: number | null;
   /**
    * 3 to 6 outcomes, each with a short line.
    */
@@ -3871,6 +6197,10 @@ export interface MicroApp {
      */
     image?: (string | null) | Media;
     description?: string | null;
+    /**
+     * The one search phrase this page is written for. No page or entry shares a primary keyword with another.
+     */
+    primaryKeyword?: string | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -4024,9 +6354,9 @@ export interface CrmFeature {
    */
   legacyGap?: string | null;
   /**
-   * Every design reads the hero fields below; the fields only one design uses show when it is picked. Conversation needs at least 2 chat messages, Picture on the right needs a picture, Stats needs at least 2 stats.
+   * Every design reads the hero fields below; the fields only one design uses show when it is picked. Conversation needs at least 2 chat messages, Picture on the right needs a picture, Stats needs at least 2 stats, Custom CSS visual needs its HTML and a screen reader description.
    */
-  heroDesign: 'conversation' | 'rightPlacement' | 'stats';
+  heroDesign: 'conversation' | 'rightPlacement' | 'stats' | 'customCss';
   /**
    * The small line above the heading. Leave empty to use the grouping's name.
    */
@@ -4138,6 +6468,23 @@ export interface CrmFeature {
         id?: string | null;
       }[]
     | null;
+  /**
+   * The markup only, no <style> or <script>. Text in it is read by search engines.
+   */
+  visualHtml?: string | null;
+  /**
+   * Styles for the HTML above. Use @media or @container visual (max-width: 480px) for small screens. Images and fonts must come from the media library.
+   */
+  visualCss?: string | null;
+  /**
+   * What the visual shows, in a sentence. Leave empty if it is only decoration.
+   */
+  visualAlt?: string | null;
+  aspect?: ('auto' | '16/9' | '4/3' | '1/1' | '3/4') | null;
+  /**
+   * Empty fills its column.
+   */
+  maxWidth?: number | null;
   /**
    * 3 to 6 outcomes, each with a short line.
    */
@@ -4293,383 +6640,14 @@ export interface CrmFeature {
      */
     image?: (string | null) | Media;
     description?: string | null;
+    /**
+     * The one search phrase this page is written for. No page or entry shares a primary keyword with another.
+     */
+    primaryKeyword?: string | null;
   };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "MediaBlock".
- */
-export interface MediaBlock {
-  media: string | Media;
-  /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
-   */
-  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'mediaBlock';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "BenefitsBlock".
- */
-export interface BenefitsBlock {
-  label?: string | null;
-  heading?: string | null;
-  /**
-   * Say what changes for the customer, not what the software contains.
-   */
-  items?:
-    | {
-        title: string;
-        description?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
-   */
-  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'benefits';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "CallToActionBlock".
- */
-export interface CallToActionBlock {
-  richText?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  links?:
-    | {
-        link: {
-          type?: ('reference' | 'custom') | null;
-          newTab?: boolean | null;
-          reference?:
-            | ({
-                relationTo: 'pages';
-                value: string | Page;
-              } | null)
-            | ({
-                relationTo: 'posts';
-                value: string | Post;
-              } | null);
-          url?: string | null;
-          label: string;
-          /**
-           * Choose how the link should be rendered.
-           */
-          appearance?: ('default' | 'outline') | null;
-        };
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
-   */
-  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'cta';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ContentBlock".
- */
-export interface ContentBlock {
-  columns?:
-    | {
-        size?: ('oneThird' | 'half' | 'twoThirds' | 'full') | null;
-        richText?: {
-          root: {
-            type: string;
-            children: {
-              type: any;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        } | null;
-        enableLink?: boolean | null;
-        link?: {
-          type?: ('reference' | 'custom') | null;
-          newTab?: boolean | null;
-          reference?:
-            | ({
-                relationTo: 'pages';
-                value: string | Page;
-              } | null)
-            | ({
-                relationTo: 'posts';
-                value: string | Post;
-              } | null);
-          url?: string | null;
-          label: string;
-          /**
-           * Choose how the link should be rendered.
-           */
-          appearance?: ('default' | 'outline') | null;
-        };
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
-   */
-  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'content';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "HowItWorks2Block".
- */
-export interface HowItWorks2Block {
-  /**
-   * Small line above the heading.
-   */
-  eyebrow?: string | null;
-  /**
-   * The section heading.
-   */
-  heading: string;
-  intro?: string | null;
-  /**
-   * 2 to 5 steps, in order. The numbers 01, 02 and so on come from the order, so leave them out of the titles.
-   */
-  steps?:
-    | {
-        title: string;
-        description: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
-   */
-  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
-  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
-  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
-  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
-  align?: ('default' | 'left' | 'center') | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'howItWorks2';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "StatBandBlock".
- */
-export interface StatBandBlock {
-  /**
-   * Use figures you could defend if a prospect asked how you measured them. Three or four works best.
-   */
-  stats?:
-    | {
-        /**
-         * e.g. 4 industries, 1,300+
-         */
-        value: string;
-        /**
-         * What the number means.
-         */
-        label: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Optional. Use it to say how the figures are measured or over what period, not to disclaim them.
-   */
-  note?: string | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'statBand';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "TrustPanelBlock".
- */
-export interface TrustPanelBlock {
-  /**
-   * e.g. Deployment & trust
-   */
-  eyebrow?: string | null;
-  heading: string;
-  intro?: string | null;
-  buttonLabel?: string | null;
-  buttonHref?: string | null;
-  /**
-   * Claims here are read closely during procurement, so only state what you can evidence.
-   */
-  cards?:
-    | {
-        title: string;
-        description: string;
-        icon?:
-          | (
-              | 'message'
-              | 'chat'
-              | 'check'
-              | 'calendar'
-              | 'card'
-              | 'document'
-              | 'refresh'
-              | 'bolt'
-              | 'layers'
-              | 'gauge'
-              | 'plug'
-              | 'shield'
-              | 'shieldCheck'
-              | 'lock'
-              | 'globe'
-              | 'server'
-              | 'eye'
-              | 'users'
-              | 'user'
-              | 'phone'
-              | 'smartphone'
-              | 'mail'
-              | 'messageCircle'
-              | 'send'
-              | 'inbox'
-              | 'headphones'
-              | 'mic'
-              | 'video'
-              | 'bell'
-              | 'handshake'
-              | 'stethoscope'
-              | 'heartPulse'
-              | 'hospital'
-              | 'activity'
-              | 'flask'
-              | 'pill'
-              | 'graduationCap'
-              | 'building'
-              | 'mapPin'
-              | 'database'
-              | 'cloud'
-              | 'workflow'
-              | 'bot'
-              | 'sparkles'
-              | 'search'
-              | 'chart'
-              | 'trendingUp'
-              | 'target'
-              | 'rocket'
-              | 'key'
-              | 'fileText'
-              | 'clipboardList'
-              | 'link'
-              | 'settings'
-              | 'puzzle'
-              | 'timer'
-              | 'clock'
-              | 'badgeCheck'
-              | 'star'
-              | 'briefcase'
-            )
-          | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Keeps the block and its content but removes it from the page.
-   */
-  hidden?: boolean | null;
-  /**
-   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
-   */
-  htmlId?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'trustPanel';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -6964,6 +8942,14 @@ export interface HubLayersSection {
               value: string | MicroApp;
             } | null)
           | ({
+              relationTo: 'sectors';
+              value: string | Sector;
+            } | null)
+          | ({
+              relationTo: 'industryTopics';
+              value: string | IndustryTopic;
+            } | null)
+          | ({
               relationTo: 'pages';
               value: string | Page;
             } | null);
@@ -6989,6 +8975,734 @@ export interface HubLayersSection {
   id?: string | null;
   blockName?: string | null;
   blockType: 'hubLayersSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "industryTopics".
+ */
+export interface IndustryTopic {
+  id: string;
+  name: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  /**
+   * Only Live and Pilot entries appear on the website, WhatsApp and the knowledge base.
+   */
+  status: 'live' | 'pilot' | 'planned';
+  /**
+   * Shown first wherever this collection is listed.
+   */
+  featured?: boolean | null;
+  /**
+   * Lower shows first, on grids and in WhatsApp lists.
+   */
+  order?: number | null;
+  /**
+   * Lets blocks pull out the entries that most set NeuronCx apart.
+   */
+  isUSP?: boolean | null;
+  /**
+   * Gives this entry a page of its own and adds it to the sitemap. The Page tab appears while this is on.
+   */
+  hasOwnPage?: boolean | null;
+  /**
+   * On: the page follows the default layout, and changes to the default reach it. Off: the layout on the Page tab is this page's own.
+   */
+  usePageDefaults?: boolean | null;
+  /**
+   * The topic page sits under this industry: the industry slug, then this slug.
+   */
+  industry: string | Sector;
+  /**
+   * The stage this topic covers, such as Qualification.
+   */
+  stage?: string | null;
+  /**
+   * Its place among the industry's topics. Sets the order of the industry page's list and the next-stage link.
+   */
+  stageOrder: number;
+  /**
+   * The links back to the industry page and on to the next stage, shown at the foot of every topic page.
+   */
+  hideClusterFooter?: boolean | null;
+  /**
+   * This page on the site: the parent entry, then this slug. Updated on save and when the parent is renamed.
+   */
+  path?: string | null;
+  /**
+   * A short line under the name. Aim for 45 characters.
+   */
+  tagline?: string | null;
+  /**
+   * One line on what it does. Aim for 120 characters.
+   */
+  summary: string;
+  /**
+   * From the shared icon library.
+   */
+  icon?:
+    | (
+        | 'message'
+        | 'chat'
+        | 'check'
+        | 'calendar'
+        | 'card'
+        | 'document'
+        | 'refresh'
+        | 'bolt'
+        | 'layers'
+        | 'gauge'
+        | 'plug'
+        | 'shield'
+        | 'shieldCheck'
+        | 'lock'
+        | 'globe'
+        | 'server'
+        | 'eye'
+        | 'users'
+        | 'user'
+        | 'phone'
+        | 'smartphone'
+        | 'mail'
+        | 'messageCircle'
+        | 'send'
+        | 'inbox'
+        | 'headphones'
+        | 'mic'
+        | 'video'
+        | 'bell'
+        | 'handshake'
+        | 'stethoscope'
+        | 'heartPulse'
+        | 'hospital'
+        | 'activity'
+        | 'flask'
+        | 'pill'
+        | 'graduationCap'
+        | 'building'
+        | 'mapPin'
+        | 'database'
+        | 'cloud'
+        | 'workflow'
+        | 'bot'
+        | 'sparkles'
+        | 'search'
+        | 'chart'
+        | 'trendingUp'
+        | 'target'
+        | 'rocket'
+        | 'key'
+        | 'fileText'
+        | 'clipboardList'
+        | 'link'
+        | 'settings'
+        | 'puzzle'
+        | 'timer'
+        | 'clock'
+        | 'badgeCheck'
+        | 'star'
+        | 'briefcase'
+      )
+    | null;
+  /**
+   * Optional. Logos go here for integrations.
+   */
+  image?: (string | null) | Media;
+  /**
+   * Leave empty to use the section's design.
+   */
+  cardDesign?: ('grid' | 'logoCard' | 'feature' | 'story') | null;
+  /**
+   * The full description. Also indexed for the knowledge base.
+   */
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * The teams or roles that use it, such as front desk or call centre.
+   */
+  whoItsFor?: string | null;
+  /**
+   * Every design reads the hero fields below; the fields only one design uses show when it is picked. Conversation needs at least 2 chat messages, Picture on the right needs a picture, Stats needs at least 2 stats, Custom CSS visual needs its HTML and a screen reader description.
+   */
+  heroDesign: 'conversation' | 'rightPlacement' | 'stats' | 'customCss';
+  /**
+   * The small line above the heading. Leave empty to use the grouping's name.
+   */
+  heroEyebrow?: string | null;
+  /**
+   * The page heading. Needed to publish with Own page on.
+   */
+  heroHeading?: string | null;
+  heroSubheading?: string | null;
+  /**
+   * Up to 4 short labels in the hero. Leave empty to use the card's key points.
+   */
+  heroChips?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * The main button, in the hero and the closing panel. Type a label to choose where it goes.
+   */
+  cta?: {
+    label?: string | null;
+    link?: {
+      type?: ('reference' | 'custom') | null;
+      newTab?: boolean | null;
+      reference?:
+        | ({
+            relationTo: 'pages';
+            value: string | Page;
+          } | null)
+        | ({
+            relationTo: 'posts';
+            value: string | Post;
+          } | null);
+      url?: string | null;
+    };
+  };
+  /**
+   * A second button in the hero. Type a label to choose where it goes.
+   */
+  heroSecondaryCta?: {
+    label?: string | null;
+    link?: {
+      type?: ('reference' | 'custom') | null;
+      newTab?: boolean | null;
+      reference?:
+        | ({
+            relationTo: 'pages';
+            value: string | Page;
+          } | null)
+        | ({
+            relationTo: 'posts';
+            value: string | Post;
+          } | null);
+      url?: string | null;
+    };
+  };
+  /**
+   * Up to 8 messages, in order. Demo details only, no real customer names or figures.
+   */
+  heroChat?:
+    | {
+        sender: 'customer' | 'business' | 'team';
+        /**
+         * The entry that sends this message, named under the chat.
+         */
+        entry?: {
+          relationTo: 'industryTopics';
+          value: string | IndustryTopic;
+        } | null;
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * A line at the top of the chat, such as where it takes place.
+   */
+  heroChatCaption?: string | null;
+  /**
+   * A flow graphic or screenshot. Needed for Picture on the right.
+   */
+  heroMedia?: (string | null) | Media;
+  /**
+   * What the picture shows, for screen readers. Leave empty to use the picture's own alt text.
+   */
+  heroMediaAlt?: string | null;
+  /**
+   * Lists this entry and the entries in its chain (Passes to), by name and card icon, under the chat.
+   */
+  heroWorkflowFromChain?: boolean | null;
+  /**
+   * The picture drifts in gently. Off keeps it still.
+   */
+  heroMotion?: ('on' | 'off') | null;
+  /**
+   * Real, defensible figures only. Stats needs 2 to 4; Conversation shows any under the hero.
+   */
+  heroStats?:
+    | {
+        /**
+         * Such as 40% or 2x.
+         */
+        value: string;
+        /**
+         * What the number means.
+         */
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * The markup only, no <style> or <script>. Text in it is read by search engines.
+   */
+  visualHtml?: string | null;
+  /**
+   * Styles for the HTML above. Use @media or @container visual (max-width: 480px) for small screens. Images and fonts must come from the media library.
+   */
+  visualCss?: string | null;
+  /**
+   * What the visual shows, in a sentence. Leave empty if it is only decoration.
+   */
+  visualAlt?: string | null;
+  aspect?: ('auto' | '16/9' | '4/3' | '1/1' | '3/4') | null;
+  /**
+   * Empty fills its column.
+   */
+  maxWidth?: number | null;
+  /**
+   * 3 to 6 outcomes, each with a short line.
+   */
+  benefits?:
+    | {
+        title: string;
+        line: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * 3 to 5 steps, in order.
+   */
+  howItWorks?:
+    | {
+        title: string;
+        line: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Up to 4, one per vertical where possible.
+   */
+  useCases?:
+    | {
+        title: string;
+        line: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Up to 3. Leave empty to show other entries from this collection, by order.
+   */
+  related?: (string | IndustryTopic)[] | null;
+  /**
+   * Ends this page with the closing panel. Off by default.
+   */
+  showClosing?: boolean | null;
+  /**
+   * The sections between the page hero and the end of the page, in order. Drag to reorder. Read-only while Use page defaults is on.
+   */
+  layout?:
+    | (
+        | TopicOverviewSection
+        | TopicStepsSection
+        | TopicRecordedSection
+        | TopicComparisonSection
+        | TopicAgentsSection
+        | TopicIntegrationsSection
+        | SharedSection
+        | FaqSection
+        | ClosingSection
+        | TestimonialBlock
+        | MediaBlock
+        | ProductInActionBlock
+        | CaseStudyGridBlock
+        | BenefitsBlock
+        | CallToActionBlock
+        | ContentBlock
+        | LogoWallBlock
+        | HowItWorks2Block
+        | StatBandBlock
+        | TrustPanelBlock
+      )[]
+    | null;
+  /**
+   * What this topic covers, feature first: what the platform does, then why it matters here.
+   */
+  overview: string;
+  /**
+   * 2 to 8 steps, in order.
+   */
+  steps?:
+    | {
+        title: string;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * What gets saved to the record, and which system fills it. Up to 10.
+   */
+  recorded?:
+    | {
+        field: string;
+        /**
+         * The system or step that fills it, such as Lead management system.
+         */
+        source: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Drawn with the Comparison table block. Leave empty for no comparison.
+   */
+  comparison?: {
+    /**
+     * Optional. The small line above the heading.
+     */
+    eyebrow?: string | null;
+    heading?: string | null;
+    /**
+     * Optional. One or two sentences under the heading.
+     */
+    intro?: string | null;
+    /**
+     * The systems being compared, left to right. Highlight one column at most, usually NeuronCx.
+     */
+    columns?:
+      | {
+          label: string;
+          highlight?: boolean | null;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Describe what each system typically covers, in plain words. No ticks or crosses, and no claims about a named product.
+     */
+    rows?:
+      | {
+          label: string;
+          /**
+           * One cell per column, in the same order as the columns.
+           */
+          cells?:
+            | {
+                text?: string | null;
+                id?: string | null;
+              }[]
+            | null;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Optional. A short note under the table.
+     */
+    footnote?: string | null;
+  };
+  /**
+   * The bot swarm agents this topic uses.
+   */
+  agents?: (string | MicroApp)[] | null;
+  /**
+   * The systems this topic connects to.
+   */
+  integrations?: (string | Integration)[] | null;
+  /**
+   * Customers who use it, shown only once cleared.
+   */
+  customers?: (string | Customer)[] | null;
+  /**
+   * Up to 6. Questions phrased the way a buyer would ask them.
+   */
+  faqs?:
+    | {
+        question: string;
+        /**
+         * Plain text, no formatting.
+         */
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  waRowTitle?: string | null;
+  /**
+   * Aim for 60 characters.
+   */
+  waRowDescription?: string | null;
+  /**
+   * Aim for 30 characters.
+   */
+  waHeader?: string | null;
+  /**
+   * Aim for 300 characters.
+   */
+  waBody?: string | null;
+  /**
+   * 3 to 5 short lines, sent inside the body.
+   */
+  waKeyPoints?:
+    | {
+        line: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Aim for 30 characters.
+   */
+  waFooter?: string | null;
+  /**
+   * Up to 3, which is the WhatsApp limit.
+   */
+  waButtons?:
+    | {
+        label: string;
+        /**
+         * The reply the assistant receives when the button is tapped, for example book-demo.
+         */
+        action: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Set on save: the entry's own page when Own page is on, otherwise left empty.
+   */
+  waLink?: string | null;
+  /**
+   * Only published entries with this on are sent to the knowledge base.
+   */
+  includeInKbase?: boolean | null;
+  /**
+   * A complete answer to "What is this?", written for the virtual agents.
+   */
+  kbAnswer?: string | null;
+  /**
+   * Short, checkable facts. One fact per line.
+   */
+  kbFacts?:
+    | {
+        fact: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * How a customer might ask about it.
+   */
+  kbQuestions?:
+    | {
+        question: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Other names people use for it.
+   */
+  kbSynonyms?:
+    | {
+        synonym: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * So answers that have gone stale can be found and fixed.
+   */
+  kbLastReviewed?: string | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (string | null) | Media;
+    description?: string | null;
+    /**
+     * The one search phrase this page is written for. No page or entry shares a primary keyword with another.
+     */
+    primaryKeyword?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TopicOverviewSection".
+ */
+export interface TopicOverviewSection {
+  /**
+   * Leave empty to show the default heading: "What it covers". Words in braces, such as {name}, are filled in for each entry.
+   */
+  heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'topicOverviewSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TopicStepsSection".
+ */
+export interface TopicStepsSection {
+  /**
+   * Leave empty to show the default heading: "Step by step". Words in braces, such as {name}, are filled in for each entry.
+   */
+  heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'topicStepsSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TopicRecordedSection".
+ */
+export interface TopicRecordedSection {
+  /**
+   * Leave empty to show the default heading: "What gets recorded". Words in braces, such as {name}, are filled in for each entry.
+   */
+  heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'topicRecordedSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TopicComparisonSection".
+ */
+export interface TopicComparisonSection {
+  /**
+   * Leave empty to show the default heading: "How it compares". Words in braces, such as {name}, are filled in for each entry.
+   */
+  heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'topicComparisonSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TopicAgentsSection".
+ */
+export interface TopicAgentsSection {
+  /**
+   * Leave empty to show the default heading: "The agents that do it". Words in braces, such as {name}, are filled in for each entry.
+   */
+  heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'topicAgentsSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TopicIntegrationsSection".
+ */
+export interface TopicIntegrationsSection {
+  /**
+   * Leave empty to show the default heading: "Works with". Words in braces, such as {name}, are filled in for each entry.
+   */
+  heading?: string | null;
+  /**
+   * The small line above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * One or two sentences under the heading.
+   */
+  intro?: string | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'topicIntegrationsSection';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -7056,10 +9770,20 @@ export interface HubIndustriesSection {
          * The entries that solve it, in order.
          */
         entries?:
-          | {
-              relationTo: 'microApps';
-              value: string | MicroApp;
-            }[]
+          | (
+              | {
+                  relationTo: 'microApps';
+                  value: string | MicroApp;
+                }
+              | {
+                  relationTo: 'sectors';
+                  value: string | Sector;
+                }
+              | {
+                  relationTo: 'industryTopics';
+                  value: string | IndustryTopic;
+                }
+            )[]
           | null;
         outcome?: string | null;
         id?: string | null;
@@ -7344,7 +10068,7 @@ export interface Hub {
   /**
    * The content collection this hub is for. One hub per collection.
    */
-  forCollection: 'microApps';
+  forCollection: 'microApps' | 'sectors' | 'industryTopics';
   /**
    * The hub shown at the collection's address, such as /bot-swarm.
    */
@@ -7399,10 +10123,19 @@ export interface Hub {
         /**
          * The entry that sends this message, shown with it.
          */
-        entry?: {
-          relationTo: 'microApps';
-          value: string | MicroApp;
-        } | null;
+        entry?:
+          | ({
+              relationTo: 'microApps';
+              value: string | MicroApp;
+            } | null)
+          | ({
+              relationTo: 'sectors';
+              value: string | Sector;
+            } | null)
+          | ({
+              relationTo: 'industryTopics';
+              value: string | IndustryTopic;
+            } | null);
         text: string;
         id?: string | null;
       }[]
@@ -7483,10 +10216,20 @@ export interface Hub {
          * Hand-picked, in order. Leave empty to show every live entry in the grouping.
          */
         entries?:
-          | {
-              relationTo: 'microApps';
-              value: string | MicroApp;
-            }[]
+          | (
+              | {
+                  relationTo: 'microApps';
+                  value: string | MicroApp;
+                }
+              | {
+                  relationTo: 'sectors';
+                  value: string | Sector;
+                }
+              | {
+                  relationTo: 'industryTopics';
+                  value: string | IndustryTopic;
+                }
+            )[]
           | null;
         id?: string | null;
       }[]
@@ -7565,6 +10308,30 @@ export interface Hub {
         | FaqSection
         | RelatedSection
         | ClosingSection
+        | IndustryProblemsSection
+        | IndustryAudiencesSection
+        | IndustryEpisodeSection
+        | IndustryRolesSection
+        | IndustryRecordSection
+        | IndustryComparisonSection
+        | IndustryCartsSection
+        | IndustryEnquirySection
+        | IndustryAnswersSection
+        | IndustryCampaignsSection
+        | IndustryReportingSection
+        | IndustryCallQualitySection
+        | IndustryCampusSystemsSection
+        | IndustryAgentsSection
+        | IndustryIntegrationsSection
+        | IndustryCustomersSection
+        | IndustryTopicsSection
+        | SharedSection
+        | TopicOverviewSection
+        | TopicStepsSection
+        | TopicRecordedSection
+        | TopicComparisonSection
+        | TopicAgentsSection
+        | TopicIntegrationsSection
       )[]
     | null;
   /**
@@ -7583,7 +10350,31 @@ export interface Hub {
           | 'agentPanel'
           | 'agentChain'
           | 'agentTeamControls'
-          | 'agentResult';
+          | 'agentResult'
+          | 'industryProblems'
+          | 'industryAudiences'
+          | 'industryEpisode'
+          | 'industryRoles'
+          | 'industryRecord'
+          | 'industryComparison'
+          | 'industryCarts'
+          | 'industryEnquiry'
+          | 'industryAnswers'
+          | 'industryCampaigns'
+          | 'industryReporting'
+          | 'industryCallQuality'
+          | 'industryCampusSystems'
+          | 'industryAgents'
+          | 'industryIntegrations'
+          | 'industryCustomers'
+          | 'industryTopics'
+          | 'shared'
+          | 'topicOverview'
+          | 'topicSteps'
+          | 'topicRecorded'
+          | 'topicComparison'
+          | 'topicAgents'
+          | 'topicIntegrations';
         heading: string;
         id?: string | null;
       }[]
@@ -7961,6 +10752,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'sectors';
         value: string | Sector;
+      } | null)
+    | ({
+        relationTo: 'industryTopics';
+        value: string | IndustryTopic;
+      } | null)
+    | ({
+        relationTo: 'sharedContent';
+        value: string | SharedContent;
       } | null)
     | ({
         relationTo: 'customers';
@@ -10156,10 +12955,719 @@ export interface EnquiriesSelect<T extends boolean = true> {
  */
 export interface SectorsSelect<T extends boolean = true> {
   name?: T;
+  generateSlug?: T;
   slug?: T;
+  status?: T;
+  featured?: T;
   order?: T;
+  isUSP?: T;
+  hasOwnPage?: T;
+  usePageDefaults?: T;
+  menuLabel?: T;
+  verticals?: T;
+  path?: T;
+  tagline?: T;
+  summary?: T;
+  icon?: T;
+  image?: T;
+  cardDesign?: T;
+  description?: T;
+  whoItsFor?: T;
+  heroDesign?: T;
+  heroEyebrow?: T;
+  heroHeading?: T;
+  heroSubheading?: T;
+  heroChips?:
+    | T
+    | {
+        label?: T;
+        id?: T;
+      };
+  cta?:
+    | T
+    | {
+        label?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+            };
+      };
+  heroSecondaryCta?:
+    | T
+    | {
+        label?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+            };
+      };
+  heroChat?:
+    | T
+    | {
+        sender?: T;
+        entry?: T;
+        text?: T;
+        id?: T;
+      };
+  heroChatCaption?: T;
+  heroMedia?: T;
+  heroMediaAlt?: T;
+  heroWorkflowFromChain?: T;
+  heroMotion?: T;
+  heroStats?:
+    | T
+    | {
+        value?: T;
+        label?: T;
+        id?: T;
+      };
+  visualHtml?: T;
+  visualCss?: T;
+  visualAlt?: T;
+  aspect?: T;
+  maxWidth?: T;
+  benefits?:
+    | T
+    | {
+        title?: T;
+        line?: T;
+        id?: T;
+      };
+  howItWorks?:
+    | T
+    | {
+        title?: T;
+        line?: T;
+        id?: T;
+      };
+  useCases?:
+    | T
+    | {
+        title?: T;
+        line?: T;
+        id?: T;
+      };
+  related?: T;
+  showClosing?: T;
+  layout?: T | {};
+  problems?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        id?: T;
+      };
+  episodeName?: T;
+  episodePoints?:
+    | T
+    | {
+        title?: T;
+        caption?: T;
+        pending?: T;
+        id?: T;
+      };
+  keyDates?:
+    | T
+    | {
+        label?: T;
+        id?: T;
+      };
+  stats?:
+    | T
+    | {
+        value?: T;
+        label?: T;
+        pending?: T;
+        id?: T;
+      };
+  roles?:
+    | T
+    | {
+        name?: T;
+        caption?: T;
+        icon?: T;
+        id?: T;
+      };
+  audiences?:
+    | T
+    | {
+        label?: T;
+        title?: T;
+        intro?: T;
+        points?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        links?:
+          | T
+          | {
+              label?: T;
+              url?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  recordLabel?: T;
+  fieldColumnLabel?: T;
+  sourceColumnLabel?: T;
+  entities?:
+    | T
+    | {
+        label?: T;
+        icon?: T;
+        description?: T;
+        fields?:
+          | T
+          | {
+              name?: T;
+              source?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  columns?:
+    | T
+    | {
+        label?: T;
+        highlight?: T;
+        id?: T;
+      };
+  rows?:
+    | T
+    | {
+        label?: T;
+        cells?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  footnote?: T;
+  carts?:
+    | T
+    | {
+        heading?: T;
+        intro?: T;
+        modelALabel?: T;
+        modelBLabel?: T;
+        carts?:
+          | T
+          | {
+              name?: T;
+              historyCount?: T;
+              id?: T;
+            };
+        addLabel?: T;
+        noteB?: T;
+        noteA?: T;
+      };
+  enquiryCapture?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        intro?: T;
+        points?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+              id?: T;
+            };
+        calloutTerm?: T;
+        calloutText?: T;
+        centreLabel?: T;
+        satellites?:
+          | T
+          | {
+              label?: T;
+              id?: T;
+            };
+      };
+  answersFromContent?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        intro?: T;
+        cards?:
+          | T
+          | {
+              cardColor?: T;
+              border?: T;
+              borderColor?: T;
+              accentLine?: T;
+              icon?: T;
+              showNumber?: T;
+              showEyebrow?: T;
+              showPoints?: T;
+              numberText?: T;
+              tag?: T;
+              title?: T;
+              description?: T;
+              points?:
+                | T
+                | {
+                    text?: T;
+                    id?: T;
+                  };
+              listStyle?: T;
+              link?:
+                | T
+                | {
+                    label?: T;
+                    url?: T;
+                    newTab?: T;
+                  };
+              id?: T;
+            };
+      };
+  campaigns?:
+    | T
+    | {
+        gap?: T;
+        rowHeight?: T;
+        dense?: T;
+        framed?: T;
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+        cards?:
+          | T
+          | {
+              colSpan?: T;
+              rowSpan?: T;
+              tabletColSpan?: T;
+              cardColor?: T;
+              border?: T;
+              borderColor?: T;
+              accentLine?: T;
+              icon?: T;
+              showNumber?: T;
+              showEyebrow?: T;
+              showPoints?: T;
+              numberText?: T;
+              tag?: T;
+              title?: T;
+              titleSize?: T;
+              body?: T;
+              points?:
+                | T
+                | {
+                    text?: T;
+                    id?: T;
+                  };
+              listStyle?: T;
+              image?: T;
+              imagePosition?: T;
+              link?:
+                | T
+                | {
+                    label?: T;
+                    url?: T;
+                    newTab?: T;
+                  };
+              id?: T;
+            };
+      };
+  reporting?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        intro?: T;
+        cards?:
+          | T
+          | {
+              cardColor?: T;
+              border?: T;
+              borderColor?: T;
+              accentLine?: T;
+              icon?: T;
+              showNumber?: T;
+              showEyebrow?: T;
+              showPoints?: T;
+              numberText?: T;
+              tag?: T;
+              title?: T;
+              description?: T;
+              points?:
+                | T
+                | {
+                    text?: T;
+                    id?: T;
+                  };
+              listStyle?: T;
+              link?:
+                | T
+                | {
+                    label?: T;
+                    url?: T;
+                    newTab?: T;
+                  };
+              id?: T;
+            };
+      };
+  callQuality?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        intro?: T;
+        showIndicators?: T;
+        layers?:
+          | T
+          | {
+              title?: T;
+              tag?: T;
+              description?: T;
+              footnote?: T;
+              link?:
+                | T
+                | {
+                    label?: T;
+                    type?: T;
+                    page?: T;
+                    url?: T;
+                  };
+              id?: T;
+            };
+      };
+  campusSystems?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        intro?: T;
+        cards?:
+          | T
+          | {
+              cardColor?: T;
+              border?: T;
+              borderColor?: T;
+              accentLine?: T;
+              icon?: T;
+              showNumber?: T;
+              showEyebrow?: T;
+              showPoints?: T;
+              numberText?: T;
+              tag?: T;
+              title?: T;
+              description?: T;
+              points?:
+                | T
+                | {
+                    text?: T;
+                    id?: T;
+                  };
+              listStyle?: T;
+              link?:
+                | T
+                | {
+                    label?: T;
+                    url?: T;
+                    newTab?: T;
+                  };
+              id?: T;
+            };
+      };
+  faqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  waRowTitle?: T;
+  waRowDescription?: T;
+  waHeader?: T;
+  waBody?: T;
+  waKeyPoints?:
+    | T
+    | {
+        line?: T;
+        id?: T;
+      };
+  waFooter?: T;
+  waButtons?:
+    | T
+    | {
+        label?: T;
+        action?: T;
+        id?: T;
+      };
+  waLink?: T;
+  includeInKbase?: T;
+  kbAnswer?: T;
+  kbFacts?:
+    | T
+    | {
+        fact?: T;
+        id?: T;
+      };
+  kbQuestions?:
+    | T
+    | {
+        question?: T;
+        id?: T;
+      };
+  kbSynonyms?:
+    | T
+    | {
+        synonym?: T;
+        id?: T;
+      };
+  kbLastReviewed?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+        primaryKeyword?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "industryTopics_select".
+ */
+export interface IndustryTopicsSelect<T extends boolean = true> {
+  name?: T;
+  generateSlug?: T;
+  slug?: T;
+  status?: T;
+  featured?: T;
+  order?: T;
+  isUSP?: T;
+  hasOwnPage?: T;
+  usePageDefaults?: T;
+  industry?: T;
+  stage?: T;
+  stageOrder?: T;
+  hideClusterFooter?: T;
+  path?: T;
+  tagline?: T;
+  summary?: T;
+  icon?: T;
+  image?: T;
+  cardDesign?: T;
+  description?: T;
+  whoItsFor?: T;
+  heroDesign?: T;
+  heroEyebrow?: T;
+  heroHeading?: T;
+  heroSubheading?: T;
+  heroChips?:
+    | T
+    | {
+        label?: T;
+        id?: T;
+      };
+  cta?:
+    | T
+    | {
+        label?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+            };
+      };
+  heroSecondaryCta?:
+    | T
+    | {
+        label?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+            };
+      };
+  heroChat?:
+    | T
+    | {
+        sender?: T;
+        entry?: T;
+        text?: T;
+        id?: T;
+      };
+  heroChatCaption?: T;
+  heroMedia?: T;
+  heroMediaAlt?: T;
+  heroWorkflowFromChain?: T;
+  heroMotion?: T;
+  heroStats?:
+    | T
+    | {
+        value?: T;
+        label?: T;
+        id?: T;
+      };
+  visualHtml?: T;
+  visualCss?: T;
+  visualAlt?: T;
+  aspect?: T;
+  maxWidth?: T;
+  benefits?:
+    | T
+    | {
+        title?: T;
+        line?: T;
+        id?: T;
+      };
+  howItWorks?:
+    | T
+    | {
+        title?: T;
+        line?: T;
+        id?: T;
+      };
+  useCases?:
+    | T
+    | {
+        title?: T;
+        line?: T;
+        id?: T;
+      };
+  related?: T;
+  showClosing?: T;
+  layout?: T | {};
+  overview?: T;
+  steps?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        id?: T;
+      };
+  recorded?:
+    | T
+    | {
+        field?: T;
+        source?: T;
+        id?: T;
+      };
+  comparison?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        intro?: T;
+        columns?:
+          | T
+          | {
+              label?: T;
+              highlight?: T;
+              id?: T;
+            };
+        rows?:
+          | T
+          | {
+              label?: T;
+              cells?:
+                | T
+                | {
+                    text?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
+        footnote?: T;
+      };
+  agents?: T;
+  integrations?: T;
+  customers?: T;
+  faqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  waRowTitle?: T;
+  waRowDescription?: T;
+  waHeader?: T;
+  waBody?: T;
+  waKeyPoints?:
+    | T
+    | {
+        line?: T;
+        id?: T;
+      };
+  waFooter?: T;
+  waButtons?:
+    | T
+    | {
+        label?: T;
+        action?: T;
+        id?: T;
+      };
+  waLink?: T;
+  includeInKbase?: T;
+  kbAnswer?: T;
+  kbFacts?:
+    | T
+    | {
+        fact?: T;
+        id?: T;
+      };
+  kbQuestions?:
+    | T
+    | {
+        question?: T;
+        id?: T;
+      };
+  kbSynonyms?:
+    | T
+    | {
+        synonym?: T;
+        id?: T;
+      };
+  kbLastReviewed?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+        primaryKeyword?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sharedContent_select".
+ */
+export interface SharedContentSelect<T extends boolean = true> {
+  name?: T;
+  key?: T;
+  block?: T | {};
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -10434,6 +13942,7 @@ export interface IntegrationsSelect<T extends boolean = true> {
   category?: T;
   connection?: T;
   products?: T;
+  verticals?: T;
   featured?: T;
   order?: T;
   slug?: T;
@@ -10731,6 +14240,11 @@ export interface CrmFeaturesSelect<T extends boolean = true> {
         label?: T;
         id?: T;
       };
+  visualHtml?: T;
+  visualCss?: T;
+  visualAlt?: T;
+  aspect?: T;
+  maxWidth?: T;
   benefits?:
     | T
     | {
@@ -10816,6 +14330,7 @@ export interface CrmFeaturesSelect<T extends boolean = true> {
         title?: T;
         image?: T;
         description?: T;
+        primaryKeyword?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -10838,6 +14353,7 @@ export interface MicroAppsSelect<T extends boolean = true> {
   usePageDefaults?: T;
   channel?: T;
   verticals?: T;
+  path?: T;
   tagline?: T;
   summary?: T;
   icon?: T;
@@ -10918,6 +14434,11 @@ export interface MicroAppsSelect<T extends boolean = true> {
         label?: T;
         id?: T;
       };
+  visualHtml?: T;
+  visualCss?: T;
+  visualAlt?: T;
+  aspect?: T;
+  maxWidth?: T;
   benefits?:
     | T
     | {
@@ -10992,6 +14513,7 @@ export interface MicroAppsSelect<T extends boolean = true> {
         title?: T;
         image?: T;
         description?: T;
+        primaryKeyword?: T;
       };
   updatedAt?: T;
   createdAt?: T;

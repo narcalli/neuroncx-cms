@@ -7,7 +7,9 @@ import { kbaseTab } from '../fields/kbase'
 import { link } from '../fields/link'
 import { plainText } from '../fields/validators/plainText'
 import { whatsappTab } from '../fields/whatsapp'
+import { VERTICAL_OPTIONS } from '../fields/verticals'
 import { checklistFields } from './integrations/checklist'
+import { revalidateIndustriesForIntegration } from './integrations/revalidateIndustries'
 import {
   itemFallbacks,
   itemRefreshCategories,
@@ -77,6 +79,16 @@ const sidebar: Field[] = [
     relationTo: 'products',
     hasMany: true,
     admin: { position: 'sidebar', sortOptions: 'order' },
+  },
+  {
+    // The same list as an agent's and an industry's Verticals
+    // (fields/verticals.ts): industry pages list the integrations for theirs.
+    name: 'verticals',
+    type: 'select',
+    label: 'Verticals',
+    hasMany: true,
+    options: [...VERTICAL_OPTIONS],
+    admin: { position: 'sidebar', description: 'The industries this integration is used in.' },
   },
   {
     name: 'featured',
@@ -434,7 +446,7 @@ export const Integrations: CollectionConfig = {
   },
   hooks: {
     beforeChange: [itemFallbacks],
-    afterChange: [itemRefreshCategories],
+    afterChange: [itemRefreshCategories, revalidateIndustriesForIntegration],
     afterDelete: [itemRefreshCategoriesAfterDelete],
   },
   fields: [

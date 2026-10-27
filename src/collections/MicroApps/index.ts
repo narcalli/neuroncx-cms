@@ -6,6 +6,7 @@ import { plainText } from '../../fields/validators/plainText'
 import './sections'
 import { VERTICAL_OPTIONS } from '../../fields/verticals'
 import { revalidateFlowDemoPages } from './flowDemoPages'
+import { byVerticals, revalidateIndustriesShowing } from '../Sectors/revalidate'
 
 /**
  * Bot swarm: one entry per small agent with one job, such as Payment
@@ -184,7 +185,7 @@ export const MicroApps = defineContentCollection({
   groupBy: { listType: 'agentFamily', field: 'family', required: true },
   groups: ['core', 'card', 'detail', 'ownPage', 'faq', 'whatsapp', 'kbase'],
   ownPage: { omit: ['howItWorks'] },
-  heroDesigns: ['conversation', 'rightPlacement', 'stats'],
+  heroDesigns: ['conversation', 'rightPlacement', 'stats', 'customCss'],
   fields: { sidebar, detail, card, page },
   extraTabs: [{ after: 'detail', tab: panel }],
   sections: [
@@ -214,7 +215,7 @@ export const MicroApps = defineContentCollection({
   ],
   kb: { resolve: ['family', 'integrations', 'passesTo', 'customers'] },
   // Pages whose Agentic Flow Demo shows this agent (flowDemoPages.ts).
-  hooks: { afterChange: [revalidateFlowDemoPages] },
+  hooks: { afterChange: [revalidateFlowDemoPages, revalidateIndustriesShowing('industryAgents', byVerticals)] },
   admin: {
     defaultColumns: ['name', 'family', 'status', 'channel', 'hasOwnPage', 'updatedAt'],
     // Family by its own order, then the agent's order within it.

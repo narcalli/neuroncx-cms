@@ -1,6 +1,6 @@
 import type { PayloadRequest } from 'payload'
 
-import { layoutBlocksFor } from '../fields/layout'
+import { resolveDefaultLayout } from '../fields/layout'
 import type { ContentCollectionEntry } from './registry'
 import { sectionForBlockType } from './sections/defineSection'
 
@@ -45,5 +45,5 @@ export const defaultLayoutBlocks = async (
   const fromHub = ((hub?.defaultLayout ?? []) as Block[])
     .filter((block) => entry.sections.includes(sectionForBlockType(block?.blockType)?.key ?? ''))
     .map(({ id: _id, ...block }) => block)
-  return fromHub.length ? fromHub : layoutBlocksFor(entry.defaultLayout)
+  return fromHub.length ? fromHub : ((await resolveDefaultLayout(entry.defaultLayout, req)) as Block[])
 }

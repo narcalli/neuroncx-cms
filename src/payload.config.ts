@@ -17,6 +17,8 @@ import { IntegrationsMaster } from './collections/IntegrationsMaster'
 import { Lists } from './collections/Lists'
 import { ConnectionTypes, IntegrationCategories, Products } from './collections/IntegrationTaxonomies'
 import { Sectors } from './collections/Sectors'
+import { IndustryTopics } from './collections/IndustryTopics'
+import { SharedContent } from './collections/SharedContent'
 import { Enquiries } from './collections/Enquiries'
 import { Features } from './collections/Features'
 import { Media } from './collections/Media'
@@ -70,6 +72,8 @@ export default buildConfig({
     Users,
     Enquiries,
     Sectors,
+    IndustryTopics,
+    SharedContent,
     Customers,
     IntegrationsMaster,
     withRag(Integrations),

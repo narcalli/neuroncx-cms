@@ -4,12 +4,15 @@ import type {
   CollectionBeforeChangeHook,
   PayloadRequest,
   RelationshipFieldSingleValidation,
-  TextFieldSingleValidation,
-  Where,
 } from 'payload'
-import { relationship, text } from 'payload/shared'
+import { relationship } from 'payload/shared'
 
+import { findPage, idOf, pagePath, resolvePagePath, writeRedirect } from '../../content/paths'
 import { revalidateContent } from '../../content/revalidate'
+
+// Shared with content collections (src/content/paths.ts); kept here under the
+// names Pages and the tests already use.
+export { pagePath, resolvePagePath, validatePrimaryKeyword } from '../../content/paths'
 
 /**
  * Pillar and cluster pages. A page may sit under one parent page (its
@@ -25,52 +28,7 @@ export const ONE_LEVEL_MESSAGE = 'Cluster pages sit directly under a pillar page
 export const HAS_CLUSTERS_MESSAGE =
   'This page has cluster pages under it, so it cannot sit under another page. Move its cluster pages first.'
 
-type Slugged = { slug?: string | null }
-type PageLike = Slugged & {
-  id?: string | number
-  parent?: unknown
-  breadcrumbs?: { url?: string | null }[] | null
-}
-
-const idOf = (v: unknown): string | null => {
-  if (v && typeof v === 'object' && 'id' in v) return String((v as { id: unknown }).id)
-  return typeof v === 'string' || typeof v === 'number' ? String(v) : null
-}
-
-/**
- * A page's path from its chain of pages, pillar first: "/" for the home
- * page on its own, otherwise every slug joined, as /pillar/cluster. Empty
- * while any page in the chain has no slug yet, since it has no address.
- */
-export const pagePath = (docs: Slugged[]): string => {
-  if (!docs.length || docs.some((d) => typeof d?.slug !== 'string' || !d.slug)) return ''
-  if (docs.length === 1 && docs[0].slug === 'home') return '/'
-  return '/' + docs.map((d) => d.slug).join('/')
-}
-
-const findPage = async (req: PayloadRequest, id: string): Promise<PageLike | null> =>
-  (await req.payload.findByID({
-    collection: 'pages',
-    id,
-    depth: 0,
-    draft: false,
-    disableErrors: true,
-    overrideAccess: true,
-    req,
-  })) as PageLike | null
-
-/** The path a page has with its current parent, read from the database. */
-export const resolvePagePath = async (req: PayloadRequest, doc: PageLike): Promise<string> => {
-  const parentId = idOf(doc.parent)
-  if (!parentId) return pagePath([doc])
-  const parent =
-    doc.parent && typeof doc.parent === 'object' && 'slug' in doc.parent
-      ? (doc.parent as PageLike)
-      : await findPage(req, parentId)
-  return parent ? pagePath([parent, doc]) : pagePath([doc])
-}
-
-const normalise = (s: string) => s.trim().replace(/\s+/g, ' ').toLowerCase()
+type PageLike = { id?: string | number; slug?: string | null; parent?: unknown; breadcrumbs?: { url?: string | null }[] | null }
 
 /**
  * The parent field: one level only. A parent that has a parent of its own
@@ -95,40 +53,6 @@ export const validateParent: RelationshipFieldSingleValidation = async (value, o
     }
   }
   return relationship(value, options)
-}
-
-/**
- * The primary keyword: no two pages may share one, compared without regard
- * to case or spacing. Checked against every page's latest version, drafts
- * included, so two pages in progress cannot claim the same keyword either.
- */
-export const validatePrimaryKeyword: TextFieldSingleValidation = async (value, options) => {
-  const base = text(value, options)
-  if (base !== true) return base
-  if (typeof value !== 'string' || !value.trim()) return true
-  const { req, id } = options
-  const wanted = normalise(value)
-  const where: Where = {
-    and: [
-      { 'meta.primaryKeyword': { like: value.trim() } },
-      ...(id ? [{ id: { not_equals: id } }] : []),
-    ],
-  }
-  const { docs } = await req.payload.find({
-    collection: 'pages',
-    where,
-    draft: true,
-    depth: 0,
-    limit: 50,
-    overrideAccess: true,
-    pagination: false,
-    req,
-  })
-  const other = docs.find(
-    (d) => typeof d.meta?.primaryKeyword === 'string' && normalise(d.meta.primaryKeyword) === wanted,
-  )
-  if (!other) return true
-  return `"${value.trim()}" is already the primary keyword of the page "${other.title}" (${await resolvePagePath(req, other as PageLike)}). Choose a different keyword.`
 }
 
 type PathChange = { from: string; pillar: string | null; pillarId: string | null }
@@ -163,39 +87,13 @@ export const pillarPath = async (req: PayloadRequest, doc: PageLike): Promise<st
 
 /**
  * After a publish that moved the page: a redirect from the old path to the
- * new one. Redirects that led to the old path are pointed at the new one, so
- * there is never a chain, and any redirect away from the new path is removed,
- * since the page now lives there.
+ * new one (writeRedirect, src/content/paths.ts).
  */
 export const redirectMovedPage: CollectionAfterChangeHook = async ({ doc, req }) => {
   const note = (req.context[CONTEXT_KEY] as Record<string, PathChange> | undefined)?.[String(doc.id)]
   if (!note || doc._status !== 'published') return doc
 
-  const from = note.from
-  const to = await resolvePagePath(req, doc as PageLike)
-  // The home page is served at / whatever its slug, so it never moves; a page
-  // with no slug has no address to redirect from or to.
-  if (!from || !to || from === to || from === '/' || to === '/') return doc
-
-  const base = { overrideAccess: true, req, depth: 0 } as const
-  const to_ = { type: 'custom' as const, url: to }
-
-  const awayFromNew = await req.payload.find({ ...base, collection: 'redirects', where: { from: { equals: to } }, limit: 10 })
-  for (const r of awayFromNew.docs) await req.payload.delete({ ...base, collection: 'redirects', id: r.id })
-
-  const intoOld = await req.payload.find({ ...base, collection: 'redirects', where: { 'to.url': { equals: from } }, limit: 100 })
-  for (const r of intoOld.docs) {
-    if (r.from === to) continue
-    await req.payload.update({ ...base, collection: 'redirects', id: r.id, data: { to: to_ } })
-  }
-
-  const existing = await req.payload.find({ ...base, collection: 'redirects', where: { from: { equals: from } }, limit: 1 })
-  if (existing.docs[0]) {
-    await req.payload.update({ ...base, collection: 'redirects', id: existing.docs[0].id, data: { to: to_ } })
-  } else {
-    await req.payload.create({ ...base, collection: 'redirects', data: { from, to: to_ } })
-  }
-  req.payload.logger.info(`Page moved: redirect from ${from} to ${to}`)
+  await writeRedirect(req, note.from, await resolvePagePath(req, doc as PageLike))
   return doc
 }
 

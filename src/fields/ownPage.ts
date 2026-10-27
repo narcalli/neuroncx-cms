@@ -6,6 +6,7 @@ import { showClosingField } from './closing'
 import { countedText } from './counted'
 import { heroDesignField, heroDesignOf, HERO_DESIGN_NAMES, type HeroDesignName } from './heroDesign'
 import { link } from './link'
+import { heroCustomVisualFields } from '../blocks/HeroCustom/config'
 
 /**
  * Own page group (fields_reference.md, section 4). Every entry starts as a
@@ -190,6 +191,18 @@ export const ownPage = (
           ],
         },
       ],
+    },
+    {
+      // The Hero (custom CSS) block's visual fields, as they are on the block
+      // (src/blocks/HeroCustom/config.ts), so the same rules check them.
+      type: 'collapsible',
+      label: 'Custom CSS visual',
+      admin: {
+        condition: forDesign('customCss'),
+        description:
+          'The visual beside the hero text, from your own HTML and CSS. The eyebrow, heading, subheading, chips and buttons above stay as they are. Needs the HTML and a screen reader description to publish.',
+      },
+      fields: heroCustomVisualFields,
     },
     titleAndLine(
       'benefits',

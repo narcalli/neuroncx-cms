@@ -6,6 +6,7 @@ import { plainTextProblem } from '../fields/validators/plainText'
 import { defaultLayoutBlocks } from './hubs'
 import { ownPageProblems, sectionPublishProblems } from './publishCheck'
 import type { ContentCollectionEntry } from './registry'
+import { computeEntryPath } from './paths'
 
 type Doc = Record<string, any>
 
@@ -32,7 +33,7 @@ export type FallbackScope = { seo: boolean; whatsapp: boolean }
  */
 export const contentFallbacks =
   (entry: ContentCollectionEntry, scope: FallbackScope): CollectionBeforeChangeHook =>
-  ({ data, originalDoc }) => {
+  async ({ data, originalDoc, req }) => {
     // Partial updates carry only some fields; read the rest from the saved entry.
     const cur: Doc = { ...originalDoc, ...data }
 
@@ -57,12 +58,11 @@ export const contentFallbacks =
       // The entry's own page, else its place on the hub. Cards-only
       // collections have neither.
       const slug = typeof cur.slug === 'string' && cur.slug ? cur.slug : null
-      data.waLink =
-        entry.route && slug
-          ? cur.hasOwnPage
-            ? `${entry.route}/${slug}`
-            : `${entry.route}#${slug}`
-          : null
+      // The address this save gives (the stored path field is set after this
+      // hook). A root or parent route has no hub address, so without an own
+      // page there is nothing to link to.
+      const own = cur.hasOwnPage ? await computeEntryPath(req, entry, cur) : null
+      data.waLink = slug ? (own ?? (entry.route ? `${entry.route}#${slug}` : null)) : null
     }
 
     return data

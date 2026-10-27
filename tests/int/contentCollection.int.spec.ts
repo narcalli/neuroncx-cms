@@ -112,6 +112,8 @@ describe('admin layout', () => {
       'isUSP',
       'hasOwnPage',
       'usePageDefaults',
+      // The stored address, last: it is worked out from the fields above.
+      'path',
     ])
   })
 
@@ -445,15 +447,18 @@ describe('knowledge base, revalidation and registry', () => {
       label: { singular: 'Agent', plural: 'Agents' },
       route: '/bot-swarm',
       hasRoute: true,
+      routing: { kind: 'base', base: '/bot-swarm' },
+      ownPage: true,
+      seo: true,
       grouping: { listType: 'agentFamily', field: 'family', required: true },
       sections: ['integrations', 'related'],
       defaultLayout: ['integrations', 'related'],
       headings: {},
       kbase: true,
-      heroDesigns: ['conversation', 'rightPlacement', 'stats'],
+      heroDesigns: ['conversation', 'rightPlacement', 'stats', 'customCss'],
       kb: { resolve: ['family'], exclude: [] },
     })
     cardsOnly('zzRegistryCards')
-    expect(getContentCollection('zzRegistryCards')).toMatchObject({ route: null, hasRoute: false })
+    expect(getContentCollection('zzRegistryCards')).toMatchObject({ route: null, hasRoute: false, routing: { kind: 'none' }, ownPage: false })
   })
 })

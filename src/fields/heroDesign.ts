@@ -10,6 +10,7 @@ const DESIGNS = {
   conversation: 'Conversation',
   rightPlacement: 'Picture on the right',
   stats: 'Stats',
+  customCss: 'Custom CSS visual',
 } as const
 
 export type HeroDesignName = keyof typeof DESIGNS
@@ -42,7 +43,7 @@ export const heroDesignField = (allowed: readonly HeroDesignName[] = HERO_DESIGN
     options: HERO_DESIGN_NAMES.filter((d) => allowed.includes(d)).map((value) => ({ label: DESIGNS[value], value })),
     admin: {
       description:
-        'Every design reads the hero fields below; the fields only one design uses show when it is picked. Conversation needs at least 2 chat messages, Picture on the right needs a picture, Stats needs at least 2 stats.',
+        'Every design reads the hero fields below; the fields only one design uses show when it is picked. Conversation needs at least 2 chat messages, Picture on the right needs a picture, Stats needs at least 2 stats, Custom CSS visual needs its HTML and a screen reader description.',
       components: { Field: '@/fields/HeroDesignPicker/Component#HeroDesignPickerField' },
     },
   }

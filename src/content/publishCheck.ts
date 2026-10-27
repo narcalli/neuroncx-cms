@@ -20,8 +20,8 @@ const filledRows = (rows: unknown, keys: string[]): number =>
 /**
  * What the entry's hero design needs (fields_reference.md section 4):
  * Conversation at least 2 chat messages, Picture on the right a picture,
- * Stats at least 2 stats. An entry with no design uses the collection's
- * default.
+ * Stats at least 2 stats, Custom CSS visual its HTML and a screen reader
+ * description. An entry with no design uses the collection's default.
  */
 export const heroDesignProblems = (
   doc: Doc,
@@ -36,6 +36,16 @@ export const heroDesignProblems = (
   }
   if (design === 'stats' && filledRows(doc.heroStats, ['value', 'label']) < 2) {
     return [{ path: 'heroStats', message: 'Add at least 2 stats for the Stats hero, or pick another hero design.' }]
+  }
+  if (design === 'customCss') {
+    const problems: PublishProblem[] = []
+    if (empty(doc.visualHtml)) {
+      problems.push({ path: 'visualHtml', message: 'Add the HTML for the Custom CSS visual hero, or pick another hero design.' })
+    }
+    if (empty(doc.visualAlt)) {
+      problems.push({ path: 'visualAlt', message: 'Add a screen reader description for the Custom CSS visual hero, or pick another hero design.' })
+    }
+    return problems
   }
   return []
 }

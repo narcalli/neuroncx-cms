@@ -10,6 +10,7 @@ import { checkbox as validateCheckbox, text as validateText } from 'payload/shar
 
 import { authenticated } from '../../access/authenticated'
 import { storyLexical } from '../../fields/storyLexical'
+import { byLinked, revalidateIndustriesShowing } from '../Sectors/revalidate'
 
 /**
  * Customers, with an optional case study page of their own at
@@ -132,7 +133,12 @@ export const Customers: CollectionConfig = {
       "Customers and their case studies. A customer's real name, logo, quotes and figures only reach the public site when Show real name is on.",
   },
   defaultSort: 'order',
-  hooks: { beforeOperation: [noInferenceForVisitors], afterRead: [realNameForVisitors] },
+  hooks: {
+    beforeOperation: [noInferenceForVisitors],
+    afterRead: [realNameForVisitors],
+    // The industry pages whose Industry customers section shows it.
+    afterChange: [revalidateIndustriesShowing('industryCustomers', byLinked('sectors'))],
+  },
   versions: {
     drafts: {
       schedulePublish: true,

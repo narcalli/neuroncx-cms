@@ -10,6 +10,7 @@ import { generatePreviewPath } from '../../utilities/generatePreviewPath'
 import { revalidateDelete, revalidatePage } from './hooks/revalidatePage'
 import { validateHighlight } from './hooks/validateHighlight'
 import { createBreadcrumbsField, createParentField } from '@payloadcms/plugin-nested-docs'
+import { pageSlugClashCheck } from '../../content/paths'
 import {
   notePublishedPath,
   redirectMovedPage,
@@ -135,7 +136,18 @@ export const Pages: CollectionConfig<'pages'> = {
         position: 'sidebar',
       },
     },
-    slugField(),
+    // The slug's own hooks generate it from the title first; then the path it
+    // gives is checked against every other address (src/content/paths.ts).
+    slugField({
+      overrides: (row) => ({
+        ...row,
+        fields: row.fields.map((f) =>
+          f.type === 'text' && f.name === 'slug'
+            ? { ...f, hooks: { ...f.hooks, beforeChange: [...(f.hooks?.beforeChange ?? []), pageSlugClashCheck] } }
+            : f,
+        ),
+      }),
+    }),
     // Pillar and cluster pages (./nesting.ts): the parent page sets the path,
     // /{parent slug}/{slug}. The nested docs plugin finds these two fields by
     // name and keeps the breadcrumbs up to date.

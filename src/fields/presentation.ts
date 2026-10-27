@@ -180,3 +180,43 @@ export const withMinimalPresentation = (block: Block): Block => ({
   ...block,
   fields: [...(block.fields || []), ...minimalPresentationFields],
 })
+
+/** A presentation field by name, wherever it sits in presentationFields. */
+const presentationField = (name: string): Field => {
+  const find = (fields: Field[]): Field | undefined => {
+    for (const f of fields) {
+      if ('name' in f && f.name === name) return f
+      if ('fields' in f && Array.isArray(f.fields)) {
+        const hit = find(f.fields)
+        if (hit) return hit
+      }
+    }
+    return undefined
+  }
+  const found = find(presentationFields)
+  if (!found) throw new Error(`presentationFields has no ${name}`)
+  return found
+}
+
+/**
+ * Just the background and the anchor ID. For sections whose width, spacing
+ * and alignment are fixed by their design (the industry page sections), where
+ * only the band colour and a jump link are the editor's to choose.
+ */
+export const backgroundAndIdFields: Field[] = [
+  {
+    type: 'collapsible',
+    label: 'Appearance',
+    admin: { initCollapsed: true, description: 'Optional. Leave as-is for the default look.' },
+    fields: [
+      { ...presentationField('background'), admin: { ...(presentationField('background') as any).admin, width: undefined } } as Field,
+      presentationField('htmlId'),
+    ],
+  },
+]
+
+/** Appends the background and anchor ID fields to a block config. */
+export const withBackgroundAndId = (block: Block): Block => ({
+  ...block,
+  fields: [...(block.fields || []), ...backgroundAndIdFields],
+})

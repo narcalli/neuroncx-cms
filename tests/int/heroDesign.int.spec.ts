@@ -35,12 +35,12 @@ describe('hero design fields', () => {
   const tab = ownPage('microApps').tab
 
   it('offers the designs a collection allows, conversation first and by default', () => {
-    expect(values(find(MicroApps.fields, 'heroDesign'))).toEqual(['conversation', 'rightPlacement', 'stats'])
+    expect(values(find(MicroApps.fields, 'heroDesign'))).toEqual(['conversation', 'rightPlacement', 'stats', 'customCss'])
     expect((find(MicroApps.fields, 'heroDesign') as SelectField).defaultValue).toBe('conversation')
     const only = ownPage('microApps', { heroDesigns: ['stats', 'rightPlacement'] }).tab
     expect(values(find(only.fields, 'heroDesign'))).toEqual(['rightPlacement', 'stats'])
     expect((find(only.fields, 'heroDesign') as SelectField).defaultValue).toBe('rightPlacement')
-    expect(getContentCollection('microApps')?.heroDesigns).toEqual(['conversation', 'rightPlacement', 'stats'])
+    expect(getContentCollection('microApps')?.heroDesigns).toEqual(['conversation', 'rightPlacement', 'stats', 'customCss'])
   })
 
   it('uses the design pictures', () => {
