@@ -62,7 +62,7 @@ describe('Agentic Flow Demo modes', () => {
     const names = AgenticFlowDemo.fields.map((f: Field) => ('name' in f ? f.name : f.type))
     // agentsFor and industries only choose which agents to show.
     expect(names).toEqual([
-      'heading', 'intro', 'mode', 'agentsFor', 'industries', 'families', 'pickFamilyLabel', 'pickAgentLabel', 'events', 'footnote', 'tabs',
+      'heading', 'intro', 'mode', 'agentsFor', 'industries', 'families', 'pickFamilyLabel', 'pickAgentLabel', 'events', 'footnote', 'collapsible', 'tabs',
     ])
   })
 })

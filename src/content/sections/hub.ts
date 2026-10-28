@@ -1,6 +1,7 @@
 import type { Field, FilterOptions, RelationshipField } from 'payload'
 
 import { countedText } from '../../fields/counted'
+import { motionFields } from '../../fields/motion'
 import { optionalCta } from '../../fields/optionalCta'
 import { iconField } from '../../fields/icons'
 import { contentSlugs } from '../registry'
@@ -78,6 +79,7 @@ export const hubStepsSection = defineSection({
     step('handsOver', 'Hands over'),
     step('records', 'Records'),
     optionalCta('cta', 'Button under the steps (optional)'),
+    motionFields({ autoplay: true, speed: true }),
   ],
 })
 
@@ -89,6 +91,17 @@ export const hubLayersSection = defineSection({
   headingDefault: 'What sits underneath',
   fields: () => [
     ...headCopy(),
+    {
+      name: 'display',
+      type: 'select',
+      label: 'Display',
+      defaultValue: 'list',
+      options: [
+        { label: 'List (today\'s look)', value: 'list' },
+        { label: '3D stack', value: 'stack' },
+      ],
+      admin: { description: 'A 3D stack of slabs beside the row cards, instead of the plain list.' },
+    },
     {
       name: 'layers',
       type: 'array',
@@ -106,6 +119,7 @@ export const hubLayersSection = defineSection({
         },
       ],
     },
+    motionFields({ autoplay: true, speed: true }),
   ],
 })
 
@@ -187,6 +201,7 @@ export const hubTrustSection = defineSection({
         iconField(undefined, { description: 'From the shared icon library.' }),
       ],
     },
+    motionFields(),
   ],
 })
 

@@ -1,3 +1,4 @@
+import { motionFields } from '../../fields/motion'
 import { defineSection } from './defineSection'
 
 /**
@@ -45,6 +46,7 @@ export const faqSection = defineSection({
   reads: ['faqs'],
   requiredWhenOn: ['faqs'],
   headingDefault: 'Questions about {name}',
+  fields: [motionFields()],
 })
 
 // Falls back to other entries in the same grouping, so nothing is required.
@@ -64,4 +66,5 @@ export const closingSection = defineSection({
   requiredWhenOn: [],
   headingDefault: 'See {name} at work',
   navyAllowed: true,
+  fields: [motionFields()],
 })

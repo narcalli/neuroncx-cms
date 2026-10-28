@@ -1,4 +1,5 @@
 import type { Block } from 'payload'
+import { motionFields } from '../../fields/motion'
 
 /**
  * "Some relationships run for months": a horizontal episode bar with points
@@ -33,8 +34,22 @@ export const AgenticEpisode: Block = {
       fields: [
         { name: 'label', type: 'text', label: 'Point label', required: true, maxLength: 40 },
         { name: 'caption', type: 'text', label: 'What attaches here', required: true, maxLength: 140 },
+        {
+          name: 'isBranch',
+          type: 'checkbox',
+          label: 'Only happens in some cases, such as a lost or expired link',
+          defaultValue: false,
+        },
+        {
+          name: 'branchLabel',
+          type: 'text',
+          label: 'Branch note',
+          defaultValue: 'Only if needed',
+          maxLength: 24,
+        },
       ],
     },
     { name: 'closing', type: 'text', label: 'Caption under the bar', maxLength: 160 },
+    motionFields({ autoplay: true, speed: true }),
   ],
 }

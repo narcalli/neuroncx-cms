@@ -21,6 +21,8 @@ import { slugRule } from '../../fields/core'
 import { chatExampleFields } from '../../fields/chatExample'
 import { showClosingField } from '../../fields/closing'
 import { countedText } from '../../fields/counted'
+import { iconField } from '../../fields/icons'
+import { motionFields, pageMotionField } from '../../fields/motion'
 import { faqTab } from '../../fields/faq'
 import { kbaseTab } from '../../fields/kbase'
 import { sectionBlocksField } from '../../fields/layout'
@@ -123,6 +125,7 @@ export const buildHubs = (): CollectionConfig => {
         description: "The hub shown at the collection's address, such as /bot-swarm.",
       },
     },
+    pageMotionField(),
   ]
 
   const hero: Tab = {
@@ -145,6 +148,12 @@ export const buildHubs = (): CollectionConfig => {
       },
       countedText({ name: 'eyebrow', label: 'Eyebrow (optional)', maxLength: 40 }),
       countedText({ name: 'h1', label: 'Page heading (H1)', maxLength: 70, required: true }),
+      countedText({
+        name: 'heroUnderlineWord',
+        label: 'Underlined word (optional)',
+        maxLength: 20,
+        description: 'A word from the heading above, underlined in crimson once the page loads. Must appear in the heading exactly as typed.',
+      }),
       countedText({ name: 'subheading', label: 'Subheading', textarea: true, maxLength: 200 }),
       {
         name: 'heroChips',
@@ -172,8 +181,38 @@ export const buildHubs = (): CollectionConfig => {
         }),
         captionDescription: 'Under the chat in the standard design, at the top of the chat in the conversation design.',
       }),
+      {
+        name: 'heroBadges',
+        type: 'array',
+        label: 'Badges (optional)',
+        labels: { singular: 'Badge', plural: 'Badges' },
+        maxRows: 3,
+        admin: {
+          description:
+            'Up to 3 small cards that float beside the chat in the conversation design, and ping when the chat row below arrives.',
+        },
+        fields: [
+          {
+            type: 'row',
+            fields: [
+              countedText({ name: 'label', label: 'Label', maxLength: 30, required: true }),
+              iconField(undefined, { description: 'From the shared icon library.' }),
+              {
+                name: 'chatRow',
+                type: 'number',
+                label: 'Chat row',
+                min: 1,
+                max: 8,
+                admin: { description: 'Which message in the Chat above (1 for the first) pings this badge when it arrives.' },
+              },
+            ],
+          },
+        ],
+      },
       optionalCta('heroCta', 'Main button'),
       optionalCta('heroSecondaryCta', 'Second button'),
+      // The hero's own animation: the load sequence and the chat, which plays and loops.
+      motionFields({ autoplay: true, loop: true, speed: true, group: { name: 'heroAnimation', label: 'Hero animation' } }),
     ],
   }
 

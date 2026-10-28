@@ -1,4 +1,19 @@
-import type { GlobalConfig } from 'payload'
+import type { GlobalAfterChangeHook, GlobalConfig } from 'payload'
+
+import { revalidateContent } from '../content/revalidate'
+import { siteAnimationsField } from '../fields/motion'
+
+/** A new Animations setting reaches every page: the website refreshes all of them. */
+const refreshEveryPage: GlobalAfterChangeHook = async ({ doc, previousDoc, req }) => {
+  if (req.context?.disableRevalidate || doc?.animations === previousDoc?.animations) return doc
+  await revalidateContent({
+    collection: 'siteSettings',
+    paths: ['/'],
+    reason: `animations ${previousDoc?.animations ?? 'on'} to ${doc?.animations}`,
+    logger: req.payload?.logger,
+  })
+  return doc
+}
 
 /**
  * Site-wide settings: browser icons, the default page title and description,
@@ -11,7 +26,14 @@ export const SiteSettings: GlobalConfig = {
   access: {
     read: () => true,
   },
+  hooks: { afterChange: [refreshEveryPage] },
   fields: [
+    {
+      type: 'collapsible',
+      label: 'Animations',
+      admin: { initCollapsed: false },
+      fields: [siteAnimationsField],
+    },
     {
       type: 'collapsible',
       label: 'Browser icons',

@@ -42,6 +42,7 @@ import { AgenticStats } from './AgenticStats/config'
 import { AgenticCartsDemo } from './AgenticCartsDemo/config'
 import { AgenticOrbit } from './AgenticOrbit/config'
 import { AgenticEpisode } from './AgenticEpisode/config'
+import { SwarmDiagram } from './SwarmDiagram/config'
 import { AgenticCases } from './AgenticCases/config'
 import { AgenticClosing } from './AgenticClosing/config'
 import { UseCases } from './UseCases/config'
@@ -85,6 +86,7 @@ export const PAGE_LAYOUT_BLOCKS: Block[] = [
     AgenticCartsDemo,
     AgenticOrbit,
     AgenticEpisode,
+    SwarmDiagram,
     AgenticCases,
     // Was on the minimal set while it painted its own opaque
     // gradient. Wave 6 put that gradient on --ncx-cloud, which the

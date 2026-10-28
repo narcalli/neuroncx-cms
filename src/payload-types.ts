@@ -136,6 +136,7 @@ export interface Config {
     agenticCartsDemo: AgenticCartsDemoBlock;
     agenticOrbit: AgenticOrbitBlock;
     agenticEpisode: AgenticEpisodeBlock;
+    swarmDiagram: SwarmDiagramBlock;
     agenticCases: AgenticCasesBlock;
     agenticClosing: AgenticClosingBlock;
     integrationsMarquee: IntegrationsMarqueeBlock;
@@ -426,6 +427,10 @@ export interface FaqSection {
    */
   heading?: string | null;
   /**
+   * Reduced keeps a simple fade. Off shows the block with no animation.
+   */
+  motion?: ('follow' | 'on' | 'reduced' | 'off') | null;
+  /**
    * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
@@ -483,6 +488,10 @@ export interface ClosingSection {
    * Leave empty to show the default heading: "See {name} at work". Words in braces, such as {name}, are filled in for each entry.
    */
   heading?: string | null;
+  /**
+   * Reduced keeps a simple fade. Off shows the block with no animation.
+   */
+  motion?: ('follow' | 'on' | 'reduced' | 'off') | null;
   /**
    * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
@@ -705,6 +714,15 @@ export interface HubStepsSection {
     label?: string | null;
   };
   /**
+   * Reduced keeps a simple fade. Off shows the block with no animation.
+   */
+  motion?: ('follow' | 'on' | 'reduced' | 'off') | null;
+  /**
+   * Plays once when it comes into view. Off shows the finished state.
+   */
+  autoplay?: boolean | null;
+  speed?: ('slower' | 'normal' | 'faster') | null;
+  /**
    * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
@@ -795,6 +813,7 @@ export interface Page {
     | AgenticCartsDemoBlock
     | AgenticOrbitBlock
     | AgenticEpisodeBlock
+    | SwarmDiagramBlock
     | AgenticCasesBlock
     | AgenticClosingBlock
     | IntegrationsMarqueeBlock
@@ -864,6 +883,10 @@ export interface Page {
    * The links back to the pillar page and on to the next stage, shown at the foot of every cluster page.
    */
   hideClusterFooter?: boolean | null;
+  /**
+   * Follow the site setting, or set this page on its own. The strictest of the site, page and block settings wins.
+   */
+  pageMotion?: ('follow' | 'on' | 'reduced' | 'off') | null;
   /**
    * Built from the parent page on save. The last row is this page and its path.
    */
@@ -2767,6 +2790,10 @@ export interface Sector {
    */
   usePageDefaults?: boolean | null;
   /**
+   * Follow the site setting, or set this page on its own. The strictest of the site, page and block settings wins.
+   */
+  pageMotion?: ('follow' | 'on' | 'reduced' | 'off') | null;
+  /**
    * A shorter name for menus, such as Education. Empty uses the name.
    */
   menuLabel?: string | null;
@@ -2999,6 +3026,7 @@ export interface Sector {
         | AgenticCartsDemoBlock
         | AgenticOrbitBlock
         | AgenticEpisodeBlock
+        | SwarmDiagramBlock
         | AgenticCasesBlock
         | AgenticClosingBlock
         | IntegrationsMarqueeBlock
@@ -4810,6 +4838,15 @@ export interface HowItWorks2Block {
       }[]
     | null;
   /**
+   * Reduced keeps a simple fade. Off shows the block with no animation.
+   */
+  motion?: ('follow' | 'on' | 'reduced' | 'off') | null;
+  /**
+   * Plays once when it comes into view. Off shows the finished state.
+   */
+  autoplay?: boolean | null;
+  speed?: ('slower' | 'normal' | 'faster') | null;
+  /**
    * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
@@ -5540,6 +5577,10 @@ export interface AgenticFlowDemoBlock {
     | null;
   footnote?: string | null;
   /**
+   * Reduced keeps a simple fade. Off shows the block with no animation.
+   */
+  motion?: ('follow' | 'on' | 'reduced' | 'off') | null;
+  /**
    * Empty hides it.
    */
   promptLabel?: string | null;
@@ -5773,6 +5814,10 @@ export interface MicroApp {
    * On: the page follows the default layout, and changes to the default reach it. Off: the layout on the Page tab is this page's own.
    */
   usePageDefaults?: boolean | null;
+  /**
+   * Follow the site setting, or set this page on its own. The strictest of the site, page and block settings wins.
+   */
+  pageMotion?: ('follow' | 'on' | 'reduced' | 'off') | null;
   /**
    * Where the agent works.
    */
@@ -6843,10 +6888,21 @@ export interface AgenticEpisodeBlock {
     | {
         label: string;
         caption: string;
+        isBranch?: boolean | null;
+        branchLabel?: string | null;
         id?: string | null;
       }[]
     | null;
   closing?: string | null;
+  /**
+   * Reduced keeps a simple fade. Off shows the block with no animation.
+   */
+  motion?: ('follow' | 'on' | 'reduced' | 'off') | null;
+  /**
+   * Plays once when it comes into view. Off shows the finished state.
+   */
+  autoplay?: boolean | null;
+  speed?: ('slower' | 'normal' | 'faster') | null;
   /**
    * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
@@ -6866,6 +6922,60 @@ export interface AgenticEpisodeBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'agenticEpisode';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SwarmDiagramBlock".
+ */
+export interface SwarmDiagramBlock {
+  eyebrow?: string | null;
+  heading: string;
+  intro?: string | null;
+  /**
+   * Up to 3 figures above the diagram. Leave a value empty to count it from the live and pilot agents: the first from how many there are, the second from how many families they fall into, the third is always 1, for the one shared customer record.
+   */
+  facts?:
+    | {
+        value?: string | null;
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Shown under the diagram when motion is off, in place of the handover it would otherwise name.
+   */
+  caption?: string | null;
+  /**
+   * Reduced keeps a simple fade. Off shows the block with no animation.
+   */
+  motion?: ('follow' | 'on' | 'reduced' | 'off') | null;
+  /**
+   * Plays once when it comes into view. Off shows the finished state.
+   */
+  autoplay?: boolean | null;
+  /**
+   * Plays again while it stays on screen. Off plays it once.
+   */
+  loop?: boolean | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'swarmDiagram';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -7465,6 +7575,10 @@ export interface ClosingCTABlock {
    * Optional, shown in italics. Keep it to a line, not a sentence.
    */
   tagline?: string | null;
+  /**
+   * Reduced keeps a simple fade. Off shows the block with no animation.
+   */
+  motion?: ('follow' | 'on' | 'reduced' | 'off') | null;
   /**
    * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
@@ -8522,6 +8636,10 @@ export interface FAQBlock {
    */
   anchorId?: string | null;
   emitSchema?: boolean | null;
+  /**
+   * Reduced keeps a simple fade. Off shows the block with no animation.
+   */
+  motion?: ('follow' | 'on' | 'reduced' | 'off') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'faq';
@@ -8979,6 +9097,10 @@ export interface HubLayersSection {
    * One or two sentences under the heading.
    */
   intro?: string | null;
+  /**
+   * A 3D stack of slabs beside the row cards, instead of the plain list.
+   */
+  display?: ('list' | 'stack') | null;
   layers?:
     | {
         title: string;
@@ -9006,6 +9128,15 @@ export interface HubLayersSection {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Reduced keeps a simple fade. Off shows the block with no animation.
+   */
+  motion?: ('follow' | 'on' | 'reduced' | 'off') | null;
+  /**
+   * Plays once when it comes into view. Off shows the finished state.
+   */
+  autoplay?: boolean | null;
+  speed?: ('slower' | 'normal' | 'faster') | null;
   /**
    * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
@@ -9062,6 +9193,10 @@ export interface IndustryTopic {
    * Off (as a new page starts): the layout on the Page tab is this page's own, starting from the default. On: the page follows the default layout, and its blocks start empty again on the next save.
    */
   usePageDefaults?: boolean | null;
+  /**
+   * Follow the site setting, or set this page on its own. The strictest of the site, page and block settings wins.
+   */
+  pageMotion?: ('follow' | 'on' | 'reduced' | 'off') | null;
   /**
    * The topic page sits under this industry: the industry slug, then this slug.
    */
@@ -9292,6 +9427,7 @@ export interface IndustryTopic {
         | AgenticCartsDemoBlock
         | AgenticOrbitBlock
         | AgenticEpisodeBlock
+        | SwarmDiagramBlock
         | AgenticCasesBlock
         | AgenticClosingBlock
         | IntegrationsMarqueeBlock
@@ -9995,6 +10131,10 @@ export interface HubTrustSection {
       }[]
     | null;
   /**
+   * Reduced keeps a simple fade. Off shows the block with no animation.
+   */
+  motion?: ('follow' | 'on' | 'reduced' | 'off') | null;
+  /**
    * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
@@ -10165,6 +10305,10 @@ export interface Hub {
    */
   isMain?: boolean | null;
   /**
+   * Follow the site setting, or set this page on its own. The strictest of the site, page and block settings wins.
+   */
+  pageMotion?: ('follow' | 'on' | 'reduced' | 'off') | null;
+  /**
    * The search phrase this page should rank for, for example whatsapp crm integration.
    */
   primaryKeyword?: string | null;
@@ -10191,6 +10335,10 @@ export interface Hub {
   heroDesign?: ('standard' | 'conversation') | null;
   eyebrow?: string | null;
   h1: string;
+  /**
+   * A word from the heading above, underlined in crimson once the page loads. Must appear in the heading exactly as typed.
+   */
+  heroUnderlineWord?: string | null;
   subheading?: string | null;
   /**
    * Up to 4 short labels under the subheading.
@@ -10236,6 +10384,86 @@ export interface Hub {
    */
   heroChatCaption?: string | null;
   /**
+   * Up to 3 small cards that float beside the chat in the conversation design, and ping when the chat row below arrives.
+   */
+  heroBadges?:
+    | {
+        label: string;
+        /**
+         * From the shared icon library.
+         */
+        icon?:
+          | (
+              | 'message'
+              | 'chat'
+              | 'check'
+              | 'calendar'
+              | 'card'
+              | 'document'
+              | 'refresh'
+              | 'bolt'
+              | 'layers'
+              | 'gauge'
+              | 'plug'
+              | 'shield'
+              | 'shieldCheck'
+              | 'lock'
+              | 'globe'
+              | 'server'
+              | 'eye'
+              | 'users'
+              | 'user'
+              | 'phone'
+              | 'smartphone'
+              | 'mail'
+              | 'messageCircle'
+              | 'send'
+              | 'inbox'
+              | 'headphones'
+              | 'mic'
+              | 'video'
+              | 'bell'
+              | 'handshake'
+              | 'stethoscope'
+              | 'heartPulse'
+              | 'hospital'
+              | 'activity'
+              | 'flask'
+              | 'pill'
+              | 'graduationCap'
+              | 'building'
+              | 'mapPin'
+              | 'database'
+              | 'cloud'
+              | 'workflow'
+              | 'bot'
+              | 'sparkles'
+              | 'search'
+              | 'chart'
+              | 'trendingUp'
+              | 'target'
+              | 'rocket'
+              | 'key'
+              | 'fileText'
+              | 'clipboardList'
+              | 'link'
+              | 'settings'
+              | 'puzzle'
+              | 'timer'
+              | 'clock'
+              | 'badgeCheck'
+              | 'star'
+              | 'briefcase'
+            )
+          | null;
+        /**
+         * Which message in the Chat above (1 for the first) pings this badge when it arrives.
+         */
+        chatRow?: number | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
    * Optional. Leave the label empty to hide this button.
    */
   heroCta?: {
@@ -10270,6 +10498,21 @@ export interface Hub {
         } | null);
     url?: string | null;
     label?: string | null;
+  };
+  heroAnimation?: {
+    /**
+     * Reduced keeps a simple fade. Off shows the block with no animation.
+     */
+    motion?: ('follow' | 'on' | 'reduced' | 'off') | null;
+    /**
+     * Plays once when it comes into view. Off shows the finished state.
+     */
+    autoplay?: boolean | null;
+    /**
+     * Plays again while it stays on screen. Off plays it once.
+     */
+    loop?: boolean | null;
+    speed?: ('slower' | 'normal' | 'faster') | null;
   };
   groupingSections?:
     | {
@@ -10364,6 +10607,7 @@ export interface Hub {
         | AgenticCartsDemoBlock
         | AgenticOrbitBlock
         | AgenticEpisodeBlock
+        | SwarmDiagramBlock
         | AgenticCasesBlock
         | AgenticClosingBlock
         | IntegrationsMarqueeBlock
@@ -11011,6 +11255,7 @@ export interface PagesSelect<T extends boolean = true> {
         agenticCartsDemo?: T | AgenticCartsDemoBlockSelect<T>;
         agenticOrbit?: T | AgenticOrbitBlockSelect<T>;
         agenticEpisode?: T | AgenticEpisodeBlockSelect<T>;
+        swarmDiagram?: T | SwarmDiagramBlockSelect<T>;
         agenticCases?: T | AgenticCasesBlockSelect<T>;
         agenticClosing?: T | AgenticClosingBlockSelect<T>;
         integrationsMarquee?: T | IntegrationsMarqueeBlockSelect<T>;
@@ -11061,6 +11306,7 @@ export interface PagesSelect<T extends boolean = true> {
   stage?: T;
   stageOrder?: T;
   hideClusterFooter?: T;
+  pageMotion?: T;
   breadcrumbs?:
     | T
     | {
@@ -11658,6 +11904,7 @@ export interface AgenticFlowDemoBlockSelect<T extends boolean = true> {
         id?: T;
       };
   footnote?: T;
+  motion?: T;
   promptLabel?: T;
   stageLabels?:
     | T
@@ -11800,9 +12047,43 @@ export interface AgenticEpisodeBlockSelect<T extends boolean = true> {
     | {
         label?: T;
         caption?: T;
+        isBranch?: T;
+        branchLabel?: T;
         id?: T;
       };
   closing?: T;
+  motion?: T;
+  autoplay?: T;
+  speed?: T;
+  background?: T;
+  width?: T;
+  spacingTop?: T;
+  spacingBottom?: T;
+  align?: T;
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SwarmDiagramBlock_select".
+ */
+export interface SwarmDiagramBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  intro?: T;
+  facts?:
+    | T
+    | {
+        value?: T;
+        label?: T;
+        id?: T;
+      };
+  caption?: T;
+  motion?: T;
+  autoplay?: T;
+  loop?: T;
   background?: T;
   width?: T;
   spacingTop?: T;
@@ -12055,6 +12336,9 @@ export interface HowItWorks2BlockSelect<T extends boolean = true> {
         description?: T;
         id?: T;
       };
+  motion?: T;
+  autoplay?: T;
+  speed?: T;
   background?: T;
   width?: T;
   spacingTop?: T;
@@ -12234,6 +12518,7 @@ export interface ClosingCTABlockSelect<T extends boolean = true> {
   secondaryLabel?: T;
   secondaryLink?: T;
   tagline?: T;
+  motion?: T;
   background?: T;
   width?: T;
   spacingTop?: T;
@@ -12742,6 +13027,7 @@ export interface FAQBlockSelect<T extends boolean = true> {
   background?: T;
   anchorId?: T;
   emitSchema?: T;
+  motion?: T;
   id?: T;
   blockName?: T;
 }
@@ -13054,6 +13340,7 @@ export interface SectorsSelect<T extends boolean = true> {
   isUSP?: T;
   hasOwnPage?: T;
   usePageDefaults?: T;
+  pageMotion?: T;
   menuLabel?: T;
   verticals?: T;
   path?: T;
@@ -13547,6 +13834,7 @@ export interface IndustryTopicsSelect<T extends boolean = true> {
   isUSP?: T;
   hasOwnPage?: T;
   usePageDefaults?: T;
+  pageMotion?: T;
   industry?: T;
   stage?: T;
   stageOrder?: T;
@@ -14442,6 +14730,7 @@ export interface MicroAppsSelect<T extends boolean = true> {
   isUSP?: T;
   hasOwnPage?: T;
   usePageDefaults?: T;
+  pageMotion?: T;
   channel?: T;
   verticals?: T;
   path?: T;
@@ -14619,6 +14908,7 @@ export interface HubsSelect<T extends boolean = true> {
   slug?: T;
   forCollection?: T;
   isMain?: T;
+  pageMotion?: T;
   primaryKeyword?: T;
   secondaryKeywords?:
     | T
@@ -14636,6 +14926,7 @@ export interface HubsSelect<T extends boolean = true> {
   heroDesign?: T;
   eyebrow?: T;
   h1?: T;
+  heroUnderlineWord?: T;
   subheading?: T;
   heroChips?:
     | T
@@ -14653,6 +14944,14 @@ export interface HubsSelect<T extends boolean = true> {
         id?: T;
       };
   heroChatCaption?: T;
+  heroBadges?:
+    | T
+    | {
+        label?: T;
+        icon?: T;
+        chatRow?: T;
+        id?: T;
+      };
   heroCta?:
     | T
     | {
@@ -14670,6 +14969,14 @@ export interface HubsSelect<T extends boolean = true> {
         reference?: T;
         url?: T;
         label?: T;
+      };
+  heroAnimation?:
+    | T
+    | {
+        motion?: T;
+        autoplay?: T;
+        loop?: T;
+        speed?: T;
       };
   groupingSections?:
     | T
@@ -15166,6 +15473,10 @@ export interface Footer {
 export interface SiteSetting {
   id: string;
   /**
+   * Turns animations on, down or off across the whole site. Reduced keeps a simple fade. Off shows every block with no animation.
+   */
+  animations: 'on' | 'reduced' | 'off';
+  /**
    * Main tab icon for modern browsers. Use a simple SVG with a square viewBox.
    */
   faviconSvg?: (string | null) | Media;
@@ -15413,6 +15724,7 @@ export interface FooterSelect<T extends boolean = true> {
  * via the `definition` "siteSettings_select".
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
+  animations?: T;
   faviconSvg?: T;
   faviconIco?: T;
   favicon32?: T;

@@ -1,5 +1,7 @@
 import type { Block } from 'payload'
 
+import { motionFields } from '../../fields/motion'
+
 export const ClosingCTA: Block = {
   slug: 'closingCta',
   interfaceName: 'ClosingCTABlock',
@@ -23,5 +25,6 @@ export const ClosingCTA: Block = {
       label: 'Tagline under the buttons',
       admin: { description: 'Optional, shown in italics. Keep it to a line, not a sentence.' },
     },
+    motionFields(),
   ],
 }

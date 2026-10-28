@@ -10,6 +10,8 @@ import { generatePreviewPath } from '../../utilities/generatePreviewPath'
 import { revalidateDelete, revalidatePage } from './hooks/revalidatePage'
 import { validateHighlight } from './hooks/validateHighlight'
 import { createBreadcrumbsField, createParentField } from '@payloadcms/plugin-nested-docs'
+
+import { pageMotionField } from '../../fields/motion'
 import { pageSlugClashCheck } from '../../content/paths'
 import {
   notePublishedPath,
@@ -201,6 +203,7 @@ export const Pages: CollectionConfig<'pages'> = {
         description: 'The links back to the pillar page and on to the next stage, shown at the foot of every cluster page.',
       },
     },
+    pageMotionField(),
     createBreadcrumbsField('pages', {
       label: 'Breadcrumbs (set on save)',
       localized: false,

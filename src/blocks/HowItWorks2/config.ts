@@ -1,4 +1,5 @@
 import type { Block } from 'payload'
+import { motionFields } from '../../fields/motion'
 
 /**
  * How it works 2: numbered circles on a line, one column per step. The
@@ -33,5 +34,6 @@ export const HowItWorks2: Block = {
         { name: 'description', type: 'textarea', required: true, maxLength: 140 },
       ],
     },
+    motionFields({ autoplay: true, speed: true }),
   ],
 }

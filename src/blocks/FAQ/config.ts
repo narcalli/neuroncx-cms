@@ -11,11 +11,15 @@ import {
 } from '@payloadcms/richtext-lexical'
 import type { TextFieldSingleValidation } from 'payload'
 
+import { motionFields } from '../../fields/motion'
+
 /**
  * A reusable FAQ list: a heading, an optional intro line, and a set of
- * question/answer pairs rendered as native <details>/<summary>, so opening
- * one needs no client JS. Answers are intentionally restricted to short,
- * simply formatted text — see the admin description on the array below.
+ * question/answer pairs rendered as native <details>/<summary>. With no
+ * script, or motion off, opening one is still instant, driven by the [open]
+ * attribute alone; at level on, a click is caught and played as an
+ * animation instead. Answers are intentionally restricted to short, simply
+ * formatted text, as the admin description on the array below explains.
  *
  * Self-contained, not wrapped with withPresentation/withMinimalPresentation:
  * its own `background` (white/cloud) and `anchorId` fields cover the same
@@ -128,5 +132,6 @@ export const FAQ: Block = {
       label: 'Output FAQPage structured data',
       defaultValue: true,
     },
+    motionFields(),
   ],
 }

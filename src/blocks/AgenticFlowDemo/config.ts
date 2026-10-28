@@ -1,5 +1,6 @@
 import type { Block, Condition, Field, SelectField } from 'payload'
 import { VERTICAL_OPTIONS } from '../../fields/verticals'
+import { motionFields } from '../../fields/motion'
 
 const isFlow: Condition = (_data, siblingData) => siblingData?.mode !== 'agentFeatures'
 const isAgentFeatures: Condition = (_data, siblingData) => siblingData?.mode === 'agentFeatures'
@@ -435,6 +436,8 @@ export const AgenticFlowDemo: Block = {
       defaultValue: 'Illustrative run, not live data.',
       admin: { condition: isFlow },
     },
+    // The agent explorer's animation, set per block. Its own autoplay (Flow mode) stays on the Design tab.
+    motionFields(),
     designTab,
   ],
 }

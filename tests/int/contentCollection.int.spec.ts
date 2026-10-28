@@ -113,6 +113,8 @@ describe('admin layout', () => {
       'isUSP',
       'hasOwnPage',
       'usePageDefaults',
+      // Animations on the entry's page, for every collection with a route.
+      'pageMotion',
       // The stored address, last: it is worked out from the fields above.
       'path',
     ])

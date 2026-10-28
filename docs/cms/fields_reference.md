@@ -214,6 +214,11 @@ Not field groups, but used across collections and blocks.
 | Lists | `src/collections/Lists` | One editable collection for small lists: CRM areas and agent families, with a `type` field |
 | WhatsApp lists | `src/WhatsappLists/config.ts` | The `whatsappLists` global: list button and section title per collection |
 | Card design | `src/fields/cardDesign.ts` | A block field group, not a collection group. `cardDesignFields({ designs, defaultDesign })` adds the design picker, columns, last row, category headings, link text, the feature look and the "All integrations" card option. Defaults live in `CARD_DESIGN_DEFAULTS`, which the website mirrors in `src/components/cards/defaults.ts` |
+| Animations (site) | `src/fields/motion.ts`, `siteAnimationsField` | On Site Settings: `animations` (select): on (default), reduced, off. Turns animations on, down or off across the whole site. Changing it refreshes every page |
+| Animations on this page | `src/fields/motion.ts`, `pageMotionField()` | `pageMotion` (select, sidebar): follow site (default), on, reduced, off. On Pages, hubs, and every collection with a route (added by `defineContentCollection`) |
+| Motion (block) | `src/fields/motion.ts`, `motionFields({ autoplay, loop, speed, group })` | A Motion panel, collapsed by default: `motion` (select): follow page (default), on, reduced, off; `autoplay` (checkbox, default on) for blocks that play a sequence; `loop` (checkbox, default on) for blocks that loop; `speed` (select): slower, normal (default), faster. The config picks which of autoplay, loop and speed a block gets. `group` keeps them under one name where they sit on a record (a hub's `heroAnimation`) |
+
+**Which animation switch wins:** the strictest. A visitor whose system asks for less motion always gets the final state. Otherwise site off beats everything, then the page, then the block; a page or block left to follow adds nothing. Reduced keeps a simple fade and drops loops, tilt and 3D. On today: the hub hero (autoplay, loop, speed), the hub steps and layers sections (autoplay, speed), the hub trust section, How it works 2 (autoplay, speed), the Episode Timeline block (autoplay, speed), the agent explorer (Agentic Flow Demo), and the faq and closing panel sections. The website combines them in `src/motion/` (neuroncx-website).
 
 ## Open items
 
