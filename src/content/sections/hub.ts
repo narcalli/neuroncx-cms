@@ -79,7 +79,9 @@ export const hubStepsSection = defineSection({
     step('handsOver', 'Hands over'),
     step('records', 'Records'),
     optionalCta('cta', 'Button under the steps (optional)'),
-    motionFields({ autoplay: true, speed: true }),
+    // The steps are drawn by the How it works block, which has nothing that
+    // plays on its own, so no Play on its own or Speed here.
+    motionFields(),
   ],
 })
 

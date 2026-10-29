@@ -718,11 +718,6 @@ export interface HubStepsSection {
    */
   motion?: ('follow' | 'on' | 'reduced' | 'off') | null;
   /**
-   * Plays once when it comes into view. Off shows the finished state.
-   */
-  autoplay?: boolean | null;
-  speed?: ('slower' | 'normal' | 'faster') | null;
-  /**
    * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
    */
   background?: ('default' | 'white' | 'cloud' | 'navy') | null;
