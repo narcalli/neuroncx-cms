@@ -3,6 +3,7 @@ import type { GlobalConfig } from 'payload'
 import { iconField } from '../fields/icons'
 import { link } from '../fields/link'
 import { revalidateHeader } from './hooks/revalidateHeader'
+import { revalidateGlobalOnSite } from '@/hooks/revalidateOnSite'
 
 const isLink = (_: unknown, siblingData: { type?: string } | undefined) => siblingData?.type !== 'megaMenu'
 
@@ -299,6 +300,7 @@ export const Header: GlobalConfig = {
     },
   ],
   hooks: {
-    afterChange: [revalidateHeader],
+    // The website first: revalidateHeader only reaches the CMS's own cache.
+    afterChange: [revalidateGlobalOnSite('header'), revalidateHeader],
   },
 }

@@ -16,6 +16,7 @@ import { iconField } from '../fields/icons'
 import { plainText } from '../fields/validators/plainText'
 import { checklistFields } from './integrations/checklist'
 import { categoryAutoRowDescription } from './integrations/hooks'
+import { revalidateOnSite } from '../hooks/revalidateOnSite'
 
 /**
  * The editable lists an integration is tagged with: its category, its
@@ -170,7 +171,12 @@ const taxonomy = (opts: {
     ...(opts.group ? { group: opts.group } : {}),
   },
   defaultSort: 'order',
-  hooks: { ...opts.hooks, beforeDelete: [refuseDeleteWhileUsed(opts.usedBy, opts.noun)] },
+  hooks: {
+    ...opts.hooks,
+    beforeDelete: [refuseDeleteWhileUsed(opts.usedBy, opts.noun)],
+    // Integrations show these by name, on their pages and in the lists.
+    afterChange: [...(opts.hooks?.afterChange ?? []), revalidateOnSite(opts.slug, () => ['/integrations'])],
+  },
   ...(opts.drafts ? { versions: { drafts: true } } : {}),
   fields: [...baseFields(Boolean(opts.capped)), ...(opts.fields || [])],
 })

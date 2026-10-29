@@ -1,6 +1,7 @@
 import type { GlobalConfig } from 'payload'
 import { link } from '@/fields/link'
 import { revalidateFooter } from './hooks/revalidateFooter'
+import { revalidateGlobalOnSite } from '@/hooks/revalidateOnSite'
 
 export const Footer: GlobalConfig = {
   slug: 'footer',
@@ -75,6 +76,7 @@ export const Footer: GlobalConfig = {
     },
   ],
   hooks: {
-    afterChange: [revalidateFooter],
+    // The website first: revalidateFooter only reaches the CMS's own cache.
+    afterChange: [revalidateGlobalOnSite('footer'), revalidateFooter],
   },
 }

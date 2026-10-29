@@ -10,6 +10,7 @@ import { link } from '../fields/link'
 import { plainText } from '../fields/validators/plainText'
 import { masterOneMain, masterSlugRule, onlyNameToken } from './integrations/hooks'
 import { integrationSeoTab, seoCheckField } from './integrations/seo'
+import { revalidateOnSite } from '../hooks/revalidateOnSite'
 
 /**
  * Integrations master: the landing pages for integrations, such as the main
@@ -149,6 +150,7 @@ export const IntegrationsMaster: CollectionConfig = {
   },
   hooks: {
     beforeChange: [masterOneMain],
+    afterChange: [revalidateOnSite('integrationsMaster', () => ['/integrations'])],
   },
   fields: [
     ...sidebar,

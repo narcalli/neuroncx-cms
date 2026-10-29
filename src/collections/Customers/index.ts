@@ -11,6 +11,10 @@ import { checkbox as validateCheckbox, text as validateText } from 'payload/shar
 import { authenticated } from '../../access/authenticated'
 import { storyLexical } from '../../fields/storyLexical'
 import { byLinked, revalidateIndustriesShowing } from '../Sectors/revalidate'
+import { revalidateOnSite, revalidateOnSiteAfterDelete } from '../../hooks/revalidateOnSite'
+
+// The customer's case study page and the customers page, on the website.
+const customerPaths = (d: { slug?: string | null }) => [d.slug ? `/customers/${d.slug}` : null, '/customers']
 
 /**
  * Customers, with an optional case study page of their own at
@@ -137,7 +141,8 @@ export const Customers: CollectionConfig = {
     beforeOperation: [noInferenceForVisitors],
     afterRead: [realNameForVisitors],
     // The industry pages whose Industry customers section shows it.
-    afterChange: [revalidateIndustriesShowing('industryCustomers', byLinked('sectors'))],
+    afterChange: [revalidateIndustriesShowing('industryCustomers', byLinked('sectors')), revalidateOnSite('customers', customerPaths)],
+    afterDelete: [revalidateOnSiteAfterDelete('customers', customerPaths)],
   },
   versions: {
     drafts: {

@@ -18,6 +18,10 @@ import {
   requiredForOwnPage,
 } from './integrations/hooks'
 import { integrationSeoTab, seoCheckField } from './integrations/seo'
+import { revalidateOnSite, revalidateOnSiteAfterDelete } from '../hooks/revalidateOnSite'
+
+// The integration's page and the integrations page, on the website.
+const integrationPaths = (d: { slug?: string | null }) => [d.slug ? `/integrations/${d.slug}` : null, '/integrations']
 
 // Visitors only ever get entries that are both published and Live. Drafts,
 // Pilot and Planned stay visible to logged-in editors only. Relationships
@@ -446,8 +450,8 @@ export const Integrations: CollectionConfig = {
   },
   hooks: {
     beforeChange: [itemFallbacks],
-    afterChange: [itemRefreshCategories, revalidateIndustriesForIntegration],
-    afterDelete: [itemRefreshCategoriesAfterDelete],
+    afterChange: [itemRefreshCategories, revalidateIndustriesForIntegration, revalidateOnSite('integrations', integrationPaths)],
+    afterDelete: [itemRefreshCategoriesAfterDelete, revalidateOnSiteAfterDelete('integrations', integrationPaths)],
   },
   fields: [
     {

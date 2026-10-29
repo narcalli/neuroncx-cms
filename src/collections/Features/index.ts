@@ -3,6 +3,7 @@ import { slugField } from 'payload'
 
 import { authenticated } from '../../access/authenticated'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
+import { revalidateOnSite, revalidateOnSiteAfterDelete } from '../../hooks/revalidateOnSite'
 
 export const Features: CollectionConfig = {
   slug: 'features',
@@ -85,6 +86,11 @@ export const Features: CollectionConfig = {
     },
     slugField(),
   ],
+  // The Feature thread block shows these on pages; the website refreshes its copy.
+  hooks: {
+    afterChange: [revalidateOnSite('features')],
+    afterDelete: [revalidateOnSiteAfterDelete('features')],
+  },
   versions: {
     drafts: {
       autosave: {

@@ -26,6 +26,10 @@ import {
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
 import { slugField } from 'payload'
+import { revalidateOnSite, revalidateOnSiteAfterDelete } from '../../hooks/revalidateOnSite'
+
+// The post's page and the posts index, on the website.
+const postPaths = (d: { slug?: string | null }) => [d.slug ? `/posts/${d.slug}` : null, '/posts']
 
 export const Posts: CollectionConfig<'posts'> = {
   slug: 'posts',
@@ -217,9 +221,9 @@ export const Posts: CollectionConfig<'posts'> = {
     slugField(),
   ],
   hooks: {
-    afterChange: [revalidatePost],
+    afterChange: [revalidateOnSite('posts', postPaths), revalidatePost],
     afterRead: [populateAuthors],
-    afterDelete: [revalidateDelete],
+    afterDelete: [revalidateOnSiteAfterDelete('posts', postPaths), revalidateDelete],
   },
   versions: {
     drafts: {

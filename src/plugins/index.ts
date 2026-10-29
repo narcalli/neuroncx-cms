@@ -9,6 +9,7 @@ import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { Page, Post } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
 import { pagePath } from '@/collections/Pages/nesting'
+import { revalidateOnSite } from '@/hooks/revalidateOnSite'
 
 const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
   return doc?.title ? `${doc.title} | Blog` : 'Blog'
@@ -46,7 +47,7 @@ export const plugins: Plugin[] = [
         })
       },
       hooks: {
-        afterChange: [revalidateRedirects],
+        afterChange: [revalidateOnSite('redirects'), revalidateRedirects],
       },
     },
   }),
