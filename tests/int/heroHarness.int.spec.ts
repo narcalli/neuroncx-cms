@@ -68,7 +68,7 @@ describe('the block', () => {
       'actionsName',
       'loopName',
     ])
-    expect(Object.keys(tab('Style'))).toEqual(['headingSize', 'spacing', 'introWidth', 'background'])
+    expect(Object.keys(tab('Style'))).toEqual(['headingSize', 'spacing', 'introWidth', 'background', 'blockWidth'])
     expect(Object.keys(tab('Behaviour'))).toEqual([
       'motion',
       'autoplay',
@@ -90,9 +90,9 @@ describe('the block', () => {
 })
 
 describe('the text', () => {
-  it('lays out stacked by default (version 1), or in a grid, or stacked with a small label', () => {
-    expect(values('textLayout')).toEqual(['stack', 'grid', 'stackWithLabel'])
-    expect(all.textLayout.defaultValue).toBe('stack')
+  it('lays out centred by default (version 4), or stacked, in a grid, or stacked with a small label', () => {
+    expect(values('textLayout')).toEqual(['centred', 'stack', 'grid', 'stackWithLabel'])
+    expect(all.textLayout.defaultValue).toBe('centred')
     expect(all.eyebrow).toMatchObject({ maxLength: 40, defaultValue: 'Agentic CRM and CX platform' })
     expect(all.eyebrow.admin.condition({}, { textLayout: 'stackWithLabel' })).toBe(true)
     expect(all.eyebrow.admin.condition({}, { textLayout: 'grid' })).toBe(false)
@@ -123,7 +123,12 @@ describe('the style', () => {
     expect(all.introWidth).toMatchObject({ type: 'number', min: 560, max: 900, defaultValue: 720 })
     // The grid layout caps the intro itself.
     expect(all.introWidth.admin.condition({}, { textLayout: 'grid' })).toBe(false)
+    expect(all.introWidth.admin.condition({}, { textLayout: 'centred' })).toBe(false)
     expect(all.introWidth.admin.condition({}, { textLayout: 'stack' })).toBe(true)
+    expect(all.introWidth.admin.condition({}, { textLayout: 'stackWithLabel' })).toBe(true)
+    // The site column as now, or the header's edges.
+    expect(values('blockWidth')).toEqual(['site', 'header'])
+    expect(all.blockWidth.defaultValue).toBe('site')
     expect(values('background')).toEqual(['cloud', 'white'])
     expect(all.background.defaultValue).toBe('cloud')
   })

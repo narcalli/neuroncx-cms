@@ -387,15 +387,16 @@ export const HeroHarness: Block = {
               type: 'select',
               label: 'Text layout',
               required: true,
-              defaultValue: 'stack',
+              defaultValue: 'centred',
               options: [
-                { label: 'Stacked: title, then the intro', value: 'stack' },
+                { label: 'Centred: title and intro centred above the cards and drawing', value: 'centred' },
+                { label: 'Stacked: title, then the intro, left aligned', value: 'stack' },
                 { label: 'Grid: the intro lines up with the drawing', value: 'grid' },
                 { label: 'Stacked, with a small label above the title', value: 'stackWithLabel' },
               ],
               admin: {
                 description:
-                  'How the title and intro sit above the cards and drawing. All three are left aligned. Stacked is the approved home page layout; grid starts the intro where the drawing starts.',
+                  'How the title and intro sit above the cards and drawing. Centred is the approved home page layout. Grid starts the intro where the drawing starts and runs it to the drawing\'s right edge.',
               },
             },
             {
@@ -514,8 +515,8 @@ export const HeroHarness: Block = {
                   admin: {
                     step: 10,
                     width: '50%',
-                    condition: (_, siblingData) => siblingData?.textLayout !== 'grid',
-                    description: 'The widest the intro gets in the two stacked layouts. In the grid layout it stops at 760px.',
+                    condition: (_, siblingData) => ['stack', 'stackWithLabel'].includes(siblingData?.textLayout),
+                    description: 'The widest the intro gets in the two stacked layouts. Centred stops at 860px; grid fills its column.',
                   },
                 },
                 {
@@ -531,6 +532,21 @@ export const HeroHarness: Block = {
                   admin: { width: '50%', description: 'The colour behind the whole hero.' },
                 },
               ],
+            },
+            {
+              name: 'blockWidth',
+              type: 'select',
+              label: 'Width',
+              required: true,
+              defaultValue: 'site',
+              options: [
+                { label: 'Site column, like the blocks below it', value: 'site' },
+                { label: 'Match the header: from under the logo to under the last header button', value: 'header' },
+              ],
+              admin: {
+                description:
+                  'How wide the title, cards and drawing run on laptops and desktops. Below 760px both use the normal phone margins.',
+              },
             },
           ],
         },

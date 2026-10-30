@@ -8646,9 +8646,9 @@ export interface FAQBlock {
  */
 export interface HeroHarnessBlock {
   /**
-   * How the title and intro sit above the cards and drawing. All three are left aligned. Stacked is the approved home page layout; grid starts the intro where the drawing starts.
+   * How the title and intro sit above the cards and drawing. Centred is the approved home page layout. Grid starts the intro where the drawing starts and runs it to the drawing's right edge.
    */
-  textLayout: 'stack' | 'grid' | 'stackWithLabel';
+  textLayout: 'centred' | 'stack' | 'grid' | 'stackWithLabel';
   /**
    * The short line above the title, with a red dot. Shown only with the "Stacked, with a small label" layout.
    */
@@ -8835,13 +8835,17 @@ export interface HeroHarnessBlock {
    */
   spacing: 'roomy' | 'compact';
   /**
-   * The widest the intro gets in the two stacked layouts. In the grid layout it stops at 760px.
+   * The widest the intro gets in the two stacked layouts. Centred stops at 860px; grid fills its column.
    */
   introWidth?: number | null;
   /**
    * The colour behind the whole hero.
    */
   background: 'cloud' | 'white';
+  /**
+   * How wide the title, cards and drawing run on laptops and desktops. Below 760px both use the normal phone margins.
+   */
+  blockWidth: 'site' | 'header';
   /**
    * How much this hero moves. Reduced keeps the card highlights but stops the dots. Off shows a still drawing.
    */
@@ -13102,6 +13106,7 @@ export interface HeroHarnessBlockSelect<T extends boolean = true> {
   spacing?: T;
   introWidth?: T;
   background?: T;
+  blockWidth?: T;
   motion?: T;
   autoplay?: T;
   loop?: T;
