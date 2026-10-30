@@ -28,8 +28,9 @@ const field = (config: { fields: any[] }, name: string) => flat(config.fields).f
 const refs = (config: { fields: any[] }) => field(config, 'layout').blockReferences as string[]
 const row = (blockType: string, extra: Doc = {}) => ({ blockType, ...extra })
 
-// Two heroes draw an H1 but are not layout heroes, so no row could hold them.
-const NOT_OFFERED = ['heroStack', 'integrationsLanding']
+// Heroes that draw an H1 but are not layout heroes, so no row could hold them.
+// Hero (harness loop) joins the layout heroes once the entry page draws it.
+const NOT_OFFERED = ['heroStack', 'integrationsLanding', 'heroHarness']
 
 describe('the block picker', () => {
   it('offers every Pages block on industries and industry topics, with their own sections', () => {

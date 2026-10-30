@@ -832,6 +832,7 @@ export interface Page {
     | HeroFullBackgroundBlock
     | HeroRightPlacementBlock
     | HeroCustomBlock
+    | HeroHarnessBlock
     | HeroWorkforceGridBlock
     | AgenticHeroBlock
     | ConversationHeroBlock
@@ -8641,6 +8642,252 @@ export interface FAQBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroHarnessBlock".
+ */
+export interface HeroHarnessBlock {
+  /**
+   * How the title and intro sit above the cards and drawing. All three are left aligned. Stacked is the approved home page layout; grid starts the intro where the drawing starts.
+   */
+  textLayout: 'stack' | 'grid' | 'stackWithLabel';
+  /**
+   * The short line above the title, with a red dot. Shown only with the "Stacked, with a small label" layout.
+   */
+  eyebrow?: string | null;
+  /**
+   * The page's main heading (the H1), so use this hero once per page. Press Enter where the line should break on laptops and desktops; phones ignore the break and wrap on their own.
+   */
+  headline: string;
+  /**
+   * One paragraph under the title. Line breaks are joined into one paragraph on the page.
+   */
+  intro: string;
+  /**
+   * Optional, up to 2, shown under the intro. The first is the main red button, the second a plain one. Empty shows no buttons.
+   */
+  buttons?:
+    | {
+        /**
+         * Link to a page or post on this site, or type any address.
+         */
+        type?: ('reference' | 'custom') | null;
+        /**
+         * Opens the link in a new browser tab.
+         */
+        newTab?: boolean | null;
+        /**
+         * The page or post the button opens.
+         */
+        reference?:
+          | ({
+              relationTo: 'pages';
+              value: string | Page;
+            } | null)
+          | ({
+              relationTo: 'posts';
+              value: string | Post;
+            } | null);
+        /**
+         * The address the button opens, such as /contact.
+         */
+        url?: string | null;
+        /**
+         * The words on the button. Empty hides the button.
+         */
+        label?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Where the cards sit on laptops and desktops. On phones they always sit below the drawing, in a row that scrolls sideways.
+   */
+  cardsPosition: 'left' | 'above';
+  /**
+   * 3 to 6 cards beside the drawing. Each one works like a tab: selecting it lights up its parts of the drawing and shows its explanation under the drawing.
+   */
+  cards: {
+    /**
+     * The only text on the card. 60 characters keeps it to two lines.
+     */
+    title: string;
+    /**
+     * Shown under the drawing while this card is selected. 160 characters keeps the caption to two lines.
+     */
+    body?: string | null;
+    /**
+     * The parts of the drawing this card lights up in red; the rest fade. The BYOC box lights the dashed box and keeps everything inside it at full strength.
+     */
+    highlights: (
+      | 'trigger'
+      | 'boundary'
+      | 'ontology'
+      | 'policy'
+      | 'guardrails'
+      | 'orchestration'
+      | 'actions'
+      | 'handover'
+      | 'customer360'
+      | 'loop'
+    )[];
+    id?: string | null;
+  }[];
+  /**
+   * The small heading on the event card. 15 characters keeps it inside the card.
+   */
+  triggerLabel: string;
+  /**
+   * The events the card shows, one at a time as the loop runs. 1 to 4; 14 characters each keeps them inside the card.
+   */
+  triggerEvents: {
+    /**
+     * Up to 14 characters, so it fits its place in the drawing.
+     */
+    label: string;
+    id?: string | null;
+  }[];
+  /**
+   * The small label in the top corner of the dashed box. 24 characters keeps it clear of the boxes below it.
+   */
+  boundaryLabel: string;
+  /**
+   * The heading of the ontology box. 20 characters keeps it on one line in the narrow phone drawing.
+   */
+  ontologyLabel: string;
+  /**
+   * Up to 3 small chips in the ontology box. They wrap onto two rows at most; the box has no room for a third.
+   */
+  ontologyItems?:
+    | {
+        /**
+         * Up to 18 characters, so it fits its place in the drawing.
+         */
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * The heading of the policy box. 18 characters keeps it on one line in both layouts.
+   */
+  policyLabel: string;
+  /**
+   * The small line under the policy heading. 20 characters keeps it inside the box.
+   */
+  policySub: string;
+  /**
+   * The large text in the navy box at the centre. 16 characters keeps it inside the box.
+   */
+  orchestrationLabel: string;
+  /**
+   * The small capitals under the orchestration heading. 18 characters keeps it inside the box.
+   */
+  orchestrationSubLabel: string;
+  /**
+   * The small label above the gate every action passes. 12 characters keeps it clear of the lines beside it.
+   */
+  guardrailsLabel: string;
+  /**
+   * What the agents do, one box each, after the guardrails. 2 to 5; 16 characters each keeps them inside their boxes.
+   */
+  actions: {
+    /**
+     * Up to 16 characters, so it fits its place in the drawing.
+     */
+    label: string;
+    id?: string | null;
+  }[];
+  /**
+   * The box for cases your team takes over. 16 characters keeps it inside the box.
+   */
+  handoverLabel: string;
+  /**
+   * The heading of the record box. 16 characters keeps it clear of the chips beside it.
+   */
+  customer360Label: string;
+  /**
+   * Up to 4 chips in the record box, on one row. Together they must fit the narrow phone drawing.
+   */
+  customer360Fields?:
+    | {
+        /**
+         * Up to 12 characters, so it fits its place in the drawing.
+         */
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * The label on the loop back into the box. On wide screens it splits into two lines beside the drawing, so each half must stay short.
+   */
+  loopLabel: string;
+  /**
+   * How the caption names the action boxes when a card lights them. 24 characters keeps the tag on one line.
+   */
+  actionsName: string;
+  /**
+   * How the caption names the loop back into the box when a card lights it. 24 characters keeps the tag on one line.
+   */
+  loopName: string;
+  /**
+   * The title size on large screens. It shrinks with the screen, down to 28px on phones.
+   */
+  headingSize: number;
+  /**
+   * The space above the title, between the title and intro, and above the cards and drawing. Compact brings more of the drawing above the fold.
+   */
+  spacing: 'roomy' | 'compact';
+  /**
+   * The widest the intro gets in the two stacked layouts. In the grid layout it stops at 760px.
+   */
+  introWidth?: number | null;
+  /**
+   * The colour behind the whole hero.
+   */
+  background: 'cloud' | 'white';
+  /**
+   * How much this hero moves. Reduced keeps the card highlights but stops the dots. Off shows a still drawing.
+   */
+  motion?: ('follow' | 'on' | 'reduced' | 'off') | null;
+  /**
+   * Moves through the cards on its own, one after another. It pauses while a visitor points at or tabs into the hero, and stops once they click a card.
+   */
+  autoplay?: boolean | null;
+  /**
+   * Keeps the dots running around the drawing while it is on screen. Off runs the loop once.
+   */
+  loop?: boolean | null;
+  /**
+   * How fast the dots travel around the drawing.
+   */
+  speed?: ('slower' | 'normal' | 'faster') | null;
+  /**
+   * How long each card stays selected while the hero moves through them on its own.
+   */
+  autoplaySeconds: number;
+  /**
+   * The short line on the drawing that names each step as the dots move.
+   */
+  showStatus?: boolean | null;
+  /**
+   * The selected card's explanation and the names of the lit parts, under the drawing.
+   */
+  showCaption?: boolean | null;
+  /**
+   * Read out in place of the drawing by screen readers. Say what the drawing shows in a sentence or two.
+   */
+  screenReaderDescription?: string | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'heroHarness';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "HeroStackBlock".
  */
 export interface HeroStackBlock {
@@ -11274,6 +11521,7 @@ export interface PagesSelect<T extends boolean = true> {
         heroFullBackground?: T | HeroFullBackgroundBlockSelect<T>;
         heroRightPlacement?: T | HeroRightPlacementBlockSelect<T>;
         heroCustom?: T | HeroCustomBlockSelect<T>;
+        heroHarness?: T | HeroHarnessBlockSelect<T>;
         heroWorkforceGrid?: T | HeroWorkforceGridBlockSelect<T>;
         agenticHero?: T | AgenticHeroBlockSelect<T>;
         conversationHero?: T | ConversationHeroBlockSelect<T>;
@@ -12780,6 +13028,88 @@ export interface HeroCustomBlockSelect<T extends boolean = true> {
   visualAlt?: T;
   aspect?: T;
   maxWidth?: T;
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroHarnessBlock_select".
+ */
+export interface HeroHarnessBlockSelect<T extends boolean = true> {
+  textLayout?: T;
+  eyebrow?: T;
+  headline?: T;
+  intro?: T;
+  buttons?:
+    | T
+    | {
+        type?: T;
+        newTab?: T;
+        reference?: T;
+        url?: T;
+        label?: T;
+        id?: T;
+      };
+  cardsPosition?: T;
+  cards?:
+    | T
+    | {
+        title?: T;
+        body?: T;
+        highlights?: T;
+        id?: T;
+      };
+  triggerLabel?: T;
+  triggerEvents?:
+    | T
+    | {
+        label?: T;
+        id?: T;
+      };
+  boundaryLabel?: T;
+  ontologyLabel?: T;
+  ontologyItems?:
+    | T
+    | {
+        label?: T;
+        id?: T;
+      };
+  policyLabel?: T;
+  policySub?: T;
+  orchestrationLabel?: T;
+  orchestrationSubLabel?: T;
+  guardrailsLabel?: T;
+  actions?:
+    | T
+    | {
+        label?: T;
+        id?: T;
+      };
+  handoverLabel?: T;
+  customer360Label?: T;
+  customer360Fields?:
+    | T
+    | {
+        label?: T;
+        id?: T;
+      };
+  loopLabel?: T;
+  actionsName?: T;
+  loopName?: T;
+  headingSize?: T;
+  spacing?: T;
+  introWidth?: T;
+  background?: T;
+  motion?: T;
+  autoplay?: T;
+  loop?: T;
+  speed?: T;
+  autoplaySeconds?: T;
+  showStatus?: T;
+  showCaption?: T;
+  screenReaderDescription?: T;
   hidden?: T;
   htmlId?: T;
   id?: T;

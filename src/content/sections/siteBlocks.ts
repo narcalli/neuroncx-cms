@@ -61,6 +61,7 @@ export const NEVER_IN_LAYOUT = [
   'heroFullBackground',
   'heroRightPlacement',
   'heroCustom',
+  'heroHarness',
   'heroWorkforceGrid',
   'agenticHero',
   'integrationsLanding',
@@ -99,6 +100,9 @@ export const LAYOUT_HERO_BLOCKS = [
   'heroRightPlacement',
   'heroWorkforceGrid',
   'agenticHero',
+  // Hero (harness loop) is left out until the website's entry page draws it
+  // (neuroncx-website src/components/industry/IndustryEntryPage.tsx,
+  // LAYOUT_HERO_BLOCKS). Add 'heroHarness' here and there together.
 ] as const
 
 /** Every block that draws a page's H1: the layout heroes, and two that only their own pages use. */

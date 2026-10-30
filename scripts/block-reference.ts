@@ -33,7 +33,7 @@ const PROD_URL = process.env.PROD_URL ?? 'https://main.duebzy83yxxuo.amplifyapp.
 // hero set to none.
 const H1_BLOCKS = new Set([
   'conversationHero', 'statHero', 'heroFullBackground', 'heroRightPlacement', 'heroWorkforceGrid', 'agenticHero',
-  'heroCustom', 'heroStack', 'integrationsLanding',
+  'heroCustom', 'heroHarness', 'heroStack', 'integrationsLanding',
 ])
 
 // Where a config's own doc comment no longer matches what the block draws.
