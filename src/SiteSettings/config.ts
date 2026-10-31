@@ -1,5 +1,6 @@
 import type { GlobalAfterChangeHook, GlobalConfig } from 'payload'
 
+import { validateWhatsappPhone } from '../blocks/WhatsappWidget/config'
 import { revalidateContent } from '../content/revalidate'
 import { siteAnimationsField } from '../fields/motion'
 
@@ -17,7 +18,8 @@ const refreshEveryPage: GlobalAfterChangeHook = async ({ doc, previousDoc, req }
 
 /**
  * Site-wide settings: browser icons, the default page title and description,
- * the default share image, and the web app manifest. Every upload is optional.
+ * the default share image, the web app manifest and the WhatsApp button. Every
+ * upload is optional.
  * Leave a field empty and the website uses its built-in default for it.
  */
 export const SiteSettings: GlobalConfig = {
@@ -33,6 +35,64 @@ export const SiteSettings: GlobalConfig = {
       label: 'Animations',
       admin: { initCollapsed: false },
       fields: [siteAnimationsField],
+    },
+    {
+      name: 'whatsappButton',
+      type: 'group',
+      label: 'WhatsApp button',
+      admin: {
+        description:
+          'One button on every page. While it is on, any WhatsApp widget block placed on a page shows nothing.',
+      },
+      fields: [
+        {
+          name: 'enabled',
+          type: 'checkbox',
+          label: 'Show the button',
+          defaultValue: false,
+        },
+        {
+          name: 'phone',
+          type: 'text',
+          label: 'WhatsApp number (E.164)',
+          admin: {
+            description:
+              'For example +919876543210. Used to build the chat link; the number itself is not shown on the page.',
+            condition: (_, siblingData) => Boolean(siblingData?.enabled),
+          },
+          validate: validateWhatsappPhone,
+        },
+        {
+          name: 'message',
+          type: 'textarea',
+          label: 'Prefilled message',
+          admin: {
+            description: 'What the visitor sends. The page reference is appended to it.',
+            condition: (_, siblingData) => Boolean(siblingData?.enabled),
+          },
+        },
+        {
+          name: 'label',
+          type: 'text',
+          label: 'Button text (up to 20 characters)',
+          maxLength: 20,
+          defaultValue: 'Chat',
+          admin: { condition: (_, siblingData) => Boolean(siblingData?.enabled) },
+        },
+        {
+          name: 'hideOnPages',
+          type: 'relationship',
+          relationTo: 'pages',
+          hasMany: true,
+          // Ids only: this global is read on every request, and the website looks up just the addresses.
+          maxDepth: 0,
+          label: 'Hide on these pages (optional)',
+          admin: {
+            description: 'CMS pages only. Pages from other collections always show the button.',
+            condition: (_, siblingData) => Boolean(siblingData?.enabled),
+          },
+        },
+      ],
     },
     {
       type: 'collapsible',

@@ -1,5 +1,14 @@
 import type { Block } from 'payload'
 
+/** A WhatsApp number in E.164 form, required once the button it belongs to is switched on. */
+export const validateWhatsappPhone = (value: string | null | undefined, { siblingData }: any) => {
+  if (!siblingData?.enabled) return true
+  if (!value) return 'A WhatsApp number is required when the widget is on.'
+  return /^\+[1-9]\d{7,14}$/.test(value.trim())
+    ? true
+    : 'Use E.164 form: a plus sign, country code, then the number, e.g. +919876543210.'
+}
+
 /**
  * A page-level block rather than site chrome, so it can be switched on for
  * the pages where a chat enquiry makes sense without a deploy.
@@ -24,13 +33,7 @@ export const WhatsappWidget: Block = {
           'In E.164 form, e.g. +919876543210. Used to build the chat link; the number itself is not shown on the page.',
         condition: (_, siblingData) => Boolean(siblingData?.enabled),
       },
-      validate: (value: string | null | undefined, { siblingData }: any) => {
-        if (!siblingData?.enabled) return true
-        if (!value) return 'A WhatsApp number is required when the widget is on.'
-        return /^\+[1-9]\d{7,14}$/.test(value.trim())
-          ? true
-          : 'Use E.164 form: a plus sign, country code, then the number, e.g. +919876543210.'
-      },
+      validate: validateWhatsappPhone,
     },
     {
       name: 'label',
