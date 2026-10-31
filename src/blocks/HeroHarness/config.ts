@@ -255,8 +255,8 @@ const drawingFields: Field[] = [
         'ontologyLabel',
         'Ontology heading',
         'Enterprise ontology',
-        20,
-        'The heading of the ontology box. 20 characters keeps it on one line in the narrow phone drawing.',
+        19,
+        'The heading of the ontology box. 19 characters keeps it on one line in the narrow phone drawing.',
       ),
       labelList(
         'ontologyItems',
@@ -271,7 +271,7 @@ const drawingFields: Field[] = [
             : 'These chips need more than two rows in the ontology box on phones. Shorten one or remove one.',
       ),
       label('policyLabel', 'Policy heading', 'Policy framework', 18, 'The heading of the policy box. 18 characters keeps it on one line in both layouts.'),
-      label('policySub', 'Policy line', 'Set by your team', 20, 'The small line under the policy heading. 20 characters keeps it inside the box.'),
+      label('policySub', 'Policy line', 'Set by your team', 19, 'The small line under the policy heading. 19 characters keeps it inside the box.'),
       label(
         'orchestrationLabel',
         'Orchestration heading',
@@ -481,7 +481,7 @@ export const HeroHarness: Block = {
                   admin: {
                     step: 1,
                     width: '50%',
-                    description: 'The title size on large screens. It shrinks with the screen, down to 28px on phones.',
+                    description: 'The title size on large screens. It shrinks with the screen; phones and small tablets use a set size.',
                   },
                 },
                 {

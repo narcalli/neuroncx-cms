@@ -8749,7 +8749,7 @@ export interface HeroHarnessBlock {
    */
   boundaryLabel: string;
   /**
-   * The heading of the ontology box. 20 characters keeps it on one line in the narrow phone drawing.
+   * The heading of the ontology box. 19 characters keeps it on one line in the narrow phone drawing.
    */
   ontologyLabel: string;
   /**
@@ -8769,7 +8769,7 @@ export interface HeroHarnessBlock {
    */
   policyLabel: string;
   /**
-   * The small line under the policy heading. 20 characters keeps it inside the box.
+   * The small line under the policy heading. 19 characters keeps it inside the box.
    */
   policySub: string;
   /**
@@ -8827,7 +8827,7 @@ export interface HeroHarnessBlock {
    */
   loopName: string;
   /**
-   * The title size on large screens. It shrinks with the screen, down to 28px on phones.
+   * The title size on large screens. It shrinks with the screen; phones and small tablets use a set size.
    */
   headingSize: number;
   /**
