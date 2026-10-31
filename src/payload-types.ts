@@ -15807,6 +15807,25 @@ export interface SiteSetting {
    */
   animations: 'on' | 'reduced' | 'off';
   /**
+   * One button on every page. While it is on, any WhatsApp widget block placed on a page shows nothing.
+   */
+  whatsappButton?: {
+    enabled?: boolean | null;
+    /**
+     * For example +919876543210. Used to build the chat link; the number itself is not shown on the page.
+     */
+    phone?: string | null;
+    /**
+     * What the visitor sends. The page reference is appended to it.
+     */
+    message?: string | null;
+    label?: string | null;
+    /**
+     * CMS pages only. Pages from other collections always show the button.
+     */
+    hideOnPages?: (string | Page)[] | null;
+  };
+  /**
    * Main tab icon for modern browsers. Use a simple SVG with a square viewBox.
    */
   faviconSvg?: (string | null) | Media;
@@ -16055,6 +16074,15 @@ export interface FooterSelect<T extends boolean = true> {
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
   animations?: T;
+  whatsappButton?:
+    | T
+    | {
+        enabled?: T;
+        phone?: T;
+        message?: T;
+        label?: T;
+        hideOnPages?: T;
+      };
   faviconSvg?: T;
   faviconIco?: T;
   favicon32?: T;
