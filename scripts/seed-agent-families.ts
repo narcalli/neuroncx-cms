@@ -47,7 +47,7 @@ const FAMILIES = [
     name: 'Read and match documents',
     slug: 'read-and-match-documents',
     order: 20,
-    painLine: 'Someone on your team retypes every prescription, marksheet and ID.',
+    painLine: 'Someone on your team retypes every prescription, transcript and ID.',
     summary:
       'One agent reads the document from a photo, the next matches what it found to your own lists and fills the record.',
   },

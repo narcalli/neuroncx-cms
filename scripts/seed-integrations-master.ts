@@ -163,7 +163,7 @@ const doc: any = await payload.create({
       {
         question: 'Which systems does NeuronCx integrate with?',
         answer:
-          'NeuronCx works with booking and records software, online booking sites, phone systems, CRMs and payment gateways. Current integrations include DocPulse, Eka Care, Practo, Exotel, Knowlarity, Tata Smartflo, Asttecs, LeadSquared and Razorpay. New systems are added as clients need them.',
+          'NeuronCx works with booking and records software, online booking sites, phone systems, CRMs and payment gateways. Current integrations include DocPulse, Eka Care, Practo, Exotel, Knowlarity, Tata Smartflo, astTECS, LeadSquared and Razorpay. New systems are added as clients need them.',
       },
       {
         question: 'What happens if a system sends the same booking twice?',
@@ -208,7 +208,7 @@ const doc: any = await payload.create({
 
     includeInKbase: true,
     kbAnswer:
-      'NeuronCx works with booking and records software, online booking sites, phone systems, CRMs and payment gateways. Current integrations include DocPulse, Eka Care, Practo, Exotel, Knowlarity, Tata Smartflo, Asttecs, LeadSquared and Razorpay. Bookings, calls, payments and chats from these systems are saved on one customer record. Systems that are not listed can often connect through the NeuronCx API and webhooks.',
+      'NeuronCx works with booking and records software, online booking sites, phone systems, CRMs and payment gateways. Current integrations include DocPulse, Eka Care, Practo, Exotel, Knowlarity, Tata Smartflo, astTECS, LeadSquared and Razorpay. Bookings, calls, payments and chats from these systems are saved on one customer record. Systems that are not listed can often connect through the NeuronCx API and webhooks.',
     kbFacts: [
       'NeuronCx connects to booking software, online booking sites, phone systems, CRMs and payment gateways.',
       'Bookings, calls, payments and chats from connected systems are saved on one customer record.',

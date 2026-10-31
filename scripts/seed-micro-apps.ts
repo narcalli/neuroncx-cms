@@ -58,14 +58,15 @@ const lines = (where: string, key: string, values: string[], max: number) =>
 /* Section 12: the candidates                                          */
 /* ------------------------------------------------------------------ */
 
-type Candidate = { name: string; family: string | null; channel: string; searchName?: string }
+// slug: only where the name has changed since the page went live, so the address and the other scripts' keys hold.
+type Candidate = { name: string; slug?: string; family: string | null; channel: string; searchName?: string }
 
 const CANDIDATES: Candidate[] = [
   { name: 'Appointment assistance', family: 'book-and-get-paid', channel: 'whatsapp', searchName: 'WhatsApp appointment booking' },
   { name: 'Payment services', family: 'book-and-get-paid', channel: 'whatsapp', searchName: 'WhatsApp payment link' },
   { name: 'Prescription understanding', family: 'read-and-match-documents', channel: 'whatsapp', searchName: 'Prescription reading AI' },
   { name: 'Test matching and pricing', family: 'read-and-match-documents', channel: 'whatsapp', searchName: 'Diagnostic test pricing' },
-  { name: 'Student mark statement assessment', family: 'read-and-match-documents', channel: 'whatsapp', searchName: 'University admission chatbot' },
+  { name: 'Student transcript assessment', slug: 'student-mark-statement-assessment', family: 'read-and-match-documents', channel: 'whatsapp', searchName: 'University admission chatbot' },
   { name: 'Identity and KYC', family: 'read-and-match-documents', channel: 'whatsapp', searchName: 'WhatsApp KYC' },
   { name: 'Assessment sampling', family: 'check-and-coach-your-team', channel: 'calls', searchName: 'Call sampling' },
   { name: 'Call quality assessment', family: 'check-and-coach-your-team', channel: 'calls', searchName: 'AI call quality monitoring' },
@@ -208,7 +209,7 @@ for (const c of CANDIDATES) {
   const order = (orderIn.get(key) ?? 0) + 10
   orderIn.set(key, order)
 
-  const slug = toSlug(c.name)
+  const slug = c.slug ?? toSlug(c.name)
   const existing = await payload.find({
     collection: 'microApps',
     where: { or: [{ slug: { equals: slug } }, { name: { equals: c.name } }] },

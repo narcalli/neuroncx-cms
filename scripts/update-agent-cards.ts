@@ -63,9 +63,9 @@ const CARDS: Record<string, Card> = {
     ],
   },
   'student-mark-statement-assessment': {
-    summary: "Reads 10th, 12th and diploma marksheets sent on WhatsApp into the student's record in your CRM.",
+    summary: "Reads school and diploma transcripts sent on WhatsApp into the student's record in your CRM.",
     keyPoints: [
-      'Reads 10th, 12th and diploma marksheets',
+      'Reads school and diploma transcripts',
       'Saves name, marks and date of birth to your CRM',
       'Follows your order of steps, such as fee first',
     ],

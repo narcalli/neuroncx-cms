@@ -77,12 +77,12 @@ const FILLS: Record<string, Fill> = {
     teamControls: 'Your test list and prices stay in your own system, so a price change needs no change here.',
   },
   'student-mark-statement-assessment': {
-    summary: 'Takes marksheets in the chat and reads them into your records.',
+    summary: 'Takes transcripts in the chat and reads them into your records.',
     result: "Nobody keys marks into the CRM, and students don't need a portal login.",
     proof: 'Live at a university.',
-    startsWhen: 'A student sends a marksheet in the chat, or your team asks for one.',
+    startsWhen: 'A student sends a transcript in the chat, or your team asks for one.',
     checks:
-      "That it's an accepted type, such as a 10th or 12th marksheet or a diploma, and that steps follow your order. For example, the application fee comes before documents.",
+      "That it's an accepted type, such as a school transcript or a diploma, and that steps follow your order. For example, the application fee comes before documents.",
     acts: "Reads the name, marks, date of birth and document type into the student's record in your CRM. Can ask for an entrance scorecard to check scholarship eligibility.",
     records: 'The fields and the document on the student record.',
   },
@@ -134,7 +134,7 @@ const PASSES_TO: Record<string, string> = {
 const EDITS = [
   'Appointment assistance, checks: "and shows only" became "so it shows only".',
   'Test matching and pricing: point 4 split, "Flags unclear matches for a person" to hands over, "saves matched tests and prices with the document" to records.',
-  'Student mark statement assessment, acts: point 4 (entrance scorecard) joined to point 3.',
+  'Student transcript assessment, acts: point 4 (entrance scorecard) joined to point 3.',
   'Identity and KYC, acts: points 2 and 4 joined into one sentence.',
   'Assessment sampling: point 4 split, sending to acts, "records which rule held back the rest" reworded for records.',
   'Call quality assessment: summary split at "so", the second half reworded as result; point 1 split between starts when and checks; points 2 and 3 joined in acts; point 4 split between hands over and records.',

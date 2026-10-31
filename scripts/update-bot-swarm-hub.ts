@@ -43,7 +43,7 @@ const FAMILIES = [
   },
   {
     name: 'Read and match documents',
-    heading: 'Document reading on WhatsApp: prescriptions, marksheets and ID proofs',
+    heading: 'Document reading on WhatsApp: prescriptions, transcripts and ID proofs',
     intro:
       'Agents that read photos of documents sent in the chat, match what they find to your own lists and prices, and save the details to the customer record.',
   },

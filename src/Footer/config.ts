@@ -12,7 +12,7 @@ export const Footer: GlobalConfig = {
     {
       name: 'tagline',
       type: 'textarea',
-      maxLength: 200,
+      maxLength: 300,
       admin: {
         description: 'One or two sentences under the logo describing what NeuronCx does.',
       },
