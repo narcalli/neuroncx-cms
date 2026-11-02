@@ -5218,6 +5218,14 @@ export interface CallToActionBlock {
  * via the `definition` "ContentBlock".
  */
 export interface ContentBlock {
+  /**
+   * Legal document is for long pages such as the terms or privacy policy. The contents list is built from the section headings, so it never needs editing. The page title is shown as the heading when the page has no hero.
+   */
+  documentStyle?: ('standard' | 'legal') | null;
+  /**
+   * Change this only when the wording changes, not for every save.
+   */
+  lastUpdated?: string | null;
   columns?:
     | {
         size?: ('oneThird' | 'half' | 'twoThirds' | 'full') | null;
@@ -12849,6 +12857,8 @@ export interface CallToActionBlockSelect<T extends boolean = true> {
  * via the `definition` "ContentBlock_select".
  */
 export interface ContentBlockSelect<T extends boolean = true> {
+  documentStyle?: T;
+  lastUpdated?: T;
   columns?:
     | T
     | {

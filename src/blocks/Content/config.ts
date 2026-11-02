@@ -68,6 +68,30 @@ export const Content: Block = {
   interfaceName: 'ContentBlock',
   fields: [
     {
+      name: 'documentStyle',
+      type: 'select',
+      label: 'Layout (Legal document adds the page title, a contents list and the date)',
+      defaultValue: 'standard',
+      options: [
+        { label: 'Standard', value: 'standard' },
+        { label: 'Legal document', value: 'legal' },
+      ],
+      admin: {
+        description:
+          'Legal document is for long pages such as the terms or privacy policy. The contents list is built from the section headings, so it never needs editing. The page title is shown as the heading when the page has no hero.',
+      },
+    },
+    {
+      name: 'lastUpdated',
+      type: 'date',
+      label: 'Last updated (shown under the title)',
+      admin: {
+        date: { pickerAppearance: 'dayOnly', displayFormat: 'd MMMM yyyy' },
+        description: 'Change this only when the wording changes, not for every save.',
+        condition: (_data, siblingData) => siblingData?.documentStyle === 'legal',
+      },
+    },
+    {
       name: 'columns',
       type: 'array',
       admin: {
