@@ -28,6 +28,7 @@ import { Benefits } from './Benefits/config'
 import { Integrations } from './Integrations/config'
 import { ProductSuite } from './ProductSuite/config'
 import { ProductSuite2 } from './ProductSuite2/config'
+import { CustomVisual } from './CustomVisual/config'
 import { ProductInAction } from './ProductInAction/config'
 import { Testimonial } from './Testimonial/config'
 import { WhatsappWidget } from './WhatsappWidget/config'
@@ -76,6 +77,7 @@ export const PAGE_LAYOUT_BLOCKS: Block[] = [
     SolutionGrid,
     ProductSuite,
     ProductSuite2,
+    CustomVisual,
     ProductInAction,
     Testimonial,
     CaseStudyGrid,

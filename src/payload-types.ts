@@ -128,6 +128,7 @@ export interface Config {
     solutionGrid: SolutionGridBlock;
     productSuite: ProductSuiteBlock;
     productSuite2: ProductSuite2Block;
+    customVisual: CustomVisualBlock;
     customerDirectory: CustomerDirectoryBlock;
     bentoGrid: BentoGridBlock;
     detailedProductSuite: DetailedProductSuiteBlock;
@@ -797,6 +798,7 @@ export interface Page {
     | SolutionGridBlock
     | ProductSuiteBlock
     | ProductSuite2Block
+    | CustomVisualBlock
     | ProductInActionBlock
     | TestimonialBlock
     | CaseStudyGridBlock
@@ -2430,6 +2432,233 @@ export interface ProductSuite2Block {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CustomVisualBlock".
+ */
+export interface CustomVisualBlock {
+  eyebrow?: string | null;
+  heading?: string | null;
+  intro?: string | null;
+  /**
+   * Points are the centre of the hub and of each card, as x% across and y% down the visual, from its top left. Draw the connector lines to meet them. Hub with 2 spokes: hub at 50%, 50%; card 1 at 15%, 50%; card 2 at 85%, 50%. Hub with 3 spokes: hub at 50%, 50%; card 1 at 50%, 17%; card 2 at 15%, 82%; card 3 at 85%, 82%. Hub with 4 spokes: hub at 50%, 50%; card 1 at 15%, 20%; card 2 at 85%, 20%; card 3 at 15%, 80%; card 4 at 85%, 80%. None: no hub and no fixed points.
+   */
+  layout: 'hubSpoke2' | 'hubSpoke3' | 'hubSpoke4' | 'none';
+  hub?: {
+    icon?:
+      | (
+          | 'message'
+          | 'chat'
+          | 'check'
+          | 'calendar'
+          | 'card'
+          | 'document'
+          | 'refresh'
+          | 'bolt'
+          | 'layers'
+          | 'gauge'
+          | 'plug'
+          | 'shield'
+          | 'shieldCheck'
+          | 'lock'
+          | 'globe'
+          | 'server'
+          | 'eye'
+          | 'users'
+          | 'user'
+          | 'phone'
+          | 'smartphone'
+          | 'mail'
+          | 'messageCircle'
+          | 'send'
+          | 'inbox'
+          | 'headphones'
+          | 'mic'
+          | 'video'
+          | 'bell'
+          | 'handshake'
+          | 'stethoscope'
+          | 'heartPulse'
+          | 'hospital'
+          | 'activity'
+          | 'flask'
+          | 'pill'
+          | 'graduationCap'
+          | 'building'
+          | 'mapPin'
+          | 'database'
+          | 'cloud'
+          | 'workflow'
+          | 'bot'
+          | 'sparkles'
+          | 'search'
+          | 'chart'
+          | 'trendingUp'
+          | 'target'
+          | 'rocket'
+          | 'key'
+          | 'fileText'
+          | 'clipboardList'
+          | 'link'
+          | 'settings'
+          | 'puzzle'
+          | 'timer'
+          | 'clock'
+          | 'badgeCheck'
+          | 'star'
+          | 'briefcase'
+        )
+      | null;
+    label?: string | null;
+    caption?: string | null;
+  };
+  /**
+   * One card for each spoke of the layout, in the order the Layout guidance numbers them.
+   */
+  cards?:
+    | {
+        cardColor?: ('grey' | 'lavender' | 'white') | null;
+        border?: ('none' | 'solid' | 'gradient') | null;
+        borderColor?: ('blue' | 'violet' | 'crimson' | 'navy') | null;
+        /**
+         * A thin rule under the content, matches the border color.
+         */
+        accentLine?: boolean | null;
+        icon?:
+          | (
+              | 'message'
+              | 'chat'
+              | 'check'
+              | 'calendar'
+              | 'card'
+              | 'document'
+              | 'refresh'
+              | 'bolt'
+              | 'layers'
+              | 'gauge'
+              | 'plug'
+              | 'shield'
+              | 'shieldCheck'
+              | 'lock'
+              | 'globe'
+              | 'server'
+              | 'eye'
+              | 'users'
+              | 'user'
+              | 'phone'
+              | 'smartphone'
+              | 'mail'
+              | 'messageCircle'
+              | 'send'
+              | 'inbox'
+              | 'headphones'
+              | 'mic'
+              | 'video'
+              | 'bell'
+              | 'handshake'
+              | 'stethoscope'
+              | 'heartPulse'
+              | 'hospital'
+              | 'activity'
+              | 'flask'
+              | 'pill'
+              | 'graduationCap'
+              | 'building'
+              | 'mapPin'
+              | 'database'
+              | 'cloud'
+              | 'workflow'
+              | 'bot'
+              | 'sparkles'
+              | 'search'
+              | 'chart'
+              | 'trendingUp'
+              | 'target'
+              | 'rocket'
+              | 'key'
+              | 'fileText'
+              | 'clipboardList'
+              | 'link'
+              | 'settings'
+              | 'puzzle'
+              | 'timer'
+              | 'clock'
+              | 'badgeCheck'
+              | 'star'
+              | 'briefcase'
+            )
+          | null;
+        showNumber?: boolean | null;
+        showEyebrow?: boolean | null;
+        showPoints?: boolean | null;
+        /**
+         * Leave empty to count automatically (01, 02, ...) across the cards that show a number. Fill in to show your own, e.g. "A" or "Step 1"; that card is then skipped in the count.
+         */
+        numberText?: string | null;
+        /**
+         * Small pill label above the title, e.g. "Tier 1 core".
+         */
+        tag?: string | null;
+        title: string;
+        description?: string | null;
+        /**
+         * Short lines shown under the text, as pills or as a bulleted list.
+         */
+        points?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        listStyle?: ('pills' | 'bullets') | null;
+        /**
+         * Optional. Leave the address empty to show the card with no link.
+         */
+        link?: {
+          label?: string | null;
+          url?: string | null;
+          newTab?: boolean | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * This renders in a sealed box: none of the page's card, button or type styles reach in, only the site's color and font variables. Use it only for the hub shape, connector lines and motion matching the anchor points listed under Layout above. Card content goes in the Cards field, not here.
+   */
+  visualHtml?: string | null;
+  /**
+   * This renders in a sealed box: none of the page's card, button or type styles reach in, only the site's color and font variables. Use it only for the hub shape, connector lines and motion matching the anchor points listed under Layout above. Card content goes in the Cards field, not here.
+   */
+  visualCss?: string | null;
+  /**
+   * What the visual shows, in a sentence. Leave empty if it is only decoration.
+   */
+  visualAlt?: string | null;
+  aspect?: ('auto' | '16/9' | '4/3' | '1/1' | '3/4') | null;
+  /**
+   * Empty fills its column.
+   */
+  maxWidth?: number | null;
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'customVisual';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "ProductInActionBlock".
  */
 export interface ProductInActionBlock {
@@ -3014,6 +3243,7 @@ export interface Sector {
         | SolutionGridBlock
         | ProductSuiteBlock
         | ProductSuite2Block
+        | CustomVisualBlock
         | CustomerDirectoryBlock
         | BentoGridBlock
         | DetailedProductSuiteBlock
@@ -9673,6 +9903,7 @@ export interface IndustryTopic {
         | SolutionGridBlock
         | ProductSuiteBlock
         | ProductSuite2Block
+        | CustomVisualBlock
         | CustomerDirectoryBlock
         | BentoGridBlock
         | DetailedProductSuiteBlock
@@ -10853,6 +11084,7 @@ export interface Hub {
         | SolutionGridBlock
         | ProductSuiteBlock
         | ProductSuite2Block
+        | CustomVisualBlock
         | CustomerDirectoryBlock
         | BentoGridBlock
         | DetailedProductSuiteBlock
@@ -11498,6 +11730,7 @@ export interface PagesSelect<T extends boolean = true> {
         solutionGrid?: T | SolutionGridBlockSelect<T>;
         productSuite?: T | ProductSuiteBlockSelect<T>;
         productSuite2?: T | ProductSuite2BlockSelect<T>;
+        customVisual?: T | CustomVisualBlockSelect<T>;
         productInAction?: T | ProductInActionBlockSelect<T>;
         testimonial?: T | TestimonialBlockSelect<T>;
         caseStudyGrid?: T | CaseStudyGridBlockSelect<T>;
@@ -11890,6 +12123,68 @@ export interface ProductSuite2BlockSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  background?: T;
+  width?: T;
+  spacingTop?: T;
+  spacingBottom?: T;
+  align?: T;
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CustomVisualBlock_select".
+ */
+export interface CustomVisualBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  intro?: T;
+  layout?: T;
+  hub?:
+    | T
+    | {
+        icon?: T;
+        label?: T;
+        caption?: T;
+      };
+  cards?:
+    | T
+    | {
+        cardColor?: T;
+        border?: T;
+        borderColor?: T;
+        accentLine?: T;
+        icon?: T;
+        showNumber?: T;
+        showEyebrow?: T;
+        showPoints?: T;
+        numberText?: T;
+        tag?: T;
+        title?: T;
+        description?: T;
+        points?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        listStyle?: T;
+        link?:
+          | T
+          | {
+              label?: T;
+              url?: T;
+              newTab?: T;
+            };
+        id?: T;
+      };
+  visualHtml?: T;
+  visualCss?: T;
+  visualAlt?: T;
+  aspect?: T;
+  maxWidth?: T;
   background?: T;
   width?: T;
   spacingTop?: T;

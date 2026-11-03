@@ -570,7 +570,7 @@ A diagram that repeats across pages: a hub, up to four cards around it and the e
 - `eyebrow` (text) "Small label above the heading (optional)": max 60 characters
 - `heading` (text) "Heading (optional)": max 140 characters
 - `intro` (textarea) "Intro (optional)": max 300 characters
-- `layout` (select, **required**): one of: `hubSpoke2` (Hub with 2 spokes), `hubSpoke3` (Hub with 3 spokes), `hubSpoke4` (Hub with 4 spokes), `none` (None (no hub)); default `hubSpoke3`. Points are the centre of the hub and of each card, as x% across and y% down the visual, from its top left. Draw the connector lines to meet them. Hub with 2 spokes: hub at 50%, 50%; card 1 at 15%, 50%; card 2 at 85%, 50%. Hub with 3 spokes: hub at 50%, 50%; card 1 at 50%, 12%; card 2 at 15%, 82%; card 3 at 85%, 82%. Hub with 4 spokes: hub at 50%, 50%; card 1 at 15%, 20%; card 2 at 85%, 20%; card 3 at 15%, 80%; card 4 at 85%, 80%. None: no hub and no fixed points.
+- `layout` (select, **required**): one of: `hubSpoke2` (Hub with 2 spokes), `hubSpoke3` (Hub with 3 spokes), `hubSpoke4` (Hub with 4 spokes), `none` (None (no hub)); default `hubSpoke3`. Points are the centre of the hub and of each card, as x% across and y% down the visual, from its top left. Draw the connector lines to meet them. Hub with 2 spokes: hub at 50%, 50%; card 1 at 15%, 50%; card 2 at 85%, 50%. Hub with 3 spokes: hub at 50%, 50%; card 1 at 50%, 17%; card 2 at 15%, 82%; card 3 at 85%, 82%. Hub with 4 spokes: hub at 50%, 50%; card 1 at 15%, 20%; card 2 at 85%, 20%; card 3 at 15%, 80%; card 4 at 85%, 80%. None: no hub and no fixed points.
 - `hub` (group): shown only in some states
   - `icon` (icon name from the icon library)
   - `label` (text): max 40 characters
