@@ -1,4 +1,4 @@
-import type { Block, Field } from 'payload'
+import type { Block } from 'payload'
 
 import {
   cardEyebrowField,
@@ -8,47 +8,6 @@ import {
   cardSwitchFields,
 } from '@/fields/cardOptions'
 import { iconField } from '@/fields/icons'
-
-/**
- * One card's fields: the shared card options (src/fields/cardOptions.ts), an
- * icon, the title, the description and an optional link. Custom Visual
- * (src/blocks/CustomVisual/config.ts) uses the same list, so the two blocks'
- * cards never drift apart.
- */
-export const productSuite2CardFields = (): Field[] => [
-  cardLookFields('white'),
-  iconField(),
-  cardSwitchFields(),
-  cardNumberTextField(),
-  cardEyebrowField(),
-  { name: 'title', type: 'text', required: true, label: 'Title' },
-  { name: 'description', type: 'textarea', label: 'Description' },
-  ...cardPointsFields(),
-  {
-    name: 'link',
-    type: 'group',
-    label: 'Link (optional)',
-    admin: {
-      hideGutter: true,
-      description: 'Optional. Leave the address empty to show the card with no link.',
-    },
-    fields: [
-      {
-        type: 'row',
-        fields: [
-          { name: 'label', type: 'text', label: 'Link text', admin: { width: '50%' } },
-          { name: 'url', type: 'text', label: 'Link address', admin: { width: '50%' } },
-        ],
-      },
-      {
-        name: 'newTab',
-        type: 'checkbox',
-        label: 'Open in new tab',
-        defaultValue: false,
-      },
-    ],
-  },
-]
 
 /**
  * A general-purpose card grid: a heading, an intro line, and 2 to 4 cards
@@ -79,7 +38,40 @@ export const ProductSuite2: Block = {
       minRows: 2,
       maxRows: 4,
       admin: { initCollapsed: true },
-      fields: productSuite2CardFields(),
+      fields: [
+        cardLookFields('white'),
+        iconField(),
+        cardSwitchFields(),
+        cardNumberTextField(),
+        cardEyebrowField(),
+        { name: 'title', type: 'text', required: true, label: 'Title' },
+        { name: 'description', type: 'textarea', label: 'Description' },
+        ...cardPointsFields(),
+        {
+          name: 'link',
+          type: 'group',
+          label: 'Link (optional)',
+          admin: {
+            hideGutter: true,
+            description: 'Optional. Leave the address empty to show the card with no link.',
+          },
+          fields: [
+            {
+              type: 'row',
+              fields: [
+                { name: 'label', type: 'text', label: 'Link text', admin: { width: '50%' } },
+                { name: 'url', type: 'text', label: 'Link address', admin: { width: '50%' } },
+              ],
+            },
+            {
+              name: 'newTab',
+              type: 'checkbox',
+              label: 'Open in new tab',
+              defaultValue: false,
+            },
+          ],
+        },
+      ],
     },
   ],
 }

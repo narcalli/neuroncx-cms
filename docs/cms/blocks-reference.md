@@ -565,38 +565,13 @@ A general-purpose card grid: a heading, an intro line, and 2 to 4 cards in an ev
 
 blockType: `customVisual` · appearance: **full**
 
-A diagram that repeats across pages: a hub, up to four cards around it and the editor's own HTML and CSS for the hub shape, the connector lines and the motion. The cards are the site's real cards (the Product Suite 2 card fields, drawn with the shared card on the website), placed on the layout's anchor points (layouts.ts); only the connector visual is free, drawn in a sealed box like the Hero (custom CSS) visual.
+A section drawn entirely by the editor's own HTML and CSS, under an optional eyebrow, heading and intro. The visual fields are the Hero (custom CSS) ones, as they are: the same checks on save (htmlProblems and cssProblems, HeroCustom/visualRules.ts), the same preview, description, shape and widest size, and the same sealed box on the website.
 
 - `eyebrow` (text) "Small label above the heading (optional)": max 60 characters
 - `heading` (text) "Heading (optional)": max 140 characters
 - `intro` (textarea) "Intro (optional)": max 300 characters
-- `layout` (select, **required**): one of: `hubSpoke2` (Hub with 2 spokes), `hubSpoke3` (Hub with 3 spokes), `hubSpoke4` (Hub with 4 spokes), `none` (None (no hub)); default `hubSpoke3`. Points are the centre of the hub and of each card, as x% across and y% down the visual, from its top left. Draw the connector lines to meet them. Hub with 2 spokes: hub at 50%, 50%; card 1 at 15%, 50%; card 2 at 85%, 50%. Hub with 3 spokes: hub at 50%, 50%; card 1 at 50%, 17%; card 2 at 15%, 82%; card 3 at 85%, 82%. Hub with 4 spokes: hub at 50%, 50%; card 1 at 15%, 20%; card 2 at 85%, 20%; card 3 at 15%, 80%; card 4 at 85%, 80%. None: no hub and no fixed points.
-- `hub` (group): shown only in some states
-  - `icon` (icon name from the icon library)
-  - `label` (text): max 40 characters
-  - `caption` (text) "Caption (one short line under the label)": max 60 characters
-- `cards` (list): up to 4 items. One card for each spoke of the layout, in the order the Layout guidance numbers them.
-  - `cardColor` (select) "Card colour": one of: `grey` (Grey), `lavender` (Lavender), `white` (White with shadow); default `white`
-  - `border` (select) "Border style": one of: `none` (None), `solid` (Solid), `gradient` (Gradient (violet to blue)); default `none`
-  - `borderColor` (select) "Border colour": one of: `blue` (Blue), `violet` (Violet), `crimson` (Crimson), `navy` (Navy); default `blue`; only when `border` is `solid`
-  - `accentLine` (checkbox) "Show accent line at bottom": default `false`. A thin rule under the content, matches the border color.
-  - `icon` (icon name from the icon library)
-  - `showNumber` (checkbox) "Show number": default `false`
-  - `showEyebrow` (checkbox) "Show eyebrow": default `true`
-  - `showPoints` (checkbox) "Show points": default `false`
-  - `numberText` (text) "Number text": max 8 characters; only when `showNumber` is on. Leave empty to count automatically (01, 02, ...) across the cards that show a number. Fill in to show your own, e.g. "A" or "Step 1"; that card is then skipped in the count.
-  - `tag` (text) "Eyebrow text": max 40 characters; only when `showEyebrow` is on. Small pill label above the title, e.g. "Tier 1 core".
-  - `title` (text, **required**)
-  - `description` (textarea)
-  - `points` (list): up to 8 items; only when `showPoints` is on. Short lines shown under the text, as pills or as a bulleted list.
-    - `text` (text, **required**): max 120 characters
-  - `listStyle` (select) "Points shown as": one of: `pills` (Pills), `bullets` (Bullets); default `pills`; only when `showPoints` is on
-  - `link` (group) "Link (optional)": Optional. Leave the address empty to show the card with no link.
-    - `label` (text) "Link text"
-    - `url` (text) "Link address"
-    - `newTab` (checkbox) "Open in new tab": default `false`
-- `visualHtml` (code) "HTML": This renders in a sealed box: none of the page's card, button or type styles reach in, only the site's color and font variables. Use it only for the hub shape, connector lines and motion matching the anchor points listed under Layout above. Card content goes in the Cards field, not here.
-- `visualCss` (code) "CSS": This renders in a sealed box: none of the page's card, button or type styles reach in, only the site's color and font variables. Use it only for the hub shape, connector lines and motion matching the anchor points listed under Layout above. Card content goes in the Cards field, not here.
+- `visualHtml` (code) "HTML": The markup only, no <style> or <script>. Text in it is read by search engines.
+- `visualCss` (code) "CSS": Styles for the HTML above. Use @media or @container visual (max-width: 480px) for small screens. Images and fonts must come from the media library.
 - `visualAlt` (text) "Description for screen readers": max 200 characters. What the visual shows, in a sentence. Leave empty if it is only decoration.
 - `aspect` (select, **required**) "Shape": one of: `auto` (As tall as its content), `16/9` (Wide (16:9)), `4/3` (Landscape (4:3)), `1/1` (Square (1:1)), `3/4` (Portrait (3:4)); default `auto`; only when `visualPosition` is not `background`
 - `maxWidth` (number) "Widest it gets (px, optional)": min 120; max 1440; only when `visualPosition` is not `background`. Empty fills its column.
