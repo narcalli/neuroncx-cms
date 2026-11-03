@@ -1,6 +1,6 @@
 # NeuronCx CMS: page block reference
 
-Generated 2026-10-26 from the block configs by `neuroncx-cms/scripts/block-reference.ts`. Re-run it after any field change rather than editing this file by hand.
+Generated 2026-11-03 from the block configs by `neuroncx-cms/scripts/block-reference.ts`. Re-run it after any field change rather than editing this file by hand.
 
 Read this with `ncx-content-notes.md`, which holds the writing rules and the publishing workflow. This file says what each block is for and exactly what it accepts.
 
@@ -12,7 +12,7 @@ Read this with `ncx-content-notes.md`, which holds the writing rules and the pub
 - Quoted text after a field name is its label in the admin. Text after the colon is the editor guidance written into the CMS: treat it as the brief for that field.
 ## Rules for the whole page
 
-- **One H1.** These blocks render the page's main heading: `conversationHero`, `statHero`, `heroFullBackground`, `heroRightPlacement`, `heroWorkforceGrid`, `agenticHero`, `heroCustom`, `heroStack`, `integrationsLanding`. Use exactly one of them, as the first block, and set the page hero to `none`.
+- **One H1.** These blocks render the page's main heading: `conversationHero`, `statHero`, `heroFullBackground`, `heroRightPlacement`, `heroWorkforceGrid`, `agenticHero`, `heroCustom`, `heroHarness`, `heroStack`, `integrationsLanding`. Use exactly one of them, as the first block, and set the page hero to `none`.
 - **One highlight.** `background: navy` ("Highlight (navy)") marks the single section the page most wants read. Only one block per page may use it; a second one stops the page saving. There is no crimson background.
 - **Appearance fields.** Most blocks accept the optional set below. Leave every one at its default unless asked; the blocks are designed to look right as they are.
 
@@ -131,6 +131,61 @@ A hero whose visual is your own HTML and CSS. Everything else is fixed and built
 - `aspect` (select, **required**) "Shape": one of: `auto` (As tall as its content), `16/9` (Wide (16:9)), `4/3` (Landscape (4:3)), `1/1` (Square (1:1)), `3/4` (Portrait (3:4)); default `auto`; only when `visualPosition` is not `background`
 - `maxWidth` (number) "Widest it gets (px, optional)": min 120; max 1440; only when `visualPosition` is not `background`. Empty fills its column.
 
+### Hero (harness loop)
+
+blockType: `heroHarness` · appearance: **minimal** · renders the page H1
+
+- `textLayout` (select, **required**) "Text layout": one of: `centred` (Centred: title and intro centred above the cards and drawing), `stack` (Stacked: title, then the intro, left aligned), `grid` (Grid: the intro lines up with the drawing), `stackWithLabel` (Stacked, with a small label above the title); default `centred`. How the title and intro sit above the cards and drawing. Centred is the approved home page layout. Grid starts the intro where the drawing starts and runs it to the drawing's right edge.
+- `eyebrow` (text) "Small label above the title": max 40 characters; default `Agentic CRM and CX platform`; only when `textLayout` is `stackWithLabel`. The short line above the title, with a red dot. Shown only with the "Stacked, with a small label" layout.
+- `headline` (textarea, **required**) "Title": max 100 characters; default `An agentic rethink of CRM,
+marketing automation and omnichannel CX.`. The page's main heading (the H1), so use this hero once per page. Press Enter where the line should break on laptops and desktops; phones ignore the break and wrap on their own.
+- `intro` (textarea, **required**): max 420 characters; default `NeuronCx is a captive AI harness that goes beyond SaaS silos, built for customer acquisition, engagement and retention. It is grounded in your enterprise ontology, so agents act on your own locations, services and rules, and hand over to your team when a person is needed. Your data layer and custom workflows run in your own cloud and change at your own pace.`. One paragraph under the title. Line breaks are joined into one paragraph on the page.
+- `buttons` (list): up to 2 items. Optional, up to 2, shown under the intro. The first is the main red button, the second a plain one. Empty shows no buttons.
+  - `type` (radio): one of: `reference` (Internal link), `custom` (Custom URL); default `custom`. Link to a page or post on this site, or type any address.
+  - `newTab` (checkbox) "Open in new tab": Opens the link in a new browser tab.
+  - `reference` (relationship to `pages` or `posts`) "Document to link to": only when `type` is `reference`. The page or post the button opens.
+  - `url` (text) "Custom URL": only when `type` is not `reference`. The address the button opens, such as /contact.
+  - `label` (text) "Button text": The words on the button. Empty hides the button.
+- `cardsPosition` (select, **required**) "Cards position": one of: `left` (Left of the drawing), `above` (Above the drawing); default `left`. Where the cards sit on laptops and desktops. On phones they always sit below the drawing, in a row that scrolls sideways.
+- `cards` (list, **required**): 3 to 6 items. 3 to 6 cards beside the drawing. Each one works like a tab: selecting it lights up its parts of the drawing and shows its explanation under the drawing.
+  - `title` (text, **required**): max 60 characters. The only text on the card. 60 characters keeps it to two lines.
+  - `body` (textarea) "Explanation": max 160 characters. Shown under the drawing while this card is selected. 160 characters keeps the caption to two lines.
+  - `highlights` (select, several allowed, **required**) "Lights up": one of: `trigger` (Customer event), `boundary` (BYOC box (your own cloud)), `ontology` (Enterprise ontology), `policy` (Policy framework), `guardrails` (Guardrails), `orchestration` (Orchestration), `actions` (Agent actions), `handover` (Team steps in), `customer360` (Customer 360), `loop` (Learning loop). The parts of the drawing this card lights up in red; the rest fade. The BYOC box lights the dashed box and keeps everything inside it at full strength.
+- `triggerLabel` (text, **required**) "Heading": max 15 characters; default `Customer event`. The small heading on the event card. 15 characters keeps it inside the card.
+- `triggerEvents` (list, **required**) "Events": 1 to 4 items. The events the card shows, one at a time as the loop runs. 1 to 4; 14 characters each keeps them inside the card.
+  - `label` (text, **required**): max 14 characters. Up to 14 characters, so it fits its place in the drawing.
+- `boundaryLabel` (text, **required**) "Box label": max 24 characters; default `BYOC`. The small label in the top corner of the dashed box. 24 characters keeps it clear of the boxes below it.
+- `ontologyLabel` (text, **required**) "Ontology heading": max 19 characters; default `Enterprise ontology`. The heading of the ontology box. 19 characters keeps it on one line in the narrow phone drawing.
+- `ontologyItems` (list) "Ontology chips": up to 3 items. Up to 3 small chips in the ontology box. They wrap onto two rows at most; the box has no room for a third.
+  - `label` (text, **required**): max 18 characters. Up to 18 characters, so it fits its place in the drawing.
+- `policyLabel` (text, **required**) "Policy heading": max 18 characters; default `Policy framework`. The heading of the policy box. 18 characters keeps it on one line in both layouts.
+- `policySub` (text, **required**) "Policy line": max 19 characters; default `Set by your team`. The small line under the policy heading. 19 characters keeps it inside the box.
+- `orchestrationLabel` (text, **required**) "Orchestration heading": max 16 characters; default `Orchestration`. The large text in the navy box at the centre. 16 characters keeps it inside the box.
+- `orchestrationSubLabel` (text, **required**) "Orchestration line": max 18 characters; default `Agents`. The small capitals under the orchestration heading. 18 characters keeps it inside the box.
+- `guardrailsLabel` (text, **required**) "Guardrails label": max 12 characters; default `Guardrails`. The small label above the gate every action passes. 12 characters keeps it clear of the lines beside it.
+- `actions` (list, **required**) "Agent actions": 2 to 5 items. What the agents do, one box each, after the guardrails. 2 to 5; 16 characters each keeps them inside their boxes.
+  - `label` (text, **required**): max 16 characters. Up to 16 characters, so it fits its place in the drawing.
+- `handoverLabel` (text, **required**) "Hand-over box": max 16 characters; default `Team steps in`. The box for cases your team takes over. 16 characters keeps it inside the box.
+- `customer360Label` (text, **required**) "Customer 360 heading": max 16 characters; default `Customer 360`. The heading of the record box. 16 characters keeps it clear of the chips beside it.
+- `customer360Fields` (list) "Customer 360 chips": up to 4 items. Up to 4 chips in the record box, on one row. Together they must fit the narrow phone drawing.
+  - `label` (text, **required**): max 12 characters. Up to 12 characters, so it fits its place in the drawing.
+- `loopLabel` (text, **required**) "Loop label": max 34 characters; default `Learns from every outcome`. The label on the loop back into the box. On wide screens it splits into two lines beside the drawing, so each half must stay short.
+- `actionsName` (text, **required**) "Name for the actions": max 24 characters; default `Agent actions`. How the caption names the action boxes when a card lights them. 24 characters keeps the tag on one line.
+- `loopName` (text, **required**) "Name for the loop": max 24 characters; default `Learning loop`. How the caption names the loop back into the box when a card lights it. 24 characters keeps the tag on one line.
+- `headingSize` (number, **required**) "Title size (px)": min 32; max 56; default `44`. The title size on large screens. It shrinks with the screen; phones and small tablets use a set size.
+- `spacing` (select, **required**): one of: `roomy` (Roomy), `compact` (Compact); default `roomy`. The space above the title, between the title and intro, and above the cards and drawing. Compact brings more of the drawing above the fold.
+- `introWidth` (number, **required**) "Intro width (px)": min 560; max 900; default `720`; only when `textLayout` is `stack` or `stackWithLabel`. The widest the intro gets in the two stacked layouts. Centred stops at 860px; grid fills its column.
+- `background` (select, **required**): one of: `cloud` (Pale grey), `white` (White); default `cloud`. The colour behind the whole hero.
+- `blockWidth` (select, **required**) "Width": one of: `site` (Site column, like the blocks below it), `header` (Match the header: from under the logo to under the last header button); default `site`. How wide the title, cards and drawing run on laptops and desktops. Below 760px both use the normal phone margins.
+- `motion` (select) "Animation": one of: `follow` (Follow the page), `on` (On), `reduced` (Reduced (a simple fade)), `off` (Off (no animation)); default `follow`. How much this hero moves. Reduced keeps the card highlights but stops the dots. Off shows a still drawing.
+- `autoplay` (checkbox) "Play on its own": default `true`. Moves through the cards on its own, one after another. It pauses while a visitor points at or tabs into the hero, and stops once they click a card.
+- `loop` (checkbox): default `true`. Keeps the dots running around the drawing while it is on screen. Off runs the loop once.
+- `speed` (select): one of: `slower` (Slower), `normal` (Normal), `faster` (Faster); default `normal`. How fast the dots travel around the drawing.
+- `autoplaySeconds` (number, **required**) "Seconds per card": min 4; max 12; default `6`. How long each card stays selected while the hero moves through them on its own.
+- `showStatus` (checkbox) "Show the live status line": default `true`. The short line on the drawing that names each step as the dots move.
+- `showCaption` (checkbox) "Show the caption": default `true`. The selected card's explanation and the names of the lit parts, under the drawing.
+- `screenReaderDescription` (text) "Drawing description for screen readers": max 400 characters; default `A diagram of the NeuronCx harness: customer events flow into orchestrated agents that work from your ontology, policies and guardrails, act or hand over to your team, write to Customer 360, and learn from each outcome. The agents run in your own cloud (BYOC).`. Read out in place of the drawing by screen readers. Say what the drawing shows in a sentence or two.
+
 ### Hero (Workforce Grid)
 
 blockType: `heroWorkforceGrid` · appearance: **minimal** · renders the page H1
@@ -228,6 +283,8 @@ An interactive trigger -> route -> resolve walkthrough. Editors define a handful
 - `heading` (text, **required**): max 140 characters
 - `intro` (textarea): max 600 characters
 - `mode` (select, **required**): one of: `flow` (Flow), `agentFeatures` (Agent features); default `flow`. Flow walks an event through trigger, route and resolve. Agent features shows what each bot swarm agent does, read from the agents.
+- `agentsFor` (select) "Show agents for": one of: `all` (All agents), `industries` (Chosen industries); default `all`; only when `mode` is `agentFeatures`. Chosen industries shows only the agents used in at least one of them.
+- `industries` (select, several allowed, **required**): one of: `healthcare` (Healthcare), `diagnostics` (Diagnostics), `education` (Education), `hospitality` (Hospitality); only when `mode` is `agentFeatures`. An agent shows when its Verticals include at least one of these. Families with no such agent are left out.
 - `families` (relationship to `lists`, several allowed) "Families (optional)": only when `mode` is `agentFeatures`. The families to offer, in this order. Leave empty for every family, by their order.
 - `pickFamilyLabel` (text) "Family buttons label": max 40 characters; default `Pick a family`; only when `mode` is `agentFeatures`
 - `pickAgentLabel` (text) "Agent buttons label": max 40 characters; default `Agents`; only when `mode` is `agentFeatures`
@@ -242,6 +299,7 @@ An interactive trigger -> route -> resolve walkthrough. Editors define a handful
   - `link` (link) "Link under the resolve card (optional)": Shown only when it has both a text and somewhere to go.
     - `type`: `reference` (an internal page or post, set in `reference`) or `custom` (a URL or site path in `url`); `label`: the visible text; `newTab`: open in a new tab
 - `footnote` (text) "Note under the demo": max 120 characters; default `Illustrative run, not live data.`; only when `mode` is not `agentFeatures`
+- `motion` (select) "Animation": one of: `follow` (Follow the page), `on` (On), `reduced` (Reduced (a simple fade)), `off` (Off (no animation)); default `follow`. Reduced keeps a simple fade. Off shows the block with no animation.
 - `promptLabel` (text) "Line above the buttons": max 80 characters; default `Pick an event and watch it travel through.`; only when `mode` is not `agentFeatures`. Empty hides it.
 - `stageLabels` (group) "Card eyebrows": Empty uses Trigger, Route and Resolve, or in Agent features mode What it does, Features and Saves to your systems.
   - `trigger` (text) "First card": max 20 characters
@@ -325,7 +383,12 @@ blockType: `agenticEpisode` · appearance: **full**
 - `points` (list) "Points along the episode": 2 to 8 items. Evenly spaced from start to end, in the order entered.
   - `label` (text, **required**) "Point label": max 40 characters
   - `caption` (text, **required**) "What attaches here": max 140 characters
+  - `isBranch` (checkbox) "Only happens in some cases, such as a lost or expired link": default `false`
+  - `branchLabel` (text) "Branch note": max 24 characters; default `Only if needed`
 - `closing` (text) "Caption under the bar": max 160 characters
+- `motion` (select) "Animation": one of: `follow` (Follow the page), `on` (On), `reduced` (Reduced (a simple fade)), `off` (Off (no animation)); default `follow`. Reduced keeps a simple fade. Off shows the block with no animation.
+- `autoplay` (checkbox) "Play on its own": default `true`. Plays once when it comes into view. Off shows the finished state.
+- `speed` (select): one of: `slower` (Slower), `normal` (Normal), `faster` (Faster); default `normal`
 
 ### Case Cards
 
@@ -498,6 +561,46 @@ A general-purpose card grid: a heading, an intro line, and 2 to 4 cards in an ev
     - `url` (text) "Link address"
     - `newTab` (checkbox) "Open in new tab": default `false`
 
+### Custom Visual (HTML/CSS)
+
+blockType: `customVisual` · appearance: **full**
+
+A diagram that repeats across pages: a hub, up to four cards around it and the editor's own HTML and CSS for the hub shape, the connector lines and the motion. The cards are the site's real cards (the Product Suite 2 card fields, drawn with the shared card on the website), placed on the layout's anchor points (layouts.ts); only the connector visual is free, drawn in a sealed box like the Hero (custom CSS) visual.
+
+- `eyebrow` (text) "Small label above the heading (optional)": max 60 characters
+- `heading` (text) "Heading (optional)": max 140 characters
+- `intro` (textarea) "Intro (optional)": max 300 characters
+- `layout` (select, **required**): one of: `hubSpoke2` (Hub with 2 spokes), `hubSpoke3` (Hub with 3 spokes), `hubSpoke4` (Hub with 4 spokes), `none` (None (no hub)); default `hubSpoke3`. Points are the centre of the hub and of each card, as x% across and y% down the visual, from its top left. Draw the connector lines to meet them. Hub with 2 spokes: hub at 50%, 50%; card 1 at 15%, 50%; card 2 at 85%, 50%. Hub with 3 spokes: hub at 50%, 50%; card 1 at 50%, 12%; card 2 at 15%, 82%; card 3 at 85%, 82%. Hub with 4 spokes: hub at 50%, 50%; card 1 at 15%, 20%; card 2 at 85%, 20%; card 3 at 15%, 80%; card 4 at 85%, 80%. None: no hub and no fixed points.
+- `hub` (group): shown only in some states
+  - `icon` (icon name from the icon library)
+  - `label` (text): max 40 characters
+  - `caption` (text) "Caption (one short line under the label)": max 60 characters
+- `cards` (list): up to 4 items. One card for each spoke of the layout, in the order the Layout guidance numbers them.
+  - `cardColor` (select) "Card colour": one of: `grey` (Grey), `lavender` (Lavender), `white` (White with shadow); default `white`
+  - `border` (select) "Border style": one of: `none` (None), `solid` (Solid), `gradient` (Gradient (violet to blue)); default `none`
+  - `borderColor` (select) "Border colour": one of: `blue` (Blue), `violet` (Violet), `crimson` (Crimson), `navy` (Navy); default `blue`; only when `border` is `solid`
+  - `accentLine` (checkbox) "Show accent line at bottom": default `false`. A thin rule under the content, matches the border color.
+  - `icon` (icon name from the icon library)
+  - `showNumber` (checkbox) "Show number": default `false`
+  - `showEyebrow` (checkbox) "Show eyebrow": default `true`
+  - `showPoints` (checkbox) "Show points": default `false`
+  - `numberText` (text) "Number text": max 8 characters; only when `showNumber` is on. Leave empty to count automatically (01, 02, ...) across the cards that show a number. Fill in to show your own, e.g. "A" or "Step 1"; that card is then skipped in the count.
+  - `tag` (text) "Eyebrow text": max 40 characters; only when `showEyebrow` is on. Small pill label above the title, e.g. "Tier 1 core".
+  - `title` (text, **required**)
+  - `description` (textarea)
+  - `points` (list): up to 8 items; only when `showPoints` is on. Short lines shown under the text, as pills or as a bulleted list.
+    - `text` (text, **required**): max 120 characters
+  - `listStyle` (select) "Points shown as": one of: `pills` (Pills), `bullets` (Bullets); default `pills`; only when `showPoints` is on
+  - `link` (group) "Link (optional)": Optional. Leave the address empty to show the card with no link.
+    - `label` (text) "Link text"
+    - `url` (text) "Link address"
+    - `newTab` (checkbox) "Open in new tab": default `false`
+- `visualHtml` (code) "HTML": This renders in a sealed box: none of the page's card, button or type styles reach in, only the site's color and font variables. Use it only for the hub shape, connector lines and motion matching the anchor points listed under Layout above. Card content goes in the Cards field, not here.
+- `visualCss` (code) "CSS": This renders in a sealed box: none of the page's card, button or type styles reach in, only the site's color and font variables. Use it only for the hub shape, connector lines and motion matching the anchor points listed under Layout above. Card content goes in the Cards field, not here.
+- `visualAlt` (text) "Description for screen readers": max 200 characters. What the visual shows, in a sentence. Leave empty if it is only decoration.
+- `aspect` (select, **required**) "Shape": one of: `auto` (As tall as its content), `16/9` (Wide (16:9)), `4/3` (Landscape (4:3)), `1/1` (Square (1:1)), `3/4` (Portrait (3:4)); default `auto`; only when `visualPosition` is not `background`
+- `maxWidth` (number) "Widest it gets (px, optional)": min 120; max 1440; only when `visualPosition` is not `background`. Empty fills its column.
+
 ### Product in Action
 
 blockType: `productInAction` · appearance: **full**
@@ -637,6 +740,23 @@ Large-format "solution spotlight" cards — bigger and richer than Bento Grid or
     - `url` (text) "Link address"
     - `newTab` (checkbox) "Open in new tab": default `false`
 
+### Swarm Diagram
+
+blockType: `swarmDiagram` · appearance: **full**
+
+The bot swarm diagram: every live and pilot agent on a ring around the shared customer record (docs/motion/bot-swarm-motion-demo.html, the swarm section). The website reads the data (neuroncx-website src/components/swarmDiagram/); this block holds only the heading, the optional facts and the caption shown when motion is off.
+
+- `eyebrow` (text): max 40 characters
+- `heading` (text, **required**): max 70 characters
+- `intro` (textarea): max 300 characters
+- `facts` (list) "Facts (optional)": up to 3 items. Up to 3 figures above the diagram. Leave a value empty to count it from the live and pilot agents: the first from how many there are, the second from how many families they fall into, the third is always 1, for the one shared customer record.
+  - `value` (text) "Value (optional)": max 12 characters
+  - `label` (text, **required**): max 40 characters
+- `caption` (textarea): max 140 characters. Shown under the diagram when motion is off, in place of the handover it would otherwise name.
+- `motion` (select) "Animation": one of: `follow` (Follow the page), `on` (On), `reduced` (Reduced (a simple fade)), `off` (Off (no animation)); default `follow`. Reduced keeps a simple fade. Off shows the block with no animation.
+- `autoplay` (checkbox) "Play on its own": default `true`. Plays once when it comes into view. Off shows the finished state.
+- `loop` (checkbox): default `true`. Plays again while it stays on screen. Off plays it once.
+
 ### Integrations Marquee
 
 blockType: `integrationsMarquee` · appearance: **full**
@@ -749,6 +869,9 @@ How it works 2: numbered circles on a line, one column per step. The original Ho
 - `steps` (list): 2 to 5 items. 2 to 5 steps, in order. The numbers 01, 02 and so on come from the order, so leave them out of the titles.
   - `title` (text, **required**): max 30 characters
   - `description` (textarea, **required**): max 140 characters
+- `motion` (select) "Animation": one of: `follow` (Follow the page), `on` (On), `reduced` (Reduced (a simple fade)), `off` (Off (no animation)); default `follow`. Reduced keeps a simple fade. Off shows the block with no animation.
+- `autoplay` (checkbox) "Play on its own": default `true`. Plays once when it comes into view. Off shows the finished state.
+- `speed` (select): one of: `slower` (Slower), `normal` (Normal), `faster` (Faster); default `normal`
 
 ### Comparison table
 
@@ -807,6 +930,32 @@ Record anatomy: shows technical readers what a record holds and which system fil
     - `name` (text, **required**) "Field name": max 60 characters
     - `source` (text, **required**) "Filled by": max 80 characters. The system or step that fills the field, such as Lead management system, ERP or Qualification form. Only sources that are live.
 
+### Cluster links
+
+blockType: `clusterLinks` · appearance: **full**
+
+Cluster links: on a pillar page, a card for every published page under it (its cluster pages), grouped by stage and in stage order. Extra pages that belong to the cluster but keep their own address can be added, each with its own stage. The block is not drawn when there is nothing to list.
+
+- `eyebrow` (text): max 60 characters. Optional. The small line above the heading.
+- `heading` (text): max 140 characters
+- `intro` (textarea): max 300 characters. Optional. One or two sentences under the heading.
+- `extraPages` (list) "Extra pages": Optional. Pages that belong to this cluster but keep their own address. The pages under this page are listed without being added here.
+  - `page` (relationship to `pages`, **required**)
+  - `stage` (text): max 30 characters. Such as Qualification.
+  - `stageOrder` (number) "Stage order": min 0
+- `cardDesign` (group) "Card design"
+  - `design` (select, **required**): one of: `grid` (Grid), `logoCard` (Logo card), `directory` (Directory with filters), `feature` (Feature card), `story` (Story card), `pill` (Pill); default `feature`
+  - `columns` (select) "Cards per row": one of: `2`, `3`, `4`; shown only in some states. Leave empty to fit as many as the width allows.
+  - `lastRow` (select) "Last row": one of: `stretch` (Stretch to fill), `center` (Centre), `leave` (Leave as is); default `leave`; shown only in some states
+  - `groupByCategory` (checkbox) "Group by category": default `false`. Show a heading for each category.
+  - `linkLabel` (text) "Link text": max 30 characters; shown only in some states. Used only for integrations that have their own page.
+  - `showKeyPoints` (checkbox) "Show key points": default `false`; shown only in some states. Lists the entry's key points under the description, up to 3.
+  - `look` (group): shown only in some states
+    - `cardColor` (select) "Card colour": one of: `grey` (Grey), `lavender` (Lavender), `white` (White with shadow); default `white`
+    - `border` (select) "Border style": one of: `none` (None), `solid` (Solid), `gradient` (Gradient (violet to blue)); default `none`
+    - `borderColor` (select) "Border colour": one of: `blue` (Blue), `violet` (Violet), `crimson` (Crimson), `navy` (Navy); default `blue`; only when `border` is `solid`
+    - `accentLine` (checkbox) "Show accent line at bottom": default `false`. A thin rule under the content, matches the border color.
+
 ### Closing call to action
 
 blockType: `closingCta` · appearance: **full**
@@ -818,6 +967,7 @@ blockType: `closingCta` · appearance: **full**
 - `secondaryLabel` (text) "Secondary button text"
 - `secondaryLink` (text) "Secondary button address"
 - `tagline` (text) "Tagline under the buttons": Optional, shown in italics. Keep it to a line, not a sentence.
+- `motion` (select) "Animation": one of: `follow` (Follow the page), `on` (On), `reduced` (Reduced (a simple fade)), `off` (Off (no animation)); default `follow`. Reduced keeps a simple fade. Off shows the block with no animation.
 
 ### Feature Thread
 
@@ -849,6 +999,8 @@ blockType: `cta` · appearance: **full**
 
 blockType: `content` · appearance: **full**
 
+- `documentStyle` (select) "Layout (Legal document adds the page title, a contents list and the date)": one of: `standard` (Standard), `legal` (Legal document); default `standard`. Legal document is for long pages such as the terms or privacy policy. The contents list is built from the section headings, so it never needs editing. The page title is shown as the heading when the page has no hero.
+- `lastUpdated` (date) "Last updated (shown under the title)": only when `documentStyle` is `legal`. Change this only when the wording changes, not for every save.
 - `columns` (list)
   - `size` (select): one of: `oneThird` (One Third), `half` (Half), `twoThirds` (Two Thirds), `full` (Full); default `oneThird`
   - `richText` (rich text)
@@ -926,7 +1078,7 @@ A floating "Chat with us" button fixed to the bottom-right corner that opens Wha
 
 blockType: `faq` · appearance: **own**
 
-A reusable FAQ list: a heading, an optional intro line, and a set of question/answer pairs rendered as native <details>/<summary>, so opening one needs no client JS. Answers are intentionally restricted to short, simply formatted text — see the admin description on the array below. Self-contained, not wrapped with withPresentation/withMinimalPresentation: its own `background` (white/cloud) and `anchorId` fields cover the same ground as those wrappers' `background` and `htmlId`, and having both would mean two fields writing the same concept. See Pages/index.ts where this block is registered unwrapped.
+A reusable FAQ list: a heading, an optional intro line, and a set of question/answer pairs rendered as native <details>/<summary>. With no script, or motion off, opening one is still instant, driven by the [open] attribute alone; at level on, a click is caught and played as an animation instead. Answers are intentionally restricted to short, simply formatted text, as the admin description on the array below explains. Self-contained, not wrapped with withPresentation/withMinimalPresentation: its own `background` (white/cloud) and `anchorId` fields cover the same ground as those wrappers' `background` and `htmlId`, and having both would mean two fields writing the same concept. See Pages/index.ts where this block is registered unwrapped.
 
 - `heading` (text, **required**): default `Frequently asked questions`
 - `intro` (textarea): Optional. One short paragraph above the list.
@@ -937,6 +1089,7 @@ A reusable FAQ list: a heading, an optional intro line, and a set of question/an
 - `background` (select): one of: `white` (White), `cloud` (Pale grey); default `cloud`
 - `anchorId` (text) "Anchor ID": Optional id for deep linking, e.g. faq
 - `emitSchema` (checkbox) "Output FAQPage structured data": default `true`
+- `motion` (select) "Animation": one of: `follow` (Follow the page), `on` (On), `reduced` (Reduced (a simple fade)), `off` (Off (no animation)); default `follow`. Reduced keeps a simple fade. Off shows the block with no animation.
 
 ### Platform Layers 2 (Scroll Stack)
 
@@ -1008,7 +1161,7 @@ slug: `header`
 
 slug: `footer`
 
-- `tagline` (textarea): max 200 characters. One or two sentences under the logo describing what NeuronCx does.
+- `tagline` (textarea): max 300 characters. One or two sentences under the logo describing what NeuronCx does.
 - `columns` (list): up to 3 items. Groups of links on the right side of the footer, e.g. Platform and Company.
   - `title` (text, **required**): Heading for this group of links.
   - `navItems` (list): up to 8 items
@@ -1024,6 +1177,13 @@ slug: `footer`
 
 slug: `siteSettings`
 
+- `animations` (select, **required**): one of: `on` (On), `reduced` (Reduced (a simple fade)), `off` (Off (no animation)); default `on`. Turns animations on, down or off across the whole site. Reduced keeps a simple fade. Off shows every block with no animation.
+- `whatsappButton` (group) "WhatsApp button": One button on every page. While it is on, any WhatsApp widget block placed on a page shows nothing.
+  - `enabled` (checkbox) "Show the button": default `false`
+  - `phone` (text) "WhatsApp number (E.164)": only when `enabled` is on. For example +919876543210. Used to build the chat link; the number itself is not shown on the page.
+  - `message` (textarea) "Prefilled message": only when `enabled` is on. What the visitor sends. The page reference is appended to it.
+  - `label` (text) "Button text (up to 20 characters)": max 20 characters; default `Chat`; only when `enabled` is on
+  - `hideOnPages` (relationship to `pages`, several allowed) "Hide on these pages (optional)": only when `enabled` is on. CMS pages only. Pages from other collections always show the button.
 - `faviconSvg` (upload from `media`) "Favicon (SVG)": Main tab icon for modern browsers. Use a simple SVG with a square viewBox.
 - `faviconIco` (upload from `media`) "Favicon (ICO)": For older browsers and Windows shortcuts. 32×32 or 48×48.
 - `favicon32` (upload from `media`) "Favicon (PNG 32×32)": PNG alternative for browsers that support it.
