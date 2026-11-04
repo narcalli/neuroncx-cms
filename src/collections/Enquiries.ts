@@ -1,3 +1,4 @@
+import { timingSafeEqual } from 'crypto'
 import type { CollectionAfterChangeHook, CollectionConfig } from 'payload'
 
 import { authenticated } from '../access/authenticated'
@@ -94,12 +95,27 @@ const notifyByEmail: CollectionAfterChangeHook = async ({ doc, operation, req })
   return doc
 }
 
+/**
+ * Whether an enquiry came through the website. The website's enquiry route
+ * sends ENQUIRY_SECRET (the same value on both sides) in this header, so a
+ * bot posting straight to /api/enquiries cannot skip the website's checks.
+ * With no secret set here, every request counts, as before.
+ */
+export const fromWebsite = (headers: Headers): boolean => {
+  const secret = process.env.ENQUIRY_SECRET
+  if (!secret) return true
+  const given = Buffer.from(headers.get('x-enquiry-secret') ?? '')
+  const expected = Buffer.from(secret)
+  return given.length === expected.length && timingSafeEqual(given, expected)
+}
+
 export const Enquiries: CollectionConfig = {
   slug: 'enquiries',
   labels: { singular: 'Enquiry', plural: 'Enquiries' },
   access: {
-    // Anyone can submit the public form.
-    create: () => true,
+    // The website's contact form (neuroncx-website src/app/(frontend)/api/enquiry),
+    // or a signed-in user. Open to anyone until ENQUIRY_SECRET is set.
+    create: ({ req }) => Boolean(req.user) || fromWebsite(req.headers),
     // Only logged-in admins can see, edit or remove what was submitted.
     read: authenticated,
     update: authenticated,

@@ -18,7 +18,7 @@ export const ContactForm: Block = {
       name: 'successMessage',
       type: 'textarea',
       label: 'Message shown after submitting',
-      defaultValue: "Thanks — we've got your enquiry and will be in touch shortly.",
+      defaultValue: "Thanks, we've got your enquiry and will be in touch shortly.",
     },
     {
       name: 'showMessageField',

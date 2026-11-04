@@ -16,9 +16,21 @@ const refreshEveryPage: GlobalAfterChangeHook = async ({ doc, previousDoc, req }
   return doc
 }
 
+/** A social profile link: a full https address. */
+export const validateProfileUrl = (value: unknown): true | string => {
+  if (typeof value !== 'string' || !value.trim()) return 'Enter the profile link.'
+  try {
+    if (new URL(value.trim()).protocol === 'https:') return true
+  } catch {
+    // Falls through to the message below.
+  }
+  return 'Enter the full address, starting with https://'
+}
+
 /**
  * Site-wide settings: browser icons, the default page title and description,
- * the default share image, the web app manifest and the WhatsApp button. Every
+ * the default share image, the company details for search engines, the web
+ * app manifest and the WhatsApp button. Every
  * upload is optional.
  * Leave a field empty and the website uses its built-in default for it.
  */
@@ -222,6 +234,47 @@ export const SiteSettings: GlobalConfig = {
           options: [
             { label: 'Large image', value: 'summary_large_image' },
             { label: 'Small image', value: 'summary' },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'organisation',
+      type: 'group',
+      label: 'Organisation',
+      admin: {
+        description:
+          'Describes the company to search engines (schema.org Organization) on every page. Leave a field empty to leave it out.',
+      },
+      fields: [
+        {
+          name: 'legalName',
+          type: 'text',
+          label: 'Legal name (as registered)',
+          maxLength: 120,
+        },
+        {
+          name: 'logo',
+          type: 'upload',
+          relationTo: 'media',
+          label: 'Logo for search results (PNG, at least 112×112)',
+          admin: { description: 'Empty uses the logo the website ships with.' },
+        },
+        {
+          name: 'profiles',
+          type: 'array',
+          label: 'Social profiles',
+          labels: { singular: 'Profile', plural: 'Profiles' },
+          maxRows: 10,
+          admin: { description: 'The company pages on LinkedIn, YouTube, X and similar.' },
+          fields: [
+            {
+              name: 'url',
+              type: 'text',
+              label: 'Profile link (full address)',
+              required: true,
+              validate: validateProfileUrl,
+            },
           ],
         },
       ],

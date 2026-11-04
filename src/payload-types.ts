@@ -16054,6 +16054,25 @@ export interface SiteSetting {
   defaultShareImage?: (string | null) | Media;
   twitterCardType?: ('summary_large_image' | 'summary') | null;
   /**
+   * Describes the company to search engines (schema.org Organization) on every page. Leave a field empty to leave it out.
+   */
+  organisation?: {
+    legalName?: string | null;
+    /**
+     * Empty uses the logo the website ships with.
+     */
+    logo?: (string | null) | Media;
+    /**
+     * The company pages on LinkedIn, YouTube, X and similar.
+     */
+    profiles?:
+      | {
+          url: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
    * Up to 12 characters, shown under the home screen icon.
    */
   manifestShortName?: string | null;
@@ -16272,6 +16291,18 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   defaultDescription?: T;
   defaultShareImage?: T;
   twitterCardType?: T;
+  organisation?:
+    | T
+    | {
+        legalName?: T;
+        logo?: T;
+        profiles?:
+          | T
+          | {
+              url?: T;
+              id?: T;
+            };
+      };
   manifestShortName?: T;
   manifestDisplay?: T;
   manifestBackground?: T;
