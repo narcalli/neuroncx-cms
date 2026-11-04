@@ -115,6 +115,8 @@ describe('admin layout', () => {
       'usePageDefaults',
       // Animations on the entry's page, for every collection with a route.
       'pageMotion',
+      // What search engines will see of the entry's own page.
+      'searchCheck',
       // The stored address, last: it is worked out from the fields above.
       'path',
     ])

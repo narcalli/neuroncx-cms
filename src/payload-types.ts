@@ -857,6 +857,10 @@ export interface Page {
     image?: (string | null) | Media;
     description?: string | null;
     /**
+     * The page stays on the site for anyone with the link, but search engines are asked to leave it out and it is not listed in the sitemap.
+     */
+    noIndex?: boolean | null;
+    /**
      * The one search phrase this page is written for. No two pages share a primary keyword.
      */
     primaryKeyword?: string | null;
@@ -945,6 +949,10 @@ export interface Post {
      */
     image?: (string | null) | Media;
     description?: string | null;
+    /**
+     * The page stays on the site for anyone with the link, but search engines are asked to leave it out and it is not listed in the sitemap.
+     */
+    noIndex?: boolean | null;
   };
   publishedAt?: string | null;
   authors?: (string | User)[] | null;
@@ -1531,6 +1539,10 @@ export interface Integration {
      * Left empty, it is filled from the summary. Needed to publish with Own page on.
      */
     description?: string | null;
+    /**
+     * The page stays on the site for anyone with the link, but search engines are asked to leave it out and it is not listed in the sitemap.
+     */
+    noIndex?: boolean | null;
   };
   /**
    * An action, the partner name and the result, for example: Book DocPulse appointments on WhatsApp. Needed to publish with Own page on.
@@ -4127,6 +4139,10 @@ export interface Sector {
      * The one search phrase this page is written for. No page or entry shares a primary keyword with another.
      */
     primaryKeyword?: string | null;
+    /**
+     * The page stays on the site for anyone with the link, but search engines are asked to leave it out and it is not listed in the sitemap.
+     */
+    noIndex?: boolean | null;
   };
   waRowTitle?: string | null;
   /**
@@ -6368,6 +6384,10 @@ export interface MicroApp {
      * The one search phrase this page is written for. No page or entry shares a primary keyword with another.
      */
     primaryKeyword?: string | null;
+    /**
+     * The page stays on the site for anyone with the link, but search engines are asked to leave it out and it is not listed in the sitemap.
+     */
+    noIndex?: boolean | null;
   };
   updatedBy?: (string | null) | User;
   rolledBackFrom?: string | null;
@@ -6813,6 +6833,10 @@ export interface CrmFeature {
      * The one search phrase this page is written for. No page or entry shares a primary keyword with another.
      */
     primaryKeyword?: string | null;
+    /**
+     * The page stays on the site for anyone with the link, but search engines are asked to leave it out and it is not listed in the sitemap.
+     */
+    noIndex?: boolean | null;
   };
   updatedBy?: (string | null) | User;
   rolledBackFrom?: string | null;
@@ -9091,6 +9115,10 @@ export interface IntegrationsMaster {
      */
     image?: (string | null) | Media;
     description?: string | null;
+    /**
+     * The page stays on the site for anyone with the link, but search engines are asked to leave it out and it is not listed in the sitemap.
+     */
+    noIndex?: boolean | null;
   };
   /**
    * The small line above the heading, for example Integrations.
@@ -9999,6 +10027,10 @@ export interface IndustryTopic {
      * The one search phrase this page is written for. No page or entry shares a primary keyword with another.
      */
     primaryKeyword?: string | null;
+    /**
+     * The page stays on the site for anyone with the link, but search engines are asked to leave it out and it is not listed in the sitemap.
+     */
+    noIndex?: boolean | null;
   };
   waRowTitle?: string | null;
   /**
@@ -10661,6 +10693,10 @@ export interface Hub {
      */
     image?: (string | null) | Media;
     description?: string | null;
+    /**
+     * The page stays on the site for anyone with the link, but search engines are asked to leave it out and it is not listed in the sitemap.
+     */
+    noIndex?: boolean | null;
   };
   /**
    * Conversation shows the chat as an animated thread, with the names of the entries that reply listed under it. It has no picture.
@@ -11650,6 +11686,7 @@ export interface PagesSelect<T extends boolean = true> {
         title?: T;
         image?: T;
         description?: T;
+        noIndex?: T;
         primaryKeyword?: T;
       };
   publishedAt?: T;
@@ -13541,6 +13578,7 @@ export interface PostsSelect<T extends boolean = true> {
         title?: T;
         image?: T;
         description?: T;
+        noIndex?: T;
       };
   publishedAt?: T;
   authors?: T;
@@ -14242,6 +14280,7 @@ export interface SectorsSelect<T extends boolean = true> {
         image?: T;
         description?: T;
         primaryKeyword?: T;
+        noIndex?: T;
       };
   waRowTitle?: T;
   waRowDescription?: T;
@@ -14460,6 +14499,7 @@ export interface IndustryTopicsSelect<T extends boolean = true> {
         image?: T;
         description?: T;
         primaryKeyword?: T;
+        noIndex?: T;
       };
   waRowTitle?: T;
   waRowDescription?: T;
@@ -14608,6 +14648,7 @@ export interface IntegrationsMasterSelect<T extends boolean = true> {
         title?: T;
         image?: T;
         description?: T;
+        noIndex?: T;
       };
   eyebrow?: T;
   h1?: T;
@@ -14827,6 +14868,7 @@ export interface IntegrationsSelect<T extends boolean = true> {
         title?: T;
         image?: T;
         description?: T;
+        noIndex?: T;
       };
   heroHeading?: T;
   heroSubheading?: T;
@@ -15195,6 +15237,7 @@ export interface CrmFeaturesSelect<T extends boolean = true> {
         image?: T;
         description?: T;
         primaryKeyword?: T;
+        noIndex?: T;
       };
   updatedBy?: T;
   rolledBackFrom?: T;
@@ -15381,6 +15424,7 @@ export interface MicroAppsSelect<T extends boolean = true> {
         image?: T;
         description?: T;
         primaryKeyword?: T;
+        noIndex?: T;
       };
   updatedBy?: T;
   rolledBackFrom?: T;
@@ -15411,6 +15455,7 @@ export interface HubsSelect<T extends boolean = true> {
         title?: T;
         image?: T;
         description?: T;
+        noIndex?: T;
       };
   heroDesign?: T;
   eyebrow?: T;

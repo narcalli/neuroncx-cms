@@ -25,6 +25,8 @@ import {
   OverviewField,
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
+import { noIndexField } from '../../fields/seo'
+import { searchCheckField } from '../../fields/searchCheck'
 import { slugField } from 'payload'
 import { revalidateOnSite, revalidateOnSiteAfterDelete } from '../../hooks/revalidateOnSite'
 
@@ -153,6 +155,7 @@ export const Posts: CollectionConfig<'posts'> = {
             }),
 
             MetaDescriptionField({}),
+            noIndexField(),
             PreviewField({
               // if the `generateUrl` function is configured
               hasGenerateFn: true,
@@ -165,6 +168,8 @@ export const Posts: CollectionConfig<'posts'> = {
         },
       ],
     },
+    // What search engines will see (fields/searchCheck.ts).
+    searchCheckField(),
     {
       name: 'publishedAt',
       type: 'date',

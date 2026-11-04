@@ -31,6 +31,8 @@ import {
   OverviewField,
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
+import { noIndexField } from '../../fields/seo'
+import { searchCheckField } from '../../fields/searchCheck'
 
 export const Pages: CollectionConfig<'pages'> = {
   slug: 'pages',
@@ -109,6 +111,7 @@ export const Pages: CollectionConfig<'pages'> = {
             }),
 
             MetaDescriptionField({}),
+            noIndexField(),
             {
               name: 'primaryKeyword',
               type: 'text',
@@ -131,6 +134,8 @@ export const Pages: CollectionConfig<'pages'> = {
         },
       ],
     },
+    // What search engines will see (fields/searchCheck.ts).
+    searchCheckField(),
     {
       name: 'publishedAt',
       type: 'date',

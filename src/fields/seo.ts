@@ -1,4 +1,4 @@
-import type { Tab } from 'payload'
+import type { CheckboxField, Tab } from 'payload'
 
 import { validatePrimaryKeyword } from '../content/paths'
 import {
@@ -8,6 +8,22 @@ import {
   OverviewField,
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
+
+/**
+ * "Hide from search engines" (meta.noIndex), in every SEO tab: the website
+ * marks the page noindex, follow and leaves it out of its sitemaps. The page
+ * stays reachable by its address.
+ */
+export const noIndexField = (): CheckboxField => ({
+  name: 'noIndex',
+  type: 'checkbox',
+  label: 'Hide from search engines (noindex)',
+  defaultValue: false,
+  admin: {
+    description:
+      'The page stays on the site for anyone with the link, but search engines are asked to leave it out and it is not listed in the sitemap.',
+  },
+})
 
 /**
  * SEO tab (fields_reference.md, section 3: meta.title, meta.description,
@@ -44,6 +60,7 @@ export const seoTab = (): Tab => ({
         description: 'The one search phrase this page is written for. No page or entry shares a primary keyword with another.',
       },
     },
+    noIndexField(),
     PreviewField({
       hasGenerateFn: true,
       titlePath: 'meta.title',

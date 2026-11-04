@@ -2,11 +2,16 @@
 import { useFormFields } from '@payloadcms/ui'
 import React from 'react'
 
+import { searchWarnings } from '../../../fields/searchCheck'
+
 /**
  * SEO check (sidebar, read only, never blocks saving). Shows whether the
  * primary keyword appears in the page heading, the SEO title, the SEO
  * description and, on items, the summary, with live character counts
- * against each limit. Matching ignores case.
+ * against each limit. Matching ignores case. Then the Search check warnings
+ * (fields/searchCheck.ts): hidden from search engines, and on the master a
+ * missing description (an item's is required for its own page, or filled
+ * from the summary).
  */
 
 type Mode = 'item' | 'master'
@@ -56,6 +61,9 @@ export const SeoCheck: React.FC<{ mode?: Mode }> = ({ mode = 'item' }) => {
     rows.map((r) => text(fields[r.path]?.value)).join('\u0000'),
   ).split('\u0000')
   const needle = keyword.toLowerCase()
+  const noIndex = useFormFields(([fields]) => fields['meta.noIndex']?.value)
+  const description = useFormFields(([fields]) => fields['meta.description']?.value)
+  const warnings = searchWarnings({ description, noIndex }, { description: mode === 'master' })
 
   return (
     <div style={box}>
@@ -108,6 +116,13 @@ export const SeoCheck: React.FC<{ mode?: Mode }> = ({ mode = 'item' }) => {
           })}
         </tbody>
       </table>
+      {warnings.length ? (
+        <ul style={{ margin: '8px 0 0', paddingLeft: 18, color: 'var(--theme-warning-700)' }}>
+          {warnings.map((w) => (
+            <li key={w}>{w}</li>
+          ))}
+        </ul>
+      ) : null}
       <div style={{ color: 'var(--theme-elevation-500)', fontSize: 12, marginTop: 8 }}>
         A guide only. It never stops a save.
       </div>

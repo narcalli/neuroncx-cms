@@ -7,6 +7,7 @@ import {
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
 
+import { noIndexField } from '../../fields/seo'
 import { requiredForOwnPage } from './hooks'
 
 /**
@@ -97,6 +98,7 @@ export const integrationSeoTab = (opts: { forItems?: boolean } = {}): Tab => ({
               : {}),
           },
         }),
+        noIndexField(),
         PreviewField({
           hasGenerateFn: false,
           titlePath: 'meta.title',

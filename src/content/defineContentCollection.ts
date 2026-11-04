@@ -27,6 +27,7 @@ import { withRag } from '../rag/with-rag'
 import { layoutField } from '../fields/layout'
 import { whileLayoutHas } from '../fields/layoutTabs'
 import { pageMotionField } from '../fields/motion'
+import { searchCheckField } from '../fields/searchCheck'
 import { contentFallbacks, contentPublishCheck, followPageDefaults } from './fallbacks'
 import { previewUrl } from '../utilities/generatePreviewPath'
 import { entryPath, hubPagePath, registerContentCollection, type ContentCollectionEntry, type ContentRouting } from './registry'
@@ -346,6 +347,8 @@ export const defineContentCollection = (opts: ContentCollectionOptions): Collect
     ...(layout ? [layout.sidebar] : []),
     // Animations on this entry's page: every collection with a route, current and future.
     ...(page && entry.hasRoute ? [pageMotionField()] : []),
+    // What search engines will see of the entry's own page (fields/searchCheck.ts).
+    ...(page ? [searchCheckField()] : []),
     ...(parentField ? [parentField] : []),
     ...(extra.sidebar ?? []).map(inSidebar),
     ...(pathField ? [pathField] : []),
