@@ -34,6 +34,7 @@ import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
 import { withRag } from './rag/with-rag'
+import { applyHistory, ContentEvents } from './history'
 import { ragSyncDocTask } from './rag/tasks/sync-doc'
 import { ragPurgeDocTask } from './rag/tasks/purge-doc'
 
@@ -63,7 +64,8 @@ export default buildConfig({
   blocks: contentBlocks(),
   // Read-only menus for the WhatsApp bot (src/endpoints/wa.ts).
   endpoints: [waEndpoint],
-  collections: [
+  // Every collection with drafts gets History and rollback to a draft (src/history).
+  collections: applyHistory([
     Pages,
     Posts,
     Media,
@@ -86,7 +88,8 @@ export default buildConfig({
     // After every content collection: its pickers list them.
     buildHubs(),
     NcxPostContents,
-  ],
+    ContentEvents,
+  ]),
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer, SiteSettings, WhatsappLists],
   plugins: [

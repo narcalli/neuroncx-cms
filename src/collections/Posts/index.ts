@@ -232,6 +232,5 @@ export const Posts: CollectionConfig<'posts'> = {
       },
       schedulePublish: true,
     },
-    maxPerDoc: 50,
   },
 }

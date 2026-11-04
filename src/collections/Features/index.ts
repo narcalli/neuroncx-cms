@@ -98,6 +98,5 @@ export const Features: CollectionConfig = {
       },
       schedulePublish: true,
     },
-    maxPerDoc: 50,
   },
 }

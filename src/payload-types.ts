@@ -187,6 +187,7 @@ export interface Config {
     microApps: MicroApp;
     hubs: Hub;
     ncxPostContents: NcxPostContent;
+    contentEvents: ContentEvent;
     redirects: Redirect;
     'payload-mcp-api-keys': PayloadMcpApiKey;
     'payload-kv': PayloadKv;
@@ -223,6 +224,7 @@ export interface Config {
     microApps: MicroAppsSelect<false> | MicroAppsSelect<true>;
     hubs: HubsSelect<false> | HubsSelect<true>;
     ncxPostContents: NcxPostContentsSelect<false> | NcxPostContentsSelect<true>;
+    contentEvents: ContentEventsSelect<false> | ContentEventsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     'payload-mcp-api-keys': PayloadMcpApiKeysSelect<false> | PayloadMcpApiKeysSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -905,6 +907,8 @@ export interface Page {
    * Short name for the breadcrumb trail. Defaults to the page title.
    */
   breadcrumbLabel?: string | null;
+  updatedBy?: (string | null) | User;
+  rolledBackFrom?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -955,6 +959,8 @@ export interface Post {
    */
   generateSlug?: boolean | null;
   slug: string;
+  updatedBy?: (string | null) | User;
+  rolledBackFrom?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -1346,6 +1352,8 @@ export interface IntegrationCategory {
    * Aim for 60 characters. Written for you while the automatic switch above is on.
    */
   waRowDescription?: string | null;
+  updatedBy?: (string | null) | User;
+  rolledBackFrom?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -1725,6 +1733,8 @@ export interface Integration {
    * So answers that have gone stale can be found and fixed.
    */
   kbLastReviewed?: string | null;
+  updatedBy?: (string | null) | User;
+  rolledBackFrom?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -1783,6 +1793,8 @@ export interface ConnectionType {
    * Answers "How do you connect to our system?" for this connection type, in plain words.
    */
   kbAnswer?: string | null;
+  updatedBy?: (string | null) | User;
+  rolledBackFrom?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -2792,6 +2804,8 @@ export interface Customer {
         id?: string | null;
       }[]
     | null;
+  updatedBy?: (string | null) | User;
+  rolledBackFrom?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -4196,6 +4210,8 @@ export interface Sector {
    * So answers that have gone stale can be found and fixed.
    */
   kbLastReviewed?: string | null;
+  updatedBy?: (string | null) | User;
+  rolledBackFrom?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -4754,6 +4770,8 @@ export interface SharedContent {
    * Exactly one: a trust panel, how it works, card grid, bento grid or stat band.
    */
   block: (TrustPanelBlock | HowItWorks2Block | ProductSuite2Block | BentoGridBlock | StatBandBlock)[];
+  updatedBy?: (string | null) | User;
+  rolledBackFrom?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -5822,6 +5840,8 @@ export interface List {
    * The line under the row title. Aim for 60 characters. Plain text.
    */
   waRowDescription?: string | null;
+  updatedBy?: (string | null) | User;
+  rolledBackFrom?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -6349,6 +6369,8 @@ export interface MicroApp {
      */
     primaryKeyword?: string | null;
   };
+  updatedBy?: (string | null) | User;
+  rolledBackFrom?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -6792,6 +6814,8 @@ export interface CrmFeature {
      */
     primaryKeyword?: string | null;
   };
+  updatedBy?: (string | null) | User;
+  rolledBackFrom?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -9378,6 +9402,8 @@ export interface IntegrationsMaster {
    * So answers that have gone stale can be found and fixed.
    */
   kbLastReviewed?: string | null;
+  updatedBy?: (string | null) | User;
+  rolledBackFrom?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -10056,6 +10082,8 @@ export interface IndustryTopic {
    * So answers that have gone stale can be found and fixed.
    */
   kbLastReviewed?: string | null;
+  updatedBy?: (string | null) | User;
+  rolledBackFrom?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -10561,6 +10589,8 @@ export interface Feature {
    */
   generateSlug?: boolean | null;
   slug: string;
+  updatedBy?: (string | null) | User;
+  rolledBackFrom?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -11137,6 +11167,8 @@ export interface Hub {
    * So answers that have gone stale can be found and fixed.
    */
   kbLastReviewed?: string | null;
+  updatedBy?: (string | null) | User;
+  rolledBackFrom?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -11164,6 +11196,21 @@ export interface NcxPostContent {
    */
   archived?: boolean | null;
   syncedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contentEvents".
+ */
+export interface ContentEvent {
+  id: string;
+  collectionSlug: string;
+  doc: string;
+  action: 'published' | 'unpublished' | 'rolledBack';
+  user?: (string | null) | User;
+  version?: string | null;
+  fromVersion?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -11629,6 +11676,8 @@ export interface PagesSelect<T extends boolean = true> {
         label?: T;
       };
   breadcrumbLabel?: T;
+  updatedBy?: T;
+  rolledBackFrom?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -13503,6 +13552,8 @@ export interface PostsSelect<T extends boolean = true> {
       };
   generateSlug?: T;
   slug?: T;
+  updatedBy?: T;
+  rolledBackFrom?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -13695,6 +13746,8 @@ export interface FeaturesSelect<T extends boolean = true> {
   order?: T;
   generateSlug?: T;
   slug?: T;
+  updatedBy?: T;
+  rolledBackFrom?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -14230,6 +14283,8 @@ export interface SectorsSelect<T extends boolean = true> {
         id?: T;
       };
   kbLastReviewed?: T;
+  updatedBy?: T;
+  rolledBackFrom?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -14446,6 +14501,8 @@ export interface IndustryTopicsSelect<T extends boolean = true> {
         id?: T;
       };
   kbLastReviewed?: T;
+  updatedBy?: T;
+  rolledBackFrom?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -14458,6 +14515,8 @@ export interface SharedContentSelect<T extends boolean = true> {
   name?: T;
   key?: T;
   block?: T | {};
+  updatedBy?: T;
+  rolledBackFrom?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -14516,6 +14575,8 @@ export interface CustomersSelect<T extends boolean = true> {
         role?: T;
         id?: T;
       };
+  updatedBy?: T;
+  rolledBackFrom?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -14721,6 +14782,8 @@ export interface IntegrationsMasterSelect<T extends boolean = true> {
         id?: T;
       };
   kbLastReviewed?: T;
+  updatedBy?: T;
+  rolledBackFrom?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -14871,6 +14934,8 @@ export interface IntegrationsSelect<T extends boolean = true> {
         id?: T;
       };
   kbLastReviewed?: T;
+  updatedBy?: T;
+  rolledBackFrom?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -14890,6 +14955,8 @@ export interface IntegrationCategoriesSelect<T extends boolean = true> {
   waRowTitle?: T;
   waRowDescriptionAuto?: T;
   waRowDescription?: T;
+  updatedBy?: T;
+  rolledBackFrom?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -14915,6 +14982,8 @@ export interface ConnectionTypesSelect<T extends boolean = true> {
       };
   waLine?: T;
   kbAnswer?: T;
+  updatedBy?: T;
+  rolledBackFrom?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -14951,6 +15020,8 @@ export interface ListsSelect<T extends boolean = true> {
   showKeyPoints?: T;
   waRowTitle?: T;
   waRowDescription?: T;
+  updatedBy?: T;
+  rolledBackFrom?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -15125,6 +15196,8 @@ export interface CrmFeaturesSelect<T extends boolean = true> {
         description?: T;
         primaryKeyword?: T;
       };
+  updatedBy?: T;
+  rolledBackFrom?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -15309,6 +15382,8 @@ export interface MicroAppsSelect<T extends boolean = true> {
         description?: T;
         primaryKeyword?: T;
       };
+  updatedBy?: T;
+  rolledBackFrom?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -15472,6 +15547,8 @@ export interface HubsSelect<T extends boolean = true> {
         id?: T;
       };
   kbLastReviewed?: T;
+  updatedBy?: T;
+  rolledBackFrom?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -15490,6 +15567,20 @@ export interface NcxPostContentsSelect<T extends boolean = true> {
   hash?: T;
   archived?: T;
   syncedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contentEvents_select".
+ */
+export interface ContentEventsSelect<T extends boolean = true> {
+  collectionSlug?: T;
+  doc?: T;
+  action?: T;
+  user?: T;
+  version?: T;
+  fromVersion?: T;
   updatedAt?: T;
   createdAt?: T;
 }

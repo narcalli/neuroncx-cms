@@ -10,6 +10,7 @@ import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { LinkFeatureClient as LinkFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { IconPickerField as IconPickerField_031fc23d82831855ad4b7922e70d91d1 } from '@/fields/IconPicker/Component'
+import { HeroCustomPreview as HeroCustomPreview_fe3c5f93d0a9e37e96ae2d56fd2f16ed } from '@/blocks/HeroCustom/Preview'
 import { ProductInActionRowLabel as ProductInActionRowLabel_d7dd69772f9ce4c0396e91f9fe9045f3 } from '@/blocks/ProductInAction/RowLabel'
 import { BentoGridRowLabel as BentoGridRowLabel_9034f91f9a14222ac73beb8c9248a9e3 } from '@/blocks/BentoGrid/RowLabel'
 import { DetailedProductSuiteHighlightRowLabel as DetailedProductSuiteHighlightRowLabel_3a3e2c9b76634a20e9fc275d09b6cc82 } from '@/blocks/DetailedProductSuite/RowLabel'
@@ -17,7 +18,6 @@ import { DetailedProductSuiteRowLabel as DetailedProductSuiteRowLabel_3a3e2c9b76
 import { PastedLabelWarning as PastedLabelWarning_35f3fd548616dbae6bb302afdc801d3e } from '@/fields/PastedLabelWarning/Component'
 import { IntegrationsMarqueeRowLabel as IntegrationsMarqueeRowLabel_e40e127a1e15772294aa68668bfab915 } from '@/blocks/IntegrationsMarquee/RowLabel'
 import { CardDesignPickerField as CardDesignPickerField_54cd30ae39099e803142646c21b639ac } from '@/fields/CardDesignPicker/Component'
-import { HeroCustomPreview as HeroCustomPreview_fe3c5f93d0a9e37e96ae2d56fd2f16ed } from '@/blocks/HeroCustom/Preview'
 import { UnorderedListFeatureClient as UnorderedListFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { FAQRowLabel as FAQRowLabel_7a0a1ede3caede510531ae1d1981b8cd } from '@/blocks/FAQ/RowLabel'
 import { PlatformLayersTwoRowLabel as PlatformLayersTwoRowLabel_19120e38fe7d436094c242d081cf8d0b } from '@/blocks/PlatformLayersTwo/RowLabel'
@@ -27,6 +27,7 @@ import { MetaImageComponent as MetaImageComponent_a8a977ebc872c5d5ea7ee689724c08
 import { MetaDescriptionComponent as MetaDescriptionComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { PreviewComponent as PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { SlugField as SlugField_2b8867833a34864a02ddf429b0728a40 } from '@payloadcms/next/client'
+import { HistoryView as HistoryView_622183fb16145707d7eaefe89562e38c } from '@/history/HistoryView'
 import { HorizontalRuleFeatureClient as HorizontalRuleFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { BlocksFeatureClient as BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { FolderTableCell as FolderTableCell_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
@@ -60,6 +61,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#LinkFeatureClient": LinkFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@/fields/IconPicker/Component#IconPickerField": IconPickerField_031fc23d82831855ad4b7922e70d91d1,
+  "@/blocks/HeroCustom/Preview#HeroCustomPreview": HeroCustomPreview_fe3c5f93d0a9e37e96ae2d56fd2f16ed,
   "@/blocks/ProductInAction/RowLabel#ProductInActionRowLabel": ProductInActionRowLabel_d7dd69772f9ce4c0396e91f9fe9045f3,
   "@/blocks/BentoGrid/RowLabel#BentoGridRowLabel": BentoGridRowLabel_9034f91f9a14222ac73beb8c9248a9e3,
   "@/blocks/DetailedProductSuite/RowLabel#DetailedProductSuiteHighlightRowLabel": DetailedProductSuiteHighlightRowLabel_3a3e2c9b76634a20e9fc275d09b6cc82,
@@ -67,7 +69,6 @@ export const importMap = {
   "@/fields/PastedLabelWarning/Component#PastedLabelWarning": PastedLabelWarning_35f3fd548616dbae6bb302afdc801d3e,
   "@/blocks/IntegrationsMarquee/RowLabel#IntegrationsMarqueeRowLabel": IntegrationsMarqueeRowLabel_e40e127a1e15772294aa68668bfab915,
   "@/fields/CardDesignPicker/Component#CardDesignPickerField": CardDesignPickerField_54cd30ae39099e803142646c21b639ac,
-  "@/blocks/HeroCustom/Preview#HeroCustomPreview": HeroCustomPreview_fe3c5f93d0a9e37e96ae2d56fd2f16ed,
   "@payloadcms/richtext-lexical/client#UnorderedListFeatureClient": UnorderedListFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@/blocks/FAQ/RowLabel#FAQRowLabel": FAQRowLabel_7a0a1ede3caede510531ae1d1981b8cd,
   "@/blocks/PlatformLayersTwo/RowLabel#PlatformLayersTwoRowLabel": PlatformLayersTwoRowLabel_19120e38fe7d436094c242d081cf8d0b,
@@ -77,6 +78,7 @@ export const importMap = {
   "@payloadcms/plugin-seo/client#MetaDescriptionComponent": MetaDescriptionComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@payloadcms/plugin-seo/client#PreviewComponent": PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@payloadcms/next/client#SlugField": SlugField_2b8867833a34864a02ddf429b0728a40,
+  "@/history/HistoryView#HistoryView": HistoryView_622183fb16145707d7eaefe89562e38c,
   "@payloadcms/richtext-lexical/client#HorizontalRuleFeatureClient": HorizontalRuleFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#BlocksFeatureClient": BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/next/rsc#FolderTableCell": FolderTableCell_f9c02e79a4aed9a3924487c0cd4cafb1,
