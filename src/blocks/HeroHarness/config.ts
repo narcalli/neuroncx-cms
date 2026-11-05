@@ -481,7 +481,8 @@ export const HeroHarness: Block = {
                   admin: {
                     step: 1,
                     width: '50%',
-                    description: 'The title size on large screens. It shrinks with the screen; phones and small tablets use a set size.',
+                    description:
+                      'The title size on screens 1440px wide and up. It shrinks with the screen below that; phones and small tablets use a set size.',
                   },
                 },
                 {
@@ -516,7 +517,25 @@ export const HeroHarness: Block = {
                     step: 10,
                     width: '50%',
                     condition: (_, siblingData) => ['stack', 'stackWithLabel'].includes(siblingData?.textLayout),
-                    description: 'The widest the intro gets in the two stacked layouts. Centred stops at 860px; grid fills its column.',
+                    description: 'The widest the intro gets in the two stacked layouts. Centred has its own width setting; grid fills its column.',
+                  },
+                },
+                {
+                  name: 'introMaxWidth',
+                  type: 'select',
+                  label: 'Intro width (px)',
+                  required: true,
+                  defaultValue: '620',
+                  options: [
+                    { label: '620px', value: '620' },
+                    { label: '720px', value: '720' },
+                    { label: '860px', value: '860' },
+                  ],
+                  admin: {
+                    width: '50%',
+                    condition: (_, siblingData) => siblingData?.textLayout === 'centred',
+                    description:
+                      'Controls how many characters fit on a line. 620 lands near 69 characters, which is the comfortable range. Wider means fewer lines but a harder read.',
                   },
                 },
                 {

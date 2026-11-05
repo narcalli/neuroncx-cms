@@ -68,7 +68,7 @@ describe('the block', () => {
       'actionsName',
       'loopName',
     ])
-    expect(Object.keys(tab('Style'))).toEqual(['headingSize', 'spacing', 'introWidth', 'background', 'blockWidth'])
+    expect(Object.keys(tab('Style'))).toEqual(['headingSize', 'spacing', 'introWidth', 'introMaxWidth', 'background', 'blockWidth'])
     expect(Object.keys(tab('Behaviour'))).toEqual([
       'motion',
       'autoplay',
@@ -126,6 +126,13 @@ describe('the style', () => {
     expect(all.introWidth.admin.condition({}, { textLayout: 'centred' })).toBe(false)
     expect(all.introWidth.admin.condition({}, { textLayout: 'stack' })).toBe(true)
     expect(all.introWidth.admin.condition({}, { textLayout: 'stackWithLabel' })).toBe(true)
+    // Centred has its own intro width, in three steps, 620px by default.
+    expect(all.introMaxWidth).toMatchObject({ type: 'select', required: true, defaultValue: '620' })
+    expect(values('introMaxWidth')).toEqual(['620', '720', '860'])
+    expect(all.introMaxWidth.admin.condition({}, { textLayout: 'centred' })).toBe(true)
+    for (const layout of ['stack', 'grid', 'stackWithLabel']) {
+      expect(all.introMaxWidth.admin.condition({}, { textLayout: layout })).toBe(false)
+    }
     // The site column as now, or the header's edges.
     expect(values('blockWidth')).toEqual(['site', 'header'])
     expect(all.blockWidth.defaultValue).toBe('site')

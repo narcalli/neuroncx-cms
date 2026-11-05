@@ -8931,7 +8931,7 @@ export interface HeroHarnessBlock {
    */
   loopName: string;
   /**
-   * The title size on large screens. It shrinks with the screen; phones and small tablets use a set size.
+   * The title size on screens 1440px wide and up. It shrinks with the screen below that; phones and small tablets use a set size.
    */
   headingSize: number;
   /**
@@ -8939,9 +8939,13 @@ export interface HeroHarnessBlock {
    */
   spacing: 'roomy' | 'compact';
   /**
-   * The widest the intro gets in the two stacked layouts. Centred stops at 860px; grid fills its column.
+   * The widest the intro gets in the two stacked layouts. Centred has its own width setting; grid fills its column.
    */
   introWidth?: number | null;
+  /**
+   * Controls how many characters fit on a line. 620 lands near 69 characters, which is the comfortable range. Wider means fewer lines but a harder read.
+   */
+  introMaxWidth?: ('620' | '720' | '860') | null;
   /**
    * The colour behind the whole hero.
    */
@@ -13275,6 +13279,7 @@ export interface HeroHarnessBlockSelect<T extends boolean = true> {
   headingSize?: T;
   spacing?: T;
   introWidth?: T;
+  introMaxWidth?: T;
   background?: T;
   blockWidth?: T;
   motion?: T;
