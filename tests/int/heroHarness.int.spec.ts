@@ -93,9 +93,10 @@ describe('the text', () => {
   it('lays out centred by default (version 4), or stacked, in a grid, or stacked with a small label', () => {
     expect(values('textLayout')).toEqual(['centred', 'stack', 'grid', 'stackWithLabel'])
     expect(all.textLayout.defaultValue).toBe('centred')
-    expect(all.eyebrow).toMatchObject({ maxLength: 40, defaultValue: 'Agentic CRM and CX platform' })
-    expect(all.eyebrow.admin.condition({}, { textLayout: 'stackWithLabel' })).toBe(true)
-    expect(all.eyebrow.admin.condition({}, { textLayout: 'grid' })).toBe(false)
+    // The small label shows in every layout when it has text, so the field is always offered, and starts empty.
+    expect(all.eyebrow).toMatchObject({ type: 'text', maxLength: 40 })
+    expect(all.eyebrow.defaultValue).toBeUndefined()
+    expect(all.eyebrow.admin.condition).toBeUndefined()
   })
 
   it('takes a two line title and a one paragraph intro, both required', () => {
@@ -110,8 +111,19 @@ describe('the text', () => {
     expect(all.buttons).toMatchObject({ type: 'array', maxRows: 2 })
     expect(all.buttons.defaultValue).toBeUndefined()
     expect(all.buttons.minRows).toBeUndefined()
-    expect(Object.keys(flatten(all.buttons.fields))).toEqual(['type', 'newTab', 'reference', 'url', 'label'])
+    expect(Object.keys(flatten(all.buttons.fields))).toEqual(['type', 'newTab', 'reference', 'url', 'label', 'appearance'])
     expect(Object.values(flatten(all.buttons.fields)).some((f: any) => f.required)).toBe(false)
+  })
+
+  it('lets each button be Primary or Secondary, named as on the shared link field, empty following its place', () => {
+    const appearance = flatten(all.buttons.fields).appearance
+    expect(appearance).toMatchObject({ type: 'select', label: 'Style' })
+    expect(appearance.options).toEqual([
+      { label: 'Primary', value: 'primary' },
+      { label: 'Secondary', value: 'secondary' },
+    ])
+    expect(appearance.defaultValue).toBeUndefined()
+    expect(appearance.admin.description).toMatch(/first button is Primary and the second Secondary/)
   })
 })
 

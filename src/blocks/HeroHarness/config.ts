@@ -61,6 +61,15 @@ const withHelp = (fields: Field[], help: Record<string, string>): Field[] =>
     return 'name' in f && help[f.name] ? ({ ...f, admin: { ...f.admin, description: help[f.name] } } as Field) : f
   })
 
+/**
+ * How a button looks. Named `appearance`, as on the shared link() field (fields/link.ts). Left empty, a button
+ * follows its place: the first is Primary, the second Secondary.
+ */
+export const BUTTON_APPEARANCES = [
+  { label: 'Primary', value: 'primary' },
+  { label: 'Secondary', value: 'secondary' },
+] as const
+
 /** Up to two buttons under the intro, with the same link fields as the Hero (custom CSS) buttons. */
 const buttons: ArrayField = {
   name: 'buttons',
@@ -70,9 +79,21 @@ const buttons: ArrayField = {
   maxRows: 2,
   admin: {
     initCollapsed: true,
-    description: 'Optional, up to 2, shown under the intro. The first is the main red button, the second a plain one. Empty shows no buttons.',
+    description: 'Optional, up to 2, shown under the intro. Empty shows no buttons.',
   },
-  fields: withHelp(optionalCta('button', 'Button').fields, BUTTON_HELP),
+  fields: [
+    ...withHelp(optionalCta('button', 'Button').fields, BUTTON_HELP),
+    {
+      name: 'appearance',
+      type: 'select',
+      label: 'Style',
+      options: [...BUTTON_APPEARANCES],
+      admin: {
+        description:
+          'Primary is the solid red button; Secondary is the plain grey one. Left empty, the first button is Primary and the second Secondary.',
+      },
+    },
+  ],
 }
 
 /** The parts of the drawing a card can light up. The website names them in the caption. */
@@ -404,10 +425,8 @@ export const HeroHarness: Block = {
               type: 'text',
               label: 'Small label above the title',
               maxLength: 40,
-              defaultValue: 'Agentic CRM and CX platform',
               admin: {
-                condition: (_, siblingData) => siblingData?.textLayout === 'stackWithLabel',
-                description: 'The short line above the title, with a red dot. Shown only with the "Stacked, with a small label" layout.',
+                description: 'A short line in a pill above the title, with a red dot. Shown in every text layout. Leave empty to show none.',
               },
             },
             {

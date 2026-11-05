@@ -8754,7 +8754,7 @@ export interface HeroHarnessBlock {
    */
   textLayout: 'centred' | 'stack' | 'grid' | 'stackWithLabel';
   /**
-   * The short line above the title, with a red dot. Shown only with the "Stacked, with a small label" layout.
+   * A short line in a pill above the title, with a red dot. Shown in every text layout. Leave empty to show none.
    */
   eyebrow?: string | null;
   /**
@@ -8766,7 +8766,7 @@ export interface HeroHarnessBlock {
    */
   intro: string;
   /**
-   * Optional, up to 2, shown under the intro. The first is the main red button, the second a plain one. Empty shows no buttons.
+   * Optional, up to 2, shown under the intro. Empty shows no buttons.
    */
   buttons?:
     | {
@@ -8798,6 +8798,10 @@ export interface HeroHarnessBlock {
          * The words on the button. Empty hides the button.
          */
         label?: string | null;
+        /**
+         * Primary is the solid red button; Secondary is the plain grey one. Left empty, the first button is Primary and the second Secondary.
+         */
+        appearance?: ('primary' | 'secondary') | null;
         id?: string | null;
       }[]
     | null;
@@ -13228,6 +13232,7 @@ export interface HeroHarnessBlockSelect<T extends boolean = true> {
         reference?: T;
         url?: T;
         label?: T;
+        appearance?: T;
         id?: T;
       };
   cardsPosition?: T;
