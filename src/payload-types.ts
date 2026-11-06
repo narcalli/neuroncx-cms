@@ -153,6 +153,7 @@ export interface Config {
     articleGrid: ArticleGridBlock;
     archive: ArchiveBlock;
     platformLayers: PlatformLayersBlock;
+    expandingCardCta: ExpandingCardCtaBlock;
     whatsappWidget: WhatsappWidgetBlock;
     platformLayersTwo: PlatformLayersTwoBlock;
     statHero: StatHeroBlock;
@@ -844,6 +845,7 @@ export interface Page {
     | PlatformLayersBlock
     | TrustPanelBlock
     | StatBandBlock
+    | ExpandingCardCtaBlock
     | IntegrationsLandingBlock
     | WhatsappWidgetBlock
     | FAQBlock
@@ -3112,6 +3114,7 @@ export interface Sector {
         | ArticleGridBlock
         | ArchiveBlock
         | PlatformLayersBlock
+        | ExpandingCardCtaBlock
         | WhatsappWidgetBlock
         | PlatformLayersTwoBlock
         | StatHeroBlock
@@ -7933,6 +7936,51 @@ export interface PlatformLayersBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ExpandingCardCtaBlock".
+ */
+export interface ExpandingCardCtaBlock {
+  /**
+   * First line of the heading. It is revealed on its own line, so break the sentence where it reads well.
+   */
+  headingLine1: string;
+  /**
+   * Second line. Leave empty for a one line heading.
+   */
+  headingLine2?: string | null;
+  /**
+   * One short paragraph under the heading.
+   */
+  description: string;
+  /**
+   * The words on the button, such as Book a demo.
+   */
+  ctaLabel: string;
+  /**
+   * A page on this site such as /contact, a section on this page such as #pricing, or an address starting https://.
+   */
+  ctaUrl: string;
+  /**
+   * The shape of the closed card before it opens out. Ignored when motion is off.
+   */
+  startShape: 'square' | 'portrait' | 'wide';
+  /**
+   * Reduced keeps a simple fade. Off shows the block with no animation.
+   */
+  motion?: ('follow' | 'on' | 'reduced' | 'off') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'expandingCardCta';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "WhatsappWidgetBlock".
  */
 export interface WhatsappWidgetBlock {
@@ -9812,6 +9860,7 @@ export interface IndustryTopic {
         | ArticleGridBlock
         | ArchiveBlock
         | PlatformLayersBlock
+        | ExpandingCardCtaBlock
         | WhatsappWidgetBlock
         | PlatformLayersTwoBlock
         | StatHeroBlock
@@ -11005,6 +11054,7 @@ export interface Hub {
         | ArticleGridBlock
         | ArchiveBlock
         | PlatformLayersBlock
+        | ExpandingCardCtaBlock
         | WhatsappWidgetBlock
         | PlatformLayersTwoBlock
       )[]
@@ -11687,6 +11737,7 @@ export interface PagesSelect<T extends boolean = true> {
         platformLayers?: T | PlatformLayersBlockSelect<T>;
         trustPanel?: T | TrustPanelBlockSelect<T>;
         statBand?: T | StatBandBlockSelect<T>;
+        expandingCardCta?: T | ExpandingCardCtaBlockSelect<T>;
         integrationsLanding?: T | IntegrationsLandingBlockSelect<T>;
         whatsappWidget?: T | WhatsappWidgetBlockSelect<T>;
         faq?: T | FAQBlockSelect<T>;
@@ -13492,6 +13543,23 @@ export interface StatBandBlockSelect<T extends boolean = true> {
         id?: T;
       };
   note?: T;
+  hidden?: T;
+  htmlId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ExpandingCardCtaBlock_select".
+ */
+export interface ExpandingCardCtaBlockSelect<T extends boolean = true> {
+  headingLine1?: T;
+  headingLine2?: T;
+  description?: T;
+  ctaLabel?: T;
+  ctaUrl?: T;
+  startShape?: T;
+  motion?: T;
   hidden?: T;
   htmlId?: T;
   id?: T;

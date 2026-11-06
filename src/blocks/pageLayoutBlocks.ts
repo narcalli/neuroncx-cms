@@ -47,6 +47,7 @@ import { AgenticEpisode } from './AgenticEpisode/config'
 import { SwarmDiagram } from './SwarmDiagram/config'
 import { AgenticCases } from './AgenticCases/config'
 import { AgenticClosing } from './AgenticClosing/config'
+import { ExpandingCardCta } from './ExpandingCardCta/config'
 import { UseCases } from './UseCases/config'
 import { ContactForm } from './ContactForm/config'
 import { PartnerStrip } from './PartnerStrip/config'
@@ -139,6 +140,7 @@ export const PAGE_LAYOUT_BLOCKS: Block[] = [
   withMinimalPresentation(PlatformLayers), // test 2: navy stage
   withMinimalPresentation(TrustPanel), // test 2: navy by design
   withMinimalPresentation(StatBand), // test 1: crimson, edge to edge
+  withMinimalPresentation(ExpandingCardCta), // tests 1 and 2: a closing block, navy and full bleed by design
   withMinimalPresentation(IntegrationsLanding), // test 1: its own light hero, edge to edge
   // Neither test, but a third case: a fixed overlay. It never
   // occupies the band, so Highlight cannot reach its ground —

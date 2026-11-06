@@ -48,6 +48,9 @@ const labelOf = (block: LayoutBlock): string =>
       'block',
   )
 
+/** Closing blocks that paint their own navy panel, so they count as navy in a free layout. */
+export const NAVY_BY_DESIGN_BLOCKS: readonly string[] = ['closingCta', 'expandingCardCta']
+
 /**
  * Highlight (navy) marks the one section a page most wants read, so a page
  * has one navy section at most, and only sections that allow it may use it:
@@ -57,9 +60,9 @@ const labelOf = (block: LayoutBlock): string =>
  * section above it may be navy as well. Returns the problem, or null.
  *
  * `freeBlocks` (a layout with every page block, siteBlocks 'all'): page
- * blocks may use navy as on a Page, the closing CTA block counts as navy (it
- * is a navy panel by design), and the one-navy rule covers sections and
- * blocks together.
+ * blocks may use navy as on a Page, the closing CTA blocks in
+ * NAVY_BY_DESIGN_BLOCKS count as navy (they are navy panels by design), and
+ * the one-navy rule covers sections and blocks together.
  */
 export const navyProblem = (
   layout: unknown,
@@ -70,7 +73,7 @@ export const navyProblem = (
   }: { allowed?: string[]; showsClosing?: boolean; freeBlocks?: boolean } = {},
 ): string | null => {
   if (!Array.isArray(layout)) return null
-  const byDesign = (block: LayoutBlock) => freeBlocks && block?.blockType === 'closingCta'
+  const byDesign = (block: LayoutBlock) => freeBlocks && NAVY_BY_DESIGN_BLOCKS.includes(String(block?.blockType))
   const navy = (layout as LayoutBlock[])
     .map((block, index) => ({ block, index, def: sectionForBlockType(block?.blockType) }))
     .filter(({ block }) => block?.background === 'navy' || byDesign(block))
@@ -170,6 +173,7 @@ export const doublesProblem = (layout: unknown): string | null => {
   const pairs: [string, string, string][] = [
     ['faq', 'faqSection', 'The FAQ block and the FAQ section both send FAQ data to search engines, so a page has one FAQ.'],
     ['closingCta', 'closingSection', 'The closing call to action block and the closing panel section both end the page, so a page has one closing panel.'],
+    ['expandingCardCta', 'closingSection', 'The Expanding Card CTA block and the closing panel section both end the page, so a page has one closing panel.'],
   ]
   for (const [blockType, sectionType, why] of pairs) {
     const found = rows.filter(({ block }) => block.blockType === blockType || block.blockType === sectionType)
