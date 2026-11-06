@@ -2,6 +2,7 @@ import { timingSafeEqual } from 'crypto'
 import type { CollectionAfterChangeHook, CollectionConfig } from 'payload'
 
 import { authenticated } from '../access/authenticated'
+import { createNcxLead } from './enquiries/ncxLead'
 
 const escapeHtml = (v: unknown): string =>
   String(v ?? '')
@@ -127,6 +128,8 @@ export const Enquiries: CollectionConfig = {
     description: 'Enquiries submitted from the website contact form.',
   },
   hooks: {
+    // Creates the lead in the NCX dashboard (IID 4) and stores the outcome.
+    beforeChange: [createNcxLead],
     afterChange: [notifyByEmail],
   },
   fields: [
@@ -147,6 +150,31 @@ export const Enquiries: CollectionConfig = {
       label: 'Followed up',
       defaultValue: false,
       admin: { position: 'sidebar' },
+    },
+    {
+      name: 'ncxLead',
+      type: 'group',
+      label: 'NCX lead',
+      admin: {
+        position: 'sidebar',
+        description: 'Set when the enquiry arrives. A lead needs a mobile number.',
+      },
+      fields: [
+        {
+          name: 'status',
+          type: 'select',
+          options: [
+            { label: 'Created in NCX', value: 'created' },
+            { label: 'Duplicate (sent in the last hour)', value: 'duplicate' },
+            { label: 'Failed', value: 'failed' },
+            { label: 'Not sent', value: 'skipped' },
+          ],
+          admin: { readOnly: true },
+        },
+        { name: 'transactionId', type: 'text', label: 'NCX reference', admin: { readOnly: true } },
+        { name: 'note', type: 'text', admin: { readOnly: true } },
+        { name: 'sentAt', type: 'date', label: 'Sent at', admin: { readOnly: true, date: { pickerAppearance: 'dayAndTime' } } },
+      ],
     },
   ],
   timestamps: true,
