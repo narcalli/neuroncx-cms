@@ -549,12 +549,13 @@ export const HeroHarness: Block = {
                     { label: '620px', value: '620' },
                     { label: '720px', value: '720' },
                     { label: '860px', value: '860' },
+                    { label: '1020px', value: '1020' },
                   ],
                   admin: {
                     width: '50%',
                     condition: (_, siblingData) => siblingData?.textLayout === 'centred',
                     description:
-                      'Controls how many characters fit on a line. 620 lands near 69 characters, which is the comfortable range. Wider means fewer lines but a harder read.',
+                      'Controls how many characters fit on a line. 620 lands near 69 characters, which is the comfortable range. Wider means fewer lines but a harder read. 1020 puts the live home passage on three lines at about 119 characters, and is the widest setting offered on purpose.',
                   },
                 },
                 {

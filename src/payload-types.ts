@@ -8995,9 +8995,9 @@ export interface HeroHarnessBlock {
    */
   introWidth?: number | null;
   /**
-   * Controls how many characters fit on a line. 620 lands near 69 characters, which is the comfortable range. Wider means fewer lines but a harder read.
+   * Controls how many characters fit on a line. 620 lands near 69 characters, which is the comfortable range. Wider means fewer lines but a harder read. 1020 puts the live home passage on three lines at about 119 characters, and is the widest setting offered on purpose.
    */
-  introMaxWidth?: ('620' | '720' | '860') | null;
+  introMaxWidth?: ('620' | '720' | '860' | '1020') | null;
   /**
    * The colour behind the whole hero.
    */

@@ -140,7 +140,9 @@ describe('the style', () => {
     expect(all.introWidth.admin.condition({}, { textLayout: 'stackWithLabel' })).toBe(true)
     // Centred has its own intro width, in three steps, 620px by default.
     expect(all.introMaxWidth).toMatchObject({ type: 'select', required: true, defaultValue: '620' })
-    expect(values('introMaxWidth')).toEqual(['620', '720', '860'])
+    // 1020 is the widest on purpose; there is no 960.
+    expect(values('introMaxWidth')).toEqual(['620', '720', '860', '1020'])
+    expect(all.introMaxWidth.admin.description).toMatch(/1020 puts the live home passage on three lines at about 119 characters, and is the widest setting offered on purpose\./)
     expect(all.introMaxWidth.admin.condition({}, { textLayout: 'centred' })).toBe(true)
     for (const layout of ['stack', 'grid', 'stackWithLabel']) {
       expect(all.introMaxWidth.admin.condition({}, { textLayout: layout })).toBe(false)
