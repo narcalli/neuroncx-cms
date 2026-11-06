@@ -8802,6 +8802,10 @@ export interface HeroHarnessBlock {
    */
   textLayout: 'centred' | 'stack' | 'grid' | 'stackWithLabel';
   /**
+   * Centred centres every line. Left, block centred starts every line on one left edge with the block itself centred on the page. Left, on the stage edge lines the text up with the left edge of the cards and drawing below.
+   */
+  textBlock?: ('centred' | 'leftCentred' | 'leftStage') | null;
+  /**
    * A short line in a pill above the title, with a red dot. Shown in every text layout. Leave empty to show none.
    */
   eyebrow?: string | null;
@@ -13276,6 +13280,7 @@ export interface HeroCustomBlockSelect<T extends boolean = true> {
  */
 export interface HeroHarnessBlockSelect<T extends boolean = true> {
   textLayout?: T;
+  textBlock?: T;
   eyebrow?: T;
   headline?: T;
   intro?: T;

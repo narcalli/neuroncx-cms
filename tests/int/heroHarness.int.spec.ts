@@ -47,7 +47,7 @@ describe('the block', () => {
 
   it('has Text, Cards, Drawing, Style and Behaviour tabs', () => {
     expect(tabs.map((t) => t.label)).toEqual(['Text', 'Cards', 'Drawing', 'Style', 'Behaviour'])
-    expect(Object.keys(tab('Text'))).toEqual(['textLayout', 'eyebrow', 'headline', 'intro', 'buttons'])
+    expect(Object.keys(tab('Text'))).toEqual(['textLayout', 'textBlock', 'eyebrow', 'headline', 'intro', 'buttons'])
     expect(Object.keys(tab('Cards'))).toEqual(['cardsPosition', 'cards'])
     expect(Object.keys(tab('Drawing'))).toEqual([
       'triggerLabel',
@@ -97,6 +97,21 @@ describe('the text', () => {
     expect(all.eyebrow).toMatchObject({ type: 'text', maxLength: 40 })
     expect(all.eyebrow.defaultValue).toBeUndefined()
     expect(all.eyebrow.admin.condition).toBeUndefined()
+  })
+
+  it('places the centred text block centred by default, or left with the block centred, or left on the stage edge', () => {
+    expect(all.textBlock).toMatchObject({ type: 'select', required: true, defaultValue: 'centred' })
+    expect(all.textBlock.options).toEqual([
+      { label: 'Centred', value: 'centred' },
+      { label: 'Left, block centred', value: 'leftCentred' },
+      { label: 'Left, on the stage edge', value: 'leftStage' },
+    ])
+    // Offered with the centred layout only.
+    expect(all.textBlock.admin.condition({}, { textLayout: 'centred' })).toBe(true)
+    for (const textLayout of ['stack', 'grid', 'stackWithLabel']) {
+      expect(all.textBlock.admin.condition({}, { textLayout }), textLayout).toBe(false)
+    }
+    expect(all.textBlock.admin.description).toMatch(/^Centred centres every line\. Left, block centred starts every line on one left edge/)
   })
 
   it('takes a two line title and a one paragraph intro, both required', () => {

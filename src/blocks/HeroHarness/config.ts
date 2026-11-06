@@ -421,6 +421,23 @@ export const HeroHarness: Block = {
               },
             },
             {
+              name: 'textBlock',
+              type: 'select',
+              label: 'Text block',
+              required: true,
+              defaultValue: 'centred',
+              options: [
+                { label: 'Centred', value: 'centred' },
+                { label: 'Left, block centred', value: 'leftCentred' },
+                { label: 'Left, on the stage edge', value: 'leftStage' },
+              ],
+              admin: {
+                condition: (_, siblingData) => siblingData?.textLayout === 'centred',
+                description:
+                  'Centred centres every line. Left, block centred starts every line on one left edge with the block itself centred on the page. Left, on the stage edge lines the text up with the left edge of the cards and drawing below.',
+              },
+            },
+            {
               name: 'eyebrow',
               type: 'text',
               label: 'Small label above the title',
