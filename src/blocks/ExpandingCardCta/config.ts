@@ -36,9 +36,8 @@ export const ExpandingCardCta: Block = {
       name: 'description',
       type: 'textarea',
       label: 'Description',
-      required: true,
       maxLength: 260,
-      admin: { description: 'One short paragraph under the heading.' },
+      admin: { description: 'Optional. One short paragraph under the heading. Leave empty to go straight from the heading to the button.' },
     },
     {
       type: 'row',

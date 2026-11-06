@@ -7948,9 +7948,9 @@ export interface ExpandingCardCtaBlock {
    */
   headingLine2?: string | null;
   /**
-   * One short paragraph under the heading.
+   * Optional. One short paragraph under the heading. Leave empty to go straight from the heading to the button.
    */
-  description: string;
+  description?: string | null;
   /**
    * The words on the button, such as Book a demo.
    */
