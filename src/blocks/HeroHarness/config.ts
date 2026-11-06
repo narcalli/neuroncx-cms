@@ -586,6 +586,20 @@ export const HeroHarness: Block = {
                   'How wide the title, cards and drawing run on laptops and desktops. Below 760px both use the normal phone margins.',
               },
             },
+            {
+              name: 'frame',
+              type: 'select',
+              label: 'Frame',
+              required: true,
+              defaultValue: 'plain',
+              options: [
+                { label: 'Plain', value: 'plain' },
+                { label: 'Framed', value: 'framed' },
+              ],
+              admin: {
+                description: 'Framed wraps the cards and the drawing in one bordered panel instead of two separate pieces.',
+              },
+            },
           ],
         },
         {

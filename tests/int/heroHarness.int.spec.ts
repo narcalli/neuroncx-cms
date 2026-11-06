@@ -68,7 +68,7 @@ describe('the block', () => {
       'actionsName',
       'loopName',
     ])
-    expect(Object.keys(tab('Style'))).toEqual(['headingSize', 'spacing', 'introWidth', 'introMaxWidth', 'background', 'blockWidth'])
+    expect(Object.keys(tab('Style'))).toEqual(['headingSize', 'spacing', 'introWidth', 'introMaxWidth', 'background', 'blockWidth', 'frame'])
     expect(Object.keys(tab('Behaviour'))).toEqual([
       'motion',
       'autoplay',
@@ -148,6 +148,11 @@ describe('the style', () => {
     // The site column as now, or the header's edges.
     expect(values('blockWidth')).toEqual(['site', 'header'])
     expect(all.blockWidth.defaultValue).toBe('site')
+    // Plain as today, or Framed: the cards and the drawing in one bordered panel.
+    expect(all.frame).toMatchObject({ type: 'select', required: true, defaultValue: 'plain' })
+    expect(values('frame')).toEqual(['plain', 'framed'])
+    expect(all.frame.options.map((o: Doc) => o.label)).toEqual(['Plain', 'Framed'])
+    expect(all.frame.admin.description).toBe('Framed wraps the cards and the drawing in one bordered panel instead of two separate pieces.')
     expect(values('background')).toEqual(['cloud', 'white'])
     expect(all.background.defaultValue).toBe('cloud')
   })

@@ -8959,6 +8959,10 @@ export interface HeroHarnessBlock {
    */
   blockWidth: 'site' | 'header';
   /**
+   * Framed wraps the cards and the drawing in one bordered panel instead of two separate pieces.
+   */
+  frame: 'plain' | 'framed';
+  /**
    * How much this hero moves. Reduced keeps the card highlights but stops the dots. Off shows a still drawing.
    */
   motion?: ('follow' | 'on' | 'reduced' | 'off') | null;
@@ -13287,6 +13291,7 @@ export interface HeroHarnessBlockSelect<T extends boolean = true> {
   introMaxWidth?: T;
   background?: T;
   blockWidth?: T;
+  frame?: T;
   motion?: T;
   autoplay?: T;
   loop?: T;
