@@ -8823,9 +8823,9 @@ export interface HeroHarnessBlock {
   buttons?:
     | {
         /**
-         * Link to a page or post on this site, or type any address.
+         * Link to a page or post on this site, type any address, or jump to a section further down this page.
          */
-        type?: ('reference' | 'custom') | null;
+        type?: ('reference' | 'custom' | 'section') | null;
         /**
          * Opens the link in a new browser tab.
          */
@@ -8846,6 +8846,10 @@ export interface HeroHarnessBlock {
          * The address the button opens, such as /contact.
          */
         url?: string | null;
+        /**
+         * The block further down this page that the button scrolls to. Lists the blocks that have an Anchor ID, set in each block's Appearance panel.
+         */
+        section?: string | null;
         /**
          * The words on the button. Empty hides the button.
          */
@@ -13291,6 +13295,7 @@ export interface HeroHarnessBlockSelect<T extends boolean = true> {
         newTab?: T;
         reference?: T;
         url?: T;
+        section?: T;
         label?: T;
         appearance?: T;
         id?: T;

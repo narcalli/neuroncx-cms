@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest'
 
 import { CARD_DEFAULTS, HeroHarness } from '@/blocks/HeroHarness/config'
 import { chipRows, chipsFit, CUSTOMER_360_CHIPS, loopFits, loopLines, ONTOLOGY_CHIPS } from '@/blocks/HeroHarness/fit'
+import { blockNameOf, blocksPathOf, sectionsOf, validateSection } from '@/blocks/HeroHarness/sectionLink'
 import { PAGE_LAYOUT_BLOCKS } from '@/blocks/pageLayoutBlocks'
+import { optionalCta } from '@/fields/optionalCta'
 import { ALL_LAYOUT_BLOCK_SLUGS, HERO_BLOCKS, HUB_LAYOUT_BLOCK_SLUGS, LAYOUT_HERO_BLOCKS, NEVER_IN_LAYOUT } from '@/content/sections/siteBlocks'
 
 /** Hero (harness loop): the text, style and behaviour settings. The cards and drawing come next. */
@@ -126,8 +128,66 @@ describe('the text', () => {
     expect(all.buttons).toMatchObject({ type: 'array', maxRows: 2 })
     expect(all.buttons.defaultValue).toBeUndefined()
     expect(all.buttons.minRows).toBeUndefined()
-    expect(Object.keys(flatten(all.buttons.fields))).toEqual(['type', 'newTab', 'reference', 'url', 'label', 'appearance'])
+    expect(Object.keys(flatten(all.buttons.fields))).toEqual(['type', 'newTab', 'reference', 'url', 'section', 'label', 'appearance'])
     expect(Object.values(flatten(all.buttons.fields)).some((f: any) => f.required)).toBe(false)
+  })
+
+  it('can jump to a section on this page, chosen from a list, with no new tab and no address', () => {
+    const f = flatten(all.buttons.fields)
+    expect(f.type.options.map((o: Doc) => o.value)).toEqual(['reference', 'custom', 'section'])
+    expect(f.type.options[2]).toEqual({ label: 'Section on this page', value: 'section' })
+    expect(f.section).toMatchObject({ type: 'text', label: 'Section to jump to' })
+    expect(f.section.admin.components.Field).toBe('@/blocks/HeroHarness/SectionPicker#SectionPicker')
+    const shown = (name: string, type: string | undefined) => f[name].admin.condition({}, { type })
+    expect(shown('section', 'section')).toBe(true)
+    expect(shown('section', 'custom')).toBe(false)
+    expect(shown('url', 'section')).toBe(false)
+    expect(shown('url', 'custom')).toBe(true)
+    expect(shown('url', undefined)).toBe(true)
+    expect(shown('newTab', 'section')).toBe(false)
+    expect(shown('newTab', 'reference')).toBe(true)
+    // The other heroes' buttons keep two link types.
+    expect(JSON.stringify(optionalCta('cta', 'CTA'))).not.toContain('section')
+  })
+})
+
+describe('the section a button jumps to', () => {
+  const layout = [
+    { blockType: 'heroHarness', htmlId: 'top' },
+    { blockType: 'howItWorks', heading: 'How it works', htmlId: 'how-it-works' },
+    { blockType: 'faq', htmlId: 'faq', hidden: true },
+    { blockType: 'logoWall' },
+    { blockType: 'integrations', blockName: 'Partners', htmlId: 'partners' },
+  ]
+  const check = (value: string | null, sibling: Doc = { type: 'section', label: 'See how' }, path: (string | number)[] = ['layout', 0, 'buttons', 0, 'section']) =>
+    validateSection(value as string, { data: { layout }, siblingData: sibling, path } as any)
+
+  it('lists the blocks with an Anchor ID, in page order, named by their own name or heading, leaving out the hero itself', () => {
+    expect(sectionsOf(layout, 0)).toEqual([
+      { id: 'how-it-works', name: 'How it works', hidden: false, index: 1 },
+      { id: 'faq', name: 'Faq', hidden: true, index: 2 },
+      { id: 'partners', name: 'Partners', hidden: false, index: 4 },
+    ])
+    expect(blockNameOf({ blockType: 'expandingCardCta' })).toBe('Expanding card cta')
+    expect(sectionsOf(undefined)).toEqual([])
+  })
+
+  it('finds the page blocks from the field path, as segments or a dotted path', () => {
+    expect(blocksPathOf(['layout', 0, 'buttons', 1, 'section'])).toEqual({ blocks: ['layout'], own: 0 })
+    expect(blocksPathOf('layout.3.buttons.0.section')).toEqual({ blocks: ['layout'], own: 3 })
+    expect(blocksPathOf('section')).toBeNull()
+  })
+
+  it('on publish: needs a section on this page that is not hidden, for a shown button set to it', () => {
+    expect(check('how-it-works')).toBe(true)
+    expect(check(null)).toMatch(/^Choose the section the button jumps to/)
+    expect(check('pricing')).toMatch(/No block on this page has the Anchor ID "pricing"/)
+    expect(check('faq')).toMatch(/is hidden, so the button would go nowhere/)
+    // The hero's own Anchor ID is not a section to jump to.
+    expect(check('top')).toMatch(/No block on this page has the Anchor ID "top"/)
+    // Not checked for other link types, or for a button with no label (it is not shown).
+    expect(check(null, { type: 'custom', label: 'Go' })).toBe(true)
+    expect(check(null, { type: 'section', label: '  ' })).toBe(true)
   })
 
   it('lets each button be Primary or Secondary, named as on the shared link field, empty following its place', () => {

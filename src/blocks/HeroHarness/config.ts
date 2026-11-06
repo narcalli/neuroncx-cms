@@ -4,6 +4,7 @@ import { motionFields } from '@/fields/motion'
 import { optionalCta } from '@/fields/optionalCta'
 
 import { chipsFit, CUSTOMER_360_CHIPS, loopFits, ONTOLOGY_CHIPS } from './fit'
+import { validateSection } from './sectionLink'
 
 /**
  * Hero (harness loop): the home page hero from the approved design
@@ -48,7 +49,7 @@ const motionPanel = (): Field => {
 
 /** What each button field does, added to the shared link fields. */
 const BUTTON_HELP: Record<string, string> = {
-  type: 'Link to a page or post on this site, or type any address.',
+  type: 'Link to a page or post on this site, type any address, or jump to a section further down this page.',
   newTab: 'Opens the link in a new browser tab.',
   reference: 'The page or post the button opens.',
   url: 'The address the button opens, such as /contact.',
@@ -60,6 +61,45 @@ const withHelp = (fields: Field[], help: Record<string, string>): Field[] =>
     if (f.type === 'row') return { ...f, fields: withHelp(f.fields, help) }
     return 'name' in f && help[f.name] ? ({ ...f, admin: { ...f.admin, description: help[f.name] } } as Field) : f
   })
+
+/** This hero's third link type: a section further down the same page (sectionLink.ts). */
+export const SECTION_LINK = { label: 'Section on this page', value: 'section' } as const
+
+const sectionField: Field = {
+  name: 'section',
+  type: 'text',
+  label: 'Section to jump to',
+  validate: validateSection,
+  admin: {
+    width: '50%',
+    condition: (_, siblingData) => siblingData?.type === 'section',
+    description:
+      "The block further down this page that the button scrolls to. Lists the blocks that have an Anchor ID, set in each block's Appearance panel.",
+    components: { Field: '@/blocks/HeroHarness/SectionPicker#SectionPicker' },
+  },
+}
+
+/** The shared button fields with "Section on this page" added: no new tab for it, and its own field in place of the address. */
+const withSectionLink = (fields: Field[]): Field[] =>
+  fields.map((f) =>
+    f.type !== 'row'
+      ? f
+      : {
+          ...f,
+          fields: f.fields.flatMap((g): Field[] => {
+            if (!('name' in g)) return [g]
+            if (g.name === 'type' && g.type === 'radio') return [{ ...g, options: [...g.options, SECTION_LINK] }]
+            if (g.name === 'newTab') return [{ ...g, admin: { ...g.admin, condition: (_, s) => s?.type !== 'section' } } as Field]
+            if (g.name === 'url') {
+              return [
+                { ...g, admin: { ...g.admin, condition: (_, s) => s?.type !== 'reference' && s?.type !== 'section' } } as Field,
+                sectionField,
+              ]
+            }
+            return [g]
+          }),
+        },
+  )
 
 /**
  * How a button looks. Named `appearance`, as on the shared link() field (fields/link.ts). Left empty, a button
@@ -82,7 +122,7 @@ const buttons: ArrayField = {
     description: 'Optional, up to 2, shown under the intro. Empty shows no buttons.',
   },
   fields: [
-    ...withHelp(optionalCta('button', 'Button').fields, BUTTON_HELP),
+    ...withSectionLink(withHelp(optionalCta('button', 'Button').fields, BUTTON_HELP)),
     {
       name: 'appearance',
       type: 'select',
