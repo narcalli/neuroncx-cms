@@ -10714,6 +10714,15 @@ export interface Enquiry {
    */
   sourcePage?: string | null;
   handled?: boolean | null;
+  /**
+   * Set when the enquiry arrives. A lead needs a mobile number.
+   */
+  ncxLead?: {
+    status?: ('created' | 'duplicate' | 'failed' | 'skipped') | null;
+    transactionId?: string | null;
+    note?: string | null;
+    sentAt?: string | null;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -13921,6 +13930,14 @@ export interface EnquiriesSelect<T extends boolean = true> {
   message?: T;
   sourcePage?: T;
   handled?: T;
+  ncxLead?:
+    | T
+    | {
+        status?: T;
+        transactionId?: T;
+        note?: T;
+        sentAt?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
