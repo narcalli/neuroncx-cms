@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { authenticated } from '../../access/authenticated'
+import { roleField } from '../../fields/role'
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -12,7 +13,7 @@ export const Users: CollectionConfig = {
     update: authenticated,
   },
   admin: {
-    defaultColumns: ['name', 'email'],
+    defaultColumns: ['name', 'email', 'role'],
     useAsTitle: 'name',
   },
   auth: {
@@ -25,6 +26,7 @@ export const Users: CollectionConfig = {
       name: 'name',
       type: 'text',
     },
+    roleField(),
   ],
   timestamps: true,
 }

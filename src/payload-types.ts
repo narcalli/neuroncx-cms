@@ -1172,6 +1172,10 @@ export interface Category {
 export interface User {
   id: string;
   name?: string | null;
+  /**
+   * What this person can do in the admin. Only admins can change it.
+   */
+  role: 'admin' | 'content-owner' | 'author';
   updatedAt: string;
   createdAt: string;
   enableAPIKey?: boolean | null;
@@ -13898,6 +13902,7 @@ export interface FeaturesSelect<T extends boolean = true> {
  */
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
+  role?: T;
   updatedAt?: T;
   createdAt?: T;
   enableAPIKey?: T;

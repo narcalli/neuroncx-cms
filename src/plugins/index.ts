@@ -10,6 +10,7 @@ import { Page, Post } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
 import { pagePath } from '@/collections/Pages/nesting'
 import { revalidateOnSite } from '@/hooks/revalidateOnSite'
+import { apiKeysDraftOnlyPlugin } from './apiKeysDraftOnly'
 
 const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
   return doc?.title ? `${doc.title} | Blog` : 'Blog'
@@ -79,4 +80,7 @@ export const plugins: Plugin[] = [
       },
     },
   }),
+  // Last, so it reaches every collection with drafts, including any a plugin
+  // above adds: API keys save drafts but never publish.
+  apiKeysDraftOnlyPlugin,
 ]
