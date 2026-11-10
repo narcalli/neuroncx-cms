@@ -23,6 +23,8 @@ import { Enquiries } from './collections/Enquiries'
 import { Features } from './collections/Features'
 import { Media } from './collections/Media'
 import { NcxPostContents } from './collections/NcxPostContents'
+import { BenchmarkRuns } from './collections/BenchmarkRuns'
+import { Rubrics } from './collections/Rubrics'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { Users } from './collections/Users'
@@ -30,6 +32,7 @@ import { Footer } from './Footer/config'
 import { Header } from './Header/config'
 import { SiteSettings } from './SiteSettings/config'
 import { WhatsappLists } from './WhatsappLists/config'
+import { ContentStandards } from './ContentStandards/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
@@ -88,10 +91,12 @@ export default buildConfig({
     // After every content collection: its pickers list them.
     buildHubs(),
     NcxPostContents,
+    Rubrics,
+    BenchmarkRuns,
     ContentEvents,
   ]),
   cors: [getServerSideURL()].filter(Boolean),
-  globals: [Header, Footer, SiteSettings, WhatsappLists],
+  globals: [Header, Footer, SiteSettings, WhatsappLists, ContentStandards],
   plugins: [
     s3Storage({
       enabled: Boolean(process.env.S3_ACCESS_KEY_ID && process.env.S3_SECRET_ACCESS_KEY),

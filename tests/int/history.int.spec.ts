@@ -238,6 +238,7 @@ describe('where History is on', () => {
         'microApps',
         'pages',
         'posts',
+        'rubrics',
         'sectors',
         'sharedContent',
       ].sort(),

@@ -188,6 +188,8 @@ export interface Config {
     microApps: MicroApp;
     hubs: Hub;
     ncxPostContents: NcxPostContent;
+    rubrics: Rubric;
+    benchmarkRuns: BenchmarkRun;
     contentEvents: ContentEvent;
     redirects: Redirect;
     'payload-mcp-api-keys': PayloadMcpApiKey;
@@ -225,6 +227,8 @@ export interface Config {
     microApps: MicroAppsSelect<false> | MicroAppsSelect<true>;
     hubs: HubsSelect<false> | HubsSelect<true>;
     ncxPostContents: NcxPostContentsSelect<false> | NcxPostContentsSelect<true>;
+    rubrics: RubricsSelect<false> | RubricsSelect<true>;
+    benchmarkRuns: BenchmarkRunsSelect<false> | BenchmarkRunsSelect<true>;
     contentEvents: ContentEventsSelect<false> | ContentEventsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     'payload-mcp-api-keys': PayloadMcpApiKeysSelect<false> | PayloadMcpApiKeysSelect<true>;
@@ -244,12 +248,14 @@ export interface Config {
     footer: Footer;
     siteSettings: SiteSetting;
     whatsappLists: WhatsappList;
+    contentStandards: ContentStandard;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
     siteSettings: SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     whatsappLists: WhatsappListsSelect<false> | WhatsappListsSelect<true>;
+    contentStandards: ContentStandardsSelect<false> | ContentStandardsSelect<true>;
   };
   locale: null;
   widgets: {
@@ -11319,6 +11325,135 @@ export interface NcxPostContent {
   createdAt: string;
 }
 /**
+ * The criteria content is scored against before it can be published. One rubric is Active at a time.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rubrics".
+ */
+export interface Rubric {
+  id: string;
+  /**
+   * What the rubric is called in lists and on benchmark runs.
+   */
+  name: string;
+  /**
+   * Goes up by one each time the rubric is published. A draft shows the version last published.
+   */
+  version?: number | null;
+  /**
+   * Active: the rubric content is scored against; only one published rubric can be Active. Retired: no longer used, kept for the runs that used it. A rubric still being written stays a draft until it is published.
+   */
+  status: 'active' | 'retired';
+  /**
+   * One row per criterion. Each benchmark run records a result for each item.
+   */
+  items: {
+    /**
+     * A short code that stays with this criterion for good, for example EX-01. Runs refer to it, so it is never changed or given to another criterion.
+     */
+    itemId: string;
+    /**
+     * Extractability: whether a bot or search engine can lift the facts out correctly. Engagement: whether a reader is drawn in and acts.
+     */
+    dimension: 'extractability' | 'engagement';
+    /**
+     * What is checked, in one or two sentences.
+     */
+    criterion: string;
+    /**
+     * What the content must show to pass this item.
+     */
+    passCondition: string;
+    /**
+     * Blocker: a failure stops publishing whatever the score. Warning: a failure lowers the score only.
+     */
+    severityIfFailed: 'blocker' | 'warning';
+    /**
+     * The content types this item is scored on. Elsewhere it is recorded as not applicable.
+     */
+    appliesTo: ('sectors' | 'industryTopics' | 'microApps')[];
+    id?: string | null;
+  }[];
+  updatedBy?: (string | null) | User;
+  rolledBackFrom?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * Each time a version of an entry is scored against a rubric. Records are never edited; a new score is a new run.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "benchmarkRuns".
+ */
+export interface BenchmarkRun {
+  id: string;
+  /**
+   * The entry that was scored.
+   */
+  document:
+    | {
+        relationTo: 'sectors';
+        value: string | Sector;
+      }
+    | {
+        relationTo: 'industryTopics';
+        value: string | IndustryTopic;
+      }
+    | {
+        relationTo: 'microApps';
+        value: string | MicroApp;
+      };
+  /**
+   * The ID of the exact saved version that was scored. A later edit is a new version and needs its own run.
+   */
+  versionId: string;
+  /**
+   * The rubric the version was scored against.
+   */
+  rubric: string | Rubric;
+  /**
+   * The rubric's version number when it was scored, kept so later edits to the rubric do not change what this run means. Must be a published version, and every result an item in it.
+   */
+  rubricVersion: string;
+  /**
+   * One row per rubric item.
+   */
+  results: {
+    /**
+     * The rubric item's ID, for example EX-01.
+     */
+    itemId: string;
+    /**
+     * Not applicable items are left out of the score.
+     */
+    state: 'pass' | 'warning' | 'blocker' | 'na';
+    /**
+     * Why it passed or failed, for whoever fixes the content.
+     */
+    note?: string | null;
+    id?: string | null;
+  }[];
+  /**
+   * Passes as a percentage of the items that apply, to one decimal. Worked out from the results; empty when no item applies.
+   */
+  score?: number | null;
+  /**
+   * How many results are blockers. Worked out from the results.
+   */
+  blockerCount?: number | null;
+  /**
+   * When the scoring ran. Defaults to when the run was recorded.
+   */
+  runAt: string;
+  /**
+   * Who recorded the run, or the owner of the API key used. Set automatically.
+   */
+  runBy?: (string | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "contentEvents".
  */
@@ -11609,6 +11744,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'ncxPostContents';
         value: string | NcxPostContent;
+      } | null)
+    | ({
+        relationTo: 'rubrics';
+        value: string | Rubric;
+      } | null)
+    | ({
+        relationTo: 'benchmarkRuns';
+        value: string | BenchmarkRun;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -15732,6 +15875,55 @@ export interface NcxPostContentsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rubrics_select".
+ */
+export interface RubricsSelect<T extends boolean = true> {
+  name?: T;
+  version?: T;
+  status?: T;
+  items?:
+    | T
+    | {
+        itemId?: T;
+        dimension?: T;
+        criterion?: T;
+        passCondition?: T;
+        severityIfFailed?: T;
+        appliesTo?: T;
+        id?: T;
+      };
+  updatedBy?: T;
+  rolledBackFrom?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "benchmarkRuns_select".
+ */
+export interface BenchmarkRunsSelect<T extends boolean = true> {
+  document?: T;
+  versionId?: T;
+  rubric?: T;
+  rubricVersion?: T;
+  results?:
+    | T
+    | {
+        itemId?: T;
+        state?: T;
+        note?: T;
+        id?: T;
+      };
+  score?: T;
+  blockerCount?: T;
+  runAt?: T;
+  runBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "contentEvents_select".
  */
 export interface ContentEventsSelect<T extends boolean = true> {
@@ -16273,6 +16465,37 @@ export interface WhatsappList {
   createdAt?: string | null;
 }
 /**
+ * The benchmark score content needs before it can be published.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contentStandards".
+ */
+export interface ContentStandard {
+  id: string;
+  /**
+   * The score needed by any collection without its own row below.
+   */
+  defaultGate: number;
+  /**
+   * Starting values, to be recalibrated after the first quarter of real benchmark runs. A collection without a row uses the default gate.
+   */
+  gates?:
+    | {
+        /**
+         * The collection this gate applies to.
+         */
+        collection: 'sectors' | 'industryTopics' | 'microApps';
+        /**
+         * The score this collection must reach.
+         */
+        gate: number;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header_select".
  */
@@ -16481,6 +16704,23 @@ export interface WhatsappListsSelect<T extends boolean = true> {
         collection?: T;
         waListButton?: T;
         waSectionTitle?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contentStandards_select".
+ */
+export interface ContentStandardsSelect<T extends boolean = true> {
+  defaultGate?: T;
+  gates?:
+    | T
+    | {
+        collection?: T;
+        gate?: T;
         id?: T;
       };
   updatedAt?: T;
