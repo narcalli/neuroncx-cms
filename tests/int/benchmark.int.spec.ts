@@ -176,14 +176,20 @@ describe('with the local database', () => {
       await expect(attempt).rejects.toMatchObject({ status: 403 })
     })
 
-    it('numbers each publish, ignoring any version sent, and keeps the number on drafts', async () => {
+    it('numbers a version only when a publish changes the items, ignoring any version sent', async () => {
       const first = await saveRubric({ name: 'ZZ BENCH numbered', status: 'retired', items: [item('NU-01')], version: 99 })
       expect(first.version).toBe(1)
-      const second = await saveRubric({ name: 'ZZ BENCH numbered again', version: 50 }, first.id)
-      expect(second.version).toBe(2)
-      const draft = await saveRubric({ name: 'ZZ BENCH numbered, draft' }, first.id, false)
-      expect(draft.version).toBe(2)
-      expect((await saveRubric({}, first.id)).version).toBe(3)
+      // A new name, a status change and a plain republish keep the number.
+      expect((await saveRubric({ name: 'ZZ BENCH numbered, renamed', version: 50 }, first.id)).version).toBe(1)
+      expect((await saveRubric({ status: 'active' }, first.id, false)).version).toBe(1)
+      expect((await saveRubric({ status: 'retired' }, first.id)).version).toBe(1)
+      // An item added, or one item's wording changed, is a new version.
+      expect((await saveRubric({ items: [item('NU-01'), item('NU-02')] }, first.id)).version).toBe(2)
+      const reworded = [item('NU-01'), { ...item('NU-02'), passCondition: 'The first sentence names the outcome and the date.' }]
+      expect((await saveRubric({ items: reworded }, first.id)).version).toBe(3)
+      // A draft shows the version last published; a reorder alone is not a change.
+      expect((await saveRubric({ items: [item('NU-01')] }, first.id, false)).version).toBe(3)
+      expect((await saveRubric({ items: [reworded[1], reworded[0]] }, first.id)).version).toBe(3)
     })
 
     it('retires the Active rubric when another is published as Active, recording which it superseded', async (ctx) => {
@@ -199,7 +205,8 @@ describe('with the local database', () => {
       const live = await saveRubric({}, b.id)
       expect(live).toMatchObject({ status: 'active', _status: 'published', supersedes: a.id })
       const oldA = await payload.findByID({ ...published, id: a.id })
-      expect(oldA).toMatchObject({ status: 'retired', _status: 'published', name: 'ZZ BENCH active A' })
+      // Retired without being renumbered: its checks did not change.
+      expect(oldA).toMatchObject({ status: 'retired', _status: 'published', name: 'ZZ BENCH active A', version: 1 })
       const active = await payload.find({ ...published, where: { and: [{ status: { equals: 'active' } }, { _status: { equals: 'published' } }] } })
       expect(active.docs.map((r) => r.id)).toEqual([b.id])
       // Republishing B supersedes nothing new and keeps the record.

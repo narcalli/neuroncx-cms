@@ -10,9 +10,28 @@ const storedRubric = async (req: PayloadRequest, id: string): Promise<Rubric | n
     .findByID({ collection: 'rubrics', id, draft: false, depth: 0, overrideAccess: true, req })
     .catch(() => null)
 
+// The checks themselves, ignoring row ids and order: what a version number stands for.
+const checksOf = (items: Rubric['items'] | undefined): string =>
+  JSON.stringify(
+    (items ?? [])
+      .map(({ itemId, dimension, criterion, passCondition, severityIfFailed, appliesTo }) => ({
+        itemId,
+        dimension,
+        criterion,
+        passCondition,
+        severityIfFailed,
+        appliesTo: [...(appliesTo ?? [])].sort(),
+      }))
+      .sort((a, b) => a.itemId.localeCompare(b.itemId)),
+  )
+
 /**
- * version goes up by one on each publish; a draft carries the version last
- * published. Always set here: the field takes nothing from the request.
+ * version means the checks changed: 1 on the first publish, then up by one
+ * only when a publish changes the items (one added or removed, or any of an
+ * item's fields). Renaming, retiring or republishing keeps the number, so a
+ * swap of Active rubrics does not renumber the old one. A draft carries the
+ * version last published. Always set here: the field takes nothing from the
+ * request.
  */
 export const numberRubricVersion: CollectionBeforeChangeHook<Rubric> = async ({
   data,
@@ -21,8 +40,14 @@ export const numberRubricVersion: CollectionBeforeChangeHook<Rubric> = async ({
   req,
 }) => {
   const stored = operation === 'update' && originalDoc?.id ? await storedRubric(req, originalDoc.id) : null
-  const last = stored?.version ?? 0
-  data.version = data._status === 'published' ? last + 1 : stored?.version ?? null
+  if (data._status !== 'published') {
+    data.version = stored?.version ?? null
+  } else if (!stored?.version) {
+    data.version = 1
+  } else {
+    const items = data.items ?? originalDoc?.items
+    data.version = checksOf(items) === checksOf(stored.items) ? stored.version : stored.version + 1
+  }
   return data
 }
 

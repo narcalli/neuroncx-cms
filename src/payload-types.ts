@@ -11337,7 +11337,7 @@ export interface Rubric {
    */
   name: string;
   /**
-   * Goes up by one each time the rubric is published. A draft shows the version last published.
+   * Goes up by one when a publish changes the items. Renaming or retiring keeps the number. A draft shows the version last published.
    */
   version?: number | null;
   /**
