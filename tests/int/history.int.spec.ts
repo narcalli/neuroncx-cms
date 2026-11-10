@@ -83,7 +83,7 @@ describe('the change summary', () => {
 
   it('looks inside arrays held by a block', () => {
     const next = structuredClone(base)
-    next.layout[1].items[0].q = 'Why not?'
+    next.layout[1].items![0].q = 'Why not?'
     expect(summariseChange(fields, base, next)).toEqual(['FAQ: Questions changed'])
   })
 

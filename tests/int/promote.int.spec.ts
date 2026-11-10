@@ -17,6 +17,7 @@ import {
  * and refusals, against a stubbed fetch standing in for local and live.
  */
 
+// The script is plain JS, so its results infer as `{}`; the tests read them as records.
 type Doc = Record<string, any>
 
 const LIVE = 'http://live.test'
@@ -128,7 +129,7 @@ describe('remapping', () => {
     stubFetch()
     const p = createPromoter({ LIVE, LOCAL, liveHeaders: {}, WRITE: false })
     const pay = doc({ id: 'local-pay', slug: 'payment-services' })
-    const { body, problems } = await p.toLiveRecord(
+    const { body, problems }: Doc = await p.toLiveRecord(
       'hubs',
       doc({
         id: 'local-hub',
@@ -185,9 +186,9 @@ describe('remapping', () => {
     stubFetch()
     const plan = new Set(['microApps:{"slug":"test-matching-and-pricing"}'])
     const record = doc({ id: 'a', slug: 'prescription-understanding', passesTo: [doc({ id: 'local-tm', slug: 'test-matching-and-pricing' })] })
-    const dry = await createPromoter({ LIVE, LOCAL, liveHeaders: {}, WRITE: false }).toLiveRecord('microApps', record, plan)
+    const dry: Doc = await createPromoter({ LIVE, LOCAL, liveHeaders: {}, WRITE: false }).toLiveRecord('microApps', record, plan)
     expect(dry.body.passesTo).toEqual(['(new in this run: microApps "test-matching-and-pricing")'])
-    const write = await createPromoter({ LIVE, LOCAL, liveHeaders: {}, WRITE: true }).toLiveRecord('microApps', record, plan)
+    const write: Doc = await createPromoter({ LIVE, LOCAL, liveHeaders: {}, WRITE: true }).toLiveRecord('microApps', record, plan)
     expect(write).toMatchObject({ deferred: true, problems: [] })
     expect(write.body.passesTo).toEqual([])
   })
@@ -217,7 +218,7 @@ describe('hero fields', () => {
     stubFetch()
     const p = createPromoter({ LIVE, LOCAL, liveHeaders: {}, WRITE: false })
     const pay = doc({ id: 'local-pay', slug: 'payment-services' })
-    const { body, problems } = await p.toLiveRecord(
+    const { body, problems }: Doc = await p.toLiveRecord(
       'microApps',
       doc({
         id: 'local-agent',

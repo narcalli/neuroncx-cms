@@ -117,6 +117,9 @@ export const WhatsappPreview: React.FC = () => {
   const [master, setMaster] = useState<Doc | null>(null)
 
   useEffect(() => {
+    // Clearing the preview when the category is removed is intended; the lint rule arrived with
+    // eslint-config-next 16 and is suppressed here rather than changing working admin code.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!d.category) return setCategory(null)
     let live = true
     fetch(`${api}/integrationCategories/${d.category}?depth=0&draft=true`, {
