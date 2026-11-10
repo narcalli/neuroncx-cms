@@ -4,7 +4,12 @@ import { array } from 'payload/shared'
 import { adminOnly } from '../../access/adminOnly'
 import { authenticated } from '../../access/authenticated'
 import { lifecycleOptions } from '../../lifecycle/scope'
-import { checkOneActiveRubric, keepItemIdsRetired, numberRubricVersion } from './hooks'
+import {
+  keepItemIdsRetired,
+  noteSupersededRubric,
+  numberRubricVersion,
+  retireSupersededRubrics,
+} from './hooks'
 
 /** No two items share an ID, so every benchmark result points at one item. */
 export const validateItems: ArrayFieldValidation = (value, options) => {
@@ -36,10 +41,11 @@ export const Rubrics: CollectionConfig = {
     useAsTitle: 'name',
     defaultColumns: ['name', 'version', 'status', 'updatedAt'],
     description:
-      'The criteria content is scored against before it can be published. One rubric is Active at a time.',
+      'The criteria content is scored against before it can be published. One rubric is Active at a time; publishing another as Active retires it.',
   },
   hooks: {
-    beforeChange: [numberRubricVersion, checkOneActiveRubric, keepItemIdsRetired],
+    beforeChange: [numberRubricVersion, noteSupersededRubric, keepItemIdsRetired],
+    afterChange: [retireSupersededRubrics],
   },
   versions: {
     drafts: { autosave: false },
@@ -76,7 +82,18 @@ export const Rubrics: CollectionConfig = {
       admin: {
         position: 'sidebar',
         description:
-          'Active: the rubric content is scored against; only one published rubric can be Active. Retired: no longer used, kept for the runs that used it. A rubric still being written stays a draft until it is published.',
+          'Active: the rubric content is scored against. Publishing a rubric as Active retires the one that was Active. Retired: no longer used, kept for the runs that used it. A rubric still being written stays a draft until it is published.',
+      },
+    },
+    {
+      name: 'supersedes',
+      type: 'relationship',
+      relationTo: 'rubrics',
+      access: { create: () => false, update: () => false },
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+        description: 'The rubric that was Active until this one was published as Active. Set automatically.',
       },
     },
     {

@@ -11325,7 +11325,7 @@ export interface NcxPostContent {
   createdAt: string;
 }
 /**
- * The criteria content is scored against before it can be published. One rubric is Active at a time.
+ * The criteria content is scored against before it can be published. One rubric is Active at a time; publishing another as Active retires it.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "rubrics".
@@ -11341,9 +11341,13 @@ export interface Rubric {
    */
   version?: number | null;
   /**
-   * Active: the rubric content is scored against; only one published rubric can be Active. Retired: no longer used, kept for the runs that used it. A rubric still being written stays a draft until it is published.
+   * Active: the rubric content is scored against. Publishing a rubric as Active retires the one that was Active. Retired: no longer used, kept for the runs that used it. A rubric still being written stays a draft until it is published.
    */
   status: 'active' | 'retired';
+  /**
+   * The rubric that was Active until this one was published as Active. Set automatically.
+   */
+  supersedes?: (string | null) | Rubric;
   /**
    * One row per criterion. Each benchmark run records a result for each item.
    */
@@ -15881,6 +15885,7 @@ export interface RubricsSelect<T extends boolean = true> {
   name?: T;
   version?: T;
   status?: T;
+  supersedes?: T;
   items?:
     | T
     | {

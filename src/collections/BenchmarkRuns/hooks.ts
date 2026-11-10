@@ -2,6 +2,7 @@ import type { CollectionBeforeChangeHook } from 'payload'
 import { APIError, ValidationError } from 'payload'
 
 import type { BenchmarkRun } from '@/payload-types'
+import { LIFECYCLE_COLLECTIONS } from '@/lifecycle/scope'
 import { scoreResults } from '@/lifecycle/score'
 
 /**
@@ -45,7 +46,10 @@ export const checkScoredVersion: CollectionBeforeChangeHook<BenchmarkRun> = asyn
 /**
  * rubricVersion must name a published version of the chosen rubric, and every
  * result must be for an item in that version, so a run never refers to
- * criteria that were not in the rubric it claims.
+ * criteria that were not in the rubric it claims. A run where every result is
+ * Not applicable is refused too: no item applying to a content type means the
+ * rubric's Applies to is wrong for it, and that should surface here rather
+ * than as a failed score.
  */
 export const checkRubricItems: CollectionBeforeChangeHook<BenchmarkRun> = async ({ data, req }) => {
   const rubric = typeof data.rubric === 'object' ? data.rubric?.id : data.rubric
@@ -85,16 +89,30 @@ export const checkRubricItems: CollectionBeforeChangeHook<BenchmarkRun> = async 
   const items = new Set((version.items ?? []).map((i) => i.itemId))
   const results = Array.isArray(data.results) ? data.results : []
   const unknown = [...new Set(results.map((r) => r?.itemId).filter((id) => id && !items.has(id)))]
-  if (!unknown.length) return data
-  throw new ValidationError({
-    collection: 'benchmarkRuns',
-    errors: [
-      {
-        path: 'results',
-        message: `Not items in version ${data.rubricVersion} of the rubric: ${unknown.join(', ')}.`,
-      },
-    ],
-  })
+  if (unknown.length) {
+    throw new ValidationError({
+      collection: 'benchmarkRuns',
+      errors: [
+        {
+          path: 'results',
+          message: `Not items in version ${data.rubricVersion} of the rubric: ${unknown.join(', ')}.`,
+        },
+      ],
+    })
+  }
+  if (results.length && results.every((r) => r?.state === 'na')) {
+    const type = LIFECYCLE_COLLECTIONS.find((c) => c.value === data.document?.relationTo)?.label
+    throw new ValidationError({
+      collection: 'benchmarkRuns',
+      errors: [
+        {
+          path: 'results',
+          message: `Every result is Not applicable, so no item in version ${data.rubricVersion} of "${version.name}" applies to ${type ?? data.document?.relationTo}. Check Applies to on the rubric's items.`,
+        },
+      ],
+    })
+  }
+  return data
 }
 
 /**

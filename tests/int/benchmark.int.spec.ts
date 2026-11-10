@@ -58,7 +58,7 @@ describe('the verdict', () => {
     expect(verdictFor({ score: 100, blockerCount: 1 }, 0)).toBe('fail')
   })
 
-  it('fails a run with no score, since nothing shows the gate was met', () => {
+  it('fails a run with no score, as a fallback for any recorded before such runs were refused', () => {
     expect(verdictFor({ score: null, blockerCount: 0 }, 0)).toBe('fail')
   })
 
@@ -186,14 +186,30 @@ describe('with the local database', () => {
       expect((await saveRubric({}, first.id)).version).toBe(3)
     })
 
-    it('allows only one Active rubric, checked on publish', async () => {
+    it('retires the Active rubric when another is published as Active, recording which it superseded', async (ctx) => {
+      const published = { ...quiet, collection: 'rubrics' as const, draft: false, overrideAccess: true }
+      const realActive = (await payload.find({ ...published, where: { and: [{ status: { equals: 'active' } }, { _status: { equals: 'published' } }, { name: { not_like: 'ZZ BENCH' } }] } })).docs
+      // Publishing a test rubric as Active would retire a real one.
+      if (realActive.length) ctx.skip()
       const a = await saveRubric({ name: 'ZZ BENCH active A', status: 'active', items: [item('AC-01')] })
+      // A draft of A that is not finished: the swap must not publish it.
+      await saveRubric({ name: 'ZZ BENCH active A, unfinished draft' }, a.id, false)
       const b = await saveRubric({ name: 'ZZ BENCH active B', status: 'active', items: [item('AC-01')] }, undefined, false)
-      expect(b).toMatchObject({ status: 'active', _status: 'draft' })
-      await expect(saveRubric({}, b.id)).rejects.toMatchObject(rejectedWith('status', /"ZZ BENCH active A" is/))
-      await saveRubric({ status: 'retired' }, a.id)
-      expect(await saveRubric({}, b.id)).toMatchObject({ status: 'active', _status: 'published' })
+      expect(b).toMatchObject({ status: 'active', _status: 'draft', supersedes: null })
+      const live = await saveRubric({}, b.id)
+      expect(live).toMatchObject({ status: 'active', _status: 'published', supersedes: a.id })
+      const oldA = await payload.findByID({ ...published, id: a.id })
+      expect(oldA).toMatchObject({ status: 'retired', _status: 'published', name: 'ZZ BENCH active A' })
+      const active = await payload.find({ ...published, where: { and: [{ status: { equals: 'active' } }, { _status: { equals: 'published' } }] } })
+      expect(active.docs.map((r) => r.id)).toEqual([b.id])
+      // Republishing B supersedes nothing new and keeps the record.
+      expect((await saveRubric({ name: 'ZZ BENCH active B again' }, b.id)).supersedes).toBe(a.id)
       await saveRubric({ status: 'retired' }, b.id)
+    })
+
+    it('takes supersedes from nobody but itself', async () => {
+      const r = await saveRubric({ name: 'ZZ BENCH supersedes', status: 'retired', items: [item('SU-01')], supersedes: 'abc' })
+      expect(r.supersedes).toBeNull()
     })
 
     it('refuses two items with one ID', async () => {
@@ -324,6 +340,14 @@ describe('with the local database', () => {
       await expect(run('2', 'VS-02')).rejects.toMatchObject(rejectedWith('results', 'VS-02'))
       const current = await run('2', 'VS-03')
       runs.push(current.id)
+    })
+
+    it('refuses a run where every result is Not applicable, naming the content type and rubric version', async () => {
+      const results = [{ itemId: 'BR-01', state: 'na' as const }, { itemId: 'BR-02', state: 'na' as const }]
+      const attempt = payload.create({ ...quiet, collection: 'benchmarkRuns', data: { ...runData(), results }, user: as(admin), overrideAccess: false })
+      await expect(attempt).rejects.toMatchObject(
+        rejectedWith('results', 'no item in version 1 of "ZZ BENCH runs" applies to Industries'),
+      )
     })
 
     it('refuses two results for one item', async () => {

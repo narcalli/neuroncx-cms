@@ -7,7 +7,8 @@ export type Verdict = 'pass' | 'fail'
  * worked out when it is read, never stored. Fail when any result is a
  * blocker, whatever the score; otherwise pass when the score reaches the
  * gate (a score equal to the gate passes). A run with no score (no item
- * applied) fails: nothing shows the content meets the gate.
+ * applied) fails: nothing shows the content meets the gate. Such runs are
+ * refused when recorded (checkRubricItems); this covers any recorded before.
  */
 export const verdictFor = (run: Pick<BenchmarkRun, 'score' | 'blockerCount'>, gate: number): Verdict => {
   if ((run.blockerCount ?? 0) > 0) return 'fail'
