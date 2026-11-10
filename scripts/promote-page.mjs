@@ -25,7 +25,9 @@
 // deleted on live.
 //
 // Reads PROMOTE_URL and PROMOTE_API_KEY (or PROMOTE_EMAIL and PROMOTE_PASSWORD)
-// from .env.promote (git-ignored), or from the file in PROMOTE_ENV. Local is
+// from .env.promote (git-ignored), or from the file in PROMOTE_ENV. --publish
+// always signs in with PROMOTE_EMAIL and PROMOTE_PASSWORD, since API keys
+// cannot publish. Local is
 // LOCAL_URL (default http://localhost:3001). Pages are read from local as a
 // visitor, published only. Collections are read with LOCAL_API_KEY (or
 // LOCAL_EMAIL and LOCAL_PASSWORD) from the same file, latest drafts included,
@@ -518,11 +520,19 @@ async function main() {
   const LOCAL = (process.env.LOCAL_URL || 'http://localhost:3001').replace(/\/$/, '')
   if (!LIVE) throw new Error('PROMOTE_URL is empty.')
 
-  // The REST API key is preferred. Email and password login is the fallback.
-  const liveHeaders = env.PROMOTE_API_KEY
-    ? { Authorization: `users API-Key ${env.PROMOTE_API_KEY}` }
-    : await login(LIVE, env.PROMOTE_EMAIL, env.PROMOTE_PASSWORD, 'live')
-  if (!liveHeaders) throw new Error('Set PROMOTE_API_KEY, or PROMOTE_EMAIL and PROMOTE_PASSWORD.')
+  // The REST API key is preferred. Email and password login is the fallback,
+  // and the only way with --publish: the CMS refuses to publish from API keys.
+  const liveHeaders =
+    env.PROMOTE_API_KEY && !PUBLISH
+      ? { Authorization: `users API-Key ${env.PROMOTE_API_KEY}` }
+      : await login(LIVE, env.PROMOTE_EMAIL, env.PROMOTE_PASSWORD, 'live')
+  if (!liveHeaders) {
+    throw new Error(
+      PUBLISH
+        ? '--publish needs PROMOTE_EMAIL and PROMOTE_PASSWORD: the CMS does not publish from API keys.'
+        : 'Set PROMOTE_API_KEY, or PROMOTE_EMAIL and PROMOTE_PASSWORD.',
+    )
+  }
 
   let localHeaders = {}
   if (collections.length) {

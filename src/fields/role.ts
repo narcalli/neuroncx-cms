@@ -16,7 +16,7 @@ export const roleField = (): SelectField => ({
   defaultValue: 'author',
   options: [
     { label: 'Admin', value: 'admin' },
-    { label: 'Content owner', value: 'content-owner' },
+    { label: 'Content owner', value: 'contentOwner' },
     { label: 'Author', value: 'author' },
   ],
   access: {

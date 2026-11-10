@@ -38,7 +38,7 @@ describe('the role field', () => {
       defaultValue: 'author',
       options: [
         { label: 'Admin', value: 'admin' },
-        { label: 'Content owner', value: 'content-owner' },
+        { label: 'Content owner', value: 'contentOwner' },
         { label: 'Author', value: 'author' },
       ],
     })
@@ -58,7 +58,7 @@ describe('the role field', () => {
 })
 
 describe('the access helpers', () => {
-  const each: (Role | undefined)[] = ['admin', 'content-owner', 'author', undefined]
+  const each: (Role | undefined)[] = ['admin', 'contentOwner', 'author', undefined]
   const check = (fn: typeof adminOnly) => each.map((role) => fn({ req: reqFor(signedIn(role)) }))
 
   it('adminOnly passes admins only', () => {
@@ -71,13 +71,13 @@ describe('the access helpers', () => {
     expect(contentOwnerOrAdmin({ req: reqFor(null) })).toBe(false)
   })
 
-  it('gives a user saved before roles existed no role at all', () => {
-    expect(hasRole(signedIn(undefined), 'admin', 'content-owner', 'author')).toBe(false)
+  it('gives a user with no role value no role at all', () => {
+    expect(hasRole(signedIn(undefined), 'admin', 'contentOwner', 'author')).toBe(false)
   })
 
   it('gives an MCP key record, which has no role field, no role', () => {
     const key = { id: 'k1', collection: 'payload-mcp-api-keys' } as unknown as SignedIn
-    expect(hasRole(key, 'admin', 'content-owner', 'author')).toBe(false)
+    expect(hasRole(key, 'admin', 'contentOwner', 'author')).toBe(false)
   })
 })
 
@@ -160,18 +160,40 @@ describe('with the local database', () => {
   })
 
   it('lets an admin change a role', async () => {
-    const changed = await payload.update({ ...quiet, collection: 'users', id: author.id, data: { role: 'content-owner' }, user: as(admin), overrideAccess: false })
-    expect(changed.role).toBe('content-owner')
+    const changed = await payload.update({ ...quiet, collection: 'users', id: author.id, data: { role: 'contentOwner' }, user: as(admin), overrideAccess: false })
+    expect(changed.role).toBe('contentOwner')
     await payload.update({ ...quiet, collection: 'users', id: author.id, data: { role: 'author' } })
   })
 
-  it('finds users saved before roles existed, which the backfill relies on, and treats them as no role', async () => {
+  it('lets anyone who is not an admin change only their own record', async () => {
+    const own = await payload.update({ ...quiet, collection: 'users', id: author.id, data: { name: 'ZZ role author' }, user: as(author), overrideAccess: false })
+    expect(own.name).toBe('ZZ role author')
+    // Resetting an admin's password would let an author sign in as that admin.
+    const other = payload.update({ ...quiet, collection: 'users', id: admin.id, data: { password: 'zz-role-taken' }, user: as(author), overrideAccess: false })
+    await expect(other).rejects.toMatchObject({ status: 403 })
+    const edited = await payload.update({ ...quiet, collection: 'users', id: author.id, data: { name: 'ZZ role by admin' }, user: as(admin), overrideAccess: false })
+    expect(edited.name).toBe('ZZ role by admin')
+  })
+
+  it('lets only admins delete users, the user themselves included', async () => {
+    const victim = await payload.create({ ...quiet, collection: 'users', data: { email: 'zz-role-delete@example.test', password, role: 'author' } })
+    for (const by of [author, victim]) {
+      const attempt = payload.delete({ ...quiet, collection: 'users', id: victim.id, user: as(by), overrideAccess: false })
+      await expect(attempt, by.email).rejects.toMatchObject({ status: 403 })
+    }
+    await payload.delete({ ...quiet, collection: 'users', id: victim.id, user: as(admin), overrideAccess: false })
+    expect((await payload.find({ ...quiet, collection: 'users', where: { id: { equals: victim.id } } })).docs).toEqual([])
+  })
+
+  it('finds users saved before roles existed, which the backfill relies on, and reads them as Author', async () => {
     const legacy = await payload.create({ ...quiet, collection: 'users', data: { email: 'zz-role-legacy@example.test', password, role: 'author' } })
     await (payload.db as MongooseAdapter).collections.users.updateOne({ _id: legacy.id }, { $unset: { role: 1 } })
     const missing = await payload.find({ ...quiet, collection: 'users', where: { role: { exists: false } }, pagination: false })
     expect(missing.docs.map((u) => u.id)).toContain(legacy.id)
+    // Payload fills the default on read, so a signed-in legacy user is an Author.
     const read = await payload.findByID({ ...quiet, collection: 'users', id: legacy.id })
-    expect(hasRole(as(read), 'admin', 'content-owner')).toBe(false)
+    expect(read.role).toBe('author')
+    expect(hasRole(as(read), 'admin', 'contentOwner')).toBe(false)
   })
 
   it('refuses to publish from an API key or MCP key, even an admin\'s, but saves its drafts', async () => {

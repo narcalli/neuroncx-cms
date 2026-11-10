@@ -74,7 +74,7 @@ if (unknown.length) {
 const target = (u: User): User['role'] | null => {
   const email = u.email.toLowerCase()
   if (admins.includes(email)) return 'admin'
-  if (owners.includes(email)) return 'content-owner'
+  if (owners.includes(email)) return 'contentOwner'
   return missing.has(u.id) ? 'author' : null
 }
 

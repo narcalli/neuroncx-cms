@@ -7,4 +7,4 @@ import { hasRole } from './roles'
  * boolean, so it works as collection access and as field access.
  */
 export const contentOwnerOrAdmin = ({ req: { user } }: { req: PayloadRequest }): boolean =>
-  hasRole(user, 'admin', 'content-owner')
+  hasRole(user, 'admin', 'contentOwner')

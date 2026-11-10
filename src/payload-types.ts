@@ -1175,7 +1175,7 @@ export interface User {
   /**
    * What this person can do in the admin. Only admins can change it.
    */
-  role: 'admin' | 'content-owner' | 'author';
+  role: 'admin' | 'contentOwner' | 'author';
   updatedAt: string;
   createdAt: string;
   enableAPIKey?: boolean | null;
