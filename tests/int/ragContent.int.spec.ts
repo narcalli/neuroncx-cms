@@ -131,7 +131,8 @@ describe('entry sections', () => {
     expect(lines[1]).toBe('Payment links are sent through Razorpay.')
     expect(lines).toEqual(
       expect.arrayContaining([
-        'Family: Book and get paid.',
+        // Not "Family:", which means nothing to someone reading the answer.
+        'Belongs to the group of agents: Book and get paid.',
         'Passes to: Test matching and pricing.',
         'Works with: Razorpay.',
         // The customers collection's own rule: no real name without Show real name.

@@ -106,7 +106,7 @@ export type ContentCollectionOptions = {
   cardDesigns?: ItemCardDesignName[]
   /** The hero designs an entry's own page may use. All of them when left out. Needs the ownPage group. */
   heroDesigns?: HeroDesignName[]
-  kb?: { resolve?: string[]; exclude?: string[] }
+  kb?: { resolve?: string[]; exclude?: string[]; labels?: Record<string, string> }
   /** Extra Payload hooks, run after the factory's own. */
   hooks?: CollectionConfig['hooks']
   /** Tabs only this collection has, each placed straight after one of the fixed tabs. */
@@ -259,7 +259,7 @@ export const defineContentCollection = (opts: ContentCollectionOptions): Collect
     heroDesigns: groups.has('ownPage') ? heroDesigns : [],
     siteBlocks: freeLayout ? [...ALL_LAYOUT_BLOCK_SLUGS] : siteBlocks,
     freeLayout,
-    kb: { resolve: opts.kb?.resolve ?? [], exclude: opts.kb?.exclude ?? [] },
+    kb: { resolve: opts.kb?.resolve ?? [], exclude: opts.kb?.exclude ?? [], labels: opts.kb?.labels },
   }
   const layout = sectionKeys.length
     ? layoutField({ collection: slug, sections: sectionKeys, defaultLayout: entry.defaultLayout, siteBlocks: entry.siteBlocks })

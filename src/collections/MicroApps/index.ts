@@ -214,7 +214,11 @@ export const MicroApps = defineContentCollection({
     'faq',
     'related',
   ],
-  kb: { resolve: ['family', 'integrations', 'passesTo', 'customers'] },
+  kb: {
+    resolve: ['family', 'integrations', 'passesTo', 'customers'],
+    // "Family" is an admin word; the knowledge base says what it means.
+    labels: { family: 'Belongs to the group of agents' },
+  },
   // Pages whose Agentic Flow Demo shows this agent (flowDemoPages.ts).
   hooks: { afterChange: [revalidateFlowDemoPages, revalidateIndustriesShowing('industryAgents', byVerticals)] },
   admin: {
