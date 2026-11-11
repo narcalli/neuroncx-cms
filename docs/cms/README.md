@@ -4,7 +4,7 @@ Design notes for the content collections, from the Notion page "[13 Oct 26] NCX 
 
 - [fields_reference.md](fields_reference.md): the shared field groups every content collection uses.
 - [features-migration.md](features-migration.md): where each entry in the old Features collection is going.
-- [roles-and-review.md](roles-and-review.md): the roles, the review workflow, and known exceptions (content-promote@neuroncx.in can override the benchmark gate).
+- [roles-and-review.md](roles-and-review.md): the roles, the review workflow, fixed and open access gaps, and how promote-page.mjs signs in.
 
 Collections, in `collections/`:
 

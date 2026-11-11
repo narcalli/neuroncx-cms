@@ -143,15 +143,15 @@ describe('with the local database', () => {
     await payload.delete({ ...quiet, collection: 'users', where: { email: { like: 'zz-role-' } } })
   })
 
-  it('gives a user created by an author the Author role, whatever was asked for', async () => {
-    const made = await payload.create({
+  it('refuses a new user from an author: only an admin adds people (src/collections/Users/signIn.ts)', async () => {
+    const attempt = payload.create({
       ...quiet,
       collection: 'users',
       data: { email: 'zz-role-new@example.test', password, role: 'admin' },
       user: as(author),
       overrideAccess: false,
     })
-    expect(made.role).toBe('author')
+    await expect(attempt).rejects.toMatchObject({ name: 'Forbidden' })
   })
 
   it('keeps an author from changing their own role', async () => {
