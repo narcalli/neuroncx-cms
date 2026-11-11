@@ -52,20 +52,25 @@ Redirects go live as soon as they are saved. Until wave 2 (11 Nov 2026) anyone s
 
 ### The enquiry read log (from 11 Nov 2026)
 
-Every enquiry a signed-in person or key reads is recorded in Enquiry reads (admin, System): who, whether it was listed among others or opened on its own, when, from which IP address and browser, and with a key or signed in (src/collections/EnquiryReads.ts). Only an admin in person can read the log; nobody can write, change or delete an entry through the API. Reads by server code with nobody signed in are not recorded. If writing an entry fails, the read still goes through and the failure is in the server log.
+Every read of enquiries by a signed-in person or key is recorded in Enquiry reads (admin, System): opening one enquiry is an entry naming it; a list is one entry with how many enquiries it returned. Each entry has who, when, the IP address and browser, and whether a key was used (src/collections/EnquiryReads.ts). Only an admin in person can read the log; nobody can write, change or delete an entry through the API. Reads by server code with nobody signed in are not recorded. If writing an entry fails, the read still goes through and the failure is in the server log.
 
 ### Enquiries on developers' machines
 
 Copies of the database on a developer's machine keep enquiries without the people in them: names, emails, phone numbers, companies and messages are replaced with placeholders (scripts/blank-enquiries.mjs). The tests' database blanks them as it copies, and the dev database pull leaves enquiries out of the production dump altogether. Older dumps in `db-backups/` still hold them.
 
+### Fixed in wave 3 (11 Nov 2026)
+
+- **MCP keys** (payload-mcp-api-keys): anyone signed in could create one and link it to any user, an admin included, and MCP requests run as the linked user. Now only an admin in person makes, reads, changes or removes them (src/plugins/index.ts).
+- **Benchmark runs**: anyone signed in could record a run with results of their choosing, so a run could be made to pass. Now nobody records a run through the API, an admin included: the scorer (`scripts/benchmark.ts record`) writes runs on the server, after its own checks, as a named user. Deleting a run is for an admin in person.
+- **Deleting with a key**: no API key deletes anything in a collection this config defines, content and media included (src/plugins/apiKeysDraftOnly.ts).
+- **Payload's own tables**: edit locks and folders are for people only, never a key; preferences can only be changed by their owner; the migrations log cannot be reached through the API at all (it had a GraphQL route). Payload adds these after plugins with no way to configure them, so the rules are set on the built config (src/access/internalCollections.ts, written against Payload 3.84.1).
+
 ### Open: what a signed-in author or an API key can still do (audit, 11 Nov 2026)
 
 Not fixed yet. An API key acts as its owner, so each of these is open to a key as well as to the person. tests/int/accessMatrix.int.spec.ts holds the full table and marks each one "Open", so closing a gap means changing it there.
 
-- **Delete published content and media**, which is live at once (Media has no drafts).
-- **Create, read and edit MCP keys** (payload-mcp-api-keys), including linking one to another user, an admin included. MCP requests run as the linked user. Today MCP can only find Pages and Media and read the Header and Footer, so this gives no more than an author already has. It would become an escalation if MCP writes are enabled.
-- **Read, create and record benchmark runs** for any entry, with any results: a run can be made to pass. The gate only warns for now.
-- **Delete edit locks** (payload-locked-documents), move media between folders (payload-folders), edit any user's admin preferences by id (payload-preferences), and edit the migrations log (payload-migrations; this project runs no migrations).
+- **Upload and replace media**: a key can still upload a new file or replace an existing one, which a live page shows at once. Deleting is refused.
+
 
 ### promote-page.mjs saves drafts only, as promote@neuroncx.in
 

@@ -22,51 +22,52 @@ type Cell = string
 type Row = { nobody: Cell; author: Cell; authorKey: Cell; owner: Cell; admin: Cell; adminKey: Cell }
 
 const EXPECTED: Record<string, Row> = {
-  'pages': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
-  'posts': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
-  // Open: keys can upload and delete media, which is live at once.
-  'media': { nobody: 'nynn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
-  'categories': { nobody: 'nynn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
-  'features': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
+  // Wave 3: no key deletes anything in a collection this config defines (src/plugins/apiKeysDraftOnly.ts).
+  'pages': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyn', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyn' },
+  'posts': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyn', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyn' },
+  // Open: keys can upload and replace media, which is live at once (deleting is refused since wave 3).
+  'media': { nobody: 'nynn', author: 'yyyy', authorKey: 'yyyn', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyn' },
+  'categories': { nobody: 'nynn', author: 'yyyy', authorKey: 'yyyn', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyn' },
+  'features': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyn', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyn' },
   // Wave 1: only an admin signed in as themselves creates users; a key never does.
-  'users': { nobody: 'nnnn', author: 'nywn', authorKey: 'nywn', owner: 'nywn', admin: 'yyyy', adminKey: 'nyyy' },
+  'users': { nobody: 'nnnn', author: 'nywn', authorKey: 'nywn', owner: 'nywn', admin: 'yyyy', adminKey: 'nyyn' },
   // Fixed (wave 2): personal data, an admin in person only; created by the website form (with its secret) or such an admin.
   'enquiries': { nobody: 'nnnn', author: 'nnnn', authorKey: 'nnnn', owner: 'nnnn', admin: 'yyyy', adminKey: 'nnnn' },
-  'sectors': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
-  'industryTopics': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
-  'sharedContent': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
-  'customers': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
-  'integrationsMaster': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
-  'integrations': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
-  'integrationCategories': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
-  'connectionTypes': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
-  'products': { nobody: 'nynn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
-  'lists': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
-  'crmFeatures': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
-  'microApps': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
-  'hubs': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
+  'sectors': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyn', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyn' },
+  'industryTopics': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyn', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyn' },
+  'sharedContent': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyn', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyn' },
+  'customers': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyn', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyn' },
+  'integrationsMaster': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyn', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyn' },
+  'integrations': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyn', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyn' },
+  'integrationCategories': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyn', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyn' },
+  'connectionTypes': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyn', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyn' },
+  'products': { nobody: 'nynn', author: 'yyyy', authorKey: 'yyyn', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyn' },
+  'lists': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyn', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyn' },
+  'crmFeatures': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyn', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyn' },
+  'microApps': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyn', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyn' },
+  'hubs': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyn', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyn' },
   'ncxPostContents': { nobody: 'nnnn', author: 'nynn', authorKey: 'nynn', owner: 'nynn', admin: 'nynn', adminKey: 'nynn' },
   // Wave 2: the enquiry read log; written by the server only, read by an admin in person.
   'enquiryReads': { nobody: 'nnnn', author: 'nnnn', authorKey: 'nnnn', owner: 'nnnn', admin: 'nynn', adminKey: 'nnnn' },
-  'rubrics': { nobody: 'nnnn', author: 'nynn', authorKey: 'nynn', owner: 'nynn', admin: 'yyyy', adminKey: 'yyyy' },
-  // Open: anyone signed in can record a run with results of their choosing.
-  'benchmarkRuns': { nobody: 'nnnn', author: 'yynn', authorKey: 'yynn', owner: 'yynn', admin: 'yyny', adminKey: 'yyny' },
+  'rubrics': { nobody: 'nnnn', author: 'nynn', authorKey: 'nynn', owner: 'nynn', admin: 'yyyy', adminKey: 'yyyn' },
+  // Fixed (wave 3): never through the API, an admin included: the scorer writes runs on the server.
+  'benchmarkRuns': { nobody: 'nnnn', author: 'nynn', authorKey: 'nynn', owner: 'nynn', admin: 'nyny', adminKey: 'nynn' },
   'contentEvents': { nobody: 'nnnn', author: 'nynn', authorKey: 'nynn', owner: 'nynn', admin: 'nynn', adminKey: 'nynn' },
   // Fixed (wave 2): live at once (no drafts), so a content owner or admin in person, never an author or a key.
   'redirects': { nobody: 'nynn', author: 'nynn', authorKey: 'nynn', owner: 'yyyy', admin: 'yyyy', adminKey: 'nynn' },
-  // Open: anyone signed in can create MCP keys and link one to any user. MCP is find-only today.
-  'payload-mcp-api-keys': { nobody: 'nnnn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
+  // Fixed (wave 3): MCP keys run as the user they link to, so an admin in person only, never a key.
+  'payload-mcp-api-keys': { nobody: 'nnnn', author: 'nnnn', authorKey: 'nnnn', owner: 'nnnn', admin: 'yyyy', adminKey: 'nnnn' },
   'payload-kv': { nobody: 'nnnn', author: 'nnnn', authorKey: 'nnnn', owner: 'nnnn', admin: 'nnnn', adminKey: 'nnnn' },
   // Fixed 279da24: read only through the API (src/access/jobsCollection.ts).
   'payload-jobs': { nobody: 'nnnn', author: 'nynn', authorKey: 'nynn', owner: 'nynn', admin: 'nynn', adminKey: 'nynn' },
-  // Open (low): media folders can be rearranged by anyone signed in.
-  'payload-folders': { nobody: 'nnnn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
-  // Open (low): anyone signed in can delete another person's edit lock.
-  'payload-locked-documents': { nobody: 'nnnn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
-  // Open (low): update is not limited to one's own preferences.
-  'payload-preferences': { nobody: 'nnnn', author: 'ywyw', authorKey: 'ywyw', owner: 'ywyw', admin: 'ywyw', adminKey: 'ywyw' },
-  // Open (low): the migrations log is editable; no migrations are run.
-  'payload-migrations': { nobody: 'nnnn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
+  // Fixed (wave 3): people only, never a key (src/access/internalCollections.ts).
+  'payload-folders': { nobody: 'nnnn', author: 'yyyy', authorKey: 'nnnn', owner: 'yyyy', admin: 'yyyy', adminKey: 'nnnn' },
+  // Fixed (wave 3): people only, never a key; taking over a lock stays possible for people.
+  'payload-locked-documents': { nobody: 'nnnn', author: 'yyyy', authorKey: 'nnnn', owner: 'yyyy', admin: 'yyyy', adminKey: 'nnnn' },
+  // Fixed (wave 3): one's own preferences only, changing included; never a key.
+  'payload-preferences': { nobody: 'nnnn', author: 'ywww', authorKey: 'nnnn', owner: 'ywww', admin: 'ywww', adminKey: 'nnnn' },
+  // Fixed (wave 3): nobody through the API; GraphQL could reach it. Payload's migration runner is unaffected.
+  'payload-migrations': { nobody: 'nnnn', author: 'nnnn', authorKey: 'nnnn', owner: 'nnnn', admin: 'nnnn', adminKey: 'nnnn' },
 }
 
 /** Globals: read, update. */
@@ -185,6 +186,16 @@ describe('keys and sign-in', () => {
     await expect(change(as(author, 'local-jwt'))).rejects.toMatchObject({ name: 'Forbidden' })
     // Saved as it was, so other tests running alongside see no change.
     await expect(change(as(admin, 'local-jwt'))).resolves.toBeTruthy()
+  })
+
+  it('lets only an admin in person make an MCP key, so nobody can mint one that runs as an admin', async () => {
+    const key = (user: Record<string, any>) =>
+      payload.create({ collection: 'payload-mcp-api-keys', data: { user: admin.id, label: 'zz-matrix MCP key' } as never, user: user as never, overrideAccess: false })
+    for (const user of [as(author, 'local-jwt'), as(author, 'api-key'), as(admin, 'api-key')]) {
+      await expect(key(user)).rejects.toMatchObject({ name: 'Forbidden' })
+    }
+    const made = await key(as(admin, 'local-jwt'))
+    await payload.delete({ collection: 'payload-mcp-api-keys', id: made.id, overrideAccess: true })
   })
 
   it('gives a key no session token through refresh', async () => {

@@ -44,11 +44,13 @@ import { serializeTransactionCalls } from './db/serializeTransactionCalls'
 import { EnquiryReads } from './collections/EnquiryReads'
 import { applyReview } from './review'
 import { withJobsAccess } from './access/jobsCollection'
+import { restrictInternalCollections } from './access/internalCollections'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-export default buildConfig({
+// Payload's own collections get their access after the build (src/access/internalCollections.ts).
+export default restrictInternalCollections(buildConfig({
   admin: {
     components: {
       // The review queue (src/review/ReviewQueue.tsx), linked from the nav.
@@ -152,4 +154,4 @@ export default buildConfig({
     // No creating, editing or deleting jobs through the API (src/access/jobsCollection.ts).
     jobsCollectionOverrides: ({ defaultJobsCollection }) => withJobsAccess(defaultJobsCollection),
   },
-})
+}))
