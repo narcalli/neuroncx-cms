@@ -1,10 +1,11 @@
 /**
- * The checks code can decide on its own (scripts/benchmark.ts), as rubric v3
- * words them. Each returns a verdict, or hands the check to the judge
- * (scripts/benchmark/judge.ts) with what code already found. Deterministic:
- * the same entry always gets the same answer.
+ * The checks code decides on its own (scripts/benchmark.ts), as rubric v4
+ * words them. Each returns a verdict, or hands the check to a person on the
+ * worksheet (scripts/benchmark/worksheet.ts) with what code already found.
+ * Deterministic: the same entry always gets the same answer. Seven checks
+ * stay with a person; everything else is decided here.
  */
-import { asDoc, rows, sectionsOf, sentencesOf, str, textOf, words, type Entry, type Refs } from './entry'
+import { asDoc, rows, sectionsOf, sentencesOf, str, textOf, words, type Entry, type Refs, type Section } from './entry'
 
 export type Verdict = 'pass' | 'fail' | 'na'
 export type Decision = { verdict: Verdict; note: string } | { judge: true; hint?: string }
@@ -14,20 +15,40 @@ const judge = (hint?: string): Decision => ({ judge: true, hint })
 const NO_OWN_PAGE = decided('na', 'No page of its own.')
 
 const lower = (s: string) => s.toLowerCase()
-const has = (text: string, phrase: string) => lower(text).includes(lower(phrase))
-const wordMatch = (text: string, term: string) =>
-  new RegExp(`(^|[^\\p{L}])${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}([^\\p{L}]|$)`, 'iu').test(text)
+const has = (text: string, phrase: string) => Boolean(phrase) && lower(text).includes(lower(phrase))
+const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+const wordMatch = (text: string, term: string) => new RegExp(`(^|[^\\p{L}])${escape(term)}([^\\p{L}]|$)`, 'iu').test(text)
+// A word from a Content standards list, singular or plural ("manager", "Managers").
+const listMatch = (text: string, term: string) => new RegExp(`(^|[^\p{L}])${escape(term)}(s|es)?([^\p{L}]|$)`, 'iu').test(text)
+const anyOf = (text: string, list: string[]) => list.find((w) => listMatch(text, w))
+const firstSentence = (text: string) => sentencesOf(text)[0] ?? ''
+const quoteShort = (s: string) => `"${s.length > 90 ? `${s.slice(0, 90)}...` : s}"`
 
 const BARE_LABELS = ['overview', 'introduction', 'benefits', 'features', 'how it works', 'why us', 'details', 'more']
 const ADMIN_WORDS = ['listing', 'card', 'panel', 'page', 'detail', 'platform sections', 'interim']
 const OUTSIDE = /\b(as mentioned|above|below|earlier section|previous section|as shown|on the left|on the right|the icon|the green|the highlighted)\b/i
-const UI_INSTRUCTION = /(^|[.!?]\s+)(select|click|tap|pick|hover|scroll|watch)\b/im
-const PRONOUN_OPENER = /(^|[.!?]\s+)(it|this|they|these)\b/im
+const UI_INSTRUCTION = /^(select|click|tap|pick|hover|scroll|watch)\b/i
+const PRONOUN_START = /^(it|this|they|these)\b/i
+const PRONOUN_START_WITH_THAT = /^(it|this|they|these|that)\b/i
 const FILLER = /\b(leverag\w*|seamless\w*|robust\w*|unlock\w*|revolutioni[sz]\w*|in today's fast-paced world|not just\b[^.]*\bit's\b)/i
 const CRITICISM = /\b(outdated|broken|fail\w*|struggl\w*|chaos\w*|nightmare|stuck|still using|old-fashioned)\b/i
-const COMPLIANCE = /\b(data protection|privacy|personal data|compliance|compliant|consent|DPDP|GDPR)\b/i
+const DATA_PROTECTION = /\b(data protection|personal data|privacy policy|data residency)\b/i
 const CONTACT_DATA = /(\b[6-9]\d{9}\b|\+91[\s-]?\d{5}[\s-]?\d{5}|[\w.+-]+@[\w-]+\.[\w.]+|\b(UHID|MRN)\s*[:#]?\s*\d+)/i
 const VERB_LABEL = /^(book|see|talk|try|get|start|request|contact|explore|watch|download|ask|schedule|learn|read|join|call)\b/i
+const FIGURE = /\b\d+(\.\d+)?\s*(%|per ?cent\b|x\b|times\b)/i
+const SOURCE = /\b(according to|source|survey|study|report)\b/i
+const STOP = new Set(['about', 'after', 'again', 'their', 'there', 'these', 'those', 'which', 'where', 'while', 'would', 'could', 'should', 'what', 'when', 'your', 'from', 'with', 'does'])
+
+/** A section's own words: a post's title line and its More link are left out. */
+const ownBody = (s: Section) =>
+  s.body
+    .split('\n')
+    .filter((line, i) => !(i === 0 && line.trim() === s.heading.trim()) && !/^More: https?:\/\//.test(line))
+    .join('\n')
+    .trim()
+
+/** Sections whose words are card fields (tagline, summary, key points), which the list check exempts. */
+const isCardSection = (s: Section) => s.key === 'tab:Card' || s.key === 'tab:Listing'
 
 const ctaLabel = (doc: Record<string, unknown>, field: string) => str(asDoc(doc[field])?.label).trim()
 
@@ -38,6 +59,7 @@ export const decide = (itemId: string, e: Entry, refs: Refs): Decision => {
   const meta = asDoc(d.meta) ?? {}
   const keyword = str(meta.primaryKeyword).trim()
   const faqs = rows(d.faqs)
+  const named = (s: string) => has(s, e.name)
 
   switch (itemId) {
     case 'ex-headings-name-subject': {
@@ -49,18 +71,48 @@ export const decide = (itemId: string, e: Entry, refs: Refs): Decision => {
         return (rest && ADMIN_WORDS.some((w) => rest.startsWith(w))) || /\(interim\)/i.test(h)
       })
       if (paired) return decided('fail', `"${paired}" pairs the entry name with an admin word.`)
-      return judge()
+      const names = [e.name, keyword, ...refs.catalogue, ...refs.terms].filter(Boolean)
+      const unnamed = headings.find((h) => !names.some((n) => has(h, n)))
+      return unnamed ? decided('fail', `"${unnamed}" has neither the entry name, the keyword nor a catalogue or terms name.`) : decided('pass')
+    }
+    case 'ex-sections-stand-alone': {
+      for (const s of sectionsOf(e)) {
+        const body = ownBody(s)
+        const first = firstSentence(body)
+        if (PRONOUN_START_WITH_THAT.test(body)) return decided('fail', `"${s.heading}" starts with ${body.split(/\s/)[0]}.`)
+        if (!named(s.heading) && !named(first)) return decided('fail', `"${s.heading}" names the entry in neither its heading nor its first sentence.`)
+      }
+      return decided('pass')
     }
     case 'ex-no-outside-references': {
       const phrase = text.match(OUTSIDE)
       if (phrase) return decided('fail', `Says "${phrase[0]}".`)
-      const ui = text.match(UI_INSTRUCTION)
-      if (ui) return decided('fail', `Tells the reader to "${ui[2]}" something on the page.`)
-      return PRONOUN_OPENER.test(text) ? judge('Some sentences open with It, This, They or These.') : decided('pass')
+      const ui = sentences.find((s) => UI_INSTRUCTION.test(s))
+      if (ui) return decided('fail', `Tells the reader to act on the page: ${quoteShort(ui)}`)
+      const pronoun = sentences.find((s) => PRONOUN_START.test(s))
+      return pronoun ? decided('fail', `Starts with a pronoun: ${quoteShort(pronoun)}`) : decided('pass')
     }
     case 'ex-terms-defined': {
-      const used = refs.terms.filter((t) => wordMatch(text, t))
-      return used.length ? judge(`Terms on the list used here: ${used.join(', ')}.`) : decided('pass', 'No term on the list is used.')
+      for (const term of refs.terms) {
+        const first = sentences.find((s) => wordMatch(s, term))
+        if (!first) continue
+        const t = escape(term)
+        const defined = new RegExp(`${t}\\s+(is|are|means)\\b|${t}\\s*\\(|${t},\\s+(a|an|the)\\b`, 'i').test(first)
+        if (!defined) return decided('fail', `"${term}" is first used without saying what it is: ${quoteShort(first)}`)
+      }
+      return decided('pass')
+    }
+    case 'ex-one-name':
+      return judge()
+    case 'ex-lists-for-enumerations': {
+      for (const s of sectionsOf(e).filter((x) => !isCardSection(x))) {
+        for (const sentence of sentencesOf(ownBody(s))) {
+          const joins = (sentence.match(/,/g)?.length ?? 0) + (sentence.match(/\b(and|or|then)\b/gi)?.length ?? 0)
+          if (joins >= 3) return decided('fail', `${joins} joins in one sentence: ${quoteShort(sentence)}`)
+          if (joins >= 2 && words(sentence) > 25) return decided('fail', `${joins} joins in a ${words(sentence)}-word sentence: ${quoteShort(sentence)}`)
+        }
+      }
+      return decided('pass')
     }
     case 'ex-image-meaning-in-text': {
       if (!e.images.length) return decided('na', 'No images.')
@@ -74,13 +126,33 @@ export const decide = (itemId: string, e: Entry, refs: Refs): Decision => {
       const twice = long.find((s, i) => long.indexOf(s) !== i)
       return twice ? decided('fail', `Appears twice: "${twice.slice(0, 80)}".`) : judge('No sentence of eight or more words repeats; check for one fact given two values.')
     }
-    case 'ex-faq-answers-stand-alone':
-      return faqs.length ? judge() : decided('na', 'No FAQs.')
-    case 'ex-kb-answer-complete':
-      return str(d.kbAnswer).trim() ? judge() : decided('fail', 'Answer is empty.')
+    case 'ex-faq-answers-stand-alone': {
+      if (!faqs.length) return decided('na', 'No FAQs.')
+      for (const f of faqs) {
+        const q = str(f.question)
+        const a = str(f.answer).trim()
+        if (/\b(it|this)\b/i.test(q)) return decided('fail', `The question says it or this: "${q}"`)
+        if (/^(yes|no)\b|^\d/i.test(a)) continue
+        const qWords = (q.match(/\p{L}{5,}/gu) ?? []).map(lower).filter((w) => !STOP.has(w))
+        if (!qWords.some((w) => wordMatch(firstSentence(a), w))) return decided('fail', `The answer to "${q}" neither starts with yes, no or a number nor repeats a word from the question.`)
+      }
+      return decided('pass')
+    }
+    case 'ex-product-claims-exist':
+    case 'hr-no-client-names':
+      return judge()
+    case 'ex-kb-answer-complete': {
+      const answer = str(d.kbAnswer).trim()
+      if (!answer) return decided('fail', 'Answer is empty.')
+      const first = firstSentence(answer)
+      if (!named(first)) return decided('fail', 'The first sentence of the answer does not contain the entry name.')
+      return anyOf(first, refs.audiences) ? decided('pass') : decided('fail', 'The first sentence of the answer names no one from the audience list.')
+    }
     case 'ex-kb-facts-checkable': {
-      const n = rows(d.kbFacts).length
-      return n < 3 ? decided('fail', `${n} facts, fewer than three.`) : judge()
+      const facts = rows(d.kbFacts).map((r) => str(r.fact).trim())
+      if (facts.length < 3) return decided('fail', `${facts.length} facts, fewer than three.`)
+      const bad = facts.find((f) => f.length > 160 || sentencesOf(f).length > 1 || PRONOUN_START_WITH_THAT.test(f))
+      return bad ? decided('fail', `Fact ${quoteShort(bad)} is not one short sentence with a noun first.`) : decided('pass')
     }
     case 'ex-kb-questions-answered': {
       const qs = rows(d.kbQuestions).map((r) => str(r.question).trim())
@@ -101,8 +173,17 @@ export const decide = (itemId: string, e: Entry, refs: Refs): Decision => {
       if (avg > 22) return decided('fail', `Average sentence ${avg.toFixed(1)} words.`)
       return decided('pass')
     }
-    case 'en-hero-says-what':
-      return e.ownPage ? judge() : NO_OWN_PAGE
+    case 'en-audience-named': {
+      // What a reader or the bot gets, not fields the entry stores but does not show.
+      const found = anyOf(text, refs.audiences)
+      return found ? decided('pass', `Names "${found}".`) : decided('fail', 'Names no one from the audience list.')
+    }
+    case 'en-hero-says-what': {
+      if (!e.ownPage) return NO_OWN_PAGE
+      const heading = str(d.heroHeading)
+      if (!named(heading) && !has(heading, keyword)) return decided('fail', 'The hero heading has neither the entry name nor the keyword.')
+      return anyOf(str(d.heroSubheading), refs.audiences) ? decided('pass') : decided('fail', 'The hero subheading names no one from the audience list.')
+    }
     case 'en-next-action': {
       if (!e.ownPage) return NO_OWN_PAGE
       const labels = [ctaLabel(d, 'cta'), ctaLabel(d, 'heroSecondaryCta')].filter(Boolean)
@@ -115,11 +196,17 @@ export const decide = (itemId: string, e: Entry, refs: Refs): Decision => {
         return str(d.result).trim() ? decided('pass', 'Panel steps under their labels, with a Result.') : decided('fail', 'Result is empty.')
       }
       return judge()
+    case 'en-concrete-example': {
+      const names = [e.name, ...refs.catalogue]
+      const example = sentences.find((s) => anyOf(s, refs.channels) && (/\d|"[^"]+"|“[^”]+”/.test(s)) && names.some((n) => has(s, n)))
+      return example ? decided('pass', `For example ${quoteShort(example)}`) : decided('fail', 'No sentence has a channel, a number or quoted item, and a NeuronCx name together.')
+    }
     case 'en-card-summary': {
       const summary = str(d.summary).trim()
       if (!summary) return decided('fail', 'Summary is empty.')
-      if (has(summary, e.name)) return decided('fail', 'Summary repeats the entry name.')
-      return judge()
+      if (summary.length > 140) return decided('fail', `Summary is ${summary.length} characters.`)
+      if (named(summary)) return decided('fail', 'Summary repeats the entry name.')
+      return PRONOUN_START_WITH_THAT.test(summary) ? decided('fail', 'Summary starts with a pronoun.') : decided('pass')
     }
     case 'hr-no-em-dashes':
       return e.raw.includes('—') ? decided('fail', 'An em dash appears.') : decided('pass')
@@ -131,17 +218,22 @@ export const decide = (itemId: string, e: Entry, refs: Refs): Decision => {
       return /agentic telephony/i.test(e.raw) ? decided('fail', 'Says agentic telephony.') : decided('pass')
     case 'hr-observation-not-criticism': {
       const hit = text.match(CRITICISM)
-      return hit ? judge(`Uses "${hit[0]}": decide whether that sentence is about how businesses work today.`) : decided('pass')
+      return hit ? decided('fail', `Uses "${hit[0]}".`) : decided('pass')
     }
-    case 'hr-dpdp-not-hipaa':
+    case 'hr-dpdp-not-hipaa': {
       if (/\bHIPAA\b/.test(e.raw)) return decided('fail', 'Mentions HIPAA.')
-      return COMPLIANCE.test(text) ? judge('Mentions data protection or compliance.') : decided('pass', 'No compliance statement.')
+      const unframed = sentences.find((s) => DATA_PROTECTION.test(s) && !/\bDPDP\b/.test(s))
+      return unframed ? decided('fail', `Mentions data protection without the DPDP Act: ${quoteShort(unframed)}`) : decided('pass')
+    }
     case 'hr-no-patient-data': {
       const hit = e.raw.match(CONTACT_DATA)
       return hit ? decided('fail', `Contains "${hit[0]}".`) : judge()
     }
-    case 'hr-claims-have-evidence':
-      return /\d/.test(text) ? judge() : decided('pass', 'No numbers.')
+    case 'hr-claims-have-evidence': {
+      const linksCustomer = e.links.some((l) => /\bcustomers\b/.test(l))
+      const unsourced = sentences.find((s) => FIGURE.test(s) && !SOURCE.test(s))
+      return unsourced && !linksCustomer ? decided('fail', `A figure with no source: ${quoteShort(unsourced)}`) : decided('pass')
+    }
     case 'seo-meta-title': {
       if (!e.ownPage) return NO_OWN_PAGE
       const title = str(meta.title).trim()
@@ -153,7 +245,7 @@ export const decide = (itemId: string, e: Entry, refs: Refs): Decision => {
       if (!e.ownPage) return NO_OWN_PAGE
       const desc = str(meta.description).trim()
       if (desc.length < 70 || desc.length > 155) return decided('fail', `SEO description is ${desc.length} characters.`)
-      return has(desc, e.name) || (keyword && has(desc, keyword)) ? decided('pass') : decided('fail', 'SEO description has neither the name nor the keyword.')
+      return named(desc) || has(desc, keyword) ? decided('pass') : decided('fail', 'SEO description has neither the name nor the keyword.')
     }
     case 'seo-share-image':
       if (!e.ownPage) return NO_OWN_PAGE
@@ -171,14 +263,14 @@ export const decide = (itemId: string, e: Entry, refs: Refs): Decision => {
   }
 }
 
-/** hr-no-client-names, from the organisations the judge found: allowed only if listed. */
+/** hr-no-client-names, from the organisations a person listed: allowed only if listed. */
 export const decideOrganisations = (names: string[], e: Entry, refs: Refs): { verdict: Verdict; note: string } => {
   const allowed = ['NeuronCx', 'NeuronCX', 'NCX', ...refs.customers, ...refs.integrations, ...refs.thirdParties].map(lower)
   const unknown = names.filter((n) => !allowed.includes(lower(n.trim())))
   return unknown.length ? { verdict: 'fail', note: `Names organisations not on any list: ${unknown.join(', ')}.` } : { verdict: 'pass', note: '' }
 }
 
-/** ex-product-claims-exist, from the NeuronCx names the judge found: each must exist. */
+/** ex-product-claims-exist, from the NeuronCx names a person listed: each must exist. */
 export const decideProductNames = (names: string[], e: Entry, refs: Refs): { verdict: Verdict; note: string } => {
   const known = [e.name, ...refs.catalogue, ...refs.terms].map(lower)
   const unknown = names.filter((n) => {

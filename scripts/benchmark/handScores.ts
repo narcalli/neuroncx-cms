@@ -1,6 +1,8 @@
 /**
  * Rubric v3, scored by hand on the ten published entries (11 Nov 2026):
  * the second calibration's results with v3's four rule changes applied.
+ * Kept as recorded for v4, whose check IDs are the same: v4 only moved
+ * checks from a person to code.
  * The scorer must match these within 5 points per entry before its runs
  * count (scripts/benchmark.ts accuracy). Never edited to fit the scorer.
  */

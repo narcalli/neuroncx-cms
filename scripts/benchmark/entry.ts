@@ -40,6 +40,8 @@ export type Refs = {
   customers: string[]
   thirdParties: string[]
   terms: string[]
+  audiences: string[]
+  channels: string[]
 }
 
 export const str = (v: unknown) => (typeof v === 'string' ? v : '')

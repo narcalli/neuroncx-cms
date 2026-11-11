@@ -16575,6 +16575,30 @@ export interface ContentStandard {
       }[]
     | null;
   /**
+   * Words that name who content is for: the people who use NeuronCx and their business types, never their customers or students.
+   */
+  audienceWords?:
+    | {
+        /**
+         * As it is written in content, for example front desk.
+         */
+        word: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * The ways customers reach a business, as content names them. A concrete example names one.
+   */
+  channelWords?:
+    | {
+        /**
+         * As it is written in content, for example WhatsApp.
+         */
+        word: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
    * NeuronCx names and concepts that are not entries of their own, such as Bot swarm or episode. Content defines each on first use. A product name in content passes if it is here or a published entry.
    */
   terms?:
@@ -16825,6 +16849,18 @@ export interface ContentStandardsSelect<T extends boolean = true> {
     | T
     | {
         name?: T;
+        id?: T;
+      };
+  audienceWords?:
+    | T
+    | {
+        word?: T;
+        id?: T;
+      };
+  channelWords?:
+    | T
+    | {
+        word?: T;
         id?: T;
       };
   terms?:

@@ -1,5 +1,5 @@
 /**
- * Scores content against the frozen rubric (scripts/seed-rubric-v3.ts) and
+ * Scores content against the frozen rubric (scripts/seed-rubric-v4.ts) and
  * records benchmark runs for the publish gate (src/lifecycle/benchmarkGate.ts).
  * No model is called. Code decides every check it can
  * (scripts/benchmark/mechanical.ts); the rest go on a worksheet a person or an
@@ -24,7 +24,7 @@
  *     Reads a filled worksheet, decides the code checks again on the same
  *     version, and records the benchmark run as that user. Refuses an
  *     incomplete worksheet, a changed version, or a rubric other than the
- *     frozen v3 as Active.
+ *     frozen v4 as Active.
  *
  * Runs only against a database on this machine unless --remote is given.
  */
@@ -40,7 +40,7 @@ import { buildEntry, str, type Doc, type Entry, type Refs } from './benchmark/en
 import { HAND_SCORES_V3 } from './benchmark/handScores'
 import { decide, decideOrganisations, decideProductNames, type Verdict } from './benchmark/mechanical'
 import { fingerprintOf, NAME_CHECKS, readWorksheet, worksheetFor, type WorksheetMeta } from './benchmark/worksheet'
-import { RUBRIC_V3 } from './seed-rubric-v3'
+import { RUBRIC_V4 } from './seed-rubric-v4'
 
 const say = (s = '') => fs.writeSync(1, s + '\n')
 const args = process.argv.slice(2)
@@ -55,15 +55,15 @@ const OUT = path.resolve('calibration')
 const ACCURACY_FILE = path.resolve('scripts/benchmark/accuracy.json')
 const TOLERANCE = 5
 /** Bump when a mechanical check changes, so an old accuracy pass no longer counts. */
-const MECHANICAL_VERSION = 1
+const MECHANICAL_VERSION = 2
 export const FINGERPRINT = fingerprintOf(
-  RUBRIC_V3.map(({ itemId, criterion, passCondition }) => ({ itemId, criterion, passCondition })),
+  RUBRIC_V4.map(({ itemId, criterion, passCondition }) => ({ itemId, criterion, passCondition })),
   MECHANICAL_VERSION,
 )
 
 type Decided = Record<string, { state: ResultState; note: string }>
 
-const severity = (id: string) => RUBRIC_V3.find((i) => i.itemId === id)!.severityIfFailed
+const severity = (id: string) => RUBRIC_V4.find((i) => i.itemId === id)!.severityIfFailed
 const stateOf = (id: string, v: Verdict): ResultState => (v === 'pass' ? 'pass' : v === 'na' ? 'na' : severity(id))
 
 /** What code decides, and what it hands to a person (with what it found). */
@@ -71,7 +71,7 @@ export const splitChecks = (e: Entry, refs: Refs) => {
   const decided: Decided = {}
   const toFill: string[] = []
   const hints: Record<string, string | undefined> = {}
-  for (const item of RUBRIC_V3) {
+  for (const item of RUBRIC_V4) {
     const d = decide(item.itemId, e, refs)
     if ('verdict' in d) decided[item.itemId] = { state: stateOf(item.itemId, d.verdict), note: d.note }
     else {
@@ -110,6 +110,8 @@ const refsFrom = async (payload: Payload, published: (c: string) => Promise<Doc[
     customers: await names('customers'),
     thirdParties: (standards.allowedThirdParties ?? []).map((r) => r.name),
     terms: (standards.terms ?? []).map((r) => r.term),
+    audiences: (standards.audienceWords ?? []).map((r) => r.word),
+    channels: (standards.channelWords ?? []).map((r) => r.word),
   }
 }
 
@@ -126,7 +128,7 @@ const requireLocal = () => {
   }
 }
 
-/** The published Active rubric, only if it is the frozen v3 the scorer was checked against. */
+/** The published Active rubric, only if it is the frozen v4 the scorer was checked against. */
 const activeV3 = async (payload: Payload) => {
   const active = await payload.find({
     collection: 'rubrics',
@@ -136,7 +138,7 @@ const activeV3 = async (payload: Payload) => {
     overrideAccess: true,
   })
   const r = active.docs[0]
-  const same = r && JSON.stringify((r.items ?? []).map((i) => [i.itemId, i.passCondition])) === JSON.stringify(RUBRIC_V3.map((i) => [i.itemId, i.passCondition]))
+  const same = r && JSON.stringify((r.items ?? []).map((i) => [i.itemId, i.passCondition])) === JSON.stringify(RUBRIC_V4.map((i) => [i.itemId, i.passCondition]))
   return r && same && r.version ? { id: r.id, version: String(r.version) } : null
 }
 
@@ -157,7 +159,7 @@ const accuracy = async (payload: Payload) => {
     const entry = await buildEntry(payload, hand.collection, doc)
     const { decided, toFill } = splitChecks(entry, refs)
     // The checks code cannot decide are scored by hand, so they take the hand scores.
-    const combined = RUBRIC_V3.map((i) => ({ state: decided[i.itemId]?.state ?? hand.states[i.itemId] }))
+    const combined = RUBRIC_V4.map((i) => ({ state: decided[i.itemId]?.state ?? hand.states[i.itemId] }))
     const scorer = scoreResults(combined).score ?? 0
     const handScore = scoreResults(Object.values(hand.states).map((state) => ({ state }))).score ?? 0
     const differ = Object.entries(decided).filter(([id, r]) => r.state !== hand.states[id])
@@ -210,7 +212,7 @@ const worksheet = async (payload: Payload) => {
   requireLocal()
   const rubric = await activeV3(payload)
   if (!rubric) {
-    say('No worksheet: the Active rubric is not the frozen v3 (publish scripts/seed-rubric-v3.ts as Active first).')
+    say('No worksheet: the Active rubric is not the frozen v4 (publish scripts/seed-rubric-v4.ts as Active first).')
     process.exit(1)
   }
   const refs = await visitorRefs(payload)
@@ -233,7 +235,7 @@ const worksheet = async (payload: Payload) => {
       rubricVersion: rubric.version,
       fingerprint: FINGERPRINT,
     }
-    const items = RUBRIC_V3.filter((i) => toFill.includes(i.itemId))
+    const items = RUBRIC_V4.filter((i) => toFill.includes(i.itemId))
     const file = path.join(OUT, `worksheet-${collection}-${entry.slug}.md`)
     fs.writeFileSync(file, worksheetFor(entry, meta, items, hints, decided))
     say(`${file}: ${Object.keys(decided).length} decided by code, ${items.length} to fill in`)
@@ -276,7 +278,7 @@ const record = async (payload: Payload) => {
   const entry = await buildEntry(payload, collection, version.version as unknown as Doc)
   // Code checks decided again on the same version: the same answers as on the worksheet.
   const { decided, toFill } = splitChecks(entry, refs)
-  const items = RUBRIC_V3.filter((i) => toFill.includes(i.itemId))
+  const items = RUBRIC_V4.filter((i) => toFill.includes(i.itemId))
   const filled = readWorksheet(text, items)
   if (filled.problems.length) {
     say('Refusing to record: the worksheet is not finished.')
@@ -284,7 +286,7 @@ const record = async (payload: Payload) => {
     process.exit(1)
   }
   const results: { itemId: string; state: ResultState; note: string; decidedBy: 'code' | 'human' }[] = []
-  for (const item of RUBRIC_V3) {
+  for (const item of RUBRIC_V4) {
     const id = item.itemId
     if (decided[id]) {
       results.push({ itemId: id, state: decided[id].state, note: decided[id].note, decidedBy: 'code' })

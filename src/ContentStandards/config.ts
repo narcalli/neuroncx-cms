@@ -53,6 +53,31 @@ const THIRD_PARTIES = [
   'UPI',
 ]
 const TERMS = ['Bot swarm', 'Family', 'Episode', 'Cart', 'Context Engine']
+// The people who use NeuronCx and their business types, never their customers.
+const AUDIENCES = [
+  'front desk',
+  'receptionist',
+  'admissions office',
+  'admissions team',
+  'admissions counsellor',
+  'counsellor',
+  'supervisor',
+  'manager',
+  'team lead',
+  'call centre',
+  'contact centre',
+  'operations team',
+  'IT team',
+  'hospital',
+  'clinic',
+  'diagnostic chain',
+  'diagnostics lab',
+  'university',
+  'college',
+  'school',
+  'salon',
+]
+const CHANNELS = ['WhatsApp', 'chat', 'call', 'phone', 'SMS', 'email', 'voice', 'web form']
 
 /**
  * The benchmark score content must reach before it can be published, by
@@ -146,6 +171,49 @@ export const ContentStandards: GlobalConfig = {
           required: true,
           maxLength: 60,
           admin: { description: 'As it is written in content, for example Google Ads.' },
+        },
+      ],
+    },
+    {
+      name: 'audienceWords',
+      type: 'array',
+      label: 'Audience words (roles and business types)',
+      labels: { singular: 'Audience word', plural: 'Audience words' },
+      // Rubric checks en-audience-named, en-hero-says-what and ex-kb-answer-complete.
+      defaultValue: AUDIENCES.map((word) => ({ word })),
+      validate: validateUniqueNames('word'),
+      admin: {
+        description:
+          'Words that name who content is for: the people who use NeuronCx and their business types, never their customers or students.',
+      },
+      fields: [
+        {
+          name: 'word',
+          type: 'text',
+          required: true,
+          maxLength: 60,
+          admin: { description: 'As it is written in content, for example front desk.' },
+        },
+      ],
+    },
+    {
+      name: 'channelWords',
+      type: 'array',
+      label: 'Channel words',
+      labels: { singular: 'Channel word', plural: 'Channel words' },
+      // Rubric check en-concrete-example.
+      defaultValue: CHANNELS.map((word) => ({ word })),
+      validate: validateUniqueNames('word'),
+      admin: {
+        description: 'The ways customers reach a business, as content names them. A concrete example names one.',
+      },
+      fields: [
+        {
+          name: 'word',
+          type: 'text',
+          required: true,
+          maxLength: 40,
+          admin: { description: 'As it is written in content, for example WhatsApp.' },
         },
       ],
     },

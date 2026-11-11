@@ -1,16 +1,20 @@
 /**
- * Rubric v3 for the content lifecycle (11 Nov 2026): v1 after two calibrations
- * on the ten published entries, drawn from the NeuronCx Content Lifecycle
+ * Rubric v4 for the content lifecycle (11 Nov 2026), drawn from the NeuronCx Content Lifecycle
  * Guideline v1.1 (docs/content-lifecycle-guideline.md): sections 6.4 (the two
  * dimensions), 5.2 (house rules, quoted as written) and 6.3 (severity:
- * blockers only for the cases it lists). Neither v1 nor v2 was published, so
+ * blockers only for the cases it lists). No earlier version was published, so
  * this is the first rubric in the CMS: its version there starts at 1.
  *
- * FROZEN for this project (11 Nov 2026). v3 settles the four ambiguities the
- * second calibration found. Any later change needs a reason that is not the
- * scores being low: a check two people score differently, a check that cannot
- * fail, or a change in the guideline. Record the reason with the change, and
- * never edit the rubric to make a particular entry pass (guideline 6.9).
+ * FROZEN for this project. v3 (11 Nov 2026) settled the four ambiguities the
+ * second calibration found, and was frozen. v4 changed wording only, and only
+ * to move fifteen checks from a person to code (scripts/benchmark/mechanical.ts),
+ * which makes scores reproducible: the same content always gets the same
+ * result on those checks. That is the sole reason a frozen rubric may change.
+ * Scores being low is never a reason, and the rubric is never edited to make
+ * a particular entry pass (guideline 6.9). Seven checks still need a person:
+ * ex-one-name, ex-facts-stated-once, ex-kb-questions-answered,
+ * en-task-completes (entries other than agents), hr-no-patient-data, and the
+ * names for hr-no-client-names and ex-product-claims-exist.
  *
  * Creates the rubric as a draft, so nobody is scored against it until it is
  * published from the admin. Publishing it as Active retires whichever rubric
@@ -36,7 +40,7 @@
  * switched off for content that never syncs to NCX.
  *
  * Usage (from neuroncx-cms):
- *   NODE_OPTIONS="--no-deprecation --import=tsx/esm" node --env-file=.env scripts/seed-rubric-v3.ts [--dry-run]
+ *   NODE_OPTIONS="--no-deprecation --import=tsx/esm" node --env-file=.env scripts/seed-rubric-v4.ts [--dry-run]
  *
  * --dry-run lists the items and writes nothing. Refuses to run if a rubric
  * with this name already exists. Runs only against a database on this
@@ -57,14 +61,14 @@ const NO_OWN_PAGE = 'Not applicable when the entry has no page of its own.'
 
 // Every item applies to all three collections in scope for now. Items about
 // the Knowledge base tab are the ones to narrow first (IDs ex-kb-).
-export const RUBRIC_V3: Item[] = [
+export const RUBRIC_V4: Item[] = [
   // AI extractability (guideline 6.4)
   {
     itemId: 'ex-headings-name-subject',
     dimension: 'extractability',
     criterion: 'Headings phrased as the questions readers ask.',
     passCondition:
-      'Every section heading names the subject of its section in words a reader would search for (the task, problem or feature by name). None is a bare label (Overview, Introduction, Benefits, Features, How it works, Why us, Details, More), and none pairs the entry name with an admin or tab word (Listing, Card, Panel, Page, Detail, Platform sections, Interim), as in "Higher Education: Listing".',
+      'Every section heading contains the entry name, its primary keyword, or a name from the catalogue or the NeuronCx terms list. None is a bare label (Overview, Introduction, Benefits, Features, How it works, Why us, Details, More), and none pairs the entry name with an admin or tab word (Listing, Card, Panel, Page, Detail, Platform sections, Interim), as in "Higher Education: Listing".',
     severityIfFailed: 'warning',
   },
   {
@@ -72,7 +76,7 @@ export const RUBRIC_V3: Item[] = [
     dimension: 'extractability',
     criterion: 'Each section answers its heading without depending on an earlier section.',
     passCondition:
-      'In the text as NCX receives it, each section names its subject (the entry, task or feature by name) in its heading or first sentence, and no section opens with it, this, these, they or that.',
+      'Each section names the entry in its heading or its first sentence, and no section starts with It, This, These, They or That.',
     severityIfFailed: 'warning',
   },
   {
@@ -81,7 +85,7 @@ export const RUBRIC_V3: Item[] = [
     criterion:
       'No "as mentioned above", no orphan pronouns, no context that only exists in the page\'s visual layout.',
     passCondition:
-      'The text contains none of: as mentioned, above, below, earlier section, previous section, as shown, on the left, on the right, the icon, the green, the highlighted. No sentence tells the reader to select, click, tap, pick, hover, scroll or watch something on the page, and no sentence opens with It, This, They or These without naming what it means in that sentence.',
+      'The text contains none of: as mentioned, above, below, earlier section, previous section, as shown, on the left, on the right, the icon, the green, the highlighted. No sentence tells the reader to select, click, tap, pick, hover, scroll or watch something on the page, and no sentence starts with It, This, They or These.',
     severityIfFailed: 'warning',
   },
   {
@@ -89,7 +93,7 @@ export const RUBRIC_V3: Item[] = [
     dimension: 'extractability',
     criterion: 'Canonical NCX terminology, used consistently, defined on first use.',
     passCondition:
-      'The first use of each term on the NeuronCx terms list in Content standards is in a sentence that says what it is.',
+      'The first sentence that uses each term on the NeuronCx terms list in Content standards says what it is: it reads "<term> is", "<term> are" or "<term> means", or the explanation follows the term straight away in brackets or after a comma, as in "cart, a course choice saved on the record".',
     severityIfFailed: 'warning',
   },
   {
@@ -105,7 +109,7 @@ export const RUBRIC_V3: Item[] = [
     dimension: 'extractability',
     criterion: 'Lists and tables for enumerable facts rather than prose.',
     passCondition:
-      'No sentence lists four or more parallel items (things or actions), however they are joined (commas, and, or, then), and no sentence of more than 25 words lists three. Card fields (tagline, summary, key points) are exempt.',
+      'Counting each comma and each and, or and then as a join: no sentence has three or more joins, and no sentence of more than 25 words has two. Card fields (tagline, summary, key points) are exempt.',
     severityIfFailed: 'warning',
   },
   {
@@ -129,7 +133,7 @@ export const RUBRIC_V3: Item[] = [
     dimension: 'extractability',
     criterion: 'Each section answers its heading without depending on an earlier section (FAQ answers).',
     passCondition:
-      "Every FAQ question names its subject instead of using it or this, and every answer's first sentence answers it (yes, no, a number or the fact asked for). A bare yes or no passes when the next sentence names the subject. Not applicable when the entry has no FAQs.",
+      'No FAQ question contains the word it or this. Each answer starts with Yes, No or a number, or its first sentence repeats a word of five or more letters from its question. Not applicable when the entry has no FAQs.',
     severityIfFailed: 'warning',
   },
   {
@@ -145,7 +149,7 @@ export const RUBRIC_V3: Item[] = [
     dimension: 'extractability',
     criterion: 'Can a retrieval system answer a question correctly using this page alone? (Knowledge base answer)',
     passCondition:
-      'Answer (kbAnswer) is filled, and its first sentence names the entry and says what it does and for whom, so it answers "What is <name>?" with nothing else read.',
+      'Answer (kbAnswer) is filled, and its first sentence contains the entry name and a word or phrase from the audience list in Content standards.',
     severityIfFailed: 'warning',
   },
   {
@@ -153,7 +157,7 @@ export const RUBRIC_V3: Item[] = [
     dimension: 'extractability',
     criterion: 'Facts stated once, in the place that owns them. (Knowledge base facts)',
     passCondition:
-      'Facts (kbFacts) has at least three rows, each one sentence making one claim, with the entry or a noun as its subject, never a pronoun.',
+      'Facts (kbFacts) has at least three rows, each a single sentence of 160 characters or fewer that does not start with It, This, They, These or That.',
     severityIfFailed: 'warning',
   },
   {
@@ -185,14 +189,15 @@ export const RUBRIC_V3: Item[] = [
     dimension: 'engagement',
     criterion: 'Can the named reader finish what they came to do?',
     passCondition:
-      'The entry names the NeuronCx user it is for at least once, as a role (front desk, admissions counsellor, supervisor) or their business type (diagnostic chain, college), not only their customer or student.',
+      'The entry contains at least one word or phrase from the audience list in Content standards: the people who use NeuronCx (front desk, supervisor) or their business type (diagnostic chain, college), not their customers.',
     severityIfFailed: 'warning',
   },
   {
     itemId: 'en-hero-says-what',
     dimension: 'engagement',
     criterion: 'Scannable in under a minute: headings, short paragraphs, no walls. (The hero)',
-    passCondition: `The hero heading names the entry or the outcome it gives, and the hero subheading names the reader or their business. ${NO_OWN_PAGE}`,
+    passCondition:
+      `The hero heading contains the entry name or its primary keyword, and the hero subheading contains a word or phrase from the audience list in Content standards. ${NO_OWN_PAGE}`,
     severityIfFailed: 'warning',
   },
   {
@@ -208,7 +213,7 @@ export const RUBRIC_V3: Item[] = [
     dimension: 'engagement',
     criterion: 'Examples are concrete and NCX-specific, not generic.',
     passCondition:
-      'At least one passage describes a specific situation that names all three of: who (a role or person), the channel, and a time, number or item, together with an NCX agent, channel or feature by name.',
+      'At least one sentence contains a word from the channel list in Content standards, a digit or words in quotation marks, and the entry name or a name from the catalogue.',
     severityIfFailed: 'warning',
   },
   {
@@ -222,7 +227,8 @@ export const RUBRIC_V3: Item[] = [
     itemId: 'en-card-summary',
     dimension: 'engagement',
     criterion: 'Scannable in under a minute: headings, short paragraphs, no walls. (The card)',
-    passCondition: 'Summary is filled, says what the entry is or does, and does not repeat the entry name.',
+    passCondition:
+      'Summary is filled, 140 characters or fewer, does not repeat the entry name, and does not start with It, This, They, These or That.',
     severityIfFailed: 'warning',
   },
 
@@ -265,7 +271,7 @@ export const RUBRIC_V3: Item[] = [
     dimension: 'houseRules',
     criterion: 'DPDP Act is the compliance frame for India, not HIPAA.',
     passCondition:
-      'HIPAA does not appear, and any statement about data protection or compliance in India names the DPDP Act.',
+      'HIPAA does not appear, and every sentence that mentions data protection, personal data, a privacy policy or data residency names the DPDP Act.',
     severityIfFailed: 'blocker',
   },
   {
@@ -280,7 +286,7 @@ export const RUBRIC_V3: Item[] = [
     dimension: 'houseRules',
     criterion: 'Observation, not criticism, when describing how the market operates today.',
     passCondition:
-      'No sentence about how businesses work today uses: outdated, broken, fail, struggle, chaos, nightmare, stuck, still using, old-fashioned.',
+      'None of these appears anywhere, in any form: outdated, broken, fail, struggle, chaos, nightmare, stuck, still using, old-fashioned.',
     severityIfFailed: 'warning',
   },
   {
@@ -288,7 +294,7 @@ export const RUBRIC_V3: Item[] = [
     dimension: 'houseRules',
     criterion: 'Claims carry evidence. A number without a source does not ship.',
     passCondition:
-      'Every number given as a result or a market fact (a percentage, multiple, count or time saved) names its source in the same sentence or links to a published proof or customer entry. A figure marked pending counts as unsourced wherever it shows. Product facts (limits, counts of integrations) are exempt.',
+      'Every percentage or multiple (a number followed by %, per cent, percent, x or times) names its source in the same sentence (according to, source, survey, study or report), or the entry links to a published customer entry. Plain counts, limits and times are exempt. A figure marked pending counts as unsourced wherever it shows.',
     severityIfFailed: 'blocker',
   },
 
@@ -333,16 +339,16 @@ export const RUBRIC_V3: Item[] = [
 const say = (s = '') => fs.writeSync(1, s + '\n')
 const DRY = process.argv.includes('--dry-run')
 
-// Only when run directly: the calibration script imports RUBRIC_V3.
-if (process.argv[1]?.endsWith('seed-rubric-v3.ts')) {
+// Only when run directly: scripts/benchmark.ts imports RUBRIC_V4.
+if (process.argv[1]?.endsWith('seed-rubric-v4.ts')) {
   const local = /^mongodb:\/\/(127\.0\.0\.1|localhost)(:\d+)?\//.test(process.env.DATABASE_URL || '')
   if (!local && !process.argv.includes('--remote')) {
     say('Refusing to run: this database is not on this machine. Add --remote to run it anyway.')
     process.exit(1)
   }
-  const blockers = RUBRIC_V3.filter((i) => i.severityIfFailed === 'blocker').length
-  say(`${RUBRIC_V3.length} items, ${blockers} blockers${DRY ? '. Dry run: nothing is written' : ''}.`)
-  for (const i of RUBRIC_V3) say(`  ${i.itemId} (${i.dimension}, ${i.severityIfFailed})`)
+  const blockers = RUBRIC_V4.filter((i) => i.severityIfFailed === 'blocker').length
+  say(`${RUBRIC_V4.length} items, ${blockers} blockers${DRY ? '. Dry run: nothing is written' : ''}.`)
+  for (const i of RUBRIC_V4) say(`  ${i.itemId} (${i.dimension}, ${i.severityIfFailed})`)
   if (DRY) process.exit(0)
 
   const payload = await getPayload({ config })
@@ -357,7 +363,7 @@ if (process.argv[1]?.endsWith('seed-rubric-v3.ts')) {
     data: {
       name: NAME,
       status: 'active',
-      items: RUBRIC_V3.map((i) => ({ ...i, appliesTo: [...LIFECYCLE_SLUGS] })),
+      items: RUBRIC_V4.map((i) => ({ ...i, appliesTo: [...LIFECYCLE_SLUGS] })),
       _status: 'draft',
     },
   })
