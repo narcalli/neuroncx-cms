@@ -42,6 +42,9 @@ const activeRubric = async (req: PayloadRequest) =>
       draft: false,
       depth: 0,
       limit: 1,
+      // One query: with pagination a count runs alongside the find, and MongoDB
+      // refuses two operations at once in the publish's transaction.
+      pagination: false,
       sort: '-updatedAt',
       overrideAccess: true,
       req,
@@ -86,6 +89,7 @@ export const checkBenchmark = async (
     },
     sort: '-runAt',
     limit: 1,
+    pagination: false,
     depth: 0,
     overrideAccess: true,
     req,

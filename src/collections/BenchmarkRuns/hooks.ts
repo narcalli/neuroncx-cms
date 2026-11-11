@@ -17,6 +17,14 @@ export const refuseRunEdits: CollectionBeforeChangeHook<BenchmarkRun> = ({ data,
   return data
 }
 
+// An id that cannot be one (a malformed value) is simply not found. A
+// database error is not the run's fault, so it is passed on as it is rather
+// than reported as a missing version.
+const notFoundOnBadId = (err: unknown): null => {
+  if (err instanceof Error && /Cast|BSON/.test(err.name)) return null
+  throw err
+}
+
 /**
  * versionId must be a saved version of the scored document itself. Sets
  * contentHash from that version, so the gate can match the run to content
@@ -31,11 +39,14 @@ export const checkScoredVersion: CollectionBeforeChangeHook<BenchmarkRun> = asyn
       collection: doc.relationTo,
       where: { and: [{ id: { equals: data.versionId } }, { parent: { equals: parent } }] },
       limit: 1,
+      // One query: with pagination a count runs alongside the find, and MongoDB
+      // refuses two operations at once in the save's transaction.
+      pagination: false,
       depth: 0,
       overrideAccess: true,
       req,
     })
-    .catch(() => null)
+    .catch(notFoundOnBadId)
   const version = found?.docs[0]?.version
   if (version) {
     data.contentHash = contentHash(version)
@@ -77,11 +88,12 @@ export const checkRubricItems: CollectionBeforeChangeHook<BenchmarkRun> = async 
           },
           sort: '-updatedAt',
           limit: 1,
+          pagination: false,
           depth: 0,
           overrideAccess: true,
           req,
         })
-        .catch(() => null)
+        .catch(notFoundOnBadId)
     : null
   const version = published?.docs[0]?.version
   if (!version) {
