@@ -217,5 +217,17 @@ describe('with the local database', () => {
       const edited = await payload.update({ ...quiet, collection: 'sectors', id: sector.id, draft: true, data: { name: 'ZZ GATE sector, changed' }, user: as(owner), overrideAccess: false })
       expect((await checkBenchmark(await createLocalReq({}, payload), 'sectors', sector.id, edited as unknown as Record<string, unknown>)).overridden).toBe(false)
     })
+
+    it('is not shown to visitors of the published entry', async (ctx) => {
+      if (skip) ctx.skip()
+      // Live, so a visitor can read the entry at all.
+      await publish({ status: 'live', gateOverride: true, gateOverrideReason: 'Internal note' }, owner)
+      const visitor = await payload.findByID({ ...quiet, collection: 'sectors', id: sector.id, overrideAccess: false })
+      expect(visitor).not.toHaveProperty('gateOverride')
+      expect(visitor).not.toHaveProperty('gateOverrideReason')
+      expect(visitor).not.toHaveProperty('gateOverrideHash')
+      const signedIn = await payload.findByID({ ...quiet, collection: 'sectors', id: sector.id, user: as(author), overrideAccess: false })
+      expect(signedIn).toMatchObject({ gateOverride: true, gateOverrideReason: 'Internal note' })
+    })
   })
 })

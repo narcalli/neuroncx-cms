@@ -1,4 +1,4 @@
-import type { CollectionAfterChangeHook, CollectionBeforeChangeHook, Field, UIField } from 'payload'
+import type { CollectionAfterChangeHook, CollectionBeforeChangeHook, Field, PayloadRequest, UIField } from 'payload'
 import { ValidationError } from 'payload'
 
 import { contentOwnerOrAdmin } from '@/access/contentOwnerOrAdmin'
@@ -22,15 +22,19 @@ export const benchmarkStatusField = (): UIField => ({
  * A content owner's override of the benchmark gate (guideline 6.6): set only
  * by a content owner or admin, with a reason, and tied to the content it was
  * granted for (gateOverrideHash), so editing the content ends it. Logged in
- * History. Built but not applied while the gate only warns.
+ * History. Built but not applied while the gate only warns. Read only by
+ * signed-in users: the reason is an internal note, and the public API serves
+ * the published entry to visitors.
  */
+const signedIn = ({ req: { user } }: { req: PayloadRequest }): boolean => Boolean(user)
+
 export const gateOverrideFields = (): Field[] => [
   {
     name: 'gateOverride',
     type: 'checkbox',
     label: 'Override the benchmark gate (content owner)',
     defaultValue: false,
-    access: { create: contentOwnerOrAdmin, update: contentOwnerOrAdmin },
+    access: { read: signedIn, create: contentOwnerOrAdmin, update: contentOwnerOrAdmin },
     admin: {
       position: 'sidebar',
       description:
@@ -42,7 +46,7 @@ export const gateOverrideFields = (): Field[] => [
     type: 'textarea',
     label: 'Override reason',
     maxLength: 500,
-    access: { create: contentOwnerOrAdmin, update: contentOwnerOrAdmin },
+    access: { read: signedIn, create: contentOwnerOrAdmin, update: contentOwnerOrAdmin },
     admin: {
       position: 'sidebar',
       condition: (_data, siblingData) => Boolean(siblingData?.gateOverride),
@@ -52,7 +56,7 @@ export const gateOverrideFields = (): Field[] => [
   {
     name: 'gateOverrideHash',
     type: 'text',
-    access: { create: () => false, update: () => false },
+    access: { read: signedIn, create: () => false, update: () => false },
     admin: {
       hidden: true,
       description: 'The content the override was granted for. Set automatically.',

@@ -12,8 +12,15 @@ import { pagePath } from '@/collections/Pages/nesting'
 import { revalidateOnSite } from '@/hooks/revalidateOnSite'
 import { apiKeysDraftOnlyPlugin } from './apiKeysDraftOnly'
 
-const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
-  return doc?.title ? `${doc.title} | Blog` : 'Blog'
+// The SEO title's Generate button. SEO titles carry the brand themselves (the
+// website adds nothing to them), so: "Title | NeuronCx", and "Title | Blog"
+// for posts. Content entries have a name, not a title.
+export const generateTitle: GenerateTitle = async ({ doc, collectionConfig, req }) => {
+  const own = String(doc?.title || doc?.name || '').trim()
+  const settings = await req.payload.findGlobal({ slug: 'siteSettings', depth: 0, req }).catch(() => null)
+  const brand = settings?.siteName?.trim() || 'NeuronCx'
+  const suffix = collectionConfig?.slug === 'posts' ? 'Blog' : brand
+  return own ? `${own} | ${suffix}` : brand
 }
 
 const generateURL: GenerateURL<Post | Page> = ({ doc }) => {

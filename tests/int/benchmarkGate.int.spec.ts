@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest'
 import config from '@/payload.config'
 import { GATE_MODE, noteBenchmarkGate } from '@/lifecycle/benchmarkGate'
 import { contentHash } from '@/lifecycle/contentHash'
+import { gateOverrideFields } from '@/fields/gateOverride'
 
 /**
  * The publish gate, warning-only (src/lifecycle/benchmarkGate.ts), the content
@@ -94,6 +95,14 @@ describe('the gate, warning-only', () => {
       const names = c.fields.flatMap((f) => ('name' in f ? [f.name] : []))
       expect(names, slug).toEqual(expect.arrayContaining(['benchmarkStatus', 'gateOverride', 'gateOverrideReason', 'gateOverrideHash']))
       expect(c.endpoints && c.endpoints.map((e) => e.path), slug).toContain('/:id/benchmark-status')
+    }
+  })
+
+  it('shows the override only to signed-in users, never to visitors', () => {
+    for (const f of gateOverrideFields()) {
+      const read = ('access' in f && f.access?.read) as (args: { req: Partial<PayloadRequest> }) => boolean
+      expect(read({ req: { user: null } }), 'name' in f ? f.name : '').toBe(false)
+      expect(read({ req: { user: { id: 'u' } as PayloadRequest['user'] } }), 'name' in f ? f.name : '').toBe(true)
     }
   })
 })

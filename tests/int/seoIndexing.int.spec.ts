@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { Field } from 'payload'
+import type { CollectionConfig, Field, PayloadRequest } from 'payload'
 
 import { buildHubs } from '@/collections/Hubs'
 import { Integrations } from '@/collections/Integrations'
@@ -10,6 +10,7 @@ import { IndustryTopics } from '@/collections/IndustryTopics'
 import { MicroApps } from '@/collections/MicroApps'
 import { Sectors } from '@/collections/Sectors'
 import { searchWarnings } from '@/fields/searchCheck'
+import { generateTitle } from '@/plugins'
 
 /**
  * "Hide from search engines" (meta.noIndex) in every SEO tab, and the Search
@@ -64,5 +65,26 @@ describe('Search check', () => {
       "No meta description: search engines show the site's default one.",
     ])
     expect(searchWarnings({ noIndex: true }, {})).toEqual(['Hidden from search engines: not listed in the sitemap.'])
+  })
+})
+
+describe("the SEO title's Generate button", () => {
+  const req = (siteName?: string) =>
+    ({ payload: { findGlobal: async () => ({ siteName }) } }) as unknown as PayloadRequest
+  const generate = (slug: string, doc: Record<string, unknown>, siteName?: string) =>
+    generateTitle({ doc, collectionConfig: { slug } as CollectionConfig, req: req(siteName) } as Parameters<typeof generateTitle>[0])
+
+  it('names the brand on pages and content entries, not the blog', async () => {
+    expect(await generate('pages', { title: 'Call Quality Assurance' })).toBe('Call Quality Assurance | NeuronCx')
+    expect(await generate('sectors', { name: 'Higher Education' })).toBe('Higher Education | NeuronCx')
+    expect(await generate('microApps', { name: 'Payment services' }, 'NeuronCX')).toBe('Payment services | NeuronCX')
+  })
+
+  it('keeps the blog suffix on posts', async () => {
+    expect(await generate('posts', { title: 'A post' })).toBe('A post | Blog')
+  })
+
+  it('falls back to the brand alone when the entry has no title yet', async () => {
+    expect(await generate('pages', {})).toBe('NeuronCx')
   })
 })
