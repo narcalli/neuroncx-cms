@@ -1,8 +1,8 @@
-import type { Access, CollectionBeforeOperationHook } from 'payload'
+import type { CollectionBeforeOperationHook } from 'payload'
 import { APIError } from 'payload'
 
+import { adminInPerson } from '../../access/adminInPerson'
 import { isApiKeyRequest } from '../../access/apiKeyRequest'
-import { hasRole } from '../../access/roles'
 
 /**
  * A key (an API key or an MCP key) is not a sign-in, and must not be able to
@@ -13,7 +13,7 @@ import { hasRole } from '../../access/roles'
  */
 
 /** New users: an admin, signed in as themselves. */
-export const signedInAdmin: Access = ({ req }) => hasRole(req.user, 'admin') && !isApiKeyRequest(req)
+export const signedInAdmin = adminInPerson
 
 const SIGN_IN_FIELDS = ['password', 'email', 'enableAPIKey', 'apiKey'] as const
 

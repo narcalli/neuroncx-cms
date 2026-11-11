@@ -1,13 +1,13 @@
 import 'dotenv/config'
 import { createLocalReq, getPayload, refreshOperation, type Payload } from 'payload'
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
 import config from '@/payload.config'
 import { KEY_SIGN_IN_MESSAGE } from '@/collections/Users/signIn'
 
 /**
- * What each kind of caller may do in every collection, Payload's own and
- * plugins' included, checked against the table below. A collection added
+ * What each kind of caller may do in every collection and global, Payload's
+ * own and plugins' included, checked against the table below. A collection added
  * later fails here until it is classified, which is the point: the access
  * gaps found on 11 Nov 2026 were in collections nobody had looked at.
  *
@@ -30,8 +30,8 @@ const EXPECTED: Record<string, Row> = {
   'features': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
   // Wave 1: only an admin signed in as themselves creates users; a key never does.
   'users': { nobody: 'nnnn', author: 'nywn', authorKey: 'nywn', owner: 'nywn', admin: 'yyyy', adminKey: 'nyyy' },
-  // Open: any signed-in user or key reads every enquiry (names, emails, phones).
-  'enquiries': { nobody: 'ynnn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
+  // Fixed (wave 2): personal data, an admin in person only; created by the website form (with its secret) or such an admin.
+  'enquiries': { nobody: 'nnnn', author: 'nnnn', authorKey: 'nnnn', owner: 'nnnn', admin: 'yyyy', adminKey: 'nnnn' },
   'sectors': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
   'industryTopics': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
   'sharedContent': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
@@ -67,6 +67,17 @@ const EXPECTED: Record<string, Row> = {
   'payload-migrations': { nobody: 'nnnn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
 }
 
+/** Globals: read, update. */
+const EXPECTED_GLOBALS: Record<string, Row> = {
+  // Open: anyone signed in, keys included, changes these, and the change is live at once (no drafts).
+  'header': { nobody: 'yn', author: 'yy', authorKey: 'yy', owner: 'yy', admin: 'yy', adminKey: 'yy' },
+  'footer': { nobody: 'yn', author: 'yy', authorKey: 'yy', owner: 'yy', admin: 'yy', adminKey: 'yy' },
+  'siteSettings': { nobody: 'yn', author: 'yy', authorKey: 'yy', owner: 'yy', admin: 'yy', adminKey: 'yy' },
+  'whatsappLists': { nobody: 'yn', author: 'yy', authorKey: 'yy', owner: 'yy', admin: 'yy', adminKey: 'yy' },
+  // Open: an admin's key can change it, the review switch and the gates included.
+  'contentStandards': { nobody: 'nn', author: 'yn', authorKey: 'yn', owner: 'yn', admin: 'yy', adminKey: 'yy' },
+}
+
 const base = { id: '000000000000000000000001', email: 'zz-matrix@example.test', collection: 'users' }
 const ACTORS: Record<keyof Row, unknown> = {
   nobody: null,
@@ -82,8 +93,11 @@ const code = (v: unknown) => (v === true ? 'y' : v ? 'w' : 'n')
 describe('the access matrix', () => {
   let payload: Payload
   beforeAll(async () => {
+    // Enquiries from nobody depend on the website's shared secret being set, as it is live.
+    vi.stubEnv('ENQUIRY_SECRET', 'zz-matrix-secret')
     payload = await getPayload({ config: await config })
   })
+  afterAll(() => vi.unstubAllEnvs())
 
   it('classifies every collection in the config, and nothing that is gone', () => {
     const slugs = payload.config.collections.map((c) => c.slug)
@@ -103,6 +117,22 @@ describe('the access matrix', () => {
       }
     }
     expect(actual).toEqual(EXPECTED)
+  })
+
+  it('gives each kind of caller exactly the access in the table for every global', async () => {
+    const slugs = payload.config.globals.map((g) => g.slug)
+    expect(slugs.filter((s) => !EXPECTED_GLOBALS[s]), 'globals with no row: add them to EXPECTED_GLOBALS').toEqual([])
+    const actual: Record<string, Partial<Row>> = {}
+    for (const g of payload.config.globals) {
+      actual[g.slug] = {}
+      for (const [who, user] of Object.entries(ACTORS) as [keyof Row, unknown][]) {
+        const req = await createLocalReq({ user: user as never }, payload)
+        let cell = ''
+        for (const op of ['read', 'update'] as const) cell += code(await (g.access as Record<string, (a: unknown) => unknown>)[op]({ req, data: {} }))
+        actual[g.slug][who] = cell
+      }
+    }
+    expect(actual).toEqual(EXPECTED_GLOBALS)
   })
 })
 

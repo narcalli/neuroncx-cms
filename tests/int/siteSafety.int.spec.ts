@@ -29,9 +29,12 @@ describe('enquiries from the website', () => {
     expect(create({ req: { user: null, headers: headers('wrong') } })).toBe(false)
   })
 
-  it('can still be added by a signed-in user without the secret', () => {
+  it('can still be added without the secret by an admin signed in, but not by an author or any key', () => {
     vi.stubEnv('ENQUIRY_SECRET', 'the-shared-secret')
-    expect(create({ req: { user: { id: 'u1', collection: 'users' }, headers: headers() } })).toBe(true)
+    const by = (role: string, strategy = 'local-jwt') => create({ req: { user: { id: 'u1', collection: 'users', role, _strategy: strategy }, headers: headers() } })
+    expect(by('admin')).toBe(true)
+    expect(by('author')).toBe(false)
+    expect(by('admin', 'api-key')).toBe(false)
   })
 })
 

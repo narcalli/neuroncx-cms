@@ -1,7 +1,7 @@
 import { timingSafeEqual } from 'crypto'
 import type { CollectionAfterChangeHook, CollectionConfig } from 'payload'
 
-import { authenticated } from '../access/authenticated'
+import { adminInPerson } from '../access/adminInPerson'
 import { createNcxLead } from './enquiries/ncxLead'
 
 const escapeHtml = (v: unknown): string =>
@@ -113,14 +113,17 @@ export const fromWebsite = (headers: Headers): boolean => {
 export const Enquiries: CollectionConfig = {
   slug: 'enquiries',
   labels: { singular: 'Enquiry', plural: 'Enquiries' },
+  // Personal data (names, emails, phone numbers): an admin signed in as
+  // themselves, never a key. Until 11 Nov 2026 anyone signed in, keys
+  // included, could read, change and delete every enquiry, and create them
+  // (each one also creates an NCX lead and sends an email).
   access: {
     // The website's contact form (neuroncx-website src/app/(frontend)/api/enquiry),
-    // or a signed-in user. Open to anyone until ENQUIRY_SECRET is set.
-    create: ({ req }) => Boolean(req.user) || fromWebsite(req.headers),
-    // Only logged-in admins can see, edit or remove what was submitted.
-    read: authenticated,
-    update: authenticated,
-    delete: authenticated,
+    // or an admin. Open to anyone until ENQUIRY_SECRET is set.
+    create: (args) => fromWebsite(args.req.headers) || adminInPerson(args),
+    read: adminInPerson,
+    update: adminInPerson,
+    delete: adminInPerson,
   },
   admin: {
     defaultColumns: ['name', 'company', 'email', 'mobile', 'createdAt'],
