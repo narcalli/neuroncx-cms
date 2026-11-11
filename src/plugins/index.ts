@@ -11,7 +11,7 @@ import { getServerSideURL } from '@/utilities/getURL'
 import { pagePath } from '@/collections/Pages/nesting'
 import { revalidateOnSite } from '@/hooks/revalidateOnSite'
 import { apiKeysDraftOnlyPlugin } from './apiKeysDraftOnly'
-import { ownerOrAdminInPerson } from '@/access/adminInPerson'
+import { adminInPerson, ownerOrAdminInPerson } from '@/access/adminInPerson'
 import { validateRedirectDestination } from '@/redirects/destination'
 
 // The SEO title's Generate button. SEO titles carry the brand themselves (the
@@ -99,6 +99,14 @@ export const plugins: Plugin[] = [
   // Claude access over MCP. Read-only to start: each key must also be allowed
   // these capabilities in the admin, and writes stay off until enabled here.
   mcpPlugin({
+    // MCP keys: an admin in person only, never a key. Anyone signed in could
+    // create one and link it to any user, an admin included, and MCP requests
+    // run as the linked user: harmless while MCP only reads, an escalation the
+    // day it can write. The MCP endpoint looks keys up itself, unaffected.
+    overrideApiKeyCollection: (collection) => ({
+      ...collection,
+      access: { ...collection.access, read: adminInPerson, create: adminInPerson, update: adminInPerson, delete: adminInPerson },
+    }),
     collections: {
       pages: {
         description: 'Website pages and their layout blocks.',
