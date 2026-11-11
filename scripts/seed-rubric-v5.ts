@@ -1,5 +1,5 @@
 /**
- * Rubric v4 for the content lifecycle (11 Nov 2026), drawn from the NeuronCx Content Lifecycle
+ * Rubric v5 for the content lifecycle (11 Nov 2026), drawn from the NeuronCx Content Lifecycle
  * Guideline v1.1 (docs/content-lifecycle-guideline.md): sections 6.4 (the two
  * dimensions), 5.2 (house rules, quoted as written) and 6.3 (severity:
  * blockers only for the cases it lists). No earlier version was published, so
@@ -9,9 +9,27 @@
  * second calibration found, and was frozen. v4 changed wording only, and only
  * to move fifteen checks from a person to code (scripts/benchmark/mechanical.ts),
  * which makes scores reproducible: the same content always gets the same
- * result on those checks. That is the sole reason a frozen rubric may change.
- * Scores being low is never a reason, and the rubric is never edited to make
- * a particular entry pass (guideline 6.9). Seven checks still need a person:
+ * result on those checks.
+ *
+ * What may change a frozen rubric: moving a check from a person to code
+ * (v4), or fixing a defect, a check that fires on copy it was never meant to
+ * catch (v5). What may not: scores being too low. The rubric is never edited
+ * to make a particular entry pass (guideline 6.9).
+ *
+ * v5 fixed five such defects in v4's new code checks: hr-claims-have-evidence
+ * no longer treats a product threshold or setting as a claim (it was a false
+ * blocker); en-concrete-example looks for its three elements across one
+ * section, not one sentence; ex-sections-stand-alone and ex-kb-answer-complete
+ * accept the primary keyword or a catalogue or terms name, as headings do;
+ * ex-lists-for-enumerations reads a comma before so, because, which or and
+ * then as a clause boundary; ex-faq-answers-stand-alone accepts any repeated
+ * word that is not a common word.
+ *
+ * Known limits, kept on purpose as the price of deciding in code:
+ * - hr-observation-not-criticism has no scope: it fails a listed word in any
+ *   sentence, such as "who is stuck" about team members.
+ * - Word-list checks match words, not meaning: en-audience-named passes on
+ *   "school" in "school and diploma transcripts". Seven checks still need a person:
  * ex-one-name, ex-facts-stated-once, ex-kb-questions-answered,
  * en-task-completes (entries other than agents), hr-no-patient-data, and the
  * names for hr-no-client-names and ex-product-claims-exist.
@@ -40,7 +58,7 @@
  * switched off for content that never syncs to NCX.
  *
  * Usage (from neuroncx-cms):
- *   NODE_OPTIONS="--no-deprecation --import=tsx/esm" node --env-file=.env scripts/seed-rubric-v4.ts [--dry-run]
+ *   NODE_OPTIONS="--no-deprecation --import=tsx/esm" node --env-file=.env scripts/seed-rubric-v5.ts [--dry-run]
  *
  * --dry-run lists the items and writes nothing. Refuses to run if a rubric
  * with this name already exists. Runs only against a database on this
@@ -61,7 +79,7 @@ const NO_OWN_PAGE = 'Not applicable when the entry has no page of its own.'
 
 // Every item applies to all three collections in scope for now. Items about
 // the Knowledge base tab are the ones to narrow first (IDs ex-kb-).
-export const RUBRIC_V4: Item[] = [
+export const RUBRIC_V5: Item[] = [
   // AI extractability (guideline 6.4)
   {
     itemId: 'ex-headings-name-subject',
@@ -76,7 +94,7 @@ export const RUBRIC_V4: Item[] = [
     dimension: 'extractability',
     criterion: 'Each section answers its heading without depending on an earlier section.',
     passCondition:
-      'Each section names the entry in its heading or its first sentence, and no section starts with It, This, These, They or That.',
+      'Each section names its subject in its heading or its first sentence (the entry name, its primary keyword, or a name from the catalogue or the NeuronCx terms list), and no section starts with It, This, These, They or That.',
     severityIfFailed: 'warning',
   },
   {
@@ -109,7 +127,7 @@ export const RUBRIC_V4: Item[] = [
     dimension: 'extractability',
     criterion: 'Lists and tables for enumerable facts rather than prose.',
     passCondition:
-      'Counting each comma and each and, or and then as a join: no sentence has three or more joins, and no sentence of more than 25 words has two. Card fields (tagline, summary, key points) are exempt.',
+      'Counting each comma and each and, or and then as a join: no sentence has three or more joins, and no sentence of more than 25 words has two. A comma before so, because, which or and then ends a clause and is not a join, and and then counts once. Card fields (tagline, summary, key points) are exempt.',
     severityIfFailed: 'warning',
   },
   {
@@ -133,7 +151,7 @@ export const RUBRIC_V4: Item[] = [
     dimension: 'extractability',
     criterion: 'Each section answers its heading without depending on an earlier section (FAQ answers).',
     passCondition:
-      'No FAQ question contains the word it or this. Each answer starts with Yes, No or a number, or its first sentence repeats a word of five or more letters from its question. Not applicable when the entry has no FAQs.',
+      'No FAQ question contains the word it or this. Each answer starts with Yes, No or a number, or its first sentence repeats a word from its question other than a common word (question words, pronouns, articles, prepositions and verbs such as is, can, do or happen). Not applicable when the entry has no FAQs.',
     severityIfFailed: 'warning',
   },
   {
@@ -149,7 +167,7 @@ export const RUBRIC_V4: Item[] = [
     dimension: 'extractability',
     criterion: 'Can a retrieval system answer a question correctly using this page alone? (Knowledge base answer)',
     passCondition:
-      'Answer (kbAnswer) is filled, and its first sentence contains the entry name and a word or phrase from the audience list in Content standards.',
+      'Answer (kbAnswer) is filled, and its first sentence contains the entry name, its primary keyword, or a name from the catalogue or the NeuronCx terms list, and a word or phrase from the audience list in Content standards.',
     severityIfFailed: 'warning',
   },
   {
@@ -213,7 +231,7 @@ export const RUBRIC_V4: Item[] = [
     dimension: 'engagement',
     criterion: 'Examples are concrete and NCX-specific, not generic.',
     passCondition:
-      'At least one sentence contains a word from the channel list in Content standards, a digit or words in quotation marks, and the entry name or a name from the catalogue.',
+      'At least one section (a heading and its text) contains a word from the channel list in Content standards, a digit or words in quotation marks, and the entry name or a name from the catalogue: the example as a whole, not one sentence, holds all three.',
     severityIfFailed: 'warning',
   },
   {
@@ -294,7 +312,7 @@ export const RUBRIC_V4: Item[] = [
     dimension: 'houseRules',
     criterion: 'Claims carry evidence. A number without a source does not ship.',
     passCondition:
-      'Every percentage or multiple (a number followed by %, per cent, percent, x or times) names its source in the same sentence (according to, source, survey, study or report), or the entry links to a published customer entry. Plain counts, limits and times are exempt. A figure marked pending counts as unsourced wherever it shows.',
+      'Every percentage or multiple (a number followed by %, per cent, percent, x or times) presented as a result or a market fact names its source in the same sentence (according to, source, survey, study or report), or the entry links to a published customer entry. A figure is a result or market fact when its sentence says fewer, faster, reduced, cut, saved, increased, improved, rose, grew or boosted (in any form), or reads "<figure> of <something>", as in "40% of bookings". A figure that describes how the product behaves, a threshold or a setting such as "under 80 percent confidence", needs no source. Plain counts, limits and times are exempt. A figure marked pending counts as unsourced wherever it shows.',
     severityIfFailed: 'blocker',
   },
 
@@ -339,16 +357,16 @@ export const RUBRIC_V4: Item[] = [
 const say = (s = '') => fs.writeSync(1, s + '\n')
 const DRY = process.argv.includes('--dry-run')
 
-// Only when run directly: scripts/benchmark.ts imports RUBRIC_V4.
-if (process.argv[1]?.endsWith('seed-rubric-v4.ts')) {
+// Only when run directly: scripts/benchmark.ts imports RUBRIC_V5.
+if (process.argv[1]?.endsWith('seed-rubric-v5.ts')) {
   const local = /^mongodb:\/\/(127\.0\.0\.1|localhost)(:\d+)?\//.test(process.env.DATABASE_URL || '')
   if (!local && !process.argv.includes('--remote')) {
     say('Refusing to run: this database is not on this machine. Add --remote to run it anyway.')
     process.exit(1)
   }
-  const blockers = RUBRIC_V4.filter((i) => i.severityIfFailed === 'blocker').length
-  say(`${RUBRIC_V4.length} items, ${blockers} blockers${DRY ? '. Dry run: nothing is written' : ''}.`)
-  for (const i of RUBRIC_V4) say(`  ${i.itemId} (${i.dimension}, ${i.severityIfFailed})`)
+  const blockers = RUBRIC_V5.filter((i) => i.severityIfFailed === 'blocker').length
+  say(`${RUBRIC_V5.length} items, ${blockers} blockers${DRY ? '. Dry run: nothing is written' : ''}.`)
+  for (const i of RUBRIC_V5) say(`  ${i.itemId} (${i.dimension}, ${i.severityIfFailed})`)
   if (DRY) process.exit(0)
 
   const payload = await getPayload({ config })
@@ -363,7 +381,7 @@ if (process.argv[1]?.endsWith('seed-rubric-v4.ts')) {
     data: {
       name: NAME,
       status: 'active',
-      items: RUBRIC_V4.map((i) => ({ ...i, appliesTo: [...LIFECYCLE_SLUGS] })),
+      items: RUBRIC_V5.map((i) => ({ ...i, appliesTo: [...LIFECYCLE_SLUGS] })),
       _status: 'draft',
     },
   })

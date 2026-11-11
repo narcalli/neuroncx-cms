@@ -4,7 +4,7 @@ import type { Entry, Refs } from '../../scripts/benchmark/entry'
 import { HAND_SCORES_V3 } from '../../scripts/benchmark/handScores'
 import { fingerprintOf, readWorksheet, worksheetFor, type WorksheetMeta } from '../../scripts/benchmark/worksheet'
 import { decide, decideOrganisations, decideProductNames } from '../../scripts/benchmark/mechanical'
-import { RUBRIC_V4 } from '../../scripts/seed-rubric-v4'
+import { RUBRIC_V5 } from '../../scripts/seed-rubric-v5'
 
 /**
  * The scoring CLI's parts (scripts/benchmark/): checks decided in code, the
@@ -100,25 +100,60 @@ describe('checks decided in code', () => {
     expect(verdictOf('ex-terms-defined', body('Each choice is a cart (a course choice) on the record.'))).toBe('pass')
   })
 
-  it('counts joins for lists, exempting card fields', () => {
-    const sentence = 'Checks: Your locations, doctors and open slots, so it shows what is free.'
-    expect(verdictOf('ex-lists-for-enumerations', agent({ posts: [{ key: 'tab:Panel', heading: 'How Payment services works', body: sentence }] }))).toBe('fail')
-    expect(verdictOf('ex-lists-for-enumerations', agent({ posts: [{ key: 'tab:Card', heading: 'Payment services in short', body: sentence }] }))).toBe('pass')
+  it('counts joins for lists, exempting card fields and clause commas', () => {
+    const panel = (body: string) => agent({ posts: [{ key: 'tab:Panel', heading: 'How Payment services works', body }] })
+    const list = 'Team controls: Your team sets services, doctors and slots from the dashboard, and the chat follows.'
+    expect(verdictOf('ex-lists-for-enumerations', panel(list))).toBe('fail')
+    expect(verdictOf('ex-lists-for-enumerations', agent({ posts: [{ key: 'tab:Card', heading: 'Payment services in short', body: list }] }))).toBe('pass')
+    // v5: a comma before so, because, which or and then ends a clause.
+    expect(verdictOf('ex-lists-for-enumerations', panel('Checks: Your locations, doctors and open slots, so it shows what is free.'))).toBe('pass')
+    expect(verdictOf('ex-lists-for-enumerations', panel('Acts: Reads the photo, and then saves it to the record.'))).toBe('pass')
+    expect(verdictOf('ex-lists-for-enumerations', panel('Acts: Asks for the document and confirms it, then reads the fields and adds them.'))).toBe('fail')
   })
 
-  it('finds the audience and a concrete example from the Content standards lists, singular or plural', () => {
+  it('finds the audience from the Content standards list, singular or plural', () => {
     const body = (text: string) => agent({ posts: [{ key: 'a', heading: 'About Payment services', body: text }] })
     expect(verdictOf('en-audience-named', body('Managers see who is improving.'))).toBe('pass')
     expect(verdictOf('en-audience-named', body('Customers pay in the chat.'))).toBe('fail')
-    expect(verdictOf('en-concrete-example', body('Payment services sends a link for 500 rupees on WhatsApp.'))).toBe('pass')
-    expect(verdictOf('en-concrete-example', body('Sends a link for 500 rupees on WhatsApp.'))).toBe('fail')
   })
 
-  it('blocks a percentage or multiple with no source, but not a plain count', () => {
+  it('finds a concrete example across one section, its heading and its text', () => {
+    const section = (heading: string, text: string) => agent({ posts: [{ key: 'a', heading, body: `${heading}\n\n${text}` }] })
+    // v5: the name in the heading, the channel and the figure in the text.
+    expect(verdictOf('en-concrete-example', section('Payment services in short', 'Sends a link for 500 rupees on WhatsApp.'))).toBe('pass')
+    expect(verdictOf('en-concrete-example', section('Pricing', 'Sends a link for 500 rupees on WhatsApp.'))).toBe('fail')
+    expect(verdictOf('en-concrete-example', section('Payment services in short', 'Sends a link on WhatsApp.'))).toBe('fail')
+  })
+
+  it('blocks a percentage or multiple presented as a result or market fact with no source', () => {
     const body = (text: string) => agent({ posts: [{ key: 'a', heading: 'About', body: text }] })
     expect(verdictOf('hr-claims-have-evidence', body('Bookings rose 40% in a month.'))).toBe('fail')
+    expect(verdictOf('hr-claims-have-evidence', body('80% of bookings now happen in the chat.'))).toBe('fail')
     expect(verdictOf('hr-claims-have-evidence', body('Bookings rose 40% in a month, according to a 2026 survey.'))).toBe('pass')
     expect(verdictOf('hr-claims-have-evidence', body('A reminder goes out after 7 days.'))).toBe('pass')
+  })
+
+  it('leaves a product threshold or setting alone (v5: this was a false blocker)', () => {
+    const body = (text: string) => agent({ posts: [{ key: 'a', heading: 'About', body: text }] })
+    expect(verdictOf('hr-claims-have-evidence', body('Reads each test from a photo on WhatsApp and sends any read under 80 percent confidence to your team.'))).toBe('pass')
+    expect(verdictOf('hr-claims-have-evidence', body('Flags any read it is less than 80 percent sure of for a person to check.'))).toBe('pass')
+  })
+
+  it('accepts the keyword or a catalogue name where a section or the answer names its subject', () => {
+    const sector = (doc: Record<string, unknown>, posts: Entry['posts']) => agent({ name: 'Higher Education', posts }, { name: 'Higher Education', meta: { primaryKeyword: 'admission CRM' }, ...doc })
+    const ok = sector({ kbAnswer: 'The NeuronCx admission CRM keeps one record for each applicant, for the front desk.' }, [])
+    expect(verdictOf('ex-kb-answer-complete', ok)).toBe('pass')
+    const section = (heading: string) => sector({}, [{ key: 'a', heading, body: `${heading}\n\nOne record per applicant.` }])
+    expect(verdictOf('ex-sections-stand-alone', section('How Payment services works'))).toBe('pass')
+    expect(verdictOf('ex-sections-stand-alone', section('An admission CRM for colleges'))).toBe('pass')
+    expect(verdictOf('ex-sections-stand-alone', section('The admission cycle'))).toBe('fail')
+  })
+
+  it('accepts any repeated word in a FAQ answer that is not a common word', () => {
+    const faq = (question: string, answer: string) => agent({}, { faqs: [{ question, answer }] })
+    // v5: "link" counts, though it has four letters.
+    expect(verdictOf('ex-faq-answers-stand-alone', faq('What happens if a payment link expires?', 'If the customer asks again, they get a new link.'))).toBe('pass')
+    expect(verdictOf('ex-faq-answers-stand-alone', faq('What happens if a payment link expires?', 'If the customer asks again, they get another one.'))).toBe('fail')
   })
 
   it('decides FAQ answers and the card summary by their wording', () => {
@@ -153,7 +188,7 @@ describe('the name checks, decided in code from the names a person lists', () =>
 })
 
 describe('the worksheet', () => {
-  const items = RUBRIC_V4.filter((i) => ['ex-one-name', 'en-hero-says-what', 'hr-no-client-names'].includes(i.itemId))
+  const items = RUBRIC_V5.filter((i) => ['ex-one-name', 'en-hero-says-what', 'hr-no-client-names'].includes(i.itemId))
   const meta: WorksheetMeta = {
     collection: 'microApps',
     entryId: 'e1',
@@ -202,7 +237,7 @@ describe('the worksheet', () => {
   })
 
   it('changes the fingerprint when the rubric or the code checks change, so an old accuracy pass stops counting', () => {
-    const plain = RUBRIC_V4.map(({ itemId, criterion, passCondition }) => ({ itemId, criterion, passCondition }))
+    const plain = RUBRIC_V5.map(({ itemId, criterion, passCondition }) => ({ itemId, criterion, passCondition }))
     const base = fingerprintOf(plain, 1)
     expect(fingerprintOf(plain, 2)).not.toBe(base)
     expect(fingerprintOf([{ ...plain[0], passCondition: 'Changed.' }, ...plain.slice(1)], 1)).not.toBe(base)
@@ -213,12 +248,12 @@ describe('the worksheet', () => {
 describe('the hand scores', () => {
   it('cover the ten calibration entries on every check of rubric v3', () => {
     expect(HAND_SCORES_V3).toHaveLength(10)
-    for (const hand of HAND_SCORES_V3) expect(Object.keys(hand.states).sort(), hand.slug).toEqual(RUBRIC_V4.map((i) => i.itemId).sort())
+    for (const hand of HAND_SCORES_V3) expect(Object.keys(hand.states).sort(), hand.slug).toEqual(RUBRIC_V5.map((i) => i.itemId).sort())
   })
 })
 
-describe('rubric v4', () => {
-  // The only checks a person still decides (scripts/seed-rubric-v4.ts header).
+describe('rubric v5', () => {
+  // The only checks a person still decides (scripts/seed-rubric-v5.ts header).
   const HUMAN = ['ex-one-name', 'ex-facts-stated-once', 'ex-kb-questions-answered', 'en-task-completes', 'hr-no-patient-data', 'hr-no-client-names', 'ex-product-claims-exist']
 
   it('hands a person only the seven judgement checks, for an agent and for an entry with a page of its own', () => {
@@ -227,7 +262,7 @@ describe('rubric v4', () => {
       { hasOwnPage: true, faqs: [{ question: 'Can a payment link expire?', answer: 'Yes.' }], kbQuestions: [{ question: 'A?' }, { question: 'B?' }, { question: 'C?' }] },
     )
     for (const e of [agent(), page]) {
-      const toPerson = RUBRIC_V4.map((i) => i.itemId).filter((id) => verdictOf(id, e) === 'judge')
+      const toPerson = RUBRIC_V5.map((i) => i.itemId).filter((id) => verdictOf(id, e) === 'judge')
       for (const id of toPerson) expect(HUMAN, `${e.collection}: ${id}`).toContain(id)
     }
   })

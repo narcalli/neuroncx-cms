@@ -10,7 +10,7 @@ import { gateFor } from '@/lifecycle/gate'
 import { scoreResults, type ResultState } from '@/lifecycle/score'
 import { verdictFor } from '@/lifecycle/verdict'
 import type { Rubric, User } from '@/payload-types'
-import { RUBRIC_V4 } from '../../scripts/seed-rubric-v4'
+import { RUBRIC_V5 } from '../../scripts/seed-rubric-v5'
 import { describeGateWithDatabase } from '../helpers/benchmarkGateDb'
 
 /**
@@ -70,13 +70,13 @@ describe('the verdict', () => {
   })
 })
 
-describe('rubric v4', () => {
+describe('rubric v5', () => {
   it('has 34 checks with permanent, unique IDs and five blockers', () => {
-    const ids = RUBRIC_V4.map((i) => i.itemId)
+    const ids = RUBRIC_V5.map((i) => i.itemId)
     expect(ids).toHaveLength(34)
     expect(new Set(ids).size).toBe(34)
     for (const id of ids) expect(id).toMatch(/^(ex|en|hr|seo)-[a-z0-9-]+$/)
-    expect(RUBRIC_V4.filter((i) => i.severityIfFailed === 'blocker').map((i) => i.itemId)).toEqual([
+    expect(RUBRIC_V5.filter((i) => i.severityIfFailed === 'blocker').map((i) => i.itemId)).toEqual([
       'ex-product-claims-exist',
       'hr-no-client-names',
       'hr-no-patient-data',
@@ -86,7 +86,7 @@ describe('rubric v4', () => {
   })
 
   it('files house rules and SEO under their own dimensions', () => {
-    for (const i of RUBRIC_V4) {
+    for (const i of RUBRIC_V5) {
       const expected = i.itemId.startsWith('hr-') ? 'houseRules' : i.itemId.startsWith('seo-') ? 'discoverability' : null
       if (expected) expect(i.dimension, i.itemId).toBe(expected)
       else expect(['extractability', 'engagement'], i.itemId).toContain(i.dimension)
@@ -94,14 +94,14 @@ describe('rubric v4', () => {
   })
 
   it('states every pass condition without vague words or em dashes', () => {
-    for (const i of RUBRIC_V4) {
+    for (const i of RUBRIC_V5) {
       expect(i.passCondition, i.itemId).not.toMatch(/\b(good|clear|strong|appropriate)\b/i)
       expect(`${i.criterion} ${i.passCondition}`, i.itemId).not.toContain('\u2014')
     }
   })
 
   it('settles the four ambiguities from the second calibration', () => {
-    const condition = (id: string) => RUBRIC_V4.find((i) => i.itemId === id)!.passCondition
+    const condition = (id: string) => RUBRIC_V5.find((i) => i.itemId === id)!.passCondition
     expect(condition('en-task-completes')).toMatch(/step label/)
     expect(condition('en-task-completes')).toMatch(/Result is filled/)
     expect(condition('ex-headings-name-subject')).toMatch(/Higher Education: Listing/)
@@ -109,7 +109,7 @@ describe('rubric v4', () => {
   })
 
   it('names the allowlist for client names, so anything not on it blocks', () => {
-    const check = RUBRIC_V4.find((i) => i.itemId === 'hr-no-client-names')!
+    const check = RUBRIC_V5.find((i) => i.itemId === 'hr-no-client-names')!
     expect(check.passCondition).toMatch(/third-party list in Content standards/)
     expect(check.passCondition).toMatch(/Any other organisation named is a blocker/)
   })

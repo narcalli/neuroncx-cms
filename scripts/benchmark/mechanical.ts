@@ -1,5 +1,5 @@
 /**
- * The checks code decides on its own (scripts/benchmark.ts), as rubric v4
+ * The checks code decides on its own (scripts/benchmark.ts), as rubric v5
  * words them. Each returns a verdict, or hands the check to a person on the
  * worksheet (scripts/benchmark/worksheet.ts) with what code already found.
  * Deterministic: the same entry always gets the same answer. Seven checks
@@ -37,7 +37,13 @@ const CONTACT_DATA = /(\b[6-9]\d{9}\b|\+91[\s-]?\d{5}[\s-]?\d{5}|[\w.+-]+@[\w-]+
 const VERB_LABEL = /^(book|see|talk|try|get|start|request|contact|explore|watch|download|ask|schedule|learn|read|join|call)\b/i
 const FIGURE = /\b\d+(\.\d+)?\s*(%|per ?cent\b|x\b|times\b)/i
 const SOURCE = /\b(according to|source|survey|study|report)\b/i
-const STOP = new Set(['about', 'after', 'again', 'their', 'there', 'these', 'those', 'which', 'where', 'while', 'would', 'could', 'should', 'what', 'when', 'your', 'from', 'with', 'does'])
+// A figure presented as a result or a market fact, not as how the product behaves.
+const RESULT_WORDS = /\b(fewer|faster|reduc\w*|cut|cuts|sav(e|es|ed|ing)|increas\w*|improv\w*|rose|rise|rises|grew|grow\w*|boost\w*)\b/i
+const FIGURE_OF = /\b\d+(\.\d+)?\s*(%|per ?cent|x|times)\s+of\s+\w/i
+// Commas that end a clause, and so do not separate list items.
+const CLAUSE_COMMA = /,(?=\s+(so|because|which|and then)\b)/gi
+// Words a FAQ answer may repeat without that showing it answers the question.
+const COMMON = new Set(['what', 'when', 'where', 'which', 'who', 'whom', 'whose', 'why', 'how', 'is', 'are', 'was', 'were', 'be', 'been', 'am', 'do', 'does', 'did', 'can', 'could', 'will', 'would', 'should', 'shall', 'may', 'might', 'must', 'has', 'have', 'had', 'get', 'gets', 'happen', 'happens', 'the', 'a', 'an', 'of', 'to', 'in', 'on', 'for', 'with', 'at', 'by', 'from', 'about', 'into', 'and', 'or', 'if', 'than', 'then', 'it', 'its', 'this', 'that', 'these', 'those', 'i', 'we', 'you', 'they', 'he', 'she', 'our', 'your', 'their', 'my', 'me', 'us', 'them', 'not', 'no', 'yes', 'there'])
 
 /** A section's own words: a post's title line and its More link are left out. */
 const ownBody = (s: Section) =>
@@ -60,6 +66,9 @@ export const decide = (itemId: string, e: Entry, refs: Refs): Decision => {
   const keyword = str(meta.primaryKeyword).trim()
   const faqs = rows(d.faqs)
   const named = (s: string) => has(s, e.name)
+  // The entry, as headings, sections and the answer may name it.
+  const subjectNames = [e.name, keyword, ...refs.catalogue, ...refs.terms].filter(Boolean)
+  const namesSubject = (s: string) => subjectNames.some((n) => has(s, n))
 
   switch (itemId) {
     case 'ex-headings-name-subject': {
@@ -71,8 +80,7 @@ export const decide = (itemId: string, e: Entry, refs: Refs): Decision => {
         return (rest && ADMIN_WORDS.some((w) => rest.startsWith(w))) || /\(interim\)/i.test(h)
       })
       if (paired) return decided('fail', `"${paired}" pairs the entry name with an admin word.`)
-      const names = [e.name, keyword, ...refs.catalogue, ...refs.terms].filter(Boolean)
-      const unnamed = headings.find((h) => !names.some((n) => has(h, n)))
+      const unnamed = headings.find((h) => !namesSubject(h))
       return unnamed ? decided('fail', `"${unnamed}" has neither the entry name, the keyword nor a catalogue or terms name.`) : decided('pass')
     }
     case 'ex-sections-stand-alone': {
@@ -80,7 +88,7 @@ export const decide = (itemId: string, e: Entry, refs: Refs): Decision => {
         const body = ownBody(s)
         const first = firstSentence(body)
         if (PRONOUN_START_WITH_THAT.test(body)) return decided('fail', `"${s.heading}" starts with ${body.split(/\s/)[0]}.`)
-        if (!named(s.heading) && !named(first)) return decided('fail', `"${s.heading}" names the entry in neither its heading nor its first sentence.`)
+        if (!namesSubject(s.heading) && !namesSubject(first)) return decided('fail', `"${s.heading}" names its subject in neither its heading nor its first sentence.`)
       }
       return decided('pass')
     }
@@ -107,7 +115,8 @@ export const decide = (itemId: string, e: Entry, refs: Refs): Decision => {
     case 'ex-lists-for-enumerations': {
       for (const s of sectionsOf(e).filter((x) => !isCardSection(x))) {
         for (const sentence of sentencesOf(ownBody(s))) {
-          const joins = (sentence.match(/,/g)?.length ?? 0) + (sentence.match(/\b(and|or|then)\b/gi)?.length ?? 0)
+          const listed = sentence.replace(CLAUSE_COMMA, '').replace(/\band then\b/gi, 'then')
+          const joins = (listed.match(/,/g)?.length ?? 0) + (listed.match(/\b(and|or|then)\b/gi)?.length ?? 0)
           if (joins >= 3) return decided('fail', `${joins} joins in one sentence: ${quoteShort(sentence)}`)
           if (joins >= 2 && words(sentence) > 25) return decided('fail', `${joins} joins in a ${words(sentence)}-word sentence: ${quoteShort(sentence)}`)
         }
@@ -133,7 +142,7 @@ export const decide = (itemId: string, e: Entry, refs: Refs): Decision => {
         const a = str(f.answer).trim()
         if (/\b(it|this)\b/i.test(q)) return decided('fail', `The question says it or this: "${q}"`)
         if (/^(yes|no)\b|^\d/i.test(a)) continue
-        const qWords = (q.match(/\p{L}{5,}/gu) ?? []).map(lower).filter((w) => !STOP.has(w))
+        const qWords = (q.match(/\p{L}+/gu) ?? []).map(lower).filter((w) => !COMMON.has(w))
         if (!qWords.some((w) => wordMatch(firstSentence(a), w))) return decided('fail', `The answer to "${q}" neither starts with yes, no or a number nor repeats a word from the question.`)
       }
       return decided('pass')
@@ -145,7 +154,7 @@ export const decide = (itemId: string, e: Entry, refs: Refs): Decision => {
       const answer = str(d.kbAnswer).trim()
       if (!answer) return decided('fail', 'Answer is empty.')
       const first = firstSentence(answer)
-      if (!named(first)) return decided('fail', 'The first sentence of the answer does not contain the entry name.')
+      if (!namesSubject(first)) return decided('fail', 'The first sentence of the answer names neither the entry, its keyword nor a catalogue or terms name.')
       return anyOf(first, refs.audiences) ? decided('pass') : decided('fail', 'The first sentence of the answer names no one from the audience list.')
     }
     case 'ex-kb-facts-checkable': {
@@ -197,9 +206,13 @@ export const decide = (itemId: string, e: Entry, refs: Refs): Decision => {
       }
       return judge()
     case 'en-concrete-example': {
+      // The example as a whole: one section, its heading and its text.
       const names = [e.name, ...refs.catalogue]
-      const example = sentences.find((s) => anyOf(s, refs.channels) && (/\d|"[^"]+"|“[^”]+”/.test(s)) && names.some((n) => has(s, n)))
-      return example ? decided('pass', `For example ${quoteShort(example)}`) : decided('fail', 'No sentence has a channel, a number or quoted item, and a NeuronCx name together.')
+      const example = sectionsOf(e).find((s) => {
+        const all = `${s.heading}\n${s.body}`
+        return anyOf(all, refs.channels) && /\d|"[^"]+"|“[^”]+”/.test(ownBody(s)) && names.some((n) => has(all, n))
+      })
+      return example ? decided('pass', `In "${example.heading}".`) : decided('fail', 'No section has a channel, a number or quoted item, and a NeuronCx name together.')
     }
     case 'en-card-summary': {
       const summary = str(d.summary).trim()
@@ -231,7 +244,8 @@ export const decide = (itemId: string, e: Entry, refs: Refs): Decision => {
     }
     case 'hr-claims-have-evidence': {
       const linksCustomer = e.links.some((l) => /\bcustomers\b/.test(l))
-      const unsourced = sentences.find((s) => FIGURE.test(s) && !SOURCE.test(s))
+      // Only figures presented as results or market facts; a threshold or setting needs no source.
+      const unsourced = sentences.find((s) => FIGURE.test(s) && (RESULT_WORDS.test(s) || FIGURE_OF.test(s)) && !SOURCE.test(s))
       return unsourced && !linksCustomer ? decided('fail', `A figure with no source: ${quoteShort(unsourced)}`) : decided('pass')
     }
     case 'seo-meta-title': {
