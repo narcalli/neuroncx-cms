@@ -121,13 +121,17 @@ export const Rubrics: CollectionConfig = {
           name: 'dimension',
           type: 'select',
           required: true,
+          // Scores are read by dimension across many pages (guideline 8.4), so each
+          // kind of check keeps its own.
           options: [
             { label: 'Extractability', value: 'extractability' },
             { label: 'Engagement', value: 'engagement' },
+            { label: 'House rules', value: 'houseRules' },
+            { label: 'Discoverability', value: 'discoverability' },
           ],
           admin: {
             description:
-              'Extractability: whether a bot or search engine can lift the facts out correctly. Engagement: whether a reader is drawn in and acts.',
+              'Extractability: whether a bot can answer correctly from this content alone. Engagement: whether the reader can finish what they came to do. House rules: the writing rules every piece follows. Discoverability: search and links.',
           },
         },
         {

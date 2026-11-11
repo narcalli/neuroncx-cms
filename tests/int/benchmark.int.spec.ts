@@ -5,11 +5,12 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import config from '@/payload.config'
 import { BenchmarkRuns } from '@/collections/BenchmarkRuns'
 import { Rubrics } from '@/collections/Rubrics'
-import { ContentStandards } from '@/ContentStandards/config'
+import { ContentStandards, validateUniqueNames } from '@/ContentStandards/config'
 import { gateFor } from '@/lifecycle/gate'
 import { scoreResults, type ResultState } from '@/lifecycle/score'
 import { verdictFor } from '@/lifecycle/verdict'
 import type { Rubric, User } from '@/payload-types'
+import { RUBRIC_V2 } from '../../scripts/seed-rubric-v2'
 
 /**
  * Rubrics, benchmark runs and content standards (stage 2 of the content
@@ -68,6 +69,43 @@ describe('the verdict', () => {
   })
 })
 
+describe('rubric v2', () => {
+  it('has 34 checks with permanent, unique IDs and five blockers', () => {
+    const ids = RUBRIC_V2.map((i) => i.itemId)
+    expect(ids).toHaveLength(34)
+    expect(new Set(ids).size).toBe(34)
+    for (const id of ids) expect(id).toMatch(/^(ex|en|hr|seo)-[a-z0-9-]+$/)
+    expect(RUBRIC_V2.filter((i) => i.severityIfFailed === 'blocker').map((i) => i.itemId)).toEqual([
+      'ex-product-claims-exist',
+      'hr-no-client-names',
+      'hr-no-patient-data',
+      'hr-dpdp-not-hipaa',
+      'hr-claims-have-evidence',
+    ])
+  })
+
+  it('files house rules and SEO under their own dimensions', () => {
+    for (const i of RUBRIC_V2) {
+      const expected = i.itemId.startsWith('hr-') ? 'houseRules' : i.itemId.startsWith('seo-') ? 'discoverability' : null
+      if (expected) expect(i.dimension, i.itemId).toBe(expected)
+      else expect(['extractability', 'engagement'], i.itemId).toContain(i.dimension)
+    }
+  })
+
+  it('states every pass condition without vague words or em dashes', () => {
+    for (const i of RUBRIC_V2) {
+      expect(i.passCondition, i.itemId).not.toMatch(/\b(good|clear|strong|appropriate)\b/i)
+      expect(`${i.criterion} ${i.passCondition}`, i.itemId).not.toContain('\u2014')
+    }
+  })
+
+  it('names the allowlist for client names, so anything not on it blocks', () => {
+    const check = RUBRIC_V2.find((i) => i.itemId === 'hr-no-client-names')!
+    expect(check.passCondition).toMatch(/third-party list in Content standards/)
+    expect(check.passCondition).toMatch(/Any other organisation named is a blocker/)
+  })
+})
+
 describe('the gate', () => {
   const standards = { defaultGate: 85, gates: [{ collection: 'sectors' as const, gate: 90 }] }
 
@@ -75,6 +113,19 @@ describe('the gate', () => {
     expect(gateFor(standards, 'sectors')).toBe(90)
     expect(gateFor(standards, 'microApps')).toBe(85)
     expect(gateFor({ defaultGate: 70, gates: null }, 'industryTopics')).toBe(70)
+  })
+
+  it('starts the third-party allowlist and the terms list, for the content owner to extend', () => {
+    const named = (n: string) => ContentStandards.fields.find((f) => 'name' in f && f.name === n) as Field & { defaultValue: unknown }
+    expect(named('allowedThirdParties').defaultValue).toEqual(expect.arrayContaining([{ name: 'Google Ads' }, { name: 'Meta' }, { name: 'JEE' }]))
+    expect(named('terms').defaultValue).toEqual(expect.arrayContaining([{ term: 'Bot swarm' }, { term: 'Context Engine' }]))
+  })
+
+  it('refuses a name twice in a list, ignoring case', () => {
+    const check = validateUniqueNames('name')
+    const opts = { req: { t: (k: string) => k } } as unknown as Parameters<typeof check>[1]
+    expect(check([{ name: 'Meta' }, { name: 'Google' }], opts)).toBe(true)
+    expect(check([{ name: 'Meta' }, { name: 'meta ' }], opts)).toBe('Each name can appear once, and "meta" appears more than once.')
   })
 
   it('starts at 85, with 90 for the three knowledge base collections', () => {
@@ -85,6 +136,25 @@ describe('the gate', () => {
       { collection: 'industryTopics', gate: 90 },
       { collection: 'microApps', gate: 90 },
     ])
+  })
+})
+
+describe('the rubric and run fields', () => {
+  type Named = { name?: string; options?: { value: string }[]; admin?: { description?: unknown }; fields?: Named[] }
+  const find = (fields: Named[], path: string[]): Named | undefined => {
+    const [head, ...rest] = path
+    const f = fields.find((x) => x.name === head)
+    return rest.length ? find(f?.fields ?? [], rest) : f
+  }
+
+  it('files each rubric item under one of four dimensions, read separately in aggregate', () => {
+    const dimension = find(Rubrics.fields as Named[], ['items', 'dimension'])
+    expect(dimension?.options?.map((o) => o.value)).toEqual(['extractability', 'engagement', 'houseRules', 'discoverability'])
+  })
+
+  it('says Not applicable is decided per document', () => {
+    const state = find(BenchmarkRuns.fields as Named[], ['results', 'state'])
+    expect(String(state?.admin?.description)).toMatch(/does not apply to this document/)
   })
 })
 

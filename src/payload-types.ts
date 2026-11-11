@@ -11357,9 +11357,9 @@ export interface Rubric {
      */
     itemId: string;
     /**
-     * Extractability: whether a bot or search engine can lift the facts out correctly. Engagement: whether a reader is drawn in and acts.
+     * Extractability: whether a bot can answer correctly from this content alone. Engagement: whether the reader can finish what they came to do. House rules: the writing rules every piece follows. Discoverability: search and links.
      */
-    dimension: 'extractability' | 'engagement';
+    dimension: 'extractability' | 'engagement' | 'houseRules' | 'discoverability';
     /**
      * What is checked, in one or two sentences.
      */
@@ -11429,7 +11429,7 @@ export interface BenchmarkRun {
      */
     itemId: string;
     /**
-     * Not applicable items are left out of the score.
+     * Not applicable: the item does not apply to this document, for example an SEO check on an entry with no page of its own. Left out of the score.
      */
     state: 'pass' | 'warning' | 'blocker' | 'na';
     /**
@@ -16470,7 +16470,7 @@ export interface WhatsappList {
   createdAt?: string | null;
 }
 /**
- * The benchmark score content needs before it can be published.
+ * The benchmark score content needs before it can be published, and the names the rubric accepts.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "contentStandards".
@@ -16494,6 +16494,34 @@ export interface ContentStandard {
          * The score this collection must reach.
          */
         gate: number;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Organisations content may name that are not customers or integrations, such as ad platforms, exam boards and regulators. Any other organisation named in content is a blocker.
+   */
+  allowedThirdParties?:
+    | {
+        /**
+         * As it is written in content, for example Google Ads.
+         */
+        name: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * NeuronCx names and concepts that are not entries of their own, such as Bot swarm or episode. Content defines each on first use. A product name in content passes if it is here or a published entry.
+   */
+  terms?:
+    | {
+        /**
+         * The term as it is written in content.
+         */
+        term: string;
+        /**
+         * What it means, in one sentence. Confirmed by the module owner.
+         */
+        meaning?: string | null;
         id?: string | null;
       }[]
     | null;
@@ -16726,6 +16754,19 @@ export interface ContentStandardsSelect<T extends boolean = true> {
     | {
         collection?: T;
         gate?: T;
+        id?: T;
+      };
+  allowedThirdParties?:
+    | T
+    | {
+        name?: T;
+        id?: T;
+      };
+  terms?:
+    | T
+    | {
+        term?: T;
+        meaning?: T;
         id?: T;
       };
   updatedAt?: T;

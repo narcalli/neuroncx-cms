@@ -119,7 +119,8 @@ export const BenchmarkRuns: CollectionConfig = {
             { label: 'Not applicable', value: 'na' },
           ],
           admin: {
-            description: 'Not applicable items are left out of the score.',
+            description:
+              'Not applicable: the item does not apply to this document, for example an SEO check on an entry with no page of its own. Left out of the score.',
           },
         },
         {
