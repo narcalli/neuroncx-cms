@@ -3,6 +3,7 @@ import { ValidationError } from 'payload'
 
 import { cutOnWord } from '../collections/integrations/hooks'
 import { plainTextProblem } from '../fields/validators/plainText'
+import { noteBenchmarkGate } from '../lifecycle/benchmarkGate'
 import { defaultLayoutBlocks } from './hubs'
 import { ownPageProblems, sectionPublishProblems } from './publishCheck'
 import type { ContentCollectionEntry } from './registry'
@@ -82,14 +83,20 @@ export const followPageDefaults =
   }
 
 /**
- * beforeChange, after the fallbacks: refuses to publish an entry with Own
- * page on until its page fields are filled. Drafts always save.
+ * beforeChange, after the fallbacks: on every publish, the benchmark gate
+ * (src/lifecycle/benchmarkGate.ts, which for now only records its verdict);
+ * then, for an entry with Own page on, refuses to publish until its page
+ * fields are filled. Drafts always save.
  */
 export const contentPublishCheck =
   (entry: ContentCollectionEntry): CollectionBeforeChangeHook =>
   async ({ data, originalDoc, req }) => {
     const cur: Doc = { ...originalDoc, ...data, meta: { ...originalDoc?.meta, ...data.meta } }
-    if (cur._status !== 'published' || !cur.hasOwnPage) return data
+    if (cur._status !== 'published') return data
+    // Before the own page check, or entries without a page of their own
+    // (every agent) would never meet the gate.
+    await noteBenchmarkGate(entry.slug, cur, originalDoc?.id, req)
+    if (!cur.hasOwnPage) return data
 
     const problems = [...ownPageProblems(cur, entry.heroDesigns), ...(await sectionPublishProblems(entry, cur, req))]
     if (problems.length) {

@@ -2,6 +2,7 @@ import type { CollectionBeforeChangeHook } from 'payload'
 import { APIError, ValidationError } from 'payload'
 
 import type { BenchmarkRun } from '@/payload-types'
+import { contentHash } from '@/lifecycle/contentHash'
 import { LIFECYCLE_COLLECTIONS } from '@/lifecycle/scope'
 import { scoreResults } from '@/lifecycle/score'
 
@@ -16,7 +17,11 @@ export const refuseRunEdits: CollectionBeforeChangeHook<BenchmarkRun> = ({ data,
   return data
 }
 
-/** versionId must be a saved version of the scored document itself. */
+/**
+ * versionId must be a saved version of the scored document itself. Sets
+ * contentHash from that version, so the gate can match the run to content
+ * about to be published, which has no version id yet.
+ */
 export const checkScoredVersion: CollectionBeforeChangeHook<BenchmarkRun> = async ({ data, req }) => {
   const doc = data.document
   if (!doc?.relationTo || !doc.value || !data.versionId) return data
@@ -31,7 +36,11 @@ export const checkScoredVersion: CollectionBeforeChangeHook<BenchmarkRun> = asyn
       req,
     })
     .catch(() => null)
-  if (found?.docs.length) return data
+  const version = found?.docs[0]?.version
+  if (version) {
+    data.contentHash = contentHash(version)
+    return data
+  }
   throw new ValidationError({
     collection: 'benchmarkRuns',
     errors: [

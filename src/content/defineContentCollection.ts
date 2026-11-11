@@ -35,6 +35,9 @@ import { entryPathField, noteEntryLivePath, redirectMovedEntry, refreshChildPath
 import './sections/shared'
 import type { DefaultLayoutRow } from './sections/defineSection'
 import { revalidateAfterChange, revalidateAfterDelete } from './revalidate'
+import { benchmarkStatusEndpoint, isLifecycleCollection, logBenchmarkGate } from '../lifecycle/benchmarkGate'
+import type { LifecycleCollection } from '../lifecycle/scope'
+import { benchmarkStatusField, gateOverrideFields, logGateOverride, stampGateOverride } from '../fields/gateOverride'
 
 /**
  * Builds a content collection from a short config (docs/cms/foundation.md,
@@ -338,6 +341,7 @@ export const defineContentCollection = (opts: ContentCollectionOptions): Collect
   // The stored address, after everything it is worked out from.
   const pathField = page && routing.kind !== 'none' ? entryPathField(entry) : null
 
+  const lifecycle = isLifecycleCollection(slug)
   const sidebar: Field[] = [
     ...core.slice(0, afterSlug),
     statusField(),
@@ -350,6 +354,8 @@ export const defineContentCollection = (opts: ContentCollectionOptions): Collect
     // What search engines will see of the entry's own page (fields/searchCheck.ts).
     ...(page ? [searchCheckField()] : []),
     ...(parentField ? [parentField] : []),
+    // The benchmark gate (src/lifecycle/benchmarkGate.ts), for collections it covers.
+    ...(lifecycle ? [benchmarkStatusField(), ...gateOverrideFields()] : []),
     ...(extra.sidebar ?? []).map(inSidebar),
     ...(pathField ? [pathField] : []),
   ]
@@ -451,12 +457,14 @@ export const defineContentCollection = (opts: ContentCollectionOptions): Collect
     },
     defaultSort: opts.admin?.defaultSort ?? 'order',
     versions: { drafts: { autosave: false } },
+    ...(lifecycle ? { endpoints: [benchmarkStatusEndpoint(slug as LifecycleCollection)] } : {}),
     fields: [...sidebar, { type: 'tabs', tabs: shownTabs }],
     hooks: mergeHooks(
       {
         beforeChange: [
           ...(layout ? [followPageDefaults(entry)] : []),
           contentFallbacks(entry, { seo: hasTab('seo'), whatsapp: groups.has('whatsapp') }),
+          ...(lifecycle ? [stampGateOverride] : []),
           contentPublishCheck(entry),
           ...(entry.hasRoute ? [noteEntryLivePath(entry)] : []),
         ],
@@ -464,6 +472,7 @@ export const defineContentCollection = (opts: ContentCollectionOptions): Collect
           revalidateAfterChange(entry),
           ...(entry.hasRoute ? [redirectMovedEntry(entry)] : []),
           refreshChildPaths(entry),
+          ...(lifecycle ? [logBenchmarkGate, logGateOverride] : []),
         ],
         afterDelete: [revalidateAfterDelete(entry)],
       },

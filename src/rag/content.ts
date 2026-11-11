@@ -63,6 +63,10 @@ const NEVER = [
   'heroMotion',
   'heroStats',
   'showClosing',
+  // The benchmark gate's override (src/fields/gateOverride.ts): editors' notes, not content.
+  'gateOverride',
+  'gateOverrideReason',
+  'gateOverrideHash',
 ]
 
 /** What a visitor receives, for collections that strip fields after a read. */

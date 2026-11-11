@@ -2875,6 +2875,18 @@ export interface Sector {
    */
   pageMotion?: ('follow' | 'on' | 'reduced' | 'off') | null;
   /**
+   * Lets this exact content publish below its gate. Only a content owner or admin can set it, with a reason. Editing the content afterwards ends it. Not applied while the gate only warns.
+   */
+  gateOverride?: boolean | null;
+  /**
+   * Why this content may publish below its gate. Kept in History.
+   */
+  gateOverrideReason?: string | null;
+  /**
+   * The content the override was granted for. Set automatically.
+   */
+  gateOverrideHash?: string | null;
+  /**
    * A shorter name for menus, such as Education. Empty uses the name.
    */
   menuLabel?: string | null;
@@ -5919,6 +5931,18 @@ export interface MicroApp {
    * Follow the site setting, or set this page on its own. The strictest of the site, page and block settings wins.
    */
   pageMotion?: ('follow' | 'on' | 'reduced' | 'off') | null;
+  /**
+   * Lets this exact content publish below its gate. Only a content owner or admin can set it, with a reason. Editing the content afterwards ends it. Not applied while the gate only warns.
+   */
+  gateOverride?: boolean | null;
+  /**
+   * Why this content may publish below its gate. Kept in History.
+   */
+  gateOverrideReason?: string | null;
+  /**
+   * The content the override was granted for. Set automatically.
+   */
+  gateOverrideHash?: string | null;
   /**
    * Where the agent works.
    */
@@ -9632,6 +9656,18 @@ export interface IndustryTopic {
    */
   pageMotion?: ('follow' | 'on' | 'reduced' | 'off') | null;
   /**
+   * Lets this exact content publish below its gate. Only a content owner or admin can set it, with a reason. Editing the content afterwards ends it. Not applied while the gate only warns.
+   */
+  gateOverride?: boolean | null;
+  /**
+   * Why this content may publish below its gate. Kept in History.
+   */
+  gateOverrideReason?: string | null;
+  /**
+   * The content the override was granted for. Set automatically.
+   */
+  gateOverrideHash?: string | null;
+  /**
    * The topic page sits under this industry: the industry slug, then this slug.
    */
   industry: string | Sector;
@@ -11413,6 +11449,10 @@ export interface BenchmarkRun {
    */
   versionId: string;
   /**
+   * A fingerprint of the scored version's content, worked out from that version. The publish gate matches runs to content by it.
+   */
+  contentHash?: string | null;
+  /**
    * The rubric the version was scored against.
    */
   rubric: string | Rubric;
@@ -11465,10 +11505,19 @@ export interface ContentEvent {
   id: string;
   collectionSlug: string;
   doc: string;
-  action: 'published' | 'unpublished' | 'rolledBack';
+  action:
+    | 'published'
+    | 'unpublished'
+    | 'rolledBack'
+    | 'benchmarkPassed'
+    | 'benchmarkFailed'
+    | 'notScored'
+    | 'overrideSet'
+    | 'overrideCleared';
   user?: (string | null) | User;
   version?: string | null;
   fromVersion?: string | null;
+  note?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -14108,6 +14157,9 @@ export interface SectorsSelect<T extends boolean = true> {
   hasOwnPage?: T;
   usePageDefaults?: T;
   pageMotion?: T;
+  gateOverride?: T;
+  gateOverrideReason?: T;
+  gateOverrideHash?: T;
   menuLabel?: T;
   verticals?: T;
   path?: T;
@@ -14605,6 +14657,9 @@ export interface IndustryTopicsSelect<T extends boolean = true> {
   hasOwnPage?: T;
   usePageDefaults?: T;
   pageMotion?: T;
+  gateOverride?: T;
+  gateOverrideReason?: T;
+  gateOverrideHash?: T;
   industry?: T;
   stage?: T;
   stageOrder?: T;
@@ -15523,6 +15578,9 @@ export interface MicroAppsSelect<T extends boolean = true> {
   hasOwnPage?: T;
   usePageDefaults?: T;
   pageMotion?: T;
+  gateOverride?: T;
+  gateOverrideReason?: T;
+  gateOverrideHash?: T;
   channel?: T;
   verticals?: T;
   path?: T;
@@ -15910,6 +15968,7 @@ export interface RubricsSelect<T extends boolean = true> {
 export interface BenchmarkRunsSelect<T extends boolean = true> {
   document?: T;
   versionId?: T;
+  contentHash?: T;
   rubric?: T;
   rubricVersion?: T;
   results?:
@@ -15938,6 +15997,7 @@ export interface ContentEventsSelect<T extends boolean = true> {
   user?: T;
   version?: T;
   fromVersion?: T;
+  note?: T;
   updatedAt?: T;
   createdAt?: T;
 }

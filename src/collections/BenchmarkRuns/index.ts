@@ -70,6 +70,18 @@ export const BenchmarkRuns: CollectionConfig = {
       },
     },
     {
+      name: 'contentHash',
+      type: 'text',
+      label: 'Content hash',
+      index: true,
+      access: computed,
+      admin: {
+        readOnly: true,
+        description:
+          'A fingerprint of the scored version\'s content, worked out from that version. The publish gate matches runs to content by it.',
+      },
+    },
+    {
       name: 'rubric',
       type: 'relationship',
       relationTo: 'rubrics',

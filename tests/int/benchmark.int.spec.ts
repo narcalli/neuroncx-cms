@@ -11,6 +11,7 @@ import { scoreResults, type ResultState } from '@/lifecycle/score'
 import { verdictFor } from '@/lifecycle/verdict'
 import type { Rubric, User } from '@/payload-types'
 import { RUBRIC_V3 } from '../../scripts/seed-rubric-v3'
+import { describeGateWithDatabase } from '../helpers/benchmarkGateDb'
 
 /**
  * Rubrics, benchmark runs and content standards (stage 2 of the content
@@ -470,3 +471,6 @@ describe('with the local database', () => {
     })
   })
 })
+
+// After the rubric tests above, never alongside them: see tests/helpers/benchmarkGateDb.ts.
+describeGateWithDatabase()

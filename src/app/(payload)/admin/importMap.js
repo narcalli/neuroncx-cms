@@ -34,6 +34,7 @@ import { HorizontalRuleFeatureClient as HorizontalRuleFeatureClient_e70f5e05f09f
 import { BlocksFeatureClient as BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { FolderTableCell as FolderTableCell_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { FolderField as FolderField_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
+import { BenchmarkStatus as BenchmarkStatus_211b0d4d2671919221d701643709ac5e } from '@/lifecycle/BenchmarkStatus'
 import { CharCounterDescription as CharCounterDescription_643d9d96b484f061684810597eecdf63 } from '@/fields/CharCounter/Component'
 import { HeroDesignPickerField as HeroDesignPickerField_b69917ee4326e530cc6db1497a016f17 } from '@/fields/HeroDesignPicker/Component'
 import { LayoutNotes as LayoutNotes_1246ecb47d6376db4ba24d6f53f98882 } from '@/fields/LayoutField/LayoutNotes'
@@ -87,6 +88,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#BlocksFeatureClient": BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/next/rsc#FolderTableCell": FolderTableCell_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@payloadcms/next/rsc#FolderField": FolderField_f9c02e79a4aed9a3924487c0cd4cafb1,
+  "@/lifecycle/BenchmarkStatus#BenchmarkStatus": BenchmarkStatus_211b0d4d2671919221d701643709ac5e,
   "@/fields/CharCounter/Component#CharCounterDescription": CharCounterDescription_643d9d96b484f061684810597eecdf63,
   "@/fields/HeroDesignPicker/Component#HeroDesignPickerField": HeroDesignPickerField_b69917ee4326e530cc6db1497a016f17,
   "@/fields/LayoutField/LayoutNotes#LayoutNotes": LayoutNotes_1246ecb47d6376db4ba24d6f53f98882,
