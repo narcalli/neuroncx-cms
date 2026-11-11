@@ -40,6 +40,7 @@ import { withRag } from './rag/with-rag'
 import { applyHistory, ContentEvents } from './history'
 import { ragSyncDocTask } from './rag/tasks/sync-doc'
 import { ragPurgeDocTask } from './rag/tasks/purge-doc'
+import { serializeTransactionCalls } from './db/serializeTransactionCalls'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -60,9 +61,12 @@ export default buildConfig({
     },
   },
   editor: defaultLexical,
-  db: mongooseAdapter({
-    url: process.env.DATABASE_URL || '',
-  }),
+  // One transaction's database calls run one at a time (src/db/serializeTransactionCalls.ts).
+  db: serializeTransactionCalls(
+    mongooseAdapter({
+      url: process.env.DATABASE_URL || '',
+    }),
+  ),
   // Layout sections and page blocks, referenced by slug from content collections' layout fields.
   blocks: contentBlocks(),
   // Read-only menus for the WhatsApp bot (src/endpoints/wa.ts).

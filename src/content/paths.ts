@@ -267,18 +267,21 @@ export const validatePrimaryKeyword: TextFieldSingleValidation = async (value, o
 export const writeRedirect = async (req: PayloadRequest, from: string | null, to: string | null): Promise<boolean> => {
   if (!from || !to || from === to || from === '/' || to === '/') return false
   const base = { overrideAccess: true, req, depth: 0 } as const
+  // Lookups without pagination: with it, a count runs alongside the find, and
+  // MongoDB refuses two operations at once in the publish's transaction.
+  const lookup = { ...base, pagination: false } as const
   const target = { type: 'custom' as const, url: to }
 
-  const awayFromNew = await req.payload.find({ ...base, collection: 'redirects', where: { from: { equals: to } }, limit: 10 })
+  const awayFromNew = await req.payload.find({ ...lookup, collection: 'redirects', where: { from: { equals: to } }, limit: 10 })
   for (const r of awayFromNew.docs) await req.payload.delete({ ...base, collection: 'redirects', id: r.id })
 
-  const intoOld = await req.payload.find({ ...base, collection: 'redirects', where: { 'to.url': { equals: from } }, limit: 100 })
+  const intoOld = await req.payload.find({ ...lookup, collection: 'redirects', where: { 'to.url': { equals: from } }, limit: 100 })
   for (const r of intoOld.docs) {
     if (r.from === to) continue
     await req.payload.update({ ...base, collection: 'redirects', id: r.id, data: { to: target } })
   }
 
-  const existing = await req.payload.find({ ...base, collection: 'redirects', where: { from: { equals: from } }, limit: 1 })
+  const existing = await req.payload.find({ ...lookup, collection: 'redirects', where: { from: { equals: from } }, limit: 1 })
   if (existing.docs[0]) await req.payload.update({ ...base, collection: 'redirects', id: existing.docs[0].id, data: { to: target } })
   else await req.payload.create({ ...base, collection: 'redirects', data: { from, to: target } })
   req.payload.logger.info(`Moved: redirect from ${from} to ${to}`)
