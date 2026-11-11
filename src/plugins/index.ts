@@ -11,6 +11,8 @@ import { getServerSideURL } from '@/utilities/getURL'
 import { pagePath } from '@/collections/Pages/nesting'
 import { revalidateOnSite } from '@/hooks/revalidateOnSite'
 import { apiKeysDraftOnlyPlugin } from './apiKeysDraftOnly'
+import { ownerOrAdminInPerson } from '@/access/adminInPerson'
+import { validateRedirectDestination } from '@/redirects/destination'
 
 // The SEO title's Generate button. SEO titles carry the brand themselves (the
 // website adds nothing to them), so: "Title | NeuronCx", and "Title | Blog"
@@ -39,7 +41,29 @@ export const plugins: Plugin[] = [
   }),
   redirectsPlugin({
     collections: ['pages', 'posts'],
+    // Permanent unless an editor marks it temporary (website bug 17). Not
+    // required: older redirects have none, and a missing type is permanent.
+    redirectTypes: ['308', '307'],
+    redirectTypeFieldOverride: {
+      label: 'Redirect type',
+      required: false,
+      defaultValue: '308',
+      options: [
+        { label: 'Permanent (most moves)', value: '308' },
+        { label: 'Temporary (the old address comes back later)', value: '307' },
+      ],
+      admin: { description: 'Permanent tells search engines the move is for good. Temporary keeps the old address listed.' },
+    },
     overrides: {
+      // Live as soon as saved (no drafts): a content owner or admin in person,
+      // never an author or a key. Redirects the CMS writes when an entry moves
+      // (src/content/paths.ts) are saved by the server and are not affected.
+      access: {
+        read: () => true,
+        create: ownerOrAdminInPerson,
+        update: ownerOrAdminInPerson,
+        delete: ownerOrAdminInPerson,
+      },
       // @ts-expect-error - This is a valid override, mapped fields don't resolve to the same type
       fields: ({ defaultFields }) => {
         return defaultFields.map((field) => {
@@ -49,6 +73,15 @@ export const plugins: Plugin[] = [
               admin: {
                 description: 'You will need to rebuild the website when changing this field.',
               },
+            }
+          }
+          // A custom address: a path on this site, or a listed https host (src/redirects/destination.ts).
+          if ('name' in field && field.name === 'to' && field.type === 'group') {
+            return {
+              ...field,
+              fields: field.fields.map((sub) =>
+                'name' in sub && sub.name === 'url' ? { ...sub, validate: validateRedirectDestination } : sub,
+              ),
             }
           }
           return field

@@ -258,5 +258,28 @@ export const ContentStandards: GlobalConfig = {
           'On: on Pages, Posts, Industries, Industry topics and Bot swarm, authors cannot publish or schedule a publish. They tick Ready for review, and content owners and admins are emailed. Off: anyone signed in can publish, and no review emails are sent.',
       },
     },
+    {
+      name: 'redirectHosts',
+      type: 'array',
+      label: 'Redirect destinations',
+      labels: { singular: 'Host', plural: 'Hosts' },
+      admin: {
+        description:
+          'Other websites a redirect may send visitors to. Redirects to paths on this site, or to the site itself, need no entry here.',
+      },
+      fields: [
+        {
+          name: 'host',
+          type: 'text',
+          required: true,
+          maxLength: 120,
+          validate: (value: unknown) =>
+            typeof value === 'string' && /^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(value.trim())
+              ? true
+              : 'The host alone, lowercase, without https:// or a path, for example docs.example.com.',
+          admin: { description: 'For example docs.example.com.' },
+        },
+      ],
+    },
   ],
 }
