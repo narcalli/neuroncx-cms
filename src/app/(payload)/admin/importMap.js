@@ -30,6 +30,7 @@ import { PreviewComponent as PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860 }
 import { SearchCheck as SearchCheck_bca3d97f1d142cce44bda3c9062cf2ae } from '@/fields/SearchCheckPanel'
 import { SlugField as SlugField_2b8867833a34864a02ddf429b0728a40 } from '@payloadcms/next/client'
 import { ReviewPublishButton as ReviewPublishButton_5e723844f626c379476c66afb476e441 } from '@/review/ReviewPublishButton'
+import { ReviewUnpublishButton as ReviewUnpublishButton_1af1d4abab907b2a162dd108b2c74551 } from '@/review/ReviewUnpublishButton'
 import { HistoryView as HistoryView_622183fb16145707d7eaefe89562e38c } from '@/history/HistoryView'
 import { HorizontalRuleFeatureClient as HorizontalRuleFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { BlocksFeatureClient as BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
@@ -87,6 +88,7 @@ export const importMap = {
   "@/fields/SearchCheckPanel#SearchCheck": SearchCheck_bca3d97f1d142cce44bda3c9062cf2ae,
   "@payloadcms/next/client#SlugField": SlugField_2b8867833a34864a02ddf429b0728a40,
   "@/review/ReviewPublishButton#ReviewPublishButton": ReviewPublishButton_5e723844f626c379476c66afb476e441,
+  "@/review/ReviewUnpublishButton#ReviewUnpublishButton": ReviewUnpublishButton_1af1d4abab907b2a162dd108b2c74551,
   "@/history/HistoryView#HistoryView": HistoryView_622183fb16145707d7eaefe89562e38c,
   "@payloadcms/richtext-lexical/client#HorizontalRuleFeatureClient": HorizontalRuleFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#BlocksFeatureClient": BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,

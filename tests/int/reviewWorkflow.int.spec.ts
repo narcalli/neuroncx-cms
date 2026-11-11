@@ -6,6 +6,7 @@ import config from '@/payload.config'
 import { contentHash } from '@/lifecycle/contentHash'
 import { REVIEW_PUBLISH_MESSAGE, REVIEW_SLUGS } from '@/review/scope'
 import { reviewQueue } from '@/review/queue'
+import { REVIEW_UNPUBLISH_MESSAGE } from '@/review/unpublish'
 import { compareWithLivePath } from '@/history/compareLink'
 
 /**
@@ -91,6 +92,30 @@ describe('the review workflow', () => {
     })
   })
 
+  describe('unpublishing', () => {
+    const unpublish = (id: string, by: Doc, context = on) => save(id, { _status: 'draft' }, by, context, false)
+
+    it('is refused to an author while it is on, and a draft change to the live entry still saves', async () => {
+      const page = await newPage('unpub', owner, on, 'published')
+      await expect(unpublish(page.id, author)).rejects.toThrow(REVIEW_UNPUBLISH_MESSAGE)
+      expect((await save(page.id, { title: 'ZZ RW unpub, draft edit' }, author))._status).toBe('draft')
+      expect((await payload.findByID({ collection: 'pages', id: page.id, depth: 0, overrideAccess: true }))._status).toBe('published')
+    })
+
+    it('is refused to an author from a list (bulk) too', async () => {
+      const page = await newPage('unpub-bulk', owner, on, 'published')
+      const bulk = payload.update({ collection: 'pages', where: { id: { equals: page.id } }, data: { _status: 'draft' } as never, user: as(author), overrideAccess: false, depth: 0, context: on })
+      await expect(bulk).rejects.toThrow(REVIEW_UNPUBLISH_MESSAGE)
+    })
+
+    it('is open to content owners, and to authors while the workflow is off', async () => {
+      const a = await newPage('unpub-owner', owner, on, 'published')
+      expect((await unpublish(a.id, owner))._status).toBe('draft')
+      const b = await newPage('unpub-off', owner, off, 'published')
+      expect((await unpublish(b.id, author, off))._status).toBe('draft')
+    })
+  })
+
   describe('Ready for review', () => {
     it('records who asked and when, and emails every content owner and admin once', async () => {
       const page = await newPage('ready', author)
@@ -159,7 +184,9 @@ describe('the review workflow', () => {
         const names = c.fields.flatMap((f) => ('name' in f ? [f.name] : []))
         expect(names, slug).toEqual(expect.arrayContaining(['readyForReview', 'reviewNote']))
         expect(c.admin.defaultColumns, slug).toContain('updatedBy')
-        expect((c.admin.components?.edit as { PublishButton?: string } | undefined)?.PublishButton, slug).toBe('@/review/ReviewPublishButton#ReviewPublishButton')
+        const edit = c.admin.components?.edit as { PublishButton?: string; UnpublishButton?: string } | undefined
+        expect(edit?.PublishButton, slug).toBe('@/review/ReviewPublishButton#ReviewPublishButton')
+        expect(edit?.UnpublishButton, slug).toBe('@/review/ReviewUnpublishButton#ReviewUnpublishButton')
       }
     })
   })
