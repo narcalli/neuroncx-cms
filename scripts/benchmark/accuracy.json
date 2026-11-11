@@ -1,16 +1,16 @@
 {
- "fingerprint": "3b29421eb3e5e4e9",
- "passed": false,
+ "fingerprint": "32f4b973da03ce45",
+ "passed": true,
  "tolerance": 5,
- "at": "2026-11-11T06:24:26.984Z",
- "method": "Code checks scored in code; the checks code cannot decide were scored by hand (scripts/benchmark/handScores.ts), as they are on every worksheet. Compared with the hand scores for the whole rubric.",
+ "at": "2026-11-11T06:39:00.503Z",
+ "method": "Code checks scored in code; the checks code cannot decide were scored by hand, as they are on every worksheet. Compared with hand scores made against the same rubric wording (scripts/benchmark/handScoresV5.ts), for all 34 checks.",
  "entries": [
   {
    "collection": "sectors",
    "slug": "higher-education",
-   "hand": 64.7,
-   "scorer": 52.9,
-   "within": false,
+   "hand": 55.9,
+   "scorer": 55.9,
+   "within": true,
    "decidedByCode": 28,
    "byHand": [
     "ex-one-name",
@@ -20,37 +20,12 @@
     "hr-no-client-names",
     "hr-no-patient-data"
    ],
-   "disagreements": [
-    {
-     "id": "ex-sections-stand-alone",
-     "code": "warning",
-     "hand": "pass",
-     "note": "\"What an education CRM fixes in the admission cycle\" names the entry in neither its heading nor its first sentence."
-    },
-    {
-     "id": "ex-kb-answer-complete",
-     "code": "warning",
-     "hand": "pass",
-     "note": "The first sentence of the answer does not contain the entry name."
-    },
-    {
-     "id": "en-concrete-example",
-     "code": "warning",
-     "hand": "pass",
-     "note": "No sentence has a channel, a number or quoted item, and a NeuronCx name together."
-    },
-    {
-     "id": "en-next-action",
-     "code": "warning",
-     "hand": "pass",
-     "note": "No button on the entry, and it does not follow the page defaults."
-    }
-   ]
+   "disagreements": []
   },
   {
    "collection": "microApps",
    "slug": "appointment-assistance",
-   "hand": 80,
+   "hand": 76,
    "scorer": 76,
    "within": true,
    "decidedByCode": 29,
@@ -61,33 +36,14 @@
     "hr-no-client-names",
     "hr-no-patient-data"
    ],
-   "disagreements": [
-    {
-     "id": "ex-terms-defined",
-     "code": "pass",
-     "hand": "warning",
-     "note": ""
-    },
-    {
-     "id": "ex-lists-for-enumerations",
-     "code": "warning",
-     "hand": "pass",
-     "note": "3 joins in one sentence: \"Checks: Your locations, doctors and open slots, so it shows only what's actually available...\""
-    },
-    {
-     "id": "en-concrete-example",
-     "code": "warning",
-     "hand": "pass",
-     "note": "No sentence has a channel, a number or quoted item, and a NeuronCx name together."
-    }
-   ]
+   "disagreements": []
   },
   {
    "collection": "microApps",
    "slug": "payment-services",
-   "hand": 76.9,
-   "scorer": 69.2,
-   "within": false,
+   "hand": 73.1,
+   "scorer": 73.1,
+   "within": true,
    "decidedByCode": 29,
    "byHand": [
     "ex-one-name",
@@ -96,95 +52,12 @@
     "hr-no-client-names",
     "hr-no-patient-data"
    ],
-   "disagreements": [
-    {
-     "id": "ex-terms-defined",
-     "code": "pass",
-     "hand": "warning",
-     "note": ""
-    },
-    {
-     "id": "ex-faq-answers-stand-alone",
-     "code": "warning",
-     "hand": "pass",
-     "note": "The answer to \"What happens if a payment link expires?\" neither starts with yes, no or a number nor repeats a word from the question."
-    },
-    {
-     "id": "en-short-paragraphs",
-     "code": "warning",
-     "hand": "pass",
-     "note": "\"How Payment services works\" runs 171 words under one heading."
-    },
-    {
-     "id": "en-concrete-example",
-     "code": "warning",
-     "hand": "pass",
-     "note": "No sentence has a channel, a number or quoted item, and a NeuronCx name together."
-    }
-   ]
+   "disagreements": []
   },
   {
    "collection": "microApps",
    "slug": "prescription-understanding",
-   "hand": 76,
-   "scorer": 72,
-   "within": true,
-   "decidedByCode": 29,
-   "byHand": [
-    "ex-one-name",
-    "ex-facts-stated-once",
-    "ex-product-claims-exist",
-    "hr-no-client-names",
-    "hr-no-patient-data"
-   ],
-   "disagreements": [
-    {
-     "id": "ex-terms-defined",
-     "code": "pass",
-     "hand": "warning",
-     "note": ""
-    },
-    {
-     "id": "en-concrete-example",
-     "code": "warning",
-     "hand": "pass",
-     "note": "No sentence has a channel, a number or quoted item, and a NeuronCx name together."
-    },
-    {
-     "id": "hr-claims-have-evidence",
-     "code": "blocker",
-     "hand": "pass",
-     "note": "A figure with no source: \"Reads each test from a prescription photo on WhatsApp and sends any read under 80 percent ...\""
-    }
-   ]
-  },
-  {
-   "collection": "microApps",
-   "slug": "test-matching-and-pricing",
-   "hand": 72,
-   "scorer": 76,
-   "within": true,
-   "decidedByCode": 29,
-   "byHand": [
-    "ex-one-name",
-    "ex-facts-stated-once",
-    "ex-product-claims-exist",
-    "hr-no-client-names",
-    "hr-no-patient-data"
-   ],
-   "disagreements": [
-    {
-     "id": "ex-terms-defined",
-     "code": "pass",
-     "hand": "warning",
-     "note": ""
-    }
-   ]
-  },
-  {
-   "collection": "microApps",
-   "slug": "student-mark-statement-assessment",
-   "hand": 76,
+   "hand": 80,
    "scorer": 80,
    "within": true,
    "decidedByCode": 29,
@@ -195,26 +68,39 @@
     "hr-no-client-names",
     "hr-no-patient-data"
    ],
-   "disagreements": [
-    {
-     "id": "ex-terms-defined",
-     "code": "pass",
-     "hand": "warning",
-     "note": ""
-    },
-    {
-     "id": "en-audience-named",
-     "code": "pass",
-     "hand": "warning",
-     "note": "Names \"school\"."
-    },
-    {
-     "id": "en-concrete-example",
-     "code": "warning",
-     "hand": "pass",
-     "note": "No sentence has a channel, a number or quoted item, and a NeuronCx name together."
-    }
-   ]
+   "disagreements": []
+  },
+  {
+   "collection": "microApps",
+   "slug": "test-matching-and-pricing",
+   "hand": 76,
+   "scorer": 76,
+   "within": true,
+   "decidedByCode": 29,
+   "byHand": [
+    "ex-one-name",
+    "ex-facts-stated-once",
+    "ex-product-claims-exist",
+    "hr-no-client-names",
+    "hr-no-patient-data"
+   ],
+   "disagreements": []
+  },
+  {
+   "collection": "microApps",
+   "slug": "student-mark-statement-assessment",
+   "hand": 84,
+   "scorer": 84,
+   "within": true,
+   "decidedByCode": 29,
+   "byHand": [
+    "ex-one-name",
+    "ex-facts-stated-once",
+    "ex-product-claims-exist",
+    "hr-no-client-names",
+    "hr-no-patient-data"
+   ],
+   "disagreements": []
   },
   {
    "collection": "microApps",
@@ -230,25 +116,12 @@
     "hr-no-client-names",
     "hr-no-patient-data"
    ],
-   "disagreements": [
-    {
-     "id": "ex-terms-defined",
-     "code": "pass",
-     "hand": "warning",
-     "note": ""
-    },
-    {
-     "id": "en-concrete-example",
-     "code": "warning",
-     "hand": "pass",
-     "note": "No sentence has a channel, a number or quoted item, and a NeuronCx name together."
-    }
-   ]
+   "disagreements": []
   },
   {
    "collection": "microApps",
    "slug": "assessment-sampling",
-   "hand": 68,
+   "hand": 72,
    "scorer": 72,
    "within": true,
    "decidedByCode": 29,
@@ -259,20 +132,13 @@
     "hr-no-client-names",
     "hr-no-patient-data"
    ],
-   "disagreements": [
-    {
-     "id": "ex-terms-defined",
-     "code": "pass",
-     "hand": "warning",
-     "note": ""
-    }
-   ]
+   "disagreements": []
   },
   {
    "collection": "microApps",
    "slug": "call-quality-assessment",
-   "hand": 80,
-   "scorer": 80,
+   "hand": 84,
+   "scorer": 84,
    "within": true,
    "decidedByCode": 29,
    "byHand": [
@@ -282,27 +148,14 @@
     "hr-no-client-names",
     "hr-no-patient-data"
    ],
-   "disagreements": [
-    {
-     "id": "ex-terms-defined",
-     "code": "pass",
-     "hand": "warning",
-     "note": ""
-    },
-    {
-     "id": "en-concrete-example",
-     "code": "warning",
-     "hand": "pass",
-     "note": "No sentence has a channel, a number or quoted item, and a NeuronCx name together."
-    }
-   ]
+   "disagreements": []
   },
   {
    "collection": "microApps",
    "slug": "longitudinal-analysis-and-feedback",
-   "hand": 80,
-   "scorer": 72,
-   "within": false,
+   "hand": 76,
+   "scorer": 76,
+   "within": true,
    "decidedByCode": 29,
    "byHand": [
     "ex-one-name",
@@ -311,32 +164,7 @@
     "hr-no-client-names",
     "hr-no-patient-data"
    ],
-   "disagreements": [
-    {
-     "id": "ex-terms-defined",
-     "code": "pass",
-     "hand": "warning",
-     "note": ""
-    },
-    {
-     "id": "ex-lists-for-enumerations",
-     "code": "warning",
-     "hand": "pass",
-     "note": "3 joins in one sentence: \"Hears: The last four weeks of checked calls, with scores, comments and evidence.\""
-    },
-    {
-     "id": "en-concrete-example",
-     "code": "warning",
-     "hand": "pass",
-     "note": "No sentence has a channel, a number or quoted item, and a NeuronCx name together."
-    },
-    {
-     "id": "hr-observation-not-criticism",
-     "code": "warning",
-     "hand": "pass",
-     "note": "Uses \"stuck\"."
-    }
-   ]
+   "disagreements": []
   }
  ]
 }
