@@ -26,6 +26,8 @@ describe('the enquiry read log', () => {
       await payload.delete({ collection: 'enquiries', id: e.id, overrideAccess: true })
     }
     for (const u of (await payload.find({ collection: 'users', where: { email: { like: 'zz-er-' } }, pagination: false, overrideAccess: true })).docs)
+      await payload.db.deleteMany({ collection: 'enquiryReads', where: { user: { equals: u.id } } })
+    for (const u of (await payload.find({ collection: 'users', where: { email: { like: 'zz-er-' } }, pagination: false, overrideAccess: true })).docs)
       await payload.delete({ collection: 'users', id: u.id, overrideAccess: true })
   }
 
@@ -47,14 +49,19 @@ describe('the enquiry read log', () => {
   it('records an admin opening an enquiry: who, how, from where', async () => {
     await payload.findByID({ collection: 'enquiries', id: enquiry.id, user: as(admin) as never, overrideAccess: false, depth: 0 })
     const [last] = await readsOf(enquiry.id)
-    expect(last).toMatchObject({ user: admin.id, how: 'opened', via: 'session' })
+    expect(last).toMatchObject({ user: admin.id, how: 'opened', via: 'session', count: 1 })
   })
 
-  it('records each enquiry an admin sees in a list', async () => {
+  it('records a list as one entry, with how many enquiries it returned', async () => {
+    const second = await payload.create({ collection: 'enquiries', data: { name: 'ZZ ER Second', email: 'zz-er-second@example.test' } as never, overrideAccess: true })
     const listed = await payload.find({ collection: 'enquiries', where: { email: { like: 'zz-er-' } }, user: as(admin) as never, overrideAccess: false, depth: 0 })
-    expect(listed.docs.length).toBe(1)
-    const [last] = await readsOf(enquiry.id)
-    expect(last).toMatchObject({ user: admin.id, how: 'listed' })
+    expect(listed.docs.length).toBe(2)
+    const lists = (
+      await payload.find({ collection: 'enquiryReads' as never, where: { and: [{ user: { equals: admin.id } }, { how: { equals: 'listed' } }] }, sort: '-createdAt', limit: 1, depth: 0, overrideAccess: true })
+    ).docs as Doc[]
+    expect(lists[0]).toMatchObject({ how: 'listed', count: 2 })
+    expect(lists[0].enquiry ?? null).toBeNull()
+    expect((await readsOf(second.id)).length).toBe(0)
   })
 
   it('records nothing for server code reading with no one signed in', async () => {

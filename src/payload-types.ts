@@ -10832,10 +10832,17 @@ export interface Enquiry {
  */
 export interface EnquiryRead {
   id: string;
-  enquiry: string | Enquiry;
+  /**
+   * The enquiry opened. Empty for a list.
+   */
+  enquiry?: (string | null) | Enquiry;
+  /**
+   * How many enquiries were returned: 1 for an enquiry opened, the number listed for a list.
+   */
+  count?: number | null;
   user?: (string | null) | User;
   /**
-   * Listed: shown among others. Opened: looked at on its own.
+   * Listed: a list of enquiries. Opened: one enquiry, looked at on its own.
    */
   how: 'listed' | 'opened';
   via?: ('session' | 'apiKey') | null;
@@ -14240,6 +14247,7 @@ export interface EnquiriesSelect<T extends boolean = true> {
  */
 export interface EnquiryReadsSelect<T extends boolean = true> {
   enquiry?: T;
+  count?: T;
   user?: T;
   how?: T;
   via?: T;
