@@ -271,6 +271,9 @@ const slugFreeIn =
       where: { slug: { equals: value } },
       draft: true,
       limit: 1,
+      // One query: with pagination a count runs alongside the find, and MongoDB
+      // refuses two operations at once in the save's transaction.
+      pagination: false,
       depth: 0,
       overrideAccess: true,
       req,
@@ -316,6 +319,7 @@ export const masterOneMain: CollectionBeforeChangeHook = async ({ data, original
     },
     draft: true,
     limit: 1,
+    pagination: false,
     depth: 0,
     overrideAccess: true,
     req,

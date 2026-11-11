@@ -97,36 +97,26 @@ const refuseDeleteWhileUsed =
   (usedBy: UsedBy, noun: string): CollectionBeforeDeleteHook =>
   async ({ id, req }) => {
     const ref = (path: string): Where => ({ [path]: { in: [id] } })
-    const integrations = await req.payload.find({
-      collection: 'integrations',
-      where: ref(usedBy.integrationField),
-      draft: true,
-      depth: 0,
-      limit: 5,
-      overrideAccess: true,
-      req,
-    })
-    const pages = usedBy.blockField
-      ? await req.payload.find({
-          collection: 'pages',
-          where: ref(`layout.${usedBy.blockField}`),
-          draft: true,
-          depth: 0,
-          limit: 5,
-          overrideAccess: true,
-          req,
-        })
-      : null
+    // The first five names, then the total as its own count: a paginated find
+    // counts alongside the find, and MongoDB refuses two operations at once in
+    // the delete's transaction.
+    const usedIn = async (collection: 'integrations' | 'pages', where: Where) => {
+      const found = await req.payload.find({ collection, where, draft: true, depth: 0, limit: 5, pagination: false, overrideAccess: true, req })
+      const { totalDocs } = found.docs.length < 5 ? { totalDocs: found.docs.length } : await req.payload.count({ collection, where, overrideAccess: true, req })
+      return { docs: found.docs, totalDocs }
+    }
+    const integrations = await usedIn('integrations', ref(usedBy.integrationField))
+    const pages = usedBy.blockField ? await usedIn('pages', ref(`layout.${usedBy.blockField}`)) : null
 
     const uses: string[] = []
     if (integrations.totalDocs) {
-      const names = integrations.docs.map((d) => d.name).join(', ')
+      const names = integrations.docs.map((d) => (d as { name?: string }).name).join(', ')
       uses.push(
         `${integrations.totalDocs} integration${integrations.totalDocs === 1 ? '' : 's'} (${names}${integrations.totalDocs > 5 ? ', ...' : ''})`,
       )
     }
     if (pages?.totalDocs) {
-      const slugs = pages.docs.map((d) => d.slug).join(', ')
+      const slugs = pages.docs.map((d) => (d as { slug?: string }).slug).join(', ')
       uses.push(
         `a block filter on ${pages.totalDocs} page${pages.totalDocs === 1 ? '' : 's'} (${slugs}${pages.totalDocs > 5 ? ', ...' : ''})`,
       )
