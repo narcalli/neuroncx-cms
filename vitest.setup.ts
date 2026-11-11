@@ -2,6 +2,8 @@
 
 // Load .env files
 import 'dotenv/config'
+import { afterAll, afterEach } from 'vitest'
+import { takeTransactionOverlaps, watchTransactionOverlaps } from './tests/helpers/transactionOverlaps'
 
 // The integration tests create, change and delete records, and each change
 // can queue a knowledge base sync job. They run against whatever
@@ -12,3 +14,16 @@ const host = (process.env.DATABASE_URL || '').replace(/^[a-z+]+:\/\/([^@/]*@)?([
 if (process.env.DATABASE_URL && !['127.0.0.1', 'localhost', '::1', '[::1]'].includes(host) && process.env.ALLOW_REMOTE_TEST_DB !== '1') {
   throw new Error('Integration tests only run against a local database: DATABASE_URL does not point at this machine. Set ALLOW_REMOTE_TEST_DB=1 to use a separate test database on purpose.')
 }
+
+// Two database commands at once in one transaction fail on Atlas now and then;
+// a test fails as soon as it happens at all (tests/helpers/transactionOverlaps.ts).
+
+watchTransactionOverlaps()
+const failOnOverlaps = () => {
+  const found = [...new Set(takeTransactionOverlaps())]
+  if (found.length) {
+    throw new Error(`Database commands overlapped inside a transaction (MongoDB refuses this on Atlas):\n- ${found.join('\n- ')}`)
+  }
+}
+afterEach(failOnOverlaps)
+afterAll(failOnOverlaps)

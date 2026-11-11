@@ -26,3 +26,4 @@ node_modules/
 # Local only: production database credentials and dumps (scripts/db-sync.mjs)
 .env.prod-db
 db-backups/
+.mongo-test/
