@@ -10,13 +10,16 @@
  *
  * Runs a separate mongod (the installed one, or MONGOD_PATH) on port 27018
  * with its data in .mongo-test/ (ignored by git). The MongoDB service and the
- * dev database are only read from, never changed.
+ * dev database are only read from, never changed. Enquiries are copied with
+ * placeholder details instead of the people's (scripts/blank-enquiries.mjs).
  */
 import { spawn } from 'child_process'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { MongoClient } from 'mongodb'
+
+import { blankEnquiry, blankEnquiryRead } from './blank-enquiries.mjs'
 
 export const TEST_DB_PORT = 27018
 export const TEST_DB_URL = `mongodb://127.0.0.1:${TEST_DB_PORT}/neuroncx?replicaSet=rs0`
@@ -116,8 +119,11 @@ const copy = async ({ always }) => {
       for (const { name } of collections) {
         if (name.startsWith('system.')) continue
         const batch = []
-        for await (const doc of from.collection(name).find()) {
-          batch.push(doc)
+        // Enquiries are copied without the people in them (scripts/blank-enquiries.mjs).
+        let n = 0
+        const scrub = name === 'enquiries' ? (doc) => blankEnquiry(doc, ++n) : name === 'enquiryreads' ? blankEnquiryRead : (doc) => doc
+        for await (const doc of from.collection(name).find({}, { sort: { _id: 1 } })) {
+          batch.push(scrub(doc))
           if (batch.length === 500) await db.collection(name).insertMany(batch.splice(0))
           docs++
         }
