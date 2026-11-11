@@ -42,6 +42,7 @@ import { ragSyncDocTask } from './rag/tasks/sync-doc'
 import { ragPurgeDocTask } from './rag/tasks/purge-doc'
 import { serializeTransactionCalls } from './db/serializeTransactionCalls'
 import { applyReview } from './review'
+import { withJobsAccess } from './access/jobsCollection'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -146,5 +147,7 @@ export default buildConfig({
       },
     },
     tasks: [ragSyncDocTask, ragPurgeDocTask],
+    // No creating, editing or deleting jobs through the API (src/access/jobsCollection.ts).
+    jobsCollectionOverrides: ({ defaultJobsCollection }) => withJobsAccess(defaultJobsCollection),
   },
 })
