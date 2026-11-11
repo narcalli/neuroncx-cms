@@ -25,8 +25,8 @@ const EXPECTED: Record<string, Row> = {
   // Wave 3: no key deletes anything in a collection this config defines (src/plugins/apiKeysDraftOnly.ts).
   'pages': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyn', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyn' },
   'posts': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyn', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyn' },
-  // Open: keys can upload and replace media, which is live at once (deleting is refused since wave 3).
-  'media': { nobody: 'nynn', author: 'yyyy', authorKey: 'yyyn', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyn' },
+  // Fixed: a key uploads images only (checked by content) and never replaces or deletes; reading stays open.
+  'media': { nobody: 'nynn', author: 'yyyy', authorKey: 'yynn', owner: 'yyyy', admin: 'yyyy', adminKey: 'yynn' },
   'categories': { nobody: 'nynn', author: 'yyyy', authorKey: 'yyyn', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyn' },
   'features': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyn', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyn' },
   // Wave 1: only an admin signed in as themselves creates users; a key never does.

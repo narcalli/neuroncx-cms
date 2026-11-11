@@ -65,11 +65,16 @@ Copies of the database on a developer's machine keep enquiries without the peopl
 - **Deleting with a key**: no API key deletes anything in a collection this config defines, content and media included (src/plugins/apiKeysDraftOnly.ts).
 - **Payload's own tables**: edit locks and folders are for people only, never a key; preferences can only be changed by their owner; the migrations log cannot be reached through the API at all (it had a GraphQL route). Payload adds these after plugins with no way to configure them, so the rules are set on the built config (src/access/internalCollections.ts, written against Payload 3.84.1).
 
+### Fixed: media from keys, and SVGs with scripts (11 Nov 2026)
+
+- A key can upload images only, checked from the file's own bytes, not the type the uploader declares: PNG, JPEG, GIF, WebP, AVIF or SVG. promote-page.mjs uploads images this way. A key can never replace or delete media, since a live page shows the change at once. Reading stays open.
+- Every SVG upload, from anyone, is checked for scripts. Payload 3.84.1 has its own check but skips it for an SVG that starts with an XML declaration; such a file with a script was accepted, and opened from the CMS's address it would run there, where an admin's sign-in cookie is sent. The single SVG in production media (the favicon) was checked and is clean. src/collections/media/uploadChecks.ts; tested in tests/int/mediaUploads.int.spec.ts.
+
 ### Open: what a signed-in author or an API key can still do (audit, 11 Nov 2026)
 
 Not fixed yet. An API key acts as its owner, so each of these is open to a key as well as to the person. tests/int/accessMatrix.int.spec.ts holds the full table and marks each one "Open", so closing a gap means changing it there.
 
-- **Upload and replace media**: a key can still upload a new file or replace an existing one, which a live page shows at once. Deleting is refused.
+- None from the 11 Nov 2026 audit. The access matrix test lists every collection and global, so a new one has to be classified before it ships.
 
 
 ### promote-page.mjs saves drafts only, as promote@neuroncx.in

@@ -15,6 +15,8 @@ import { fileURLToPath } from 'url'
 
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
+import { isApiKeyRequest } from '../access/apiKeyRequest'
+import { checkUpload } from './media/uploadChecks'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -171,13 +173,17 @@ export const Media: CollectionConfig = {
   slug: 'media',
   folders: true,
   access: {
+    // A key may upload images (promote-page.mjs brings them to live), checked
+    // by content in checkUpload, but never replace or delete media: a live
+    // page shows the change at once. Deleting is refused to keys by the
+    // draft-only plugin too.
     create: authenticated,
     delete: authenticated,
     read: anyone,
-    update: authenticated,
+    update: (args) => !isApiKeyRequest(args.req) && authenticated(args),
   },
   hooks: {
-    beforeOperation: [skipResizeForGifs],
+    beforeOperation: [checkUpload, skipResizeForGifs],
     afterOperation: [restoreResizeAfterGif],
   },
   fields: [
