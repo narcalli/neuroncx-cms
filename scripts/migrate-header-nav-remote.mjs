@@ -6,6 +6,9 @@
 //   node scripts/migrate-header-nav-remote.mjs --write    applies it
 //
 // Reads PROMOTE_URL and PROMOTE_API_KEY from .env.promote (git-ignored).
+// Since 11 Nov 2026 no API key can change a global (src/access/adminInPerson.ts),
+// so --write is refused: the migration it carries has already run. The dry run
+// still reads.
 // Refuses to write until the target is running the new schema, so it cannot
 // quietly strip fields the deployed build does not know about yet.
 

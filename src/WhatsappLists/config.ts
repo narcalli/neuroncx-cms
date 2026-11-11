@@ -2,7 +2,7 @@ import type { ArrayField, GlobalConfig } from 'payload'
 import { array as validateArray } from 'payload/shared'
 
 import { anyone } from '../access/anyone'
-import { authenticated } from '../access/authenticated'
+import { ownerOrAdminInPerson } from '../access/adminInPerson'
 import { plainText } from '../fields/validators/plainText'
 
 /**
@@ -39,7 +39,8 @@ export const WhatsappLists: GlobalConfig = {
   label: 'WhatsApp lists',
   access: {
     read: anyone,
-    update: authenticated,
+    // Live at once (no drafts): a content owner or admin in person, never a key.
+    update: ownerOrAdminInPerson,
   },
   admin: {
     description:

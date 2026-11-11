@@ -1,5 +1,7 @@
 import type { GlobalConfig } from 'payload'
 
+import { ownerOrAdminInPerson } from '@/access/adminInPerson'
+
 import { iconField } from '../fields/icons'
 import { link } from '../fields/link'
 import { revalidateHeader } from './hooks/revalidateHeader'
@@ -59,6 +61,8 @@ export const Header: GlobalConfig = {
   slug: 'header',
   access: {
     read: () => true,
+    // Live at once (no drafts): a content owner or admin in person, never a key.
+    update: ownerOrAdminInPerson,
   },
   fields: [
     {

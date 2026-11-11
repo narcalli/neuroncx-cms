@@ -69,13 +69,13 @@ const EXPECTED: Record<string, Row> = {
 
 /** Globals: read, update. */
 const EXPECTED_GLOBALS: Record<string, Row> = {
-  // Open: anyone signed in, keys included, changes these, and the change is live at once (no drafts).
-  'header': { nobody: 'yn', author: 'yy', authorKey: 'yy', owner: 'yy', admin: 'yy', adminKey: 'yy' },
-  'footer': { nobody: 'yn', author: 'yy', authorKey: 'yy', owner: 'yy', admin: 'yy', adminKey: 'yy' },
-  'siteSettings': { nobody: 'yn', author: 'yy', authorKey: 'yy', owner: 'yy', admin: 'yy', adminKey: 'yy' },
-  'whatsappLists': { nobody: 'yn', author: 'yy', authorKey: 'yy', owner: 'yy', admin: 'yy', adminKey: 'yy' },
-  // Open: an admin's key can change it, the review switch and the gates included.
-  'contentStandards': { nobody: 'nn', author: 'yn', authorKey: 'yn', owner: 'yn', admin: 'yy', adminKey: 'yy' },
+  // Fixed (wave 3): live at once (no drafts), so a content owner or admin in person, never a key.
+  'header': { nobody: 'yn', author: 'yn', authorKey: 'yn', owner: 'yy', admin: 'yy', adminKey: 'yn' },
+  'footer': { nobody: 'yn', author: 'yn', authorKey: 'yn', owner: 'yy', admin: 'yy', adminKey: 'yn' },
+  'siteSettings': { nobody: 'yn', author: 'yn', authorKey: 'yn', owner: 'yy', admin: 'yy', adminKey: 'yn' },
+  'whatsappLists': { nobody: 'yn', author: 'yn', authorKey: 'yn', owner: 'yy', admin: 'yy', adminKey: 'yn' },
+  // Fixed (wave 3): it holds the review switch and the gates, so an admin in person only, never a key.
+  'contentStandards': { nobody: 'nn', author: 'yn', authorKey: 'yn', owner: 'yn', admin: 'yy', adminKey: 'yn' },
 }
 
 const base = { id: '000000000000000000000001', email: 'zz-matrix@example.test', collection: 'users' }
@@ -172,6 +172,17 @@ describe('keys and sign-in', () => {
     expect(named.name).toBe('ZZ Matrix')
     const changed = await payload.update({ collection: 'users', id: author.id, data: { password: 'zz-matrix-Changed-2' } as never, user: as(author, 'local-jwt'), overrideAccess: false })
     expect(changed.id).toBe(author.id)
+  })
+
+  it('lets no key switch off the review workflow, an admin key included; the admin in person can', async () => {
+    const standards = await payload.findGlobal({ slug: 'contentStandards', depth: 0, overrideAccess: true })
+    const was = Boolean((standards as { reviewRequired?: boolean }).reviewRequired)
+    const change = (user: Record<string, any>) =>
+      payload.updateGlobal({ slug: 'contentStandards', data: { reviewRequired: was } as never, depth: 0, user: user as never, overrideAccess: false })
+    await expect(change(as(admin, 'api-key'))).rejects.toMatchObject({ name: 'Forbidden' })
+    await expect(change(as(author, 'local-jwt'))).rejects.toMatchObject({ name: 'Forbidden' })
+    // Saved as it was, so other tests running alongside see no change.
+    await expect(change(as(admin, 'local-jwt'))).resolves.toBeTruthy()
   })
 
   it('gives a key no session token through refresh', async () => {

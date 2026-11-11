@@ -9,3 +9,6 @@ import { hasRole } from './roles'
  * credential that sits in files and settings, not a person at the admin.
  */
 export const adminInPerson: Access = ({ req }) => hasRole(req.user, 'admin') && !isApiKeyRequest(req)
+
+/** A content owner or admin signed in as themselves, never a key. */
+export const ownerOrAdminInPerson: Access = ({ req }) => hasRole(req.user, 'admin', 'contentOwner') && !isApiKeyRequest(req)

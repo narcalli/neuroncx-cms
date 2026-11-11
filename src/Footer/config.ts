@@ -1,4 +1,6 @@
 import type { GlobalConfig } from 'payload'
+
+import { ownerOrAdminInPerson } from '@/access/adminInPerson'
 import { link } from '@/fields/link'
 import { revalidateFooter } from './hooks/revalidateFooter'
 import { revalidateGlobalOnSite } from '@/hooks/revalidateOnSite'
@@ -7,6 +9,8 @@ export const Footer: GlobalConfig = {
   slug: 'footer',
   access: {
     read: () => true,
+    // Live at once (no drafts): a content owner or admin in person, never a key.
+    update: ownerOrAdminInPerson,
   },
   fields: [
     {

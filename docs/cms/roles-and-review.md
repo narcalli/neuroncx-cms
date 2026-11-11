@@ -11,7 +11,8 @@ Every user has one role, set on their record in Users. Only an admin can change 
 | Edit content and save drafts | Yes | Yes | Yes |
 | Publish, schedule a publish, unpublish (Pages, Posts, Industries, Industry topics, Bot swarm), while the review workflow is on | Yes | Yes | No: ticks Ready for review |
 | Override the benchmark gate on an entry, with a reason (logged in History) | Yes | Yes | No |
-| Edit Rubrics and Content standards | Yes | No | No |
+| Edit Rubrics and Content standards (in person, never with a key) | Yes | No | No |
+| Edit the Header, Footer, Site settings and WhatsApp lists (in person, never with a key) | Yes | Yes | No |
 | Add users, manage users and roles (signed in as themselves, never with a key) | Yes | No | No |
 
 API keys, including MCP keys, cannot publish or unpublish an entry, whatever their owner's role: a publish sent with a key is refused (src/fields/publishStatus.ts). That is not the same as "drafts only": see Known exceptions and open gaps below for what a key can still do.
@@ -41,6 +42,10 @@ Until wave 1 (11 Nov 2026), a key could create a user account with a password (U
 
 Until wave 2 (11 Nov 2026), anyone signed in, API keys included, could read, change and delete every enquiry (names, emails, phone numbers, messages), and create enquiries, each of which also creates an NCX lead and sends an email. Now an enquiry is read, changed or deleted only by an admin signed in as themselves, never with a key, and created only by the website's form (with ENQUIRY_SECRET) or such an admin (src/collections/Enquiries.ts, src/access/adminInPerson.ts). Who could read them before is not recorded: the CMS keeps no log of reads.
 
+### Fixed: a key could change the globals, the review switch included (until 11 Nov 2026)
+
+Until wave 3 (11 Nov 2026), anyone signed in, keys included, could change the Header, Footer, Site settings and WhatsApp lists, which have no drafts, so each change was live at once. An admin's key could also change Content standards, which holds the review switch: a key could turn the review workflow off and then publish. Now the Header, Footer, Site settings and WhatsApp lists are changed by a content owner or admin in person, and Content standards by an admin in person, never with a key (src/access/adminInPerson.ts). Tested in tests/int/accessMatrix.int.spec.ts.
+
 ### Open: what a signed-in author or an API key can still do (audit, 11 Nov 2026)
 
 Not fixed yet. An API key acts as its owner, so each of these is open to a key as well as to the person. tests/int/accessMatrix.int.spec.ts holds the full table and marks each one "Open", so closing a gap means changing it there.
@@ -49,7 +54,6 @@ Not fixed yet. An API key acts as its owner, so each of these is open to a key a
 - **Create, read and edit MCP keys** (payload-mcp-api-keys), including linking one to another user, an admin included. MCP requests run as the linked user. Today MCP can only find Pages and Media and read the Header and Footer, so this gives no more than an author already has. It would become an escalation if MCP writes are enabled.
 - **Read, create and record benchmark runs** for any entry, with any results: a run can be made to pass. The gate only warns for now.
 - **Delete edit locks** (payload-locked-documents), move media between folders (payload-folders), edit any user's admin preferences by id (payload-preferences), and edit the migrations log (payload-migrations; this project runs no migrations).
-- **Change the Header, Footer, Site settings and WhatsApp lists**, which have no drafts, so a change is live at once. An admin's key can also change Content standards, the review switch and the gates included.
 
 ### promote-page.mjs saves drafts only, as promote@neuroncx.in
 
@@ -57,4 +61,4 @@ Not fixed yet. An API key acts as its owner, so each of these is open to a key a
 
 Until 11 Nov 2026 the script signed in as the admin, digital@neuroncx.in, with its email and password for `--publish` and the admin's API key for drafts, all kept in `.env.promote`. Those were removed from the file that day, and the admin's password and key were changed. (An earlier version of this page said a content-promote@neuroncx.in Content owner account did the publishing; that was wrong, and that account no longer exists.)
 
-`scripts/migrate-header-nav-remote.mjs` reads the same key.
+`scripts/migrate-header-nav-remote.mjs` reads the same key, but can no longer write: no key can change a global.

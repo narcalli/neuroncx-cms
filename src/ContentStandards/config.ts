@@ -1,7 +1,7 @@
 import type { ArrayFieldValidation, GlobalConfig } from 'payload'
 import { array } from 'payload/shared'
 
-import { adminOnly } from '../access/adminOnly'
+import { adminInPerson } from '../access/adminInPerson'
 import { authenticated } from '../access/authenticated'
 import { lifecycleOptions } from '../lifecycle/scope'
 
@@ -90,7 +90,9 @@ export const ContentStandards: GlobalConfig = {
   label: 'Content standards',
   access: {
     read: authenticated,
-    update: adminOnly,
+    // An admin in person, never a key: it holds the review switch and the
+    // gates, so a key that could change it could switch the review off and publish.
+    update: adminInPerson,
   },
   admin: {
     group: 'System',

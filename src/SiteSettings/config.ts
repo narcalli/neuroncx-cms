@@ -1,5 +1,7 @@
 import type { GlobalAfterChangeHook, GlobalConfig } from 'payload'
 
+import { ownerOrAdminInPerson } from '@/access/adminInPerson'
+
 import { validateWhatsappPhone } from '../blocks/WhatsappWidget/config'
 import { revalidateContent } from '../content/revalidate'
 import { siteAnimationsField } from '../fields/motion'
@@ -39,6 +41,8 @@ export const SiteSettings: GlobalConfig = {
   label: 'Site Settings',
   access: {
     read: () => true,
+    // Live at once (no drafts): a content owner or admin in person, never a key.
+    update: ownerOrAdminInPerson,
   },
   hooks: { afterChange: [refreshEveryPage] },
   fields: [
