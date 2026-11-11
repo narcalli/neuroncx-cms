@@ -1,7 +1,7 @@
 import type { ArrayFieldValidation, CollectionConfig } from 'payload'
 import { array } from 'payload/shared'
 
-import { adminOnly } from '../../access/adminOnly'
+import { adminInPerson } from '../../access/adminInPerson'
 import { authenticated } from '../../access/authenticated'
 import { LIFECYCLE_SLUGS } from '../../lifecycle/scope'
 import { checkRubricItems, checkScoredVersion, refuseRunEdits, scoreRun, stampRunner } from './hooks'
@@ -32,10 +32,12 @@ export const BenchmarkRuns: CollectionConfig = {
   labels: { singular: 'Benchmark run', plural: 'Benchmark runs' },
   access: {
     read: authenticated,
-    // Signed in, by a person or with an API key (the scorer).
-    create: authenticated,
+    // Never through the API: a run carries the results it is given, so one
+    // made through the API could pass anything. The scorer (scripts/benchmark.ts
+    // record) writes runs on the server, after its own checks, as a named user.
+    create: () => false,
     update: () => false,
-    delete: adminOnly,
+    delete: adminInPerson,
   },
   admin: {
     group: 'System',

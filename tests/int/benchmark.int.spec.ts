@@ -344,6 +344,13 @@ describe('with the local database', () => {
       rubric = await saveRubric({ name: 'ZZ BENCH runs', status: 'retired', items: [item('BR-01'), item('BR-02'), item('BR-03')] })
     })
 
+    it('cannot be recorded through the API by anyone, an admin included: only the scorer writes runs', async () => {
+      for (const user of [as(author), as(author, 'api-key'), as(admin), as(admin, 'api-key')]) {
+        const attempt = payload.create({ ...quiet, collection: 'benchmarkRuns', data: runData(), user, overrideAccess: false })
+        await expect(attempt).rejects.toMatchObject({ status: 403 })
+      }
+    })
+
     it('works out score and blockers itself, ignoring what the request sends', async () => {
       // runAt left out: it defaults to now.
       const { runAt: _runAt, ...untimed } = runData()
@@ -353,7 +360,7 @@ describe('with the local database', () => {
         collection: 'benchmarkRuns',
         data: sent as RequiredDataFromCollectionSlug<'benchmarkRuns'>,
         user: as(author, 'api-key'),
-        overrideAccess: false,
+        overrideAccess: true,
       })
       runs.push(run.id)
       expect(run).toMatchObject({ score: 50, blockerCount: 0, runBy: author.id, rubricVersion: '1' })
@@ -364,7 +371,7 @@ describe('with the local database', () => {
 
     it('counts blockers', async () => {
       const data = { ...runData(), results: [{ itemId: 'BR-01', state: 'blocker' as const, decidedBy: 'human' as const }, { itemId: 'BR-02', state: 'pass' as const, decidedBy: 'human' as const }] }
-      const run = await payload.create({ ...quiet, collection: 'benchmarkRuns', data, user: as(author, 'api-key'), overrideAccess: false })
+      const run = await payload.create({ ...quiet, collection: 'benchmarkRuns', data, user: as(author, 'api-key'), overrideAccess: true })
       runs.push(run.id)
       expect(run).toMatchObject({ score: 50, blockerCount: 1 })
     })
@@ -374,7 +381,7 @@ describe('with the local database', () => {
         { itemId: 'BR-01', state: 'pass' as const, decidedBy: 'code' as const },
         { itemId: 'BR-02', state: 'warning' as const, decidedBy: 'human' as const, note: 'Scored on a worksheet.' },
       ]
-      const run = await payload.create({ ...quiet, collection: 'benchmarkRuns', data: { ...runData(), results }, user: as(admin), overrideAccess: false })
+      const run = await payload.create({ ...quiet, collection: 'benchmarkRuns', data: { ...runData(), results }, user: as(admin), overrideAccess: true })
       runs.push(run.id)
       expect(run.results.map((r) => r.decidedBy)).toEqual(['code', 'human'])
       const unsaid = { ...runData(), results: [{ itemId: 'BR-01', state: 'pass' as const }] }
@@ -383,14 +390,14 @@ describe('with the local database', () => {
         collection: 'benchmarkRuns',
         data: unsaid as RequiredDataFromCollectionSlug<'benchmarkRuns'>,
         user: as(admin),
-        overrideAccess: false,
+        overrideAccess: true,
       })
       runs.push(fromAdmin.id)
       expect(fromAdmin.results[0].decidedBy).toBe('human')
     })
 
     it('cannot be changed by anyone, even with access checks skipped', async () => {
-      const run = await payload.create({ ...quiet, collection: 'benchmarkRuns', data: runData(), user: as(admin), overrideAccess: false })
+      const run = await payload.create({ ...quiet, collection: 'benchmarkRuns', data: runData(), user: as(admin), overrideAccess: true })
       runs.push(run.id)
       const edit = { ...quiet, collection: 'benchmarkRuns' as const, id: run.id, data: { rubricVersion: '2' } }
       await expect(payload.update({ ...edit, user: as(admin), overrideAccess: false })).rejects.toMatchObject({ status: 403 })
@@ -402,7 +409,7 @@ describe('with the local database', () => {
     })
 
     it('can be deleted by admins only', async () => {
-      const run = await payload.create({ ...quiet, collection: 'benchmarkRuns', data: runData(), user: as(admin), overrideAccess: false })
+      const run = await payload.create({ ...quiet, collection: 'benchmarkRuns', data: runData(), user: as(admin), overrideAccess: true })
       runs.push(run.id)
       const attempt = payload.delete({ ...quiet, collection: 'benchmarkRuns', id: run.id, user: as(author), overrideAccess: false })
       await expect(attempt).rejects.toMatchObject({ status: 403 })
@@ -411,14 +418,14 @@ describe('with the local database', () => {
 
     it('needs the ID of a saved version of the scored document', async () => {
       for (const versionId of ['not-a-version', rubric.id]) {
-        const attempt = payload.create({ ...quiet, collection: 'benchmarkRuns', data: { ...runData(), versionId }, user: as(admin), overrideAccess: false })
+        const attempt = payload.create({ ...quiet, collection: 'benchmarkRuns', data: { ...runData(), versionId }, user: as(admin), overrideAccess: true })
         await expect(attempt, versionId).rejects.toMatchObject(rejectedWith('versionId', /not a saved version/))
       }
     })
 
     it('needs a published version of the rubric', async () => {
       for (const rubricVersion of ['2', 'one']) {
-        const attempt = payload.create({ ...quiet, collection: 'benchmarkRuns', data: { ...runData(), rubricVersion }, user: as(admin), overrideAccess: false })
+        const attempt = payload.create({ ...quiet, collection: 'benchmarkRuns', data: { ...runData(), rubricVersion }, user: as(admin), overrideAccess: true })
         await expect(attempt, rubricVersion).rejects.toMatchObject(rejectedWith('rubricVersion', `no published version ${rubricVersion}`))
       }
       const unpublished = await saveRubric({ name: 'ZZ BENCH never published', status: 'retired', items: [item('BR-01')] }, undefined, false)
@@ -427,14 +434,14 @@ describe('with the local database', () => {
         collection: 'benchmarkRuns',
         data: { ...runData(), rubric: unpublished.id },
         user: as(admin),
-        overrideAccess: false,
+        overrideAccess: true,
       })
       await expect(attempt).rejects.toMatchObject(rejectedWith('rubricVersion', 'no published version 1'))
     })
 
     it("needs every result to be an item in that version, naming the ones that are not", async () => {
       const results = [{ itemId: 'BR-01', state: 'pass' as const, decidedBy: 'human' as const }, { itemId: 'XX-01', state: 'pass' as const, decidedBy: 'human' as const }, { itemId: 'XX-02', state: 'na' as const, decidedBy: 'human' as const }]
-      const attempt = payload.create({ ...quiet, collection: 'benchmarkRuns', data: { ...runData(), results }, user: as(admin), overrideAccess: false })
+      const attempt = payload.create({ ...quiet, collection: 'benchmarkRuns', data: { ...runData(), results }, user: as(admin), overrideAccess: true })
       await expect(attempt).rejects.toMatchObject(rejectedWith('results', 'Not items in version 1 of the rubric: XX-01, XX-02.'))
     })
 
@@ -447,7 +454,7 @@ describe('with the local database', () => {
           collection: 'benchmarkRuns',
           data: { ...runData(), rubric: r.id, rubricVersion, results: [{ itemId, state: 'pass' as const, decidedBy: 'human' as const }] },
           user: as(admin),
-          overrideAccess: false,
+          overrideAccess: true,
         })
       const old = await run('1', 'VS-02')
       runs.push(old.id)
@@ -458,7 +465,7 @@ describe('with the local database', () => {
 
     it('refuses a run where every result is Not applicable, naming the content type and rubric version', async () => {
       const results = [{ itemId: 'BR-01', state: 'na' as const, decidedBy: 'human' as const }, { itemId: 'BR-02', state: 'na' as const, decidedBy: 'human' as const }]
-      const attempt = payload.create({ ...quiet, collection: 'benchmarkRuns', data: { ...runData(), results }, user: as(admin), overrideAccess: false })
+      const attempt = payload.create({ ...quiet, collection: 'benchmarkRuns', data: { ...runData(), results }, user: as(admin), overrideAccess: true })
       await expect(attempt).rejects.toMatchObject(
         rejectedWith('results', 'no item in version 1 of "ZZ BENCH runs" applies to Industries'),
       )
@@ -466,7 +473,7 @@ describe('with the local database', () => {
 
     it('refuses two results for one item', async () => {
       const data = { ...runData(), results: [{ itemId: 'BR-01', state: 'pass' as const, decidedBy: 'human' as const }, { itemId: 'BR-01', state: 'warning' as const, decidedBy: 'human' as const }] }
-      const attempt = payload.create({ ...quiet, collection: 'benchmarkRuns', data, user: as(admin), overrideAccess: false })
+      const attempt = payload.create({ ...quiet, collection: 'benchmarkRuns', data, user: as(admin), overrideAccess: true })
       await expect(attempt).rejects.toMatchObject(rejectedWith('results', /BR-01 has more than one/))
     })
   })

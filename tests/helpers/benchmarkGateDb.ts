@@ -63,8 +63,9 @@ describe('with the local database', () => {
         runAt: new Date().toISOString(),
         results: states.map((state, i) => ({ itemId: `ZG-0${i + 1}`, state, decidedBy: 'human' as const })),
       },
+      // Server-side, as the scorer records runs; nobody records one through the API.
       user: as(admin),
-      overrideAccess: false,
+      overrideAccess: true,
     })
     runs.push(run.id)
     return run

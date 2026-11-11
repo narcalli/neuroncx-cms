@@ -318,8 +318,10 @@ const record = async (payload: Payload) => {
       runAt: new Date().toISOString(),
       results: results.map((r) => ({ ...r, note: r.note.slice(0, 500) })),
     },
+    // Runs are recorded here, on the server, never through the API (src/collections/BenchmarkRuns):
+    // the hooks still check the version, rubric and items, and stamp who ran it.
     user: { ...user, collection: 'users', _strategy: 'local-jwt' },
-    overrideAccess: false,
+    overrideAccess: true,
     context: { disableRevalidate: true },
   })
   const byCode = results.filter((r) => r.decidedBy === 'code').length
