@@ -23,12 +23,14 @@ type Result = { sent: number; unchanged: number; archived: number }
  * scripts/rag-dry-run.ts, so a dry run shows exactly what would be sent.
  */
 export const composePostContent = (docTitle: string, path: string, section: RagSection) => {
-  const sameAsTitle = section.heading.trim().toLowerCase() === docTitle.toLowerCase()
-  const title = (sameAsTitle ? docTitle : `${docTitle} | ${section.heading}`).slice(0, 250)
+  const heading = section.heading.trim()
+  // A heading that already names the entry ("How Payment services works") stands
+  // alone: prefixing the title would repeat it. A pilot title such as
+  // "X (in pilot)" is not inside the heading, so it is still prefixed.
+  const standsAlone = heading.toLowerCase().includes(docTitle.toLowerCase())
+  const title = (standsAlone ? heading : `${docTitle} | ${heading}`).slice(0, 250)
   const link = `${siteUrl()}${path}${section.anchor ? `#${section.anchor}` : ''}`
-  const text = [sameAsTitle ? docTitle : `${docTitle} - ${section.heading}`, section.body, `More: ${link}`].join(
-    '\n\n',
-  )
+  const text = [standsAlone ? heading : `${docTitle} - ${heading}`, section.body, `More: ${link}`].join('\n\n')
   return { title, text, link }
 }
 

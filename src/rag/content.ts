@@ -27,14 +27,18 @@ const published = (d: any) => d?._status === 'published'
 /** Tabs by label, heaviest first. Tabs not listed follow, in admin order. */
 const WEIGHT = ['Knowledge base', 'FAQ', 'Detail']
 
-/** Section headings the bot reads better than admin tab labels. */
-const HEADINGS: Record<string, string> = {
-  'Knowledge base': 'About',
-  FAQ: 'Questions',
-  Detail: 'Detail',
-  Card: 'In short',
-  Panel: 'How it works',
-  Page: 'More detail',
+/**
+ * Section headings that name the entry, in place of admin tab labels, so a
+ * section retrieved on its own still says what it is about. Any other tab
+ * reads "<name>: <tab>", and the untabbed fields are headed by the name.
+ */
+const HEADINGS: Record<string, (name: string) => string> = {
+  'Knowledge base': (n) => `About ${n}`,
+  FAQ: (n) => `Questions about ${n}`,
+  Detail: (n) => `${n} in detail`,
+  Card: (n) => `${n} in short`,
+  Panel: (n) => `How ${n} works`,
+  Page: (n) => `More about ${n}`,
 }
 
 /** Fields that only shape the page. */
@@ -144,15 +148,20 @@ const weightOf = (s: RagSection) => {
   return at === -1 ? WEIGHT.length : at
 }
 
-/** Sections by weight (stable), with the headings the bot reads. */
-const weighAndName = (sections: RagSection[]): RagSection[] =>
+const headingFor = (s: RagSection, name: string): string => {
+  if (!name) return s.heading
+  if (s.key === 'overview') return s.heading.replace('Overview', name)
+  if (!s.key.startsWith('tab:')) return s.heading
+  const label = tabLabelOf(s.key)
+  return s.heading.replace(label, HEADINGS[label]?.(name) ?? `${name}: ${label}`)
+}
+
+/** Sections by weight (stable), headed with the entry's name. */
+const weighAndName = (sections: RagSection[], name: string): RagSection[] =>
   sections
     .map((s, i) => ({ s, i }))
     .sort((a, b) => weightOf(a.s) - weightOf(b.s) || a.i - b.i)
-    .map(({ s }) => {
-      const label = tabLabelOf(s.key)
-      return HEADINGS[label] ? { ...s, heading: s.heading.replace(label, HEADINGS[label]) } : s
-    })
+    .map(({ s }) => ({ ...s, heading: headingFor(s, name) }))
 
 /** An entry's sections: weighted, renamed, with its resolved relationships. */
 export const serializeEntry = async (
@@ -163,11 +172,13 @@ export const serializeEntry = async (
   const fields = (payload.collections as any)[entry.slug].config.fields as Field[]
   // Pending rows (src/content/pending.ts) never reach the knowledge base.
   doc = withoutPendingRows(doc)
+  const name = String(doc?.name ?? doc?.title ?? '').trim()
   const sections = weighAndName(
     projectDoc(fields, doc, {
       getBlock: (slug) => (payload.blocks as any)?.[slug],
       omit: [...NEVER, ...entry.kb.exclude],
     }),
+    name,
   )
 
   const names = await resolvedNames(payload, fields, doc, entry.kb.resolve)
@@ -177,7 +188,8 @@ export const serializeEntry = async (
     about.body = [about.body, ...names].join('\n')
     return sections
   }
-  return [{ key: 'tab:Knowledge base', heading: 'About', body: names.join('\n') }, ...sections]
+  const heading = name ? `About ${name}` : 'About'
+  return [{ key: 'tab:Knowledge base', heading, body: names.join('\n') }, ...sections]
 }
 
 /** The source for a registered content collection with the kbase group, or undefined. */
@@ -215,6 +227,6 @@ export const hubRagSource: RagSource = {
         tabs: (tabs?.tabs ?? []).filter((t) => HUB_TABS.includes(String(t.label))),
       } as Field,
     ]
-    return weighAndName(projectDoc(kept, doc, { getBlock: () => undefined }))
+    return weighAndName(projectDoc(kept, doc, { getBlock: () => undefined }), String(doc?.name ?? '').trim())
   },
 }

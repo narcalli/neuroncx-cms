@@ -4,6 +4,8 @@ import { buildHubs } from '../../src/collections/Hubs'
 import { MicroApps } from '../../src/collections/MicroApps'
 import { defineContentCollection } from '../../src/content/defineContentCollection'
 import { contentRagSource, hubRagSource } from '../../src/rag/content'
+import { projectDoc } from '../../src/rag/serialize'
+import { composePostContent } from '../../src/rag/sync'
 import { getRagSource, isRagSource } from '../../src/rag/sources'
 
 /**
@@ -111,7 +113,14 @@ describe('entry sections', () => {
       'tab:Card',
       'tab:Panel',
     ])
-    expect(sections.map((s) => s.heading)).toEqual(['About', 'Questions', 'Detail', 'In short', 'How it works'])
+    // Each heading names the entry, so a section retrieved alone says what it is about.
+    expect(sections.map((s) => s.heading)).toEqual([
+      'About Payment services',
+      'Questions about Payment services',
+      'Payment services in detail',
+      'Payment services in short',
+      'How Payment services works',
+    ])
   })
 
   it('weights the answer, then the facts, and adds the resolved names a visitor would see', async () => {
@@ -138,6 +147,18 @@ describe('entry sections', () => {
     for (const text of [agent.hears, agent.checks, agent.result, agent.teamControls]) {
       expect(panel.body).toContain(text)
     }
+  })
+
+  it('keeps the label on each panel step, without the admin hint in brackets', async () => {
+    const withSees = { ...agent, customerSees: 'A payment link with the amount.' }
+    const panel = (await contentRagSource('microApps')!.serialize!(fakePayload(), withSees)).find(
+      (s) => s.key === 'tab:Panel',
+    )!
+    const lines = panel.body.split('\n')
+    expect(lines).toContain(`Hears: ${agent.hears}`)
+    expect(lines).toContain(`Checks: ${agent.checks}`)
+    expect(lines).toContain(`Result: ${agent.result}`)
+    expect(lines).toContain('Customer sees: A payment link with the amount.')
   })
 
   it('never sends the SEO or WhatsApp tabs, or the layout', async () => {
@@ -176,7 +197,7 @@ describe('hub sections', () => {
     expect(hubRagSource.titleOf(hub)).toBe('Bot swarm')
     expect(hubRagSource.urlOf(hub)).toBe('/bot-swarm')
     const sections = await hubRagSource.serialize!(fakePayload(), hub)
-    expect(sections.map((s) => s.heading)).toEqual(['About', 'Questions'])
+    expect(sections.map((s) => s.heading)).toEqual(['About Bot swarm', 'Questions about Bot swarm'])
     expect(sections[0].body.split('\n')[0]).toBe(hub.kbAnswer)
     expect(sections.map((s) => s.body).join('\n')).not.toMatch(/SHOULD NEVER BE SENT/)
   })
@@ -185,5 +206,71 @@ describe('hub sections', () => {
     expect(hubRagSource.shouldIndex(hub)).toBe(true)
     expect(hubRagSource.shouldIndex({ ...hub, _status: 'draft' })).toBe(false)
     expect(hubRagSource.shouldIndex({ ...hub, includeInKbase: false })).toBe(false)
+  })
+})
+
+describe('figures', () => {
+  const fields = [
+    {
+      name: 'stats',
+      type: 'array',
+      fields: [
+        { name: 'value', type: 'number' },
+        { name: 'prefix', type: 'text' },
+        { name: 'suffix', type: 'text' },
+        { name: 'label', type: 'text' },
+      ],
+    },
+    { name: 'order', type: 'number' },
+    { name: 'note', type: 'text' },
+  ] as any
+
+  it('sends a value with its prefix and suffix, and no other number', () => {
+    const [section] = projectDoc(
+      fields,
+      {
+        stats: [
+          { value: 80, suffix: '%', label: 'of the application journey runs without manual work' },
+          { value: 1300, prefix: '~', suffix: '+', label: 'leads handled a day' },
+        ],
+        order: 3,
+        note: 'Figures from the last quarter.',
+      },
+      { getBlock: () => undefined },
+    )
+    expect(section.body.split('\n')).toEqual([
+      '80% - of the application journey runs without manual work',
+      '~1,300+ - leads handled a day',
+      'Figures from the last quarter.',
+    ])
+  })
+
+  it('keeps a text suffix when there is no number to write it onto', () => {
+    const [section] = projectDoc(
+      fields,
+      { stats: [{ suffix: 'per cent', label: 'of calls checked, a figure written as text' }] },
+      { getBlock: () => undefined },
+    )
+    expect(section.body).toBe('per cent - of calls checked, a figure written as text')
+  })
+})
+
+describe('post content', () => {
+  const section = { key: 'tab:Panel', heading: 'How Payment services works', body: 'Hears: a request.' }
+
+  it('uses a heading that already names the entry on its own, without repeating the title', () => {
+    const post = composePostContent('Payment services', '/bot-swarm', section)
+    expect(post.title).toBe('How Payment services works')
+    expect(post.text.split('\n\n')[0]).toBe('How Payment services works')
+  })
+
+  it('still prefixes a pilot title, so the bot never presents a pilot as live', () => {
+    const post = composePostContent('Payment services (in pilot)', '/bot-swarm', section)
+    expect(post.title).toBe('Payment services (in pilot) | How Payment services works')
+  })
+
+  it('prefixes the title to a heading that does not name the entry', () => {
+    const post = composePostContent('Payment services', '/bot-swarm', { ...section, heading: 'Pricing' })
+    expect(post.title).toBe('Payment services | Pricing')
   })
 })
