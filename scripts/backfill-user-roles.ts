@@ -14,6 +14,11 @@
  * match a user, and nothing is written if one does not. Runs only against a
  * database on this machine; add --remote to run it anywhere else (production,
  * after the CMS deploy that adds the role field). Back up first.
+ *
+ * Writes only the role field, directly to the database, so it touches nothing
+ * else on a user (API keys included) and needs no production PAYLOAD_SECRET.
+ * Against production, give the production database in DATABASE_URL, which
+ * takes precedence over the one in .env.
  */
 import fs from 'fs'
 import { getPayload } from 'payload'
@@ -89,7 +94,10 @@ for (const u of users) {
   say(`  ${u.email}: ${before} -> ${role}`)
   changed++
   if (!DRY) {
-    await payload.update({ collection: 'users', id: u.id, data: { role }, overrideAccess: true, depth: 0 })
+    // Straight to the database, the role field only: a save through payload.update
+    // runs the API key hooks, which re-encrypt each user's key with this machine's
+    // PAYLOAD_SECRET and would break production keys if it differs.
+    await payload.db.updateOne({ collection: 'users', id: u.id, data: { role } })
   }
 }
 say(`${users.length} users, ${changed} ${DRY ? 'would change' : 'changed'}.`)

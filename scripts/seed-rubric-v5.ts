@@ -25,6 +25,12 @@
  * then as a clause boundary; ex-faq-answers-stand-alone accepts any repeated
  * word that is not a common word.
  *
+ * Scoring rulings (11 Nov 2026), for whoever fills in a worksheet:
+ * - An agent group name ("Book and get paid") is a grouping, not a NeuronCx
+ *   product name, so it is not listed for ex-product-claims-exist.
+ * - The Synonyms field (kbSynonyms) holds names for search, not a second name
+ *   for the entry, so it does not fail ex-one-name.
+ *
  * Known limits, kept on purpose as the price of deciding in code:
  * - hr-observation-not-criticism has no scope: it fails a listed word in any
  *   sentence, such as "who is stuck" about team members.

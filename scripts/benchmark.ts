@@ -193,6 +193,8 @@ const accuracy = async (payload: Payload) => {
         at: new Date().toISOString(),
         method:
           'Code checks scored in code; the checks code cannot decide were scored by hand, as they are on every worksheet. Compared with hand scores made against the same rubric wording (scripts/benchmark/handScoresV5.ts), for all 34 checks.',
+        caveat:
+          'The hand scores (scripts/benchmark/handScoresV5.ts) and the code checks were written by the same author, so agreement shows the code does what the wording says as that author reads it, not that an independent scorer would agree. The real test is an independent scorer filling in the same worksheets (benchmark.ts calibrate). Acceptable while the gate only warns; needed before it enforces.',
         entries,
       },
       null,
