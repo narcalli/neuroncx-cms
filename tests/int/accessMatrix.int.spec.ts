@@ -46,12 +46,14 @@ const EXPECTED: Record<string, Row> = {
   'microApps': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
   'hubs': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
   'ncxPostContents': { nobody: 'nnnn', author: 'nynn', authorKey: 'nynn', owner: 'nynn', admin: 'nynn', adminKey: 'nynn' },
+  // Wave 2: the enquiry read log; written by the server only, read by an admin in person.
+  'enquiryReads': { nobody: 'nnnn', author: 'nnnn', authorKey: 'nnnn', owner: 'nnnn', admin: 'nynn', adminKey: 'nnnn' },
   'rubrics': { nobody: 'nnnn', author: 'nynn', authorKey: 'nynn', owner: 'nynn', admin: 'yyyy', adminKey: 'yyyy' },
   // Open: anyone signed in can record a run with results of their choosing.
   'benchmarkRuns': { nobody: 'nnnn', author: 'yynn', authorKey: 'yynn', owner: 'yynn', admin: 'yyny', adminKey: 'yyny' },
   'contentEvents': { nobody: 'nnnn', author: 'nynn', authorKey: 'nynn', owner: 'nynn', admin: 'nynn', adminKey: 'nynn' },
-  // Open: keys can create redirects, which go live at once (no drafts).
-  'redirects': { nobody: 'nynn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
+  // Fixed (wave 2): live at once (no drafts), so a content owner or admin in person, never an author or a key.
+  'redirects': { nobody: 'nynn', author: 'nynn', authorKey: 'nynn', owner: 'yyyy', admin: 'yyyy', adminKey: 'nynn' },
   // Open: anyone signed in can create MCP keys and link one to any user. MCP is find-only today.
   'payload-mcp-api-keys': { nobody: 'nnnn', author: 'yyyy', authorKey: 'yyyy', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyy' },
   'payload-kv': { nobody: 'nnnn', author: 'nnnn', authorKey: 'nnnn', owner: 'nnnn', admin: 'nnnn', adminKey: 'nnnn' },

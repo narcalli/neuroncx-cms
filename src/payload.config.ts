@@ -41,6 +41,7 @@ import { applyHistory, ContentEvents } from './history'
 import { ragSyncDocTask } from './rag/tasks/sync-doc'
 import { ragPurgeDocTask } from './rag/tasks/purge-doc'
 import { serializeTransactionCalls } from './db/serializeTransactionCalls'
+import { EnquiryReads } from './collections/EnquiryReads'
 import { applyReview } from './review'
 import { withJobsAccess } from './access/jobsCollection'
 
@@ -89,6 +90,7 @@ export default buildConfig({
     Features,
     Users,
     Enquiries,
+    EnquiryReads,
     Sectors,
     IndustryTopics,
     SharedContent,

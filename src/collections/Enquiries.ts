@@ -3,6 +3,7 @@ import type { CollectionAfterChangeHook, CollectionConfig } from 'payload'
 
 import { adminInPerson } from '../access/adminInPerson'
 import { createNcxLead } from './enquiries/ncxLead'
+import { logEnquiryReads } from './EnquiryReads'
 
 const escapeHtml = (v: unknown): string =>
   String(v ?? '')
@@ -134,6 +135,8 @@ export const Enquiries: CollectionConfig = {
     // Creates the lead in the NCX dashboard (IID 4) and stores the outcome.
     beforeChange: [createNcxLead],
     afterChange: [notifyByEmail],
+    // Who saw which enquiry (src/collections/EnquiryReads.ts).
+    afterOperation: [logEnquiryReads],
   },
   fields: [
     { name: 'name', type: 'text', required: true, label: 'Name' },

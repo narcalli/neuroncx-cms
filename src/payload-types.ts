@@ -174,6 +174,7 @@ export interface Config {
     features: Feature;
     users: User;
     enquiries: Enquiry;
+    enquiryReads: EnquiryRead;
     sectors: Sector;
     industryTopics: IndustryTopic;
     sharedContent: SharedContent;
@@ -213,6 +214,7 @@ export interface Config {
     features: FeaturesSelect<false> | FeaturesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     enquiries: EnquiriesSelect<false> | EnquiriesSelect<true>;
+    enquiryReads: EnquiryReadsSelect<false> | EnquiryReadsSelect<true>;
     sectors: SectorsSelect<false> | SectorsSelect<true>;
     industryTopics: IndustryTopicsSelect<false> | IndustryTopicsSelect<true>;
     sharedContent: SharedContentSelect<false> | SharedContentSelect<true>;
@@ -10823,6 +10825,26 @@ export interface Enquiry {
   createdAt: string;
 }
 /**
+ * Who saw which enquiry, and when. Kept by the system; it cannot be edited.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "enquiryReads".
+ */
+export interface EnquiryRead {
+  id: string;
+  enquiry: string | Enquiry;
+  user?: (string | null) | User;
+  /**
+   * Listed: shown among others. Opened: looked at on its own.
+   */
+  how: 'listed' | 'opened';
+  via?: ('session' | 'apiKey') | null;
+  ip?: string | null;
+  userAgent?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * One hub page per content collection, and what its entry pages share.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -11598,6 +11620,10 @@ export interface Redirect {
         } | null);
     url?: string | null;
   };
+  /**
+   * Permanent tells search engines the move is for good. Temporary keeps the old address listed.
+   */
+  type?: ('308' | '307') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -11795,6 +11821,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'enquiries';
         value: string | Enquiry;
+      } | null)
+    | ({
+        relationTo: 'enquiryReads';
+        value: string | EnquiryRead;
       } | null)
     | ({
         relationTo: 'sectors';
@@ -14206,6 +14236,20 @@ export interface EnquiriesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "enquiryReads_select".
+ */
+export interface EnquiryReadsSelect<T extends boolean = true> {
+  enquiry?: T;
+  user?: T;
+  how?: T;
+  via?: T;
+  ip?: T;
+  userAgent?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "sectors_select".
  */
 export interface SectorsSelect<T extends boolean = true> {
@@ -16089,6 +16133,7 @@ export interface RedirectsSelect<T extends boolean = true> {
         reference?: T;
         url?: T;
       };
+  type?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -16688,6 +16733,18 @@ export interface ContentStandard {
    * On: on Pages, Posts, Industries, Industry topics and Bot swarm, authors cannot publish or schedule a publish. They tick Ready for review, and content owners and admins are emailed. Off: anyone signed in can publish, and no review emails are sent.
    */
   reviewRequired?: boolean | null;
+  /**
+   * Other websites a redirect may send visitors to. Redirects to paths on this site, or to the site itself, need no entry here.
+   */
+  redirectHosts?:
+    | {
+        /**
+         * For example docs.example.com.
+         */
+        host: string;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -16945,6 +17002,12 @@ export interface ContentStandardsSelect<T extends boolean = true> {
         id?: T;
       };
   reviewRequired?: T;
+  redirectHosts?:
+    | T
+    | {
+        host?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
