@@ -4,9 +4,8 @@
 // Usage (from neuroncx-cms):
 //   node scripts/promote-page.mjs <slug>                          dry run for one page
 //   node scripts/promote-page.mjs <slug> --write                  creates or updates it on live as a draft
-//   node scripts/promote-page.mjs <slug> --write --publish
 //
-//   node scripts/promote-page.mjs --collection lists,microApps,hubs [<slug> ...] [--write] [--publish]
+//   node scripts/promote-page.mjs --collection lists,microApps,hubs [<slug> ...] [--write]
 //     Every record of each collection, or only the slugs given. Several
 //     collections run in dependency order: Lists entries, then microApps,
 //     then hubs. --collection can also be repeated.
@@ -14,8 +13,11 @@
 // Dry run lists every record with its status and whether it is new, changed
 // or unchanged on live, and every reason a record would be refused. --write
 // saves drafts on live (a published live record keeps its published version
-// and gets a new draft); --write --publish publishes. Each record's own status
-// (live, pilot, planned) is copied as it is locally.
+// and gets a new draft). It never publishes: on Pages, Posts, Industries,
+// Industry topics and Bot swarm each draft is marked Ready for review, with
+// the note "promoted from local", so it shows in the admin's Review queue for
+// a content owner or admin to publish. Each record's own status (live, pilot,
+// planned) is copied as it is locally.
 //
 // Records are matched between local and live by slug (Lists entries by slug
 // and type, media by filename), never by id. Every relationship is remapped
@@ -24,10 +26,10 @@
 // record uses is uploaded when live does not have it. Nothing is ever
 // deleted on live.
 //
-// Reads PROMOTE_URL and PROMOTE_API_KEY (or PROMOTE_EMAIL and PROMOTE_PASSWORD)
-// from .env.promote (git-ignored), or from the file in PROMOTE_ENV. --publish
-// always signs in with PROMOTE_EMAIL and PROMOTE_PASSWORD, since API keys
-// cannot publish. Local is
+// Reads PROMOTE_URL and PROMOTE_API_KEY from .env.promote (git-ignored), or
+// from the file in PROMOTE_ENV. The key belongs to promote@neuroncx.in, an
+// Author with an API key and no password anyone knows (docs/cms/roles-and-review.md),
+// so promoting can only ever save drafts. Local is
 // LOCAL_URL (default http://localhost:3001). Pages are read from local as a
 // visitor, published only. Collections are read with LOCAL_API_KEY (or
 // LOCAL_EMAIL and LOCAL_PASSWORD) from the same file, latest drafts included,
@@ -365,14 +367,14 @@ export const createPromoter = ({ LIVE, LOCAL, liveHeaders, localHeaders = {}, WR
     return { body, problems, deferred }
   }
 
-  async function save(collection, liveDoc, body, publish) {
+  async function save(collection, liveDoc, body) {
     // A draft save goes in as a new draft version (draft=true), so a published
     // live record keeps its published version.
     const url = liveDoc ? `${LIVE}/api/${collection}/${liveDoc.id}` : `${LIVE}/api/${collection}`
-    const res = await fetch(publish ? url : `${url}?draft=true`, {
+    const res = await fetch(`${url}?draft=true`, {
       method: liveDoc ? 'PATCH' : 'POST',
       headers: { ...liveHeaders, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...body, _status: publish ? 'published' : 'draft' }),
+      body: JSON.stringify({ ...body, ...reviewRequest(collection), _status: 'draft' }),
     })
     return (await json(res, `live ${collection} save`)).doc
   }
@@ -382,11 +384,19 @@ export const createPromoter = ({ LIVE, LOCAL, liveHeaders, localHeaders = {}, WR
 
 const DEFER = Symbol('deferred')
 
+/** The collections with Ready for review (src/review/scope.ts REVIEW_SLUGS; a test keeps the two in step). */
+export const REVIEW_COLLECTIONS = ['pages', 'posts', 'sectors', 'industryTopics', 'microApps']
+export const PROMOTED_NOTE = 'promoted from local'
+
+/** Marks a promoted draft Ready for review, where the collection has it. */
+export const reviewRequest = (collection) =>
+  REVIEW_COLLECTIONS.includes(collection) ? { readyForReview: true, reviewNote: PROMOTED_NOTE } : {}
+
 /* ------------------------------------------------------------------ */
 /* Runs                                                                */
 /* ------------------------------------------------------------------ */
 
-async function promotePage(p, { LIVE, liveHeaders, LOCAL, slug, WRITE, PUBLISH }) {
+async function promotePage(p, { LIVE, liveHeaders, LOCAL, slug, WRITE }) {
   const res = await fetch(`${LOCAL}/api/pages?where[slug][equals]=${encodeURIComponent(slug)}&depth=2&limit=1`)
   const local = (await json(res, 'local page read')).docs?.[0]
   if (!local) throw new Error(`No local page with slug "${slug}"`)
@@ -404,11 +414,11 @@ async function promotePage(p, { LIVE, liveHeaders, LOCAL, slug, WRITE, PUBLISH }
     log('Dry run complete. Re-run with --write to apply.')
     return
   }
-  const saved = await p.save('pages', target, body, PUBLISH)
-  log(`Saved. Live page id: ${saved?.id}, status: ${PUBLISH ? 'published' : 'draft'}`)
+  const saved = await p.save('pages', target, body)
+  log(`Saved as a draft, marked Ready for review. Live page id: ${saved?.id}`)
 }
 
-export async function promoteCollections(p, { collections, slugs, WRITE, PUBLISH }) {
+export async function promoteCollections(p, { collections, slugs, WRITE }) {
   const ordered = orderCollections(collections)
   log(`Collections, in order: ${ordered.join(', ')}`)
 
@@ -458,9 +468,9 @@ export async function promoteCollections(p, { collections, slugs, WRITE, PUBLISH
       const state = !live ? 'new' : changed.length ? 'changed' : 'unchanged'
       counts[state]++
       log(`  [${state}]${' '.repeat(10 - state.length)}${name}  ${status}${changed.length ? `  fields: ${changed.join(', ')}` : ''}${deferred ? '  (links to records created later in this run: filled in a second pass)' : ''}`)
-      if (!WRITE || (state === 'unchanged' && !PUBLISH)) continue
+      if (!WRITE || state === 'unchanged') continue
       try {
-        const saved = await p.save(c, live, body, PUBLISH)
+        const saved = await p.save(c, live, body)
         p.remember(c, match, saved)
         counts.saved++
         if (deferred) second.push(local)
@@ -480,7 +490,7 @@ export async function promoteCollections(p, { collections, slugs, WRITE, PUBLISH
         continue
       }
       try {
-        await p.save(c, await p.findLive(c, match), body, PUBLISH)
+        await p.save(c, await p.findLive(c, match), body)
         log(`  [second pass] ${match.slug}: links filled in`)
       } catch (e) {
         log(`  [second pass failed] ${match.slug}: ${e.message}`)
@@ -491,7 +501,7 @@ export async function promoteCollections(p, { collections, slugs, WRITE, PUBLISH
 
   log(
     `\n${counts.new} new, ${counts.changed} changed, ${counts.unchanged} unchanged, ${counts.skipped} skipped, ${counts.refused} refused.` +
-      (WRITE ? ` Saved ${counts.saved} as ${PUBLISH ? 'published' : 'drafts'}, ${counts.failed} failed.` : ' Dry run: nothing written. Re-run with --write to save drafts.'),
+      (WRITE ? ` Saved ${counts.saved} as drafts, ${counts.failed} failed. Publish them from the admin Review queue.` : ' Dry run: nothing written. Re-run with --write to save drafts.'),
   )
   if (counts.refused || counts.failed) process.exitCode = 1
 }
@@ -499,7 +509,12 @@ export async function promoteCollections(p, { collections, slugs, WRITE, PUBLISH
 async function main() {
   const args = process.argv.slice(2)
   const WRITE = args.includes('--write')
-  const PUBLISH = WRITE && args.includes('--publish')
+  if (args.includes('--publish')) {
+    console.error(
+      'promote-page no longer publishes. Run it with --write: drafts are marked Ready for review and listed in the admin Review queue, where a content owner or admin publishes them.',
+    )
+    process.exit(1)
+  }
   const collections = []
   const rest = []
   for (let i = 0; i < args.length; i++) {
@@ -508,8 +523,8 @@ async function main() {
   }
   if (!collections.length && !rest[0]) {
     console.error(
-      'Usage: node scripts/promote-page.mjs <slug> [--write] [--publish]\n' +
-        '       node scripts/promote-page.mjs --collection <slug>[,<slug>] [<record slug> ...] [--write] [--publish]',
+      'Usage: node scripts/promote-page.mjs <slug> [--write]\n' +
+        '       node scripts/promote-page.mjs --collection <slug>[,<slug>] [<record slug> ...] [--write]',
     )
     process.exit(1)
   }
@@ -520,19 +535,10 @@ async function main() {
   const LOCAL = (process.env.LOCAL_URL || 'http://localhost:3001').replace(/\/$/, '')
   if (!LIVE) throw new Error('PROMOTE_URL is empty.')
 
-  // The REST API key is preferred. Email and password login is the fallback,
-  // and the only way with --publish: the CMS refuses to publish from API keys.
-  const liveHeaders =
-    env.PROMOTE_API_KEY && !PUBLISH
-      ? { Authorization: `users API-Key ${env.PROMOTE_API_KEY}` }
-      : await login(LIVE, env.PROMOTE_EMAIL, env.PROMOTE_PASSWORD, 'live')
-  if (!liveHeaders) {
-    throw new Error(
-      PUBLISH
-        ? '--publish needs PROMOTE_EMAIL and PROMOTE_PASSWORD: the CMS does not publish from API keys.'
-        : 'Set PROMOTE_API_KEY, or PROMOTE_EMAIL and PROMOTE_PASSWORD.',
-    )
-  }
+  // Live is written with promote@neuroncx.in's API key only: no password, so
+  // the script can save drafts and nothing else.
+  if (!env.PROMOTE_API_KEY) throw new Error('Set PROMOTE_API_KEY in .env.promote: the API key of promote@neuroncx.in.')
+  const liveHeaders = { Authorization: `users API-Key ${env.PROMOTE_API_KEY}` }
 
   let localHeaders = {}
   if (collections.length) {
@@ -545,11 +551,11 @@ async function main() {
   }
 
   log(`Promoting ${collections.length ? `collections ${collections.join(', ')}` : `page "${rest[0]}"`} from ${LOCAL} to ${LIVE}`)
-  log(WRITE ? (PUBLISH ? 'Mode: WRITE and PUBLISH' : 'Mode: WRITE (drafts)') : 'Mode: DRY RUN (no changes)')
+  log(WRITE ? 'Mode: WRITE (drafts, marked Ready for review)' : 'Mode: DRY RUN (no changes)')
 
   const p = createPromoter({ LIVE, LOCAL, liveHeaders, localHeaders, WRITE })
-  if (collections.length) await promoteCollections(p, { collections, slugs: rest, WRITE, PUBLISH })
-  else await promotePage(p, { LIVE, liveHeaders, LOCAL, slug: rest[0], WRITE, PUBLISH })
+  if (collections.length) await promoteCollections(p, { collections, slugs: rest, WRITE })
+  else await promotePage(p, { LIVE, liveHeaders, LOCAL, slug: rest[0], WRITE })
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {

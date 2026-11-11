@@ -8,9 +8,13 @@ import {
   matchOf,
   orderCollections,
   promoteCollections,
+  PROMOTED_NOTE,
+  REVIEW_COLLECTIONS,
+  reviewRequest,
   ruleFor,
   skipReason,
 } from '../../scripts/promote-page.mjs'
+import { REVIEW_SLUGS } from '@/review/scope'
 
 /**
  * scripts/promote-page.mjs --collection: ordering, slug matching, remapping
@@ -96,7 +100,7 @@ describe('skipping', () => {
       save: async () => ({}),
       remember: () => {},
     }
-    await promoteCollections(fake, { collections: ['microApps'], slugs: [], WRITE: false, PUBLISH: false })
+    await promoteCollections(fake, { collections: ['microApps'], slugs: [], WRITE: false })
     logSpy.mockRestore()
     expect(lines).toContain('  [skipped]   qualify  status planned, local draft  no family: set one locally to promote it')
     expect(lines.some((l) => l.includes('[new]') && l.includes('payment-services'))).toBe(true)
@@ -234,5 +238,33 @@ describe('hero fields', () => {
     expect(body.heroMedia).toBe('dry-run:flow.png')
     expect(body.heroChat[0].entry).toEqual({ relationTo: 'microApps', value: 'live-pay' })
     expect(JSON.stringify(body)).not.toMatch(/local-/)
+  })
+})
+
+describe('promoted drafts', () => {
+  afterEach(() => vi.unstubAllGlobals())
+
+  it('marks a draft Ready for review, noting it was promoted, on the collections that have it, and nowhere else', () => {
+    expect([...REVIEW_COLLECTIONS].sort()).toEqual([...REVIEW_SLUGS].sort())
+    expect(reviewRequest('pages')).toEqual({ readyForReview: true, reviewNote: PROMOTED_NOTE })
+    expect(PROMOTED_NOTE).toBe('promoted from local')
+    expect(reviewRequest('lists')).toEqual({})
+  })
+
+  it('saves only ever as a draft, with the review request', async () => {
+    const sent: { url: string; body: Record<string, unknown> }[] = []
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string, init: { body: string }) => {
+        sent.push({ url: String(url), body: JSON.parse(init.body) })
+        return new Response(JSON.stringify({ doc: { id: 'x' } }), { status: 200 })
+      }),
+    )
+    const p = createPromoter({ LIVE: 'https://cms.example', LOCAL: 'http://localhost:3001', liveHeaders: {}, WRITE: true })
+    await p.save('microApps', { id: 'm1' }, { name: 'Payment services' })
+    await p.save('lists', null, { name: 'A list' })
+    expect(sent[0]).toMatchObject({ url: 'https://cms.example/api/microApps/m1?draft=true', body: { _status: 'draft', readyForReview: true, reviewNote: 'promoted from local' } })
+    expect(sent[1].url).toBe('https://cms.example/api/lists?draft=true')
+    expect(sent[1].body).toEqual({ name: 'A list', _status: 'draft' })
   })
 })
