@@ -2,14 +2,14 @@ import { describe, expect, it } from 'vitest'
 
 import type { Entry, Refs } from '../../scripts/benchmark/entry'
 import { HAND_SCORES_V3 } from '../../scripts/benchmark/handScores'
-import { EFFORT, fingerprintOf, judgeRequest, MODEL, SYSTEM_PROMPT } from '../../scripts/benchmark/judge'
+import { fingerprintOf, readWorksheet, worksheetFor, type WorksheetMeta } from '../../scripts/benchmark/worksheet'
 import { decide, decideOrganisations, decideProductNames } from '../../scripts/benchmark/mechanical'
 import { RUBRIC_V3 } from '../../scripts/seed-rubric-v3'
 
 /**
  * The scoring CLI's parts (scripts/benchmark/): checks decided in code, the
- * two name checks decided from what Claude finds, and the request sent to
- * Claude. No call to the API is made here.
+ * two name checks decided from the names a person lists, and the worksheet
+ * for the checks code cannot decide.
  */
 
 const refs: Refs = {
@@ -92,7 +92,7 @@ describe('checks decided in code', () => {
   })
 })
 
-describe('the name checks, decided in code from what Claude finds', () => {
+describe('the name checks, decided in code from the names a person lists', () => {
   it('blocks an organisation on no list, and allows integrations, customers and listed third parties', () => {
     expect(decideOrganisations(['Razorpay', 'Google Ads', 'NeuronCx'], agent(), refs).verdict).toBe('pass')
     expect(decideOrganisations(['Apollo Hospitals'], agent(), refs)).toEqual({
@@ -107,27 +107,56 @@ describe('the name checks, decided in code from what Claude finds', () => {
   })
 })
 
-describe('the request to Claude', () => {
-  const items = RUBRIC_V3.filter((i) => ['ex-one-name', 'en-audience-named'].includes(i.itemId))
-  const body = judgeRequest(agent(), refs, items, { 'ex-one-name': 'A hint.' })
+describe('the worksheet', () => {
+  const items = RUBRIC_V3.filter((i) => ['ex-one-name', 'en-hero-says-what', 'hr-no-client-names'].includes(i.itemId))
+  const meta: WorksheetMeta = {
+    collection: 'microApps',
+    entryId: 'e1',
+    slug: 'payment-services',
+    versionId: 'v1',
+    contentHash: 'h1',
+    rubricId: 'r1',
+    rubricVersion: '1',
+    fingerprint: 'f1',
+  }
+  const blank = worksheetFor(agent(), meta, items, { 'ex-one-name': 'A hint.' }, { 'hr-no-em-dashes': { state: 'pass', note: '' } })
+  const fill = (text: string, id: string, state: string, note = '') =>
+    text.replace(new RegExp(`(### ${id} [\\s\\S]*?)State:\\nNote:`), `$1State: ${state}\nNote: ${note}`)
 
-  it('uses the current Opus at high effort, structured output, and server-side fallback', () => {
-    expect(body.model).toBe(MODEL)
-    expect(MODEL).toBe('claude-opus-5-5')
-    expect(body.output_config.effort).toBe(EFFORT)
-    expect(body.output_config.format.type).toBe('json_schema')
-    expect(body.fallbacks).toBe('default')
-    expect(body).not.toHaveProperty('temperature')
-    expect(body.system).toBe(SYSTEM_PROMPT)
+  it('lists only the checks code could not decide, with the text each needs', () => {
+    expect(blank).toContain('### ex-one-name (warning if failed)')
+    expect(blank).toContain('Code found: A hint.')
+    expect(blank).toContain('- hr-no-em-dashes: pass')
+    expect(blank).not.toContain('### hr-no-em-dashes')
+    expect(blank).toContain('Organisations named (comma separated, or none):')
   })
 
-  it('limits the answer to the checks asked, and passes on what code found', () => {
-    const schema = body.output_config.format.schema as { properties: { checks: { items: { properties: { itemId: { enum: string[] } } } } } }
-    expect(schema.properties.checks.items.properties.itemId.enum).toEqual(['ex-one-name', 'en-audience-named'])
-    expect(body.messages[0].content).toContain('Already found: A hint.')
+  it('reads back a filled worksheet, with the names for code to decide', () => {
+    let text = fill(blank, 'ex-one-name', 'pass')
+    text = fill(text, 'en-hero-says-what', 'na')
+    text = text.replace('Organisations named (comma separated, or none):', 'Organisations named (comma separated, or none): Razorpay')
+    const read = readWorksheet(text, items)
+    // Saved on Windows, with \r\n line endings, it reads the same.
+    expect(readWorksheet(text.replace(/\n/g, '\r\n'), items)).toEqual(read)
+    expect(read.meta).toEqual(meta)
+    expect(read.problems).toEqual([])
+    expect(read.answers['ex-one-name']).toEqual({ verdict: 'pass', note: '' })
+    expect(read.names['hr-no-client-names']).toEqual(['Razorpay'])
   })
 
-  it('changes the fingerprint when the rubric or the scorer changes, so an old accuracy pass stops counting', () => {
+  it('never lets an unscored check through, and allows na only where the pass condition does', () => {
+    expect(readWorksheet(blank, items).problems).toEqual([
+      'ex-one-name: State must be pass, fail or na.',
+      'en-hero-says-what: State must be pass, fail or na.',
+      'hr-no-client-names: fill in "Organisations named", or write none.',
+    ])
+    const na = readWorksheet(fill(blank, 'ex-one-name', 'na'), items)
+    expect(na.problems).toContain('ex-one-name: na is not allowed; its pass condition always applies.')
+    const failNoNote = readWorksheet(fill(blank, 'ex-one-name', 'fail'), items)
+    expect(failNoNote.problems).toContain('ex-one-name: give a one-line note for a fail.')
+  })
+
+  it('changes the fingerprint when the rubric or the code checks change, so an old accuracy pass stops counting', () => {
     const plain = RUBRIC_V3.map(({ itemId, criterion, passCondition }) => ({ itemId, criterion, passCondition }))
     const base = fingerprintOf(plain, 1)
     expect(fingerprintOf(plain, 2)).not.toBe(base)

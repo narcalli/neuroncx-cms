@@ -142,6 +142,21 @@ export const BenchmarkRuns: CollectionConfig = {
             description: 'Why it passed or failed, for whoever fixes the content.',
           },
         },
+        {
+          name: 'decidedBy',
+          type: 'select',
+          label: 'Decided by',
+          required: true,
+          defaultValue: 'human',
+          options: [
+            { label: 'Code', value: 'code' },
+            { label: 'Person', value: 'human' },
+          ],
+          admin: {
+            description:
+              'Code: the same content always gets the same result. Person: scored by hand on a worksheet. Shows which part of the score can be reproduced.',
+          },
+        },
       ],
     },
     {

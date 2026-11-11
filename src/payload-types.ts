@@ -11476,6 +11476,10 @@ export interface BenchmarkRun {
      * Why it passed or failed, for whoever fixes the content.
      */
     note?: string | null;
+    /**
+     * Code: the same content always gets the same result. Person: scored by hand on a worksheet. Shows which part of the score can be reproduced.
+     */
+    decidedBy: 'code' | 'human';
     id?: string | null;
   }[];
   /**
@@ -15977,6 +15981,7 @@ export interface BenchmarkRunsSelect<T extends boolean = true> {
         itemId?: T;
         state?: T;
         note?: T;
+        decidedBy?: T;
         id?: T;
       };
   score?: T;

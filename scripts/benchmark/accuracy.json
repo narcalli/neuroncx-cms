@@ -1,0 +1,319 @@
+{
+ "fingerprint": "1c0eabe3cd6f234a",
+ "passed": true,
+ "tolerance": 5,
+ "at": "2026-11-11T06:04:43.894Z",
+ "method": "Code checks scored in code; the checks code cannot decide were scored by hand (scripts/benchmark/handScores.ts), as they are on every worksheet. Compared with the hand scores for the whole rubric.",
+ "entries": [
+  {
+   "collection": "sectors",
+   "slug": "higher-education",
+   "hand": 64.7,
+   "scorer": 61.8,
+   "within": true,
+   "decidedByCode": 17,
+   "byHand": [
+    "ex-sections-stand-alone",
+    "ex-terms-defined",
+    "ex-one-name",
+    "ex-lists-for-enumerations",
+    "ex-faq-answers-stand-alone",
+    "ex-product-claims-exist",
+    "ex-kb-answer-complete",
+    "ex-kb-facts-checkable",
+    "ex-kb-questions-answered",
+    "en-audience-named",
+    "en-hero-says-what",
+    "en-task-completes",
+    "en-concrete-example",
+    "en-card-summary",
+    "hr-no-client-names",
+    "hr-no-patient-data",
+    "hr-claims-have-evidence"
+   ],
+   "disagreements": [
+    {
+     "id": "en-next-action",
+     "code": "warning",
+     "hand": "pass",
+     "note": "No button on the entry, and it does not follow the page defaults."
+    }
+   ]
+  },
+  {
+   "collection": "microApps",
+   "slug": "appointment-assistance",
+   "hand": 80,
+   "scorer": 84,
+   "within": true,
+   "decidedByCode": 23,
+   "byHand": [
+    "ex-headings-name-subject",
+    "ex-sections-stand-alone",
+    "ex-one-name",
+    "ex-lists-for-enumerations",
+    "ex-facts-stated-once",
+    "ex-product-claims-exist",
+    "en-audience-named",
+    "en-concrete-example",
+    "en-card-summary",
+    "hr-no-client-names",
+    "hr-no-patient-data"
+   ],
+   "disagreements": [
+    {
+     "id": "ex-terms-defined",
+     "code": "pass",
+     "hand": "warning",
+     "note": "No term on the list is used."
+    }
+   ]
+  },
+  {
+   "collection": "microApps",
+   "slug": "payment-services",
+   "hand": 76.9,
+   "scorer": 76.9,
+   "within": true,
+   "decidedByCode": 20,
+   "byHand": [
+    "ex-headings-name-subject",
+    "ex-sections-stand-alone",
+    "ex-no-outside-references",
+    "ex-one-name",
+    "ex-lists-for-enumerations",
+    "ex-facts-stated-once",
+    "ex-faq-answers-stand-alone",
+    "ex-product-claims-exist",
+    "ex-kb-answer-complete",
+    "en-audience-named",
+    "en-concrete-example",
+    "en-card-summary",
+    "hr-no-client-names",
+    "hr-no-patient-data"
+   ],
+   "disagreements": [
+    {
+     "id": "ex-terms-defined",
+     "code": "pass",
+     "hand": "warning",
+     "note": "No term on the list is used."
+    },
+    {
+     "id": "en-short-paragraphs",
+     "code": "warning",
+     "hand": "pass",
+     "note": "\"How Payment services works\" runs 171 words under one heading."
+    }
+   ]
+  },
+  {
+   "collection": "microApps",
+   "slug": "prescription-understanding",
+   "hand": 76,
+   "scorer": 80,
+   "within": true,
+   "decidedByCode": 22,
+   "byHand": [
+    "ex-headings-name-subject",
+    "ex-sections-stand-alone",
+    "ex-one-name",
+    "ex-lists-for-enumerations",
+    "ex-facts-stated-once",
+    "ex-product-claims-exist",
+    "en-audience-named",
+    "en-concrete-example",
+    "en-card-summary",
+    "hr-no-client-names",
+    "hr-no-patient-data",
+    "hr-claims-have-evidence"
+   ],
+   "disagreements": [
+    {
+     "id": "ex-terms-defined",
+     "code": "pass",
+     "hand": "warning",
+     "note": "No term on the list is used."
+    }
+   ]
+  },
+  {
+   "collection": "microApps",
+   "slug": "test-matching-and-pricing",
+   "hand": 72,
+   "scorer": 76,
+   "within": true,
+   "decidedByCode": 23,
+   "byHand": [
+    "ex-headings-name-subject",
+    "ex-sections-stand-alone",
+    "ex-one-name",
+    "ex-lists-for-enumerations",
+    "ex-facts-stated-once",
+    "ex-product-claims-exist",
+    "en-audience-named",
+    "en-concrete-example",
+    "en-card-summary",
+    "hr-no-client-names",
+    "hr-no-patient-data"
+   ],
+   "disagreements": [
+    {
+     "id": "ex-terms-defined",
+     "code": "pass",
+     "hand": "warning",
+     "note": "No term on the list is used."
+    }
+   ]
+  },
+  {
+   "collection": "microApps",
+   "slug": "student-mark-statement-assessment",
+   "hand": 76,
+   "scorer": 80,
+   "within": true,
+   "decidedByCode": 22,
+   "byHand": [
+    "ex-headings-name-subject",
+    "ex-sections-stand-alone",
+    "ex-one-name",
+    "ex-lists-for-enumerations",
+    "ex-facts-stated-once",
+    "ex-product-claims-exist",
+    "en-audience-named",
+    "en-concrete-example",
+    "en-card-summary",
+    "hr-no-client-names",
+    "hr-no-patient-data",
+    "hr-claims-have-evidence"
+   ],
+   "disagreements": [
+    {
+     "id": "ex-terms-defined",
+     "code": "pass",
+     "hand": "warning",
+     "note": "No term on the list is used."
+    }
+   ]
+  },
+  {
+   "collection": "microApps",
+   "slug": "identity-and-kyc",
+   "hand": 76,
+   "scorer": 80,
+   "within": true,
+   "decidedByCode": 23,
+   "byHand": [
+    "ex-headings-name-subject",
+    "ex-sections-stand-alone",
+    "ex-one-name",
+    "ex-lists-for-enumerations",
+    "ex-facts-stated-once",
+    "ex-product-claims-exist",
+    "en-audience-named",
+    "en-concrete-example",
+    "en-card-summary",
+    "hr-no-client-names",
+    "hr-no-patient-data"
+   ],
+   "disagreements": [
+    {
+     "id": "ex-terms-defined",
+     "code": "pass",
+     "hand": "warning",
+     "note": "No term on the list is used."
+    }
+   ]
+  },
+  {
+   "collection": "microApps",
+   "slug": "assessment-sampling",
+   "hand": 68,
+   "scorer": 72,
+   "within": true,
+   "decidedByCode": 23,
+   "byHand": [
+    "ex-headings-name-subject",
+    "ex-sections-stand-alone",
+    "ex-one-name",
+    "ex-lists-for-enumerations",
+    "ex-facts-stated-once",
+    "ex-product-claims-exist",
+    "en-audience-named",
+    "en-concrete-example",
+    "en-card-summary",
+    "hr-no-client-names",
+    "hr-no-patient-data"
+   ],
+   "disagreements": [
+    {
+     "id": "ex-terms-defined",
+     "code": "pass",
+     "hand": "warning",
+     "note": "No term on the list is used."
+    }
+   ]
+  },
+  {
+   "collection": "microApps",
+   "slug": "call-quality-assessment",
+   "hand": 80,
+   "scorer": 84,
+   "within": true,
+   "decidedByCode": 22,
+   "byHand": [
+    "ex-headings-name-subject",
+    "ex-sections-stand-alone",
+    "ex-one-name",
+    "ex-lists-for-enumerations",
+    "ex-facts-stated-once",
+    "ex-product-claims-exist",
+    "en-audience-named",
+    "en-concrete-example",
+    "en-card-summary",
+    "hr-no-client-names",
+    "hr-no-patient-data",
+    "hr-claims-have-evidence"
+   ],
+   "disagreements": [
+    {
+     "id": "ex-terms-defined",
+     "code": "pass",
+     "hand": "warning",
+     "note": "No term on the list is used."
+    }
+   ]
+  },
+  {
+   "collection": "microApps",
+   "slug": "longitudinal-analysis-and-feedback",
+   "hand": 80,
+   "scorer": 84,
+   "within": true,
+   "decidedByCode": 21,
+   "byHand": [
+    "ex-headings-name-subject",
+    "ex-sections-stand-alone",
+    "ex-one-name",
+    "ex-lists-for-enumerations",
+    "ex-facts-stated-once",
+    "ex-product-claims-exist",
+    "en-audience-named",
+    "en-concrete-example",
+    "en-card-summary",
+    "hr-no-client-names",
+    "hr-no-patient-data",
+    "hr-observation-not-criticism",
+    "hr-claims-have-evidence"
+   ],
+   "disagreements": [
+    {
+     "id": "ex-terms-defined",
+     "code": "pass",
+     "hand": "warning",
+     "note": "No term on the list is used."
+    }
+   ]
+  }
+ ]
+}

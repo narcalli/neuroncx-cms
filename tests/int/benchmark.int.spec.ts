@@ -328,9 +328,9 @@ describe('with the local database', () => {
       rubricVersion: '1',
       runAt: '2026-11-10T09:00:00.000Z',
       results: [
-        { itemId: 'BR-01', state: 'pass' as const },
-        { itemId: 'BR-02', state: 'warning' as const },
-        { itemId: 'BR-03', state: 'na' as const },
+        { itemId: 'BR-01', state: 'pass' as const, decidedBy: 'human' as const },
+        { itemId: 'BR-02', state: 'warning' as const, decidedBy: 'human' as const },
+        { itemId: 'BR-03', state: 'na' as const, decidedBy: 'human' as const },
       ],
     })
 
@@ -357,10 +357,30 @@ describe('with the local database', () => {
     })
 
     it('counts blockers', async () => {
-      const data = { ...runData(), results: [{ itemId: 'BR-01', state: 'blocker' as const }, { itemId: 'BR-02', state: 'pass' as const }] }
+      const data = { ...runData(), results: [{ itemId: 'BR-01', state: 'blocker' as const, decidedBy: 'human' as const }, { itemId: 'BR-02', state: 'pass' as const, decidedBy: 'human' as const }] }
       const run = await payload.create({ ...quiet, collection: 'benchmarkRuns', data, user: as(author, 'api-key'), overrideAccess: false })
       runs.push(run.id)
       expect(run).toMatchObject({ score: 50, blockerCount: 1 })
+    })
+
+    it('keeps whether code or a person decided each result, a person unless said otherwise', async () => {
+      const results = [
+        { itemId: 'BR-01', state: 'pass' as const, decidedBy: 'code' as const },
+        { itemId: 'BR-02', state: 'warning' as const, decidedBy: 'human' as const, note: 'Scored on a worksheet.' },
+      ]
+      const run = await payload.create({ ...quiet, collection: 'benchmarkRuns', data: { ...runData(), results }, user: as(admin), overrideAccess: false })
+      runs.push(run.id)
+      expect(run.results.map((r) => r.decidedBy)).toEqual(['code', 'human'])
+      const unsaid = { ...runData(), results: [{ itemId: 'BR-01', state: 'pass' as const }] }
+      const fromAdmin = await payload.create({
+        ...quiet,
+        collection: 'benchmarkRuns',
+        data: unsaid as RequiredDataFromCollectionSlug<'benchmarkRuns'>,
+        user: as(admin),
+        overrideAccess: false,
+      })
+      runs.push(fromAdmin.id)
+      expect(fromAdmin.results[0].decidedBy).toBe('human')
     })
 
     it('cannot be changed by anyone, even with access checks skipped', async () => {
@@ -407,7 +427,7 @@ describe('with the local database', () => {
     })
 
     it("needs every result to be an item in that version, naming the ones that are not", async () => {
-      const results = [{ itemId: 'BR-01', state: 'pass' as const }, { itemId: 'XX-01', state: 'pass' as const }, { itemId: 'XX-02', state: 'na' as const }]
+      const results = [{ itemId: 'BR-01', state: 'pass' as const, decidedBy: 'human' as const }, { itemId: 'XX-01', state: 'pass' as const, decidedBy: 'human' as const }, { itemId: 'XX-02', state: 'na' as const, decidedBy: 'human' as const }]
       const attempt = payload.create({ ...quiet, collection: 'benchmarkRuns', data: { ...runData(), results }, user: as(admin), overrideAccess: false })
       await expect(attempt).rejects.toMatchObject(rejectedWith('results', 'Not items in version 1 of the rubric: XX-01, XX-02.'))
     })
@@ -419,7 +439,7 @@ describe('with the local database', () => {
         payload.create({
           ...quiet,
           collection: 'benchmarkRuns',
-          data: { ...runData(), rubric: r.id, rubricVersion, results: [{ itemId, state: 'pass' as const }] },
+          data: { ...runData(), rubric: r.id, rubricVersion, results: [{ itemId, state: 'pass' as const, decidedBy: 'human' as const }] },
           user: as(admin),
           overrideAccess: false,
         })
@@ -431,7 +451,7 @@ describe('with the local database', () => {
     })
 
     it('refuses a run where every result is Not applicable, naming the content type and rubric version', async () => {
-      const results = [{ itemId: 'BR-01', state: 'na' as const }, { itemId: 'BR-02', state: 'na' as const }]
+      const results = [{ itemId: 'BR-01', state: 'na' as const, decidedBy: 'human' as const }, { itemId: 'BR-02', state: 'na' as const, decidedBy: 'human' as const }]
       const attempt = payload.create({ ...quiet, collection: 'benchmarkRuns', data: { ...runData(), results }, user: as(admin), overrideAccess: false })
       await expect(attempt).rejects.toMatchObject(
         rejectedWith('results', 'no item in version 1 of "ZZ BENCH runs" applies to Industries'),
@@ -439,7 +459,7 @@ describe('with the local database', () => {
     })
 
     it('refuses two results for one item', async () => {
-      const data = { ...runData(), results: [{ itemId: 'BR-01', state: 'pass' as const }, { itemId: 'BR-01', state: 'warning' as const }] }
+      const data = { ...runData(), results: [{ itemId: 'BR-01', state: 'pass' as const, decidedBy: 'human' as const }, { itemId: 'BR-01', state: 'warning' as const, decidedBy: 'human' as const }] }
       const attempt = payload.create({ ...quiet, collection: 'benchmarkRuns', data, user: as(admin), overrideAccess: false })
       await expect(attempt).rejects.toMatchObject(rejectedWith('results', /BR-01 has more than one/))
     })

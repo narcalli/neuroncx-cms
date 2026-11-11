@@ -61,7 +61,7 @@ describe('with the local database', () => {
         rubric: rubric.id,
         rubricVersion: String(rubric.version),
         runAt: new Date().toISOString(),
-        results: states.map((state, i) => ({ itemId: `ZG-0${i + 1}`, state })),
+        results: states.map((state, i) => ({ itemId: `ZG-0${i + 1}`, state, decidedBy: 'human' as const })),
       },
       user: as(admin),
       overrideAccess: false,
