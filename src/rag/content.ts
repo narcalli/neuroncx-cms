@@ -101,6 +101,7 @@ export const resolvedNames = async (
   fields: Field[],
   doc: any,
   resolve: string[],
+  labels: Record<string, string> = {},
 ): Promise<string[]> => {
   const lines: string[] = []
   for (const name of resolve) {
@@ -134,7 +135,7 @@ export const resolvedNames = async (
     }
     const ordered = values.map((v: any) => names.get(idOf(v) ?? '')).filter(Boolean)
     if (ordered.length) {
-      const label = typeof field.label === 'string' ? field.label : humanize(name)
+      const label = labels[name] ?? (typeof field.label === 'string' ? field.label : humanize(name))
       lines.push(`${label}: ${ordered.join(', ')}.`)
     }
   }
@@ -181,7 +182,7 @@ export const serializeEntry = async (
     name,
   )
 
-  const names = await resolvedNames(payload, fields, doc, entry.kb.resolve)
+  const names = await resolvedNames(payload, fields, doc, entry.kb.resolve, entry.kb.labels)
   if (!names.length) return sections
   const about = sections.find((s) => s.key === 'tab:Knowledge base')
   if (about) {

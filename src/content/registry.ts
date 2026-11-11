@@ -17,6 +17,11 @@ import type { DefaultLayoutRow } from './sections/defineSection'
 export type ContentKbOptions = {
   /** Relationships sent to the knowledge base as names, such as the grouping. */
   resolve: string[]
+  /**
+   * The words before those names, by field, when the admin label would not
+   * explain itself to someone reading the knowledge base ("Family").
+   */
+  labels?: Record<string, string>
   /** Fields left out of the knowledge base. */
   exclude: string[]
 }
