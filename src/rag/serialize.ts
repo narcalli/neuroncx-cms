@@ -40,6 +40,11 @@ const SKIP_FIELDS = new Set([
   'blockName',
   'populatedAuthors',
   'headingOverrides',
+  // A review request (src/review/fields.ts), on any collection that has one.
+  'readyForReview',
+  'reviewNote',
+  'reviewRequestedBy',
+  'reviewRequestedAt',
 ])
 
 /** Groups that hold buttons or links: their labels are "Book a demo" style noise. */

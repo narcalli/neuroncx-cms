@@ -921,6 +921,16 @@ export interface Page {
   breadcrumbLabel?: string | null;
   updatedBy?: (string | null) | User;
   rolledBackFrom?: string | null;
+  /**
+   * Asks a content owner or admin to review and publish this entry. They are emailed when this is ticked and saved, while the review workflow is on. Cleared on publish.
+   */
+  readyForReview?: boolean | null;
+  /**
+   * What changed and what to check. Sent in the email and shown in the review queue.
+   */
+  reviewNote?: string | null;
+  reviewRequestedBy?: (string | null) | User;
+  reviewRequestedAt?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -977,6 +987,16 @@ export interface Post {
   slug: string;
   updatedBy?: (string | null) | User;
   rolledBackFrom?: string | null;
+  /**
+   * Asks a content owner or admin to review and publish this entry. They are emailed when this is ticked and saved, while the review workflow is on. Cleared on publish.
+   */
+  readyForReview?: boolean | null;
+  /**
+   * What changed and what to check. Sent in the email and shown in the review queue.
+   */
+  reviewNote?: string | null;
+  reviewRequestedBy?: (string | null) | User;
+  reviewRequestedAt?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -4253,6 +4273,16 @@ export interface Sector {
   kbLastReviewed?: string | null;
   updatedBy?: (string | null) | User;
   rolledBackFrom?: string | null;
+  /**
+   * Asks a content owner or admin to review and publish this entry. They are emailed when this is ticked and saved, while the review workflow is on. Cleared on publish.
+   */
+  readyForReview?: boolean | null;
+  /**
+   * What changed and what to check. Sent in the email and shown in the review queue.
+   */
+  reviewNote?: string | null;
+  reviewRequestedBy?: (string | null) | User;
+  reviewRequestedAt?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -6428,6 +6458,16 @@ export interface MicroApp {
   };
   updatedBy?: (string | null) | User;
   rolledBackFrom?: string | null;
+  /**
+   * Asks a content owner or admin to review and publish this entry. They are emailed when this is ticked and saved, while the review workflow is on. Cleared on publish.
+   */
+  readyForReview?: boolean | null;
+  /**
+   * What changed and what to check. Sent in the email and shown in the review queue.
+   */
+  reviewNote?: string | null;
+  reviewRequestedBy?: (string | null) | User;
+  reviewRequestedAt?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -10231,6 +10271,16 @@ export interface IndustryTopic {
   kbLastReviewed?: string | null;
   updatedBy?: (string | null) | User;
   rolledBackFrom?: string | null;
+  /**
+   * Asks a content owner or admin to review and publish this entry. They are emailed when this is ticked and saved, while the review workflow is on. Cleared on publish.
+   */
+  readyForReview?: boolean | null;
+  /**
+   * What changed and what to check. Sent in the email and shown in the review queue.
+   */
+  reviewNote?: string | null;
+  reviewRequestedBy?: (string | null) | User;
+  reviewRequestedAt?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -11999,6 +12049,10 @@ export interface PagesSelect<T extends boolean = true> {
   breadcrumbLabel?: T;
   updatedBy?: T;
   rolledBackFrom?: T;
+  readyForReview?: T;
+  reviewNote?: T;
+  reviewRequestedBy?: T;
+  reviewRequestedAt?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -13898,6 +13952,10 @@ export interface PostsSelect<T extends boolean = true> {
   slug?: T;
   updatedBy?: T;
   rolledBackFrom?: T;
+  readyForReview?: T;
+  reviewNote?: T;
+  reviewRequestedBy?: T;
+  reviewRequestedAt?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -14642,6 +14700,10 @@ export interface SectorsSelect<T extends boolean = true> {
   kbLastReviewed?: T;
   updatedBy?: T;
   rolledBackFrom?: T;
+  readyForReview?: T;
+  reviewNote?: T;
+  reviewRequestedBy?: T;
+  reviewRequestedAt?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -14864,6 +14926,10 @@ export interface IndustryTopicsSelect<T extends boolean = true> {
   kbLastReviewed?: T;
   updatedBy?: T;
   rolledBackFrom?: T;
+  readyForReview?: T;
+  reviewNote?: T;
+  reviewRequestedBy?: T;
+  reviewRequestedAt?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -15752,6 +15818,10 @@ export interface MicroAppsSelect<T extends boolean = true> {
       };
   updatedBy?: T;
   rolledBackFrom?: T;
+  readyForReview?: T;
+  reviewNote?: T;
+  reviewRequestedBy?: T;
+  reviewRequestedAt?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -16614,6 +16684,10 @@ export interface ContentStandard {
         id?: string | null;
       }[]
     | null;
+  /**
+   * On: on Pages, Posts, Industries, Industry topics and Bot swarm, authors cannot publish or schedule a publish. They tick Ready for review, and content owners and admins are emailed. Off: anyone signed in can publish, and no review emails are sent.
+   */
+  reviewRequired?: boolean | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -16870,6 +16944,7 @@ export interface ContentStandardsSelect<T extends boolean = true> {
         meaning?: T;
         id?: T;
       };
+  reviewRequired?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

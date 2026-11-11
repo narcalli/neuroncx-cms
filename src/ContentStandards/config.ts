@@ -246,5 +246,15 @@ export const ContentStandards: GlobalConfig = {
         },
       ],
     },
+    {
+      name: 'reviewRequired',
+      type: 'checkbox',
+      label: 'Authors need review to publish',
+      defaultValue: false,
+      admin: {
+        description:
+          'On: on Pages, Posts, Industries, Industry topics and Bot swarm, authors cannot publish or schedule a publish. They tick Ready for review, and content owners and admins are emailed. Off: anyone signed in can publish, and no review emails are sent.',
+      },
+    },
   ],
 }

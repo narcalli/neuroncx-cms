@@ -19,5 +19,8 @@ export default defineConfig({
     // starting at once that can pass the 10 second default, and a suite that
     // times out never cleans up, leaving zz- records that fail the next run.
     hookTimeout: 30000,
+    // The same for a file's first test that saves: Payload starting up and the
+    // first imports take a few seconds once every file runs at once.
+    testTimeout: 20000,
   },
 })

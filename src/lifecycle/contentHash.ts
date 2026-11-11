@@ -2,8 +2,8 @@ import { createHash } from 'crypto'
 
 /**
  * Keys that do not change what an entry says: ids, timestamps, draft state,
- * who saved it, block names, and the gate override, which is granted for a
- * hash and so must not change it.
+ * who saved it, block names, the gate override, which is granted for a
+ * hash and so must not change it, and a review request.
  */
 const NOT_CONTENT = new Set([
   'id',
@@ -17,6 +17,11 @@ const NOT_CONTENT = new Set([
   'gateOverride',
   'gateOverrideReason',
   'gateOverrideHash',
+  // A review request (src/review/fields.ts) is about the content, not part of it.
+  'readyForReview',
+  'reviewNote',
+  'reviewRequestedBy',
+  'reviewRequestedAt',
 ])
 
 const isPlainObject = (v: unknown): v is Record<string, unknown> =>

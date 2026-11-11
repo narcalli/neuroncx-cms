@@ -67,6 +67,11 @@ const NEVER = [
   'gateOverride',
   'gateOverrideReason',
   'gateOverrideHash',
+  // A review request (src/review/fields.ts): a note to the reviewer, not content.
+  'readyForReview',
+  'reviewNote',
+  'reviewRequestedBy',
+  'reviewRequestedAt',
 ]
 
 /** What a visitor receives, for collections that strip fields after a read. */

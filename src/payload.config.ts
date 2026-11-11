@@ -41,13 +41,20 @@ import { applyHistory, ContentEvents } from './history'
 import { ragSyncDocTask } from './rag/tasks/sync-doc'
 import { ragPurgeDocTask } from './rag/tasks/purge-doc'
 import { serializeTransactionCalls } from './db/serializeTransactionCalls'
+import { applyReview } from './review'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 export default buildConfig({
   admin: {
-    components: {},
+    components: {
+      // The review queue (src/review/ReviewQueue.tsx), linked from the nav.
+      afterNavLinks: ['@/review/ReviewNavLink#ReviewNavLink'],
+      views: {
+        reviewQueue: { Component: '@/review/ReviewQueue#ReviewQueue', path: '/review' },
+      },
+    },
     importMap: {
       baseDir: path.resolve(dirname),
     },
@@ -72,7 +79,8 @@ export default buildConfig({
   // Read-only menus for the WhatsApp bot (src/endpoints/wa.ts).
   endpoints: [waEndpoint],
   // Every collection with drafts gets History and rollback to a draft (src/history).
-  collections: applyHistory([
+  // Review workflow (src/review) on Pages, Posts and the content collections.
+  collections: applyReview(applyHistory([
     Pages,
     Posts,
     Media,
@@ -98,7 +106,7 @@ export default buildConfig({
     Rubrics,
     BenchmarkRuns,
     ContentEvents,
-  ]),
+  ])),
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer, SiteSettings, WhatsappLists, ContentStandards],
   plugins: [

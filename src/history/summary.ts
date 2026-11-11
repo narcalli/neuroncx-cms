@@ -22,6 +22,8 @@ const SKIP = new Set([
   'updatedBy',
   'rolledBackFrom',
   'breadcrumbs',
+  'reviewRequestedBy',
+  'reviewRequestedAt',
 ])
 
 const MAX_LINES = 8

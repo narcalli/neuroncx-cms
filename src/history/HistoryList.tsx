@@ -42,7 +42,7 @@ type Props = HistoryPage & {
 type Pending = { entry: HistoryEntry; check: RollbackCheck | null }
 
 /** The History tab's list, and its rollback confirmation (client side). */
-export const HistoryList: React.FC<Props> = ({ entries, page, hasMore, adminRoute, apiURL, collection, docID }) => {
+export const HistoryList: React.FC<Props> = ({ entries, page, hasMore, compareWithLive, adminRoute, apiURL, collection, docID }) => {
   const router = useRouter()
   const { openModal } = useModal()
   const [pending, setPending] = useState<Pending | null>(null)
@@ -116,6 +116,11 @@ export const HistoryList: React.FC<Props> = ({ entries, page, hasMore, adminRout
                 <Button buttonStyle="secondary" size="small" margin={false} el="link" url={`${editURL}/versions/${e.versionId}`}>
                   Compare
                 </Button>
+                {e.currentDraft && compareWithLive ? (
+                  <Button buttonStyle="secondary" size="small" margin={false} el="link" url={compareWithLive}>
+                    Compare with live
+                  </Button>
+                ) : null}
                 {e.previewUrl ? (
                   <Button buttonStyle="secondary" size="small" margin={false} el="anchor" url={e.previewUrl} newTab>
                     Preview

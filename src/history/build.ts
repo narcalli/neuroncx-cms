@@ -1,5 +1,7 @@
 import type { Block, PayloadRequest, SanitizedCollectionConfig } from 'payload'
 
+import { compareWithLivePath } from './compareLink'
+
 import { previewUrl } from '../utilities/generatePreviewPath'
 import { CONTENT_EVENTS } from './ContentEvents'
 import { summariseChange } from './summary'
@@ -28,7 +30,13 @@ export type HistoryEntry = {
   previewUrl: string | null
 }
 
-export type HistoryPage = { entries: HistoryEntry[]; page: number; hasMore: boolean }
+export type HistoryPage = {
+  entries: HistoryEntry[]
+  page: number
+  hasMore: boolean
+  /** Payload's comparison of the newest version against the live one, when both exist and differ. */
+  compareWithLive: string | null
+}
 
 type Version = {
   id: string
@@ -248,7 +256,8 @@ export const buildHistory = async ({
   }
   entries.sort((a, b) => Date.parse(b.at) - Date.parse(a.at))
 
-  return { entries, page, hasMore }
+  const compareWithLive = page === 1 ? await compareWithLivePath(req, slug, id) : null
+  return { entries, page, hasMore, compareWithLive }
 }
 
 /** The entry's own preview link (the Preview button's), for collections that have one. */

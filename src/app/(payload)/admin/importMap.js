@@ -29,6 +29,7 @@ import { MetaDescriptionComponent as MetaDescriptionComponent_a8a977ebc872c5d5ea
 import { PreviewComponent as PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { SearchCheck as SearchCheck_bca3d97f1d142cce44bda3c9062cf2ae } from '@/fields/SearchCheckPanel'
 import { SlugField as SlugField_2b8867833a34864a02ddf429b0728a40 } from '@payloadcms/next/client'
+import { ReviewPublishButton as ReviewPublishButton_5e723844f626c379476c66afb476e441 } from '@/review/ReviewPublishButton'
 import { HistoryView as HistoryView_622183fb16145707d7eaefe89562e38c } from '@/history/HistoryView'
 import { HorizontalRuleFeatureClient as HorizontalRuleFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { BlocksFeatureClient as BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
@@ -47,7 +48,9 @@ import { FillKeyPoints as FillKeyPoints_429d4a4d03d610ec6cdfceba54f73123 } from 
 import { FolderTypeField as FolderTypeField_2b8867833a34864a02ddf429b0728a40 } from '@payloadcms/next/client'
 import { RowLabel as RowLabel_ec255a65fa6fa8d1faeb09cf35284224 } from '@/Header/RowLabel'
 import { LayoutRowLabel as LayoutRowLabel_bdd915eadcfa0d1f03b46a11a9fbeafa } from '@/fields/LayoutField/RowLabel'
+import { ReviewNavLink as ReviewNavLink_c3c54aa77263073fd9c13a24d3b8559a } from '@/review/ReviewNavLink'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
+import { ReviewQueue as ReviewQueue_e9ea6e776ca1a8c8645e81fa89963a2f } from '@/review/ReviewQueue'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 /** @type import('payload').ImportMap */
@@ -83,6 +86,7 @@ export const importMap = {
   "@payloadcms/plugin-seo/client#PreviewComponent": PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@/fields/SearchCheckPanel#SearchCheck": SearchCheck_bca3d97f1d142cce44bda3c9062cf2ae,
   "@payloadcms/next/client#SlugField": SlugField_2b8867833a34864a02ddf429b0728a40,
+  "@/review/ReviewPublishButton#ReviewPublishButton": ReviewPublishButton_5e723844f626c379476c66afb476e441,
   "@/history/HistoryView#HistoryView": HistoryView_622183fb16145707d7eaefe89562e38c,
   "@payloadcms/richtext-lexical/client#HorizontalRuleFeatureClient": HorizontalRuleFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#BlocksFeatureClient": BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
@@ -101,6 +105,8 @@ export const importMap = {
   "@payloadcms/next/client#FolderTypeField": FolderTypeField_2b8867833a34864a02ddf429b0728a40,
   "@/Header/RowLabel#RowLabel": RowLabel_ec255a65fa6fa8d1faeb09cf35284224,
   "@/fields/LayoutField/RowLabel#LayoutRowLabel": LayoutRowLabel_bdd915eadcfa0d1f03b46a11a9fbeafa,
+  "@/review/ReviewNavLink#ReviewNavLink": ReviewNavLink_c3c54aa77263073fd9c13a24d3b8559a,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
+  "@/review/ReviewQueue#ReviewQueue": ReviewQueue_e9ea6e776ca1a8c8645e81fa89963a2f,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }
