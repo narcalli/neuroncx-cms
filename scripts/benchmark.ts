@@ -1,245 +1,307 @@
 /**
- * Throwaway: lays out published entries for scoring the rubric by hand
- * (11 Nov 2026). Calls no LLM and records no benchmark runs.
+ * Scores content against the frozen rubric (scripts/seed-rubric-v3.ts) and
+ * records benchmark runs for the publish gate (src/lifecycle/benchmarkGate.ts).
+ * Mechanical checks are decided in code (scripts/benchmark/mechanical.ts), the
+ * judgement checks by Claude (scripts/benchmark/judge.ts, needs
+ * ANTHROPIC_API_KEY). Runs count only once the scorer matches the hand scores
+ * (scripts/benchmark/handScores.ts) within 5 points on every entry.
  *
- * Reads the published entries of sectors, industryTopics and microApps from the
- * live CMS's public API (what visitors get), flattens each with serializeEntry
- * (src/rag/content.ts, built on src/rag/serialize.ts) and shows every section as
- * the NCX post it becomes (composePostContent, title line included): exactly
- * what the knowledge base receives. Also shows the page body the knowledge base
- * does not receive, the fields the flattener leaves out (card, hero, images,
- * SEO, knowledge base, links), some counts to save scoring by eye, and the
- * rubric v3 checks to work through. Writes one file per entry to calibration/,
- * ignored through .git/info/exclude, plus calibration/_reference.md with the
- * catalogue, customers and the Content standards lists.
+ * Usage (from neuroncx-cms), with NODE_OPTIONS="--no-deprecation --import=tsx/esm":
  *
- * Usage (from neuroncx-cms):
- *   NODE_OPTIONS="--no-deprecation --import=tsx/esm" node --env-file=.env scripts/calibrate-rubric.ts [--from <cms url>]
+ *   node --env-file=.env scripts/benchmark.ts accuracy [--mechanical-only] [--from <cms url>]
+ *     Scores the ten hand-scored entries as published on the live CMS and compares.
+ *     Writes calibration/accuracy.json; a full pass is what lets runs be written.
+ *     --mechanical-only skips Claude and compares only the checks code decides.
  *
- * Needs the local database only to load Payload, resolve related names and
- * read Content standards (ids match, as the local database is a copy of
- * production). Writes nothing to any database.
+ *   node --env-file=.env scripts/benchmark.ts score --collection <slug> [--slug <entry>] [--write --as <email>] [--remote]
+ *     Scores the latest saved version of each entry in the database. With --write,
+ *     records a benchmark run per entry as that user. Refuses to write unless the
+ *     last accuracy check passed for this exact scorer and the Active rubric is v3.
+ *     Runs only against a database on this machine unless --remote is given.
+ *
+ *   node --env-file=.env scripts/benchmark.ts layout [--from <cms url>]
+ *     Writes one file per published entry to calibration/ (ignored through
+ *     .git/info/exclude) to score by hand, as the calibrations were.
  */
 import fs from 'fs'
 import path from 'path'
-import { getPayload, type Block } from 'payload'
+import { getPayload, type Payload } from 'payload'
 
 import config from '../src/payload.config'
-import { getContentCollection } from '../src/content/registry'
-import { LIFECYCLE_SLUGS } from '../src/lifecycle/scope'
-import { contentRagSource, serializeEntry } from '../src/rag/content'
-import { projectDoc } from '../src/rag/serialize'
-import { composePostContent } from '../src/rag/sync'
+import { LIFECYCLE_SLUGS, type LifecycleCollection } from '../src/lifecycle/scope'
+import { scoreResults, type ResultState } from '../src/lifecycle/score'
+import { buildEntry, sectionsOf, str, type Doc, type Entry, type Refs } from './benchmark/entry'
+import { HAND_SCORES_V3 } from './benchmark/handScores'
+import { judge, fingerprintOf, MODEL } from './benchmark/judge'
+import { decide, decideOrganisations, decideProductNames, type Verdict } from './benchmark/mechanical'
 import { RUBRIC_V3 } from './seed-rubric-v3'
 
-type Doc = Record<string, unknown>
-
 const say = (s = '') => fs.writeSync(1, s + '\n')
-const arg = (flag: string) => {
-  const i = process.argv.indexOf(flag)
-  return i === -1 ? undefined : process.argv[i + 1]
+const args = process.argv.slice(2)
+const command = args[0]
+const flag = (name: string) => args.includes(name)
+const option = (name: string) => {
+  const i = args.indexOf(name)
+  return i === -1 ? undefined : args[i + 1]
 }
-const FROM = (arg('--from') || 'https://main.duebzy83yxxuo.amplifyapp.com').replace(/\/$/, '')
+const FROM = (option('--from') || 'https://main.duebzy83yxxuo.amplifyapp.com').replace(/\/$/, '')
 const OUT = path.resolve('calibration')
+const ACCURACY_FILE = path.join(OUT, 'accuracy.json')
+const TOLERANCE = 5
+/** Bump when a mechanical check changes, so an old accuracy pass no longer counts. */
+const MECHANICAL_VERSION = 1
+const FINGERPRINT = fingerprintOf(
+  RUBRIC_V3.map(({ itemId, criterion, passCondition }) => ({ itemId, criterion, passCondition })),
+  MECHANICAL_VERSION,
+)
 
-const get = async (url: string): Promise<Doc[]> => {
+export type Scored = Record<string, { state: ResultState | 'unknown'; note: string; by: 'code' | 'claude' | 'nobody' }>
+
+/** One entry against rubric v3: code first, Claude for the rest (unless mechanicalOnly). */
+export const scoreEntry = async (e: Entry, refs: Refs, mechanicalOnly: boolean): Promise<Scored> => {
+  const severity = (id: string) => RUBRIC_V3.find((i) => i.itemId === id)!.severityIfFailed
+  const stateOf = (id: string, v: Verdict): ResultState => (v === 'pass' ? 'pass' : v === 'na' ? 'na' : severity(id))
+  const scored: Scored = {}
+  const toJudge: string[] = []
+  const hints: Record<string, string | undefined> = {}
+  for (const item of RUBRIC_V3) {
+    const d = decide(item.itemId, e, refs)
+    if ('verdict' in d) scored[item.itemId] = { state: stateOf(item.itemId, d.verdict), note: d.note, by: 'code' }
+    else {
+      toJudge.push(item.itemId)
+      hints[item.itemId] = d.hint
+    }
+  }
+  // These two are decided by code from the names Claude finds, never by Claude alone.
+  const byNames = ['hr-no-client-names', 'ex-product-claims-exist']
+  const askClaude = toJudge.filter((id) => !byNames.includes(id))
+  if (mechanicalOnly) {
+    for (const id of toJudge) scored[id] = { state: 'unknown', note: 'Needs Claude.', by: 'nobody' }
+    return scored
+  }
+  const result = await judge(
+    e,
+    refs,
+    RUBRIC_V3.filter((i) => askClaude.includes(i.itemId)),
+    hints,
+  )
+  for (const id of askClaude) scored[id] = { state: stateOf(id, result.checks[id].verdict), note: result.checks[id].reason, by: 'claude' }
+  const orgs = decideOrganisations(result.organisations, e, refs)
+  scored['hr-no-client-names'] = { state: stateOf('hr-no-client-names', orgs.verdict), note: orgs.note, by: 'claude' }
+  const names = decideProductNames(result.neuronCxNames, e, refs)
+  scored['ex-product-claims-exist'] = { state: stateOf('ex-product-claims-exist', names.verdict), note: names.note, by: 'claude' }
+  return scored
+}
+
+const scoreOf = (scored: Scored) => scoreResults(Object.values(scored).filter((s) => s.state !== 'unknown').map((s) => ({ state: s.state as ResultState })))
+
+// ---------------------------------------------------------------- sources
+
+const nameOf = (d: Doc) => str(d.name) || str(d.title) || str(d.slug)
+
+const fetchDocs = async (url: string): Promise<Doc[]> => {
   for (let attempt = 1; ; attempt++) {
     try {
       const res = await fetch(url)
       if (!res.ok) throw new Error(`${res.status} ${url}`)
       return ((await res.json()) as { docs: Doc[] }).docs
-    } catch (e) {
-      if (attempt === 4) throw e
+    } catch (err) {
+      if (attempt === 4) throw err
       await new Promise((r) => setTimeout(r, 2000))
     }
   }
 }
-const published = (collection: string, depth = 1) =>
-  get(`${FROM}/api/${collection}?depth=${depth}&limit=200&where[_status][equals]=published`)
+const livePublished = (collection: string, depth = 1) =>
+  fetchDocs(`${FROM}/api/${collection}?depth=${depth}&limit=200&where[_status][equals]=published`)
 
-const str = (v: unknown) => (typeof v === 'string' ? v : '')
-const nameOf = (d: Doc) => str(d.name) || str(d.title) || str(d.slug)
-const asDoc = (v: unknown): Doc | null => (v && typeof v === 'object' && !Array.isArray(v) ? (v as Doc) : null)
-const rows = (v: unknown): Doc[] => (Array.isArray(v) ? v.map(asDoc).filter((d): d is Doc => d !== null) : [])
-
-// Every value in a document, with its path: for images, links and characters
-// the flattener does not keep.
-const walk = (v: unknown, at: string, visit: (value: unknown, at: string) => void) => {
-  visit(v, at)
-  if (Array.isArray(v)) v.forEach((x, i) => walk(x, `${at}[${i}]`, visit))
-  else if (v && typeof v === 'object') for (const [k, x] of Object.entries(v)) walk(x, at ? `${at}.${k}` : k, visit)
+const refsFrom = async (payload: Payload, published: (c: string) => Promise<Doc[]>): Promise<Refs> => {
+  const names = async (c: string) => (await published(c)).map(nameOf).filter(Boolean)
+  const standards = await payload.findGlobal({ slug: 'contentStandards', depth: 0, overrideAccess: true })
+  return {
+    catalogue: [...(await names('features')), ...(await names('microApps')), ...(await names('integrations')), ...(await names('crmFeatures'))],
+    integrations: await names('integrations'),
+    customers: await names('customers'),
+    thirdParties: (standards.allowedThirdParties ?? []).map((r) => r.name),
+    terms: (standards.terms ?? []).map((r) => r.term),
+  }
 }
 
-const imagesOf = (doc: Doc) => {
-  const found: string[] = []
-  walk(doc, '', (v, at) => {
-    const d = asDoc(v)
-    if (d && typeof d.mimeType === 'string' && d.mimeType.startsWith('image/')) {
-      found.push(`${at}: ${str(d.filename)} | alt: ${str(d.alt) ? `"${str(d.alt)}"` : '(none)'}`)
+// ---------------------------------------------------------------- accuracy
+
+const accuracy = async (payload: Payload) => {
+  const mechanicalOnly = flag('--mechanical-only')
+  if (!mechanicalOnly && !process.env.ANTHROPIC_API_KEY) {
+    say('ANTHROPIC_API_KEY is not set. Run with --mechanical-only to check the code-decided checks alone.')
+    process.exit(1)
+  }
+  const refs = await refsFrom(payload, (c) => livePublished(c, 0))
+  const report: Record<string, unknown>[] = []
+  let allWithin = true
+  const disagreements: Record<string, number> = {}
+  for (const hand of HAND_SCORES_V3) {
+    const doc = (await livePublished(hand.collection)).find((d) => d.slug === hand.slug)
+    if (!doc) {
+      say(`${hand.collection}/${hand.slug}: not published any more; skipped.`)
+      allWithin = false
+      continue
     }
-    if (typeof v === 'string' && /Alt$/.test(at)) found.push(`${at}: "${v}"`)
-  })
-  return found
-}
-
-const linksOf = (doc: Doc) => {
-  const found: string[] = []
-  walk(doc, '', (v, at) => {
-    const d = asDoc(v)
-    if (!d) return
-    const ref = asDoc(d.reference)
-    if (ref) found.push(`${at}: ${str(d.label) || '(no label)'} -> ${str(ref.relationTo)}/${str(asDoc(ref.value)?.slug) || str(ref.value)}`)
-    else if (typeof d.url === 'string' && d.url && !d.mimeType) found.push(`${at}: ${str(d.label) || '(no label)'} -> ${d.url}`)
-    else if (typeof d.relationTo === 'string' && asDoc(d.value)?.slug) found.push(`${at}: related ${d.relationTo}/${str(asDoc(d.value)?.slug)}`)
-  })
-  // Relationship fields that hold entries directly (integrations, passesTo, ...).
-  for (const [k, v] of Object.entries(doc)) {
-    const related = rows(v).filter((r) => typeof r.slug === 'string' && !r.mimeType && !r.blockType)
-    if (related.length) found.push(`${k}: related ${related.map((r) => r.slug).join(', ')}`)
+    const entry = await buildEntry(payload, hand.collection, doc)
+    const scored = await scoreEntry(entry, refs, mechanicalOnly)
+    const handScore = scoreResults(Object.values(hand.states).map((state) => ({ state }))).score ?? 0
+    const differ = Object.entries(scored).filter(([id, s]) => s.state !== 'unknown' && s.state !== hand.states[id])
+    for (const [id] of differ) disagreements[id] = (disagreements[id] ?? 0) + 1
+    const decidedCount = Object.values(scored).filter((s) => s.state !== 'unknown').length
+    let line: string
+    if (mechanicalOnly) {
+      // Unknown checks counted as passes for the top of the range, failures for the bottom.
+      const states = Object.values(scored)
+      const applicable = states.filter((s) => s.state !== 'na').length
+      const passes = states.filter((s) => s.state === 'pass').length
+      const unknown = states.filter((s) => s.state === 'unknown').length
+      const low = Math.round((passes / applicable) * 1000) / 10
+      const high = Math.round(((passes + unknown) / applicable) * 1000) / 10
+      line = `${hand.collection}/${hand.slug}: hand ${handScore} | code decided ${decidedCount}/34, agrees on ${decidedCount - differ.length} | score could be ${low} to ${high}`
+      report.push({ collection: hand.collection, slug: hand.slug, hand: handScore, decided: decidedCount, agrees: decidedCount - differ.length, low, high, differ: differ.map(([id, s]) => ({ id, scorer: s.state, hand: hand.states[id], note: s.note })) })
+    } else {
+      const score = scoreOf(scored).score ?? 0
+      const within = Math.abs(score - handScore) <= TOLERANCE
+      allWithin &&= within
+      line = `${hand.collection}/${hand.slug}: hand ${handScore} | scorer ${score} | ${within ? 'within' : 'OUTSIDE'} ${TOLERANCE}`
+      report.push({ collection: hand.collection, slug: hand.slug, hand: handScore, scorer: score, within, differ: differ.map(([id, s]) => ({ id, scorer: s.state, hand: hand.states[id], note: s.note })) })
+    }
+    say(line)
+    for (const [id, s] of differ) say(`    ${id}: scorer ${s.state} (${s.by}), hand ${hand.states[id]}. ${s.note}`)
   }
-  return [...new Set(found)]
+  const passed = !mechanicalOnly && allWithin
+  say('')
+  say(Object.keys(disagreements).length ? `Disagreements by check: ${Object.entries(disagreements).map(([id, n]) => `${id} ${n}`).join(', ')}` : 'No disagreements.')
+  say(mechanicalOnly ? 'Mechanical only: this cannot pass the accuracy check, which needs the judgement checks too.' : passed ? `PASSED: every entry within ${TOLERANCE} points.` : `FAILED: not every entry is within ${TOLERANCE} points. Runs will not be written.`)
+  fs.mkdirSync(OUT, { recursive: true })
+  fs.writeFileSync(
+    ACCURACY_FILE,
+    JSON.stringify({ fingerprint: FINGERPRINT, model: MODEL, mode: mechanicalOnly ? 'mechanical-only' : 'full', passed, at: new Date().toISOString(), entries: report }, null, 1),
+  )
+  say(`Written to ${ACCURACY_FILE}`)
 }
 
-const sentencesOf = (text: string) =>
-  text
-    .split(/\n+/)
-    .flatMap((line) => line.split(/(?<=[.!?])\s+(?=[A-Z0-9"])/))
-    .map((s) => s.trim())
-    .filter((s) => s.split(/\s+/).length >= 3)
-const words = (s: string) => s.split(/\s+/).filter(Boolean).length
+// ---------------------------------------------------------------- score
 
-// Phrases the checks name, found mechanically so they are not missed by eye.
-const SCANS: [string, RegExp][] = [
-  ['ex-no-outside-references', /\b(as mentioned|above|below|earlier|previous section|as shown|on the left|on the right|the icon|the green|the highlighted)\b/gi],
-  ['hr-no-filler', /\b(leverag\w*|seamless\w*|robust\w*|unlock\w*|revolutioni[sz]\w*|fast-paced world|not just\b)/gi],
-  ['hr-dpdp-not-hipaa', /\b(HIPAA|DPDP\w*)\b/g],
-  ['hr-cloud-telephony', /\b(agentic telephony|cloud telephony)\b/gi],
-  ['hr-observation-not-criticism', /\b(outdated|broken|fail\w*|struggl\w*|chaos\w*|nightmare|stuck|still using|old-fashioned)\b/gi],
-  ['en-task-completes', /\b(set up|setup|configur\w*|integrat\w*)\b/gi],
-  ['bare-label headings', /^(Overview|Introduction|Benefits|Features|How it works|Why us|Details|More)$/gim],
-]
-
-type Section = { key: string; heading: string; body: string }
-
-const layout = (slug: string, doc: Doc, kbSections: Section[], pageSections: Section[], ref: string) => {
-  const sections = [...kbSections, ...pageSections]
-  const text = sections.map((s) => `${s.heading}\n${s.body}`).join('\n\n')
-  const allStrings: string[] = []
-  walk(doc, '', (v) => typeof v === 'string' && allStrings.push(v))
-  const raw = allStrings.join('\n')
-  const sentences = sentencesOf(text)
-  const longest = sentences.reduce((a, b) => (words(b) > words(a) ? b : a), '')
-  const avg = sentences.length ? sentences.reduce((n, s) => n + words(s), 0) / sentences.length : 0
-  const paragraphs = text.split(/\n+/).filter((p) => words(p) > 60)
-  const meta = asDoc(doc.meta) ?? {}
-  const numbers = sentences.filter((s) => /\d/.test(s))
-
-  const out: string[] = [
-    `# ${nameOf(doc)} (${slug}/${str(doc.slug)})`,
-    '',
-    `Own page: ${doc.hasOwnPage ? `yes, ${str(doc.path)}` : 'no'} | status: ${str(doc.status)} | updated ${str(doc.updatedAt).slice(0, 10)}`,
-    '',
-    '## Fields the flattener leaves out',
-    '',
-    `- Card: tagline "${str(doc.tagline)}" | summary "${str(doc.summary)}"`,
-    `- Hero: heading "${str(doc.heroHeading)}" | subheading "${str(doc.heroSubheading)}"`,
-    `- SEO: title "${str(meta.title)}" (${str(meta.title).length}) | description "${str(meta.description)}" (${str(meta.description).length}) | image ${meta.image ? 'set' : 'none'} | primary keyword "${str(meta.primaryKeyword)}" | noIndex ${String(meta.noIndex ?? false)}`,
-    `- Knowledge base: include ${String(doc.includeInKbase ?? true)} | answer "${str(doc.kbAnswer)}"`,
-    `- Facts (${rows(doc.kbFacts).length}): ${rows(doc.kbFacts).map((r) => `"${str(r.fact)}"`).join(' ') || '(none)'}`,
-    `- Questions (${rows(doc.kbQuestions).length}): ${rows(doc.kbQuestions).map((r) => `"${str(r.question)}"`).join(' ') || '(none)'}`,
-    `- FAQs: ${rows(doc.faqs).length}`,
-    '- Images:',
-    ...(imagesOf(doc).map((i) => `  - ${i}`).length ? imagesOf(doc).map((i) => `  - ${i}`) : ['  - (none)']),
-    '- Links and related entries:',
-    ...(linksOf(doc).length ? linksOf(doc).map((l) => `  - ${l}`) : ['  - (none)']),
-    '',
-    '## Counts (aids, not verdicts)',
-    '',
-    `- Sections ${sections.length} | words ${words(text)} | sentences ${sentences.length} | average ${avg.toFixed(1)} words`,
-    `- Longest sentence (${words(longest)} words): ${longest}`,
-    `- Paragraphs over 60 words: ${paragraphs.length}${paragraphs.map((p) => `\n  - (${words(p)}) ${p.slice(0, 120)}...`).join('')}`,
-    `- Em dashes in any field: ${(raw.match(/—/g) || []).length}`,
-    ...SCANS.map(([id, re]) => {
-      const hits = [...new Set((id === 'bare-label headings' ? sections.map((s) => s.heading).join('\n') : raw).match(re) || [])]
-      return `- ${id}: ${hits.length ? hits.join(', ') : '(none)'}`
-    }),
-    `- Sentences with a number (${numbers.length}):${numbers.map((s) => `\n  - ${s}`).join('')}`,
-    '',
-    `Reference lists (products, customers): ${ref}`,
-    '',
-    '## What NCX receives: one post per section (composePostContent), title line included',
-    '',
-    ...kbSections.flatMap((s) => [`### ${s.heading}  [${s.key}]`, '', s.body, '']),
-    ...(pageSections.length
-      ? [
-          '## Page body (layout, through projectDoc): on the page but NOT sent to the knowledge base',
-          '',
-          ...pageSections.flatMap((s) => [`### ${s.heading}  [${s.key}]`, '', s.body, '']),
-        ]
-      : []),
-    '## Checklist (rubric v3)',
-    '',
-    ...RUBRIC_V3.flatMap((i) => [
-      `### ${i.itemId} (${i.dimension}, ${i.severityIfFailed})`,
-      `Criterion: ${i.criterion}`,
-      `Pass when: ${i.passCondition}`,
-      'Result:',
-      'Reason:',
-      '',
-    ]),
-  ]
-  return out.join('\n')
-}
-
-fs.mkdirSync(OUT, { recursive: true })
-const payload = await getPayload({ config })
-
-// What the product, customer and terms checks compare against.
-const refLines: string[] = ['# Reference lists (published, live)', '']
-// Content standards as this code reads it (its defaults until it is saved).
-const standards = await payload.findGlobal({ slug: 'contentStandards', depth: 0, overrideAccess: true })
-refLines.push(
-  '## Third parties that may be named (Content standards)',
-  '',
-  ...(standards.allowedThirdParties ?? []).map((r) => `- ${r.name}`),
-  '',
-  '## NeuronCx terms (Content standards)',
-  '',
-  ...(standards.terms ?? []).map((r) => `- ${r.term}${r.meaning ? `: ${r.meaning}` : ''}`),
-  '',
-)
-for (const c of ['features', 'microApps', 'integrations', 'crmFeatures', 'customers']) {
-  const docs = await published(c, 0)
-  refLines.push(`## ${c} (${docs.length})`, '', ...docs.map((d) => `- ${nameOf(d)}${d.slug ? ` (${str(d.slug)})` : ''}`), '')
-}
-const refFile = path.join(OUT, '_reference.md')
-fs.writeFileSync(refFile, refLines.join('\n'))
-
-let n = 0
-for (const slug of LIFECYCLE_SLUGS) {
-  const entry = getContentCollection(slug)
-  if (!entry) throw new Error(`No content collection ${slug}`)
-  const docs = await published(slug)
-  say(`${slug}: ${docs.length} published`)
-  for (const doc of docs) {
-    const sections = await serializeEntry(payload, entry, doc)
-    // Each section as the NCX post it becomes, which is what the rubric scores.
-    const source = contentRagSource(slug)
-    if (!source) throw new Error(`${slug} is not a knowledge base source`)
-    const posts = sections.map((s) => {
-      const post = composePostContent(source.titleOf(doc), source.urlOf(doc), s)
-      return { key: s.key, heading: post.title, body: post.text }
+const score = async (payload: Payload) => {
+  const collection = option('--collection') as LifecycleCollection | undefined
+  if (!collection || !LIFECYCLE_SLUGS.includes(collection)) {
+    say(`Name a collection with --collection: ${LIFECYCLE_SLUGS.join(', ')}.`)
+    process.exit(1)
+  }
+  const write = flag('--write')
+  const local = /^mongodb:\/\/(127\.0\.0\.1|localhost)(:\d+)?\//.test(process.env.DATABASE_URL || '')
+  if (!local && !flag('--remote')) {
+    say('Refusing to run: this database is not on this machine. Add --remote to run it anyway.')
+    process.exit(1)
+  }
+  let asUser: Doc | undefined
+  let rubric: { id: string; version?: number | null } | undefined
+  if (write) {
+    const accuracyCheck = fs.existsSync(ACCURACY_FILE) ? (JSON.parse(fs.readFileSync(ACCURACY_FILE, 'utf8')) as { fingerprint?: string; passed?: boolean; mode?: string }) : null
+    if (!accuracyCheck?.passed || accuracyCheck.mode !== 'full' || accuracyCheck.fingerprint !== FINGERPRINT) {
+      say('Refusing to write runs: the scorer has not passed the accuracy check against the hand scores (run "accuracy" first).')
+      process.exit(1)
+    }
+    const email = option('--as')
+    const users = email ? await payload.find({ collection: 'users', where: { email: { equals: email } }, limit: 1, overrideAccess: true }) : null
+    asUser = users?.docs[0] as unknown as Doc | undefined
+    if (!asUser) {
+      say('Name the user the runs are recorded as with --as <email>.')
+      process.exit(1)
+    }
+    const active = await payload.find({
+      collection: 'rubrics',
+      where: { and: [{ status: { equals: 'active' } }, { _status: { equals: 'published' } }] },
+      draft: false,
+      limit: 1,
+      overrideAccess: true,
     })
-    // Everything on the page, then only what serializeEntry left out (the
-    // layout blocks, which the knowledge base never receives).
-    const fields = payload.collections[slug].config.fields
-    const blocks = payload.blocks as unknown as Record<string, Block | undefined>
-    const sent = new Set(sections.map((s) => s.key))
-    const page = projectDoc(fields, doc, { getBlock: (b) => blocks[b] }).filter((s) => !sent.has(s.key))
-    const file = path.join(OUT, `${String(++n).padStart(2, '0')}-${slug}-${str(doc.slug)}.md`)
-    fs.writeFileSync(file, layout(slug, doc, posts, page, refFile))
-    say(`  ${path.basename(file)}: ${sections.length} knowledge base sections, ${page.length} page sections`)
+    const r = active.docs[0]
+    const same = r && JSON.stringify((r.items ?? []).map((i) => [i.itemId, i.passCondition])) === JSON.stringify(RUBRIC_V3.map((i) => [i.itemId, i.passCondition]))
+    if (!r || !same) {
+      say('Refusing to write runs: the Active rubric is not the frozen v3 the scorer was checked against.')
+      process.exit(1)
+    }
+    rubric = { id: r.id, version: r.version }
+  }
+  const visitor = async (c: string) =>
+    (await payload.find({ collection: c as LifecycleCollection, where: { _status: { equals: 'published' } }, draft: false, depth: 0, pagination: false, overrideAccess: false })).docs as unknown as Doc[]
+  const refs = await refsFrom(payload, visitor)
+  const slug = option('--slug')
+  const entries = await payload.find({
+    collection,
+    where: slug ? { slug: { equals: slug } } : {},
+    draft: true,
+    depth: 0,
+    pagination: false,
+    overrideAccess: true,
+  })
+  for (const doc of entries.docs) {
+    const latest = await payload.findVersions({ collection, where: { parent: { equals: doc.id } }, sort: '-updatedAt', limit: 1, depth: 1, overrideAccess: true })
+    const version = latest.docs[0]
+    if (!version) continue
+    const entry = await buildEntry(payload, collection, version.version as unknown as Doc)
+    const scored = await scoreEntry(entry, refs, false)
+    const { score: s, blockerCount } = scoreOf(scored)
+    say(`${collection}/${entry.slug}: ${s} (${blockerCount} blockers), version ${version.id}`)
+    for (const [id, r] of Object.entries(scored)) if (r.state !== 'pass' && r.state !== 'na') say(`    ${id}: ${r.state}. ${r.note}`)
+    if (write && asUser && rubric) {
+      const run = await payload.create({
+        collection: 'benchmarkRuns',
+        data: {
+          document: { relationTo: collection, value: String(doc.id) },
+          versionId: String(version.id),
+          rubric: rubric.id,
+          rubricVersion: String(rubric.version),
+          runAt: new Date().toISOString(),
+          results: Object.entries(scored).map(([itemId, r]) => ({ itemId, state: r.state as ResultState, note: r.note.slice(0, 500) })),
+        },
+        user: { ...asUser, collection: 'users', _strategy: 'local-jwt' },
+        overrideAccess: false,
+        context: { disableRevalidate: true },
+      })
+      say(`    recorded run ${run.id}`)
+    }
   }
 }
-say(`${n} files in ${OUT}`)
-process.exit(0)
+
+// ---------------------------------------------------------------- layout
+
+const layout = async (payload: Payload) => {
+  fs.mkdirSync(OUT, { recursive: true })
+  let n = 0
+  for (const collection of LIFECYCLE_SLUGS) {
+    for (const doc of await livePublished(collection)) {
+      const e = await buildEntry(payload, collection, doc)
+      const lines = [
+        `# ${e.name} (${collection}/${e.slug})`,
+        '',
+        `Own page: ${e.ownPage ? 'yes' : 'no'} | images: ${e.images.map((i) => `${i.at} "${i.alt}"`).join('; ') || 'none'} | links: ${e.links.join('; ') || 'none'}`,
+        '',
+        ...sectionsOf(e).flatMap((s) => [`## ${s.heading}  [${s.key}]`, '', s.body, '']),
+        '# Checklist (rubric v3)',
+        '',
+        ...RUBRIC_V3.flatMap((i) => [`## ${i.itemId} (${i.dimension}, ${i.severityIfFailed})`, `Pass when: ${i.passCondition}`, 'Result:', 'Reason:', '']),
+      ]
+      const file = path.join(OUT, `${String(++n).padStart(2, '0')}-${collection}-${e.slug}.md`)
+      fs.writeFileSync(file, lines.join('\n'))
+      say(path.basename(file))
+    }
+  }
+}
+
+if (process.argv[1]?.endsWith('benchmark.ts')) {
+  const commands: Record<string, (p: Payload) => Promise<void>> = { accuracy, score, layout }
+  const run = commands[command ?? '']
+  if (!run) {
+    say('Commands: accuracy, score, layout. See the header of scripts/benchmark.ts.')
+    process.exit(1)
+  }
+  const payload = await getPayload({ config })
+  await run(payload)
+  process.exit(0)
+}
