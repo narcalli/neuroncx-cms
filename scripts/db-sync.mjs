@@ -10,6 +10,10 @@
 // this machine, and refuses to run otherwise.
 //
 // There is deliberately no push. Content goes from production to local, never back.
+//
+// Neither command copies enquiries or the enquiry read log (personal data): so
+// db:backup is not a complete backup of production. Production's own backups
+// (Atlas) are the backup for those.
 
 import fs from 'node:fs'
 import path from 'node:path'
@@ -85,10 +89,15 @@ function run(name, args, redact) {
   })
 }
 
+// Enquiries hold personal data from healthcare clients' leads (names, emails,
+// phone numbers), so they never leave production: the production dump, and so
+// the local copy restored from it, has no enquiries and no enquiry read log.
+const NOT_COPIED = ['enquiries', 'enquiryreads']
+
 // Dumps one database and returns { collection: documentCount } as mongodump reported it.
-async function dump(uri, db, dir) {
+async function dump(uri, db, dir, { exclude = [] } = {}) {
   const redact = redactor(uri)
-  const { code, out } = await run('mongodump', ['--uri', uri, `--out=${dir}`], redact)
+  const { code, out } = await run('mongodump', ['--uri', uri, ...exclude.map((c) => `--excludeCollection=${c}`), `--out=${dir}`], redact)
   if (code !== 0) fail(`mongodump failed:\n${out.trim().split('\n').slice(-12).join('\n')}`)
   const counts = {}
   // Tools 100.19 wraps the namespace in backticks; older versions do not.
@@ -122,7 +131,7 @@ async function main() {
 
   if (mode === 'backup') {
     log(`Backing up production (${prod.hosts}, database ${prod.db}). Read only.`)
-    const counts = await dump(prodUri, prod.db, prodDir)
+    const counts = await dump(prodUri, prod.db, prodDir, { exclude: NOT_COPIED })
     if (!Object.keys(counts).length) fail(`Production database "${prod.db}" came back empty. Check the database name in PROD_DATABASE_URL.`)
     table(Object.entries(counts).sort().map(([c, n]) => [c, n]))
     log(`\nSaved to ${path.relative(ROOT, prodDir)}`)
@@ -145,7 +154,7 @@ async function main() {
   // 2. Production, read only. An empty dump almost always means a wrong database
   //    name, and restoring it would leave local empty, so it stops here.
   log(`2/3 Dumping production (${prod.hosts}, database ${prod.db}). Read only.`)
-  const counts = await dump(prodUri, prod.db, prodDir)
+  const counts = await dump(prodUri, prod.db, prodDir, { exclude: NOT_COPIED })
   if (!Object.keys(counts).length) fail(`Production database "${prod.db}" came back empty, so local was left untouched. Check the database name in PROD_DATABASE_URL.`)
 
   // 3. Empty local first, so collections that only exist locally do not survive.
