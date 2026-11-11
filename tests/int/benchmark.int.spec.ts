@@ -10,7 +10,7 @@ import { gateFor } from '@/lifecycle/gate'
 import { scoreResults, type ResultState } from '@/lifecycle/score'
 import { verdictFor } from '@/lifecycle/verdict'
 import type { Rubric, User } from '@/payload-types'
-import { RUBRIC_V2 } from '../../scripts/seed-rubric-v2'
+import { RUBRIC_V3 } from '../../scripts/seed-rubric-v3'
 
 /**
  * Rubrics, benchmark runs and content standards (stage 2 of the content
@@ -69,13 +69,13 @@ describe('the verdict', () => {
   })
 })
 
-describe('rubric v2', () => {
+describe('rubric v3', () => {
   it('has 34 checks with permanent, unique IDs and five blockers', () => {
-    const ids = RUBRIC_V2.map((i) => i.itemId)
+    const ids = RUBRIC_V3.map((i) => i.itemId)
     expect(ids).toHaveLength(34)
     expect(new Set(ids).size).toBe(34)
     for (const id of ids) expect(id).toMatch(/^(ex|en|hr|seo)-[a-z0-9-]+$/)
-    expect(RUBRIC_V2.filter((i) => i.severityIfFailed === 'blocker').map((i) => i.itemId)).toEqual([
+    expect(RUBRIC_V3.filter((i) => i.severityIfFailed === 'blocker').map((i) => i.itemId)).toEqual([
       'ex-product-claims-exist',
       'hr-no-client-names',
       'hr-no-patient-data',
@@ -85,7 +85,7 @@ describe('rubric v2', () => {
   })
 
   it('files house rules and SEO under their own dimensions', () => {
-    for (const i of RUBRIC_V2) {
+    for (const i of RUBRIC_V3) {
       const expected = i.itemId.startsWith('hr-') ? 'houseRules' : i.itemId.startsWith('seo-') ? 'discoverability' : null
       if (expected) expect(i.dimension, i.itemId).toBe(expected)
       else expect(['extractability', 'engagement'], i.itemId).toContain(i.dimension)
@@ -93,14 +93,22 @@ describe('rubric v2', () => {
   })
 
   it('states every pass condition without vague words or em dashes', () => {
-    for (const i of RUBRIC_V2) {
+    for (const i of RUBRIC_V3) {
       expect(i.passCondition, i.itemId).not.toMatch(/\b(good|clear|strong|appropriate)\b/i)
       expect(`${i.criterion} ${i.passCondition}`, i.itemId).not.toContain('\u2014')
     }
   })
 
+  it('settles the four ambiguities from the second calibration', () => {
+    const condition = (id: string) => RUBRIC_V3.find((i) => i.itemId === id)!.passCondition
+    expect(condition('en-task-completes')).toMatch(/step label/)
+    expect(condition('en-task-completes')).toMatch(/Result is filled/)
+    expect(condition('ex-headings-name-subject')).toMatch(/Higher Education: Listing/)
+    expect(condition('ex-lists-for-enumerations')).toMatch(/however they are joined/)
+  })
+
   it('names the allowlist for client names, so anything not on it blocks', () => {
-    const check = RUBRIC_V2.find((i) => i.itemId === 'hr-no-client-names')!
+    const check = RUBRIC_V3.find((i) => i.itemId === 'hr-no-client-names')!
     expect(check.passCondition).toMatch(/third-party list in Content standards/)
     expect(check.passCondition).toMatch(/Any other organisation named is a blocker/)
   })
@@ -118,7 +126,9 @@ describe('the gate', () => {
   it('starts the third-party allowlist and the terms list, for the content owner to extend', () => {
     const named = (n: string) => ContentStandards.fields.find((f) => 'name' in f && f.name === n) as Field & { defaultValue: unknown }
     expect(named('allowedThirdParties').defaultValue).toEqual(expect.arrayContaining([{ name: 'Google Ads' }, { name: 'Meta' }, { name: 'JEE' }]))
-    expect(named('terms').defaultValue).toEqual(expect.arrayContaining([{ term: 'Bot swarm' }, { term: 'Context Engine' }]))
+    // Terms as they are written in content: Family, not Agent family.
+    expect(named('terms').defaultValue).toEqual(expect.arrayContaining([{ term: 'Bot swarm' }, { term: 'Family' }, { term: 'Context Engine' }]))
+    expect(named('terms').defaultValue).not.toContainEqual({ term: 'Agent family' })
   })
 
   it('refuses a name twice in a list, ignoring case', () => {
@@ -128,13 +138,13 @@ describe('the gate', () => {
     expect(check([{ name: 'Meta' }, { name: 'meta ' }], opts)).toBe('Each name can appear once, and "meta" appears more than once.')
   })
 
-  it('starts at 85, with 90 for the three knowledge base collections', () => {
+  it('starts at 85, with 75 for the three factory collections, as calibrated', () => {
     const [defaultGate, gates] = ContentStandards.fields as [Field & { defaultValue: unknown }, Field & { defaultValue: unknown }]
     expect(defaultGate.defaultValue).toBe(85)
     expect(gates.defaultValue).toEqual([
-      { collection: 'sectors', gate: 90 },
-      { collection: 'industryTopics', gate: 90 },
-      { collection: 'microApps', gate: 90 },
+      { collection: 'sectors', gate: 75 },
+      { collection: 'industryTopics', gate: 75 },
+      { collection: 'microApps', gate: 75 },
     ])
   })
 })
@@ -440,9 +450,9 @@ describe('with the local database', () => {
       if (standards.updatedAt) return // Saved on this machine: the defaults no longer apply.
       expect(standards.defaultGate).toBe(85)
       expect(standards.gates?.map(({ collection, gate }) => ({ collection, gate }))).toEqual([
-        { collection: 'sectors', gate: 90 },
-        { collection: 'industryTopics', gate: 90 },
-        { collection: 'microApps', gate: 90 },
+        { collection: 'sectors', gate: 75 },
+        { collection: 'industryTopics', gate: 75 },
+        { collection: 'microApps', gate: 75 },
       ])
     })
 

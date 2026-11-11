@@ -9,7 +9,7 @@
  * what the knowledge base receives. Also shows the page body the knowledge base
  * does not receive, the fields the flattener leaves out (card, hero, images,
  * SEO, knowledge base, links), some counts to save scoring by eye, and the
- * rubric v2 checks to work through. Writes one file per entry to calibration/,
+ * rubric v3 checks to work through. Writes one file per entry to calibration/,
  * ignored through .git/info/exclude, plus calibration/_reference.md with the
  * catalogue, customers and the Content standards lists.
  *
@@ -30,7 +30,7 @@ import { LIFECYCLE_SLUGS } from '../src/lifecycle/scope'
 import { contentRagSource, serializeEntry } from '../src/rag/content'
 import { projectDoc } from '../src/rag/serialize'
 import { composePostContent } from '../src/rag/sync'
-import { RUBRIC_V2 } from './seed-rubric-v2'
+import { RUBRIC_V3 } from './seed-rubric-v3'
 
 type Doc = Record<string, unknown>
 
@@ -177,9 +177,9 @@ const layout = (slug: string, doc: Doc, kbSections: Section[], pageSections: Sec
           ...pageSections.flatMap((s) => [`### ${s.heading}  [${s.key}]`, '', s.body, '']),
         ]
       : []),
-    '## Checklist (rubric v2)',
+    '## Checklist (rubric v3)',
     '',
-    ...RUBRIC_V2.flatMap((i) => [
+    ...RUBRIC_V3.flatMap((i) => [
       `### ${i.itemId} (${i.dimension}, ${i.severityIfFailed})`,
       `Criterion: ${i.criterion}`,
       `Pass when: ${i.passCondition}`,

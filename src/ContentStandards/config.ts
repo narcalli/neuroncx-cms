@@ -29,8 +29,9 @@ export const validateUniqueNames =
     return twice ? `Each name can appear once, and "${twice}" appears more than once.` : true
   }
 
-// Starting lists, for the content owner to extend. Terms are names already
-// used in published content; their meanings are left for the module owner.
+// Starting lists, for the content owner to extend. Terms are written as they
+// appear in content ("Family", not "Agent family"); their meanings are left for
+// the module owner.
 const THIRD_PARTIES = [
   'Google',
   'Google Ads',
@@ -51,7 +52,7 @@ const THIRD_PARTIES = [
   'NPCI',
   'UPI',
 ]
-const TERMS = ['Bot swarm', 'Agent family', 'Episode', 'Cart', 'Context Engine']
+const TERMS = ['Bot swarm', 'Family', 'Episode', 'Cart', 'Context Engine']
 
 /**
  * The benchmark score content must reach before it can be published, by
@@ -89,17 +90,18 @@ export const ContentStandards: GlobalConfig = {
       type: 'array',
       label: 'Gates by collection',
       labels: { singular: 'Gate', plural: 'Gates' },
-      // Higher than the default: these sync to the NCX knowledge base, where an
-      // extractability failure becomes a wrong bot answer.
+      // Set just below the best calibration score (80, on 11 Nov 2026), so the
+      // gate starts where content is and rises with it. The guideline's target
+      // for knowledge base content is 95.
       defaultValue: [
-        { collection: 'sectors', gate: 90 },
-        { collection: 'industryTopics', gate: 90 },
-        { collection: 'microApps', gate: 90 },
+        { collection: 'sectors', gate: 75 },
+        { collection: 'industryTopics', gate: 75 },
+        { collection: 'microApps', gate: 75 },
       ],
       validate: validateGates,
       admin: {
         description:
-          'Starting values, to be recalibrated after the first quarter of real benchmark runs. A collection without a row uses the default gate.',
+          'Starting values from calibration, to be recalibrated after the first quarter of real benchmark runs. Each gate rises in steps of 5 once 80 percent of the published entries in that collection clear the next step. A collection without a row uses the default gate.',
       },
       fields: [
         {

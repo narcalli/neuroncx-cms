@@ -1,10 +1,16 @@
 /**
- * Rubric v2 for the content lifecycle (11 Nov 2026): v1 after one calibration
+ * Rubric v3 for the content lifecycle (11 Nov 2026): v1 after two calibrations
  * on the ten published entries, drawn from the NeuronCx Content Lifecycle
  * Guideline v1.1 (docs/content-lifecycle-guideline.md): sections 6.4 (the two
  * dimensions), 5.2 (house rules, quoted as written) and 6.3 (severity:
- * blockers only for the cases it lists). v1 was never published, so this is
- * the first rubric in the CMS: its version there starts at 1.
+ * blockers only for the cases it lists). Neither v1 nor v2 was published, so
+ * this is the first rubric in the CMS: its version there starts at 1.
+ *
+ * FROZEN for this project (11 Nov 2026). v3 settles the four ambiguities the
+ * second calibration found. Any later change needs a reason that is not the
+ * scores being low: a check two people score differently, a check that cannot
+ * fail, or a change in the guideline. Record the reason with the change, and
+ * never edit the rubric to make a particular entry pass (guideline 6.9).
  *
  * Creates the rubric as a draft, so nobody is scored against it until it is
  * published from the admin. Publishing it as Active retires whichever rubric
@@ -30,7 +36,7 @@
  * switched off for content that never syncs to NCX.
  *
  * Usage (from neuroncx-cms):
- *   NODE_OPTIONS="--no-deprecation --import=tsx/esm" node --env-file=.env scripts/seed-rubric-v2.ts [--dry-run]
+ *   NODE_OPTIONS="--no-deprecation --import=tsx/esm" node --env-file=.env scripts/seed-rubric-v3.ts [--dry-run]
  *
  * --dry-run lists the items and writes nothing. Refuses to run if a rubric
  * with this name already exists. Runs only against a database on this
@@ -51,14 +57,14 @@ const NO_OWN_PAGE = 'Not applicable when the entry has no page of its own.'
 
 // Every item applies to all three collections in scope for now. Items about
 // the Knowledge base tab are the ones to narrow first (IDs ex-kb-).
-export const RUBRIC_V2: Item[] = [
+export const RUBRIC_V3: Item[] = [
   // AI extractability (guideline 6.4)
   {
     itemId: 'ex-headings-name-subject',
     dimension: 'extractability',
     criterion: 'Headings phrased as the questions readers ask.',
     passCondition:
-      'Every section heading names the subject of its section in words a reader would search for (the task, problem or feature by name), and none is a bare label: Overview, Introduction, Benefits, Features, How it works, Why us, Details, More.',
+      'Every section heading names the subject of its section in words a reader would search for (the task, problem or feature by name). None is a bare label (Overview, Introduction, Benefits, Features, How it works, Why us, Details, More), and none pairs the entry name with an admin or tab word (Listing, Card, Panel, Page, Detail, Platform sections, Interim), as in "Higher Education: Listing".',
     severityIfFailed: 'warning',
   },
   {
@@ -99,7 +105,7 @@ export const RUBRIC_V2: Item[] = [
     dimension: 'extractability',
     criterion: 'Lists and tables for enumerable facts rather than prose.',
     passCondition:
-      'No sentence lists four or more parallel items separated by commas, and no sentence of more than 25 words lists three. Card fields (tagline, summary, key points) are exempt.',
+      'No sentence lists four or more parallel items (things or actions), however they are joined (commas, and, or, then), and no sentence of more than 25 words lists three. Card fields (tagline, summary, key points) are exempt.',
     severityIfFailed: 'warning',
   },
   {
@@ -194,7 +200,7 @@ export const RUBRIC_V2: Item[] = [
     dimension: 'engagement',
     criterion: 'The task completes on the page, with no undocumented step.',
     passCondition:
-      'Every step of each process the entry describes is a full sentence that names who or what does it (the agent, the customer, the team), the process ends with its result stated (for an agent, Result is filled), and no step says set up, configure or integrate without saying how or linking to where.',
+      'Every step of each process the entry describes names who or what does it (the agent, the customer, the team), either in the sentence or through the step label it sits under: a row reading "Acts: Books the appointment" passes. The process ends with its result stated (for an agent, Result is filled), and no step says set up, configure or integrate without saying how or linking to where.',
     severityIfFailed: 'warning',
   },
   {
@@ -327,16 +333,16 @@ export const RUBRIC_V2: Item[] = [
 const say = (s = '') => fs.writeSync(1, s + '\n')
 const DRY = process.argv.includes('--dry-run')
 
-// Only when run directly: the calibration script imports RUBRIC_V2.
-if (process.argv[1]?.endsWith('seed-rubric-v2.ts')) {
+// Only when run directly: the calibration script imports RUBRIC_V3.
+if (process.argv[1]?.endsWith('seed-rubric-v3.ts')) {
   const local = /^mongodb:\/\/(127\.0\.0\.1|localhost)(:\d+)?\//.test(process.env.DATABASE_URL || '')
   if (!local && !process.argv.includes('--remote')) {
     say('Refusing to run: this database is not on this machine. Add --remote to run it anyway.')
     process.exit(1)
   }
-  const blockers = RUBRIC_V2.filter((i) => i.severityIfFailed === 'blocker').length
-  say(`${RUBRIC_V2.length} items, ${blockers} blockers${DRY ? '. Dry run: nothing is written' : ''}.`)
-  for (const i of RUBRIC_V2) say(`  ${i.itemId} (${i.dimension}, ${i.severityIfFailed})`)
+  const blockers = RUBRIC_V3.filter((i) => i.severityIfFailed === 'blocker').length
+  say(`${RUBRIC_V3.length} items, ${blockers} blockers${DRY ? '. Dry run: nothing is written' : ''}.`)
+  for (const i of RUBRIC_V3) say(`  ${i.itemId} (${i.dimension}, ${i.severityIfFailed})`)
   if (DRY) process.exit(0)
 
   const payload = await getPayload({ config })
@@ -351,7 +357,7 @@ if (process.argv[1]?.endsWith('seed-rubric-v2.ts')) {
     data: {
       name: NAME,
       status: 'active',
-      items: RUBRIC_V2.map((i) => ({ ...i, appliesTo: [...LIFECYCLE_SLUGS] })),
+      items: RUBRIC_V3.map((i) => ({ ...i, appliesTo: [...LIFECYCLE_SLUGS] })),
       _status: 'draft',
     },
   })

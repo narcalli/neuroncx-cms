@@ -1,3 +1,4 @@
+import type { Field } from 'payload'
 import { describe, expect, it, vi } from 'vitest'
 
 import { buildHubs } from '../../src/collections/Hubs'
@@ -210,7 +211,7 @@ describe('hub sections', () => {
 })
 
 describe('figures', () => {
-  const fields = [
+  const fields: Field[] = [
     {
       name: 'stats',
       type: 'array',
@@ -223,7 +224,7 @@ describe('figures', () => {
     },
     { name: 'order', type: 'number' },
     { name: 'note', type: 'text' },
-  ] as any
+  ]
 
   it('sends a value with its prefix and suffix, and no other number', () => {
     const [section] = projectDoc(

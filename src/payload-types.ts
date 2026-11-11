@@ -16482,7 +16482,7 @@ export interface ContentStandard {
    */
   defaultGate: number;
   /**
-   * Starting values, to be recalibrated after the first quarter of real benchmark runs. A collection without a row uses the default gate.
+   * Starting values from calibration, to be recalibrated after the first quarter of real benchmark runs. Each gate rises in steps of 5 once 80 percent of the published entries in that collection clear the next step. A collection without a row uses the default gate.
    */
   gates?:
     | {
