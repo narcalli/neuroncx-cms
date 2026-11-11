@@ -3,7 +3,7 @@ import type { PayloadRequest } from 'payload'
 import { compareWithLivePath } from '@/history/compareLink'
 import { checkBenchmark, isLifecycleCollection } from '@/lifecycle/benchmarkGate'
 
-import { REVIEW_SLUGS } from './scope'
+import { canPublish, inReviewScope, REVIEW_SLUGS } from './scope'
 
 type Doc = Record<string, unknown> & { id: string }
 export type ReviewRow = {
@@ -61,4 +61,65 @@ export const reviewQueue = async (req: PayloadRequest): Promise<ReviewRow[]> => 
     }
   }
   return rows.sort((a, b) => (a.at ?? '').localeCompare(b.at ?? ''))
+}
+
+export type PendingSchedule = {
+  key: string
+  type: 'publish' | 'unpublish'
+  collection: string
+  title: string
+  edit: string
+  at: string | null
+  by: string
+  role: string
+  inScope: boolean
+  /** Refused when it runs, once the review workflow is on: the person who scheduled it cannot publish. */
+  refusedWhenOn: boolean
+  /** No one is recorded: it runs with full access, whatever the workflow says. */
+  noUser: boolean
+}
+
+/**
+ * Scheduled publishes and unpublishes that have not run yet, soonest first,
+ * with who scheduled each. A schedule runs as that person, so an author's is
+ * refused when it runs while the review workflow is on.
+ */
+export const pendingSchedules = async (req: PayloadRequest): Promise<PendingSchedule[]> => {
+  const jobs = await req.payload.find({
+    collection: 'payload-jobs',
+    where: { and: [{ taskSlug: { equals: 'schedulePublish' } }, { completedAt: { exists: false } }] },
+    sort: 'waitUntil',
+    depth: 0,
+    pagination: false,
+    overrideAccess: true,
+    req,
+  })
+  const rows: PendingSchedule[] = []
+  for (const job of jobs.docs as unknown as { id: string; hasError?: boolean; waitUntil?: string; input?: Record<string, any> }[]) {
+    if (job.hasError) continue
+    const input = job.input ?? {}
+    const doc = input.doc as { relationTo?: string; value?: string } | undefined
+    if (!doc?.relationTo || !doc.value) continue
+    const entry = (await req.payload
+      .findByID({ collection: doc.relationTo as never, id: doc.value, draft: true, depth: 0, overrideAccess: true, req })
+      .catch(() => null)) as Doc | null
+    const user = input.user
+      ? ((await req.payload.findByID({ collection: 'users', id: input.user, depth: 0, overrideAccess: true, req }).catch(() => null)) as Doc | null)
+      : null
+    const inScope = inReviewScope(doc.relationTo)
+    rows.push({
+      key: String(job.id),
+      type: input.type === 'unpublish' ? 'unpublish' : 'publish',
+      collection: doc.relationTo,
+      title: entry ? String(entry.title || entry.name || entry.slug || entry.id) : `(deleted: ${doc.value})`,
+      edit: `${req.payload.config.routes.admin}/collections/${doc.relationTo}/${doc.value}`,
+      at: job.waitUntil ?? null,
+      by: user ? userName(user) : 'Nobody (runs with full access)',
+      role: user ? String(user.role ?? 'author') : '-',
+      inScope,
+      refusedWhenOn: inScope && Boolean(user) && !canPublish(user as never),
+      noUser: !user,
+    })
+  }
+  return rows
 }

@@ -5,7 +5,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vites
 import config from '@/payload.config'
 import { contentHash } from '@/lifecycle/contentHash'
 import { REVIEW_PUBLISH_MESSAGE, REVIEW_SLUGS } from '@/review/scope'
-import { reviewQueue } from '@/review/queue'
+import { pendingSchedules, reviewQueue } from '@/review/queue'
 import { REVIEW_UNPUBLISH_MESSAGE } from '@/review/unpublish'
 import { compareWithLivePath } from '@/history/compareLink'
 
@@ -173,6 +173,28 @@ describe('the review workflow', () => {
       expect(row?.compare).toContain('?versionFrom=')
       await save(page.id, { _status: 'published' }, owner, on, false)
       expect((await reviewQueue(await reqFor(payload, admin))).some((r) => r.key === `pages:${page.id}`)).toBe(false)
+    })
+  })
+
+  describe('pending schedules', () => {
+    it("lists schedules not run yet, flagging an author's as refused once the workflow is on", async () => {
+      const page = await newPage('scheduled', owner)
+      const schedule = (user?: Doc) =>
+        payload.jobs.queue({
+          task: 'schedulePublish',
+          input: { type: 'publish', doc: { relationTo: 'pages', value: page.id }, ...(user ? { user: user.id } : {}) } as never,
+          waitUntil: new Date(Date.now() + 86_400_000),
+        }) as Promise<Doc>
+      const jobs = [await schedule(author), await schedule(owner), await schedule()]
+      try {
+        const rows = (await pendingSchedules(await reqFor(payload, admin))).filter((r) => jobs.some((j) => String(j.id) === r.key))
+        const byKey = Object.fromEntries(rows.map((r) => [r.key, r]))
+        expect(byKey[String(jobs[0].id)]).toMatchObject({ title: 'ZZ RW scheduled', by: 'ZZ RW Author', role: 'author', refusedWhenOn: true, noUser: false })
+        expect(byKey[String(jobs[1].id)]).toMatchObject({ by: 'ZZ RW Owner', role: 'contentOwner', refusedWhenOn: false })
+        expect(byKey[String(jobs[2].id)]).toMatchObject({ noUser: true, refusedWhenOn: false })
+      } finally {
+        for (const j of jobs) await payload.delete({ collection: 'payload-jobs', id: j.id, overrideAccess: true })
+      }
     })
   })
 

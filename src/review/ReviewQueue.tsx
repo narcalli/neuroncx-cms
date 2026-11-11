@@ -3,7 +3,7 @@ import { Gutter } from '@payloadcms/ui'
 import type { AdminViewServerProps } from 'payload'
 import React from 'react'
 
-import { reviewQueue } from './queue'
+import { pendingSchedules, reviewQueue } from './queue'
 import { reviewWorkflowOn } from './scope'
 
 const when = new Intl.DateTimeFormat('en-IN', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Kolkata' })
@@ -13,7 +13,9 @@ export async function ReviewQueue({ initPageResult, params, searchParams }: Admi
   const { req, locale, permissions, visibleEntities } = initPageResult
   const { payload, i18n, user } = req
   const signedIn = Boolean(user)
-  const [rows, on] = signedIn ? await Promise.all([reviewQueue(req), reviewWorkflowOn(req)]) : [[], false]
+  const rows = signedIn ? await reviewQueue(req) : []
+  const schedules = signedIn ? await pendingSchedules(req) : []
+  const on = signedIn ? await reviewWorkflowOn(req) : false
   const cell: React.CSSProperties = { padding: '10px 12px', borderTop: '1px solid var(--theme-elevation-100)', verticalAlign: 'top' }
 
   return (
@@ -73,6 +75,55 @@ export async function ReviewQueue({ initPageResult, params, searchParams }: Admi
                           </>
                         ) : (
                           <div style={{ color: 'var(--theme-elevation-500)' }}>Not live yet</div>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+            <h2 style={{ margin: '32px 0 8px' }}>Scheduled publishes and unpublishes</h2>
+            <p style={{ color: 'var(--theme-elevation-600)', marginTop: 0 }}>
+              Not run yet, soonest first. A schedule runs as the person who made it, so one made by an author is refused when it runs while the review
+              workflow is on: an owner should cancel it and schedule it again, or publish it.
+            </p>
+            {schedules.length === 0 ? (
+              <p>Nothing is scheduled.</p>
+            ) : (
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+                <thead>
+                  <tr style={{ textAlign: 'left' }}>
+                    <th style={cell}>Entry</th>
+                    <th style={cell}>Runs</th>
+                    <th style={cell}>Scheduled by</th>
+                    <th style={cell}>With the workflow on</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {schedules.map((s) => (
+                    <tr key={s.key}>
+                      <td style={cell}>
+                        <a href={s.edit}>
+                          <strong>{s.title}</strong>
+                        </a>
+                        <div style={{ color: 'var(--theme-elevation-600)' }}>
+                          {s.type === 'publish' ? 'Publish' : 'Unpublish'} · {s.collection}
+                        </div>
+                      </td>
+                      <td style={cell}>{s.at ? when.format(new Date(s.at)) : 'As soon as jobs run'}</td>
+                      <td style={cell}>
+                        {s.by}
+                        <div style={{ color: 'var(--theme-elevation-600)' }}>{s.role}</div>
+                      </td>
+                      <td style={cell}>
+                        {s.noUser ? (
+                          <strong>Runs with full access: check where it came from</strong>
+                        ) : s.refusedWhenOn ? (
+                          <strong>Will be refused</strong>
+                        ) : s.inScope ? (
+                          'Runs as scheduled'
+                        ) : (
+                          'Not covered by the workflow'
                         )}
                       </td>
                     </tr>
