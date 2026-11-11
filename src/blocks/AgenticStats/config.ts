@@ -1,9 +1,13 @@
 import type { Block } from 'payload'
 
+import { hidePendingFieldRowsFromVisitors } from '../../content/pending'
+
 /**
  * A row of headline numbers. Any number can be a count-up (animates from 0
- * to its value on view). Leave "Pending" ticked for a figure not yet
- * confirmed — it shows a shimmer placeholder and a "figure to confirm" tag.
+ * to its value on view). Tick "Pending" for a figure not yet confirmed: it is
+ * left out for visitors (src/content/pending.ts), so a band whose figures are
+ * all pending does not appear, and draft preview shows it with a "figure to
+ * confirm" tag.
  */
 export const AgenticStats: Block = {
   slug: 'agenticStats',
@@ -16,6 +20,7 @@ export const AgenticStats: Block = {
       name: 'stats',
       type: 'array',
       label: 'Stats',
+      hooks: { afterRead: [hidePendingFieldRowsFromVisitors] },
       minRows: 1,
       maxRows: 4,
       fields: [

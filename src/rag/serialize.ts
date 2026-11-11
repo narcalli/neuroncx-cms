@@ -110,6 +110,20 @@ const humanize = (s: string) =>
     .replace(/[-_]+/g, ' ')
     .replace(/^\w/, (c) => c.toUpperCase())
 
+/** Text fields that belong to a number: written onto it, not on their own. */
+const AFFIXES = new Set(['prefix', 'suffix'])
+
+/**
+ * "Checks: " for a field marked custom.kbLabel, so a row such as an agent's
+ * panel step keeps the label that gives it its meaning. The admin hint in
+ * brackets ("Customer sees (chat agents only)") is left out.
+ */
+const kbLabelOf = (field: { label?: unknown; custom?: { kbLabel?: unknown } }): string => {
+  if (field.custom?.kbLabel !== true) return ''
+  const label = labelText(field.label).replace(/\s*\([^)]*\)\s*$/, '').trim()
+  return label ? `${label}: ` : ''
+}
+
 const labelText = (label: unknown): string => {
   if (typeof label === 'string') return label
   if (label && typeof label === 'object') {
@@ -253,8 +267,19 @@ export const fieldText = (fields: Field[], data: any, ctx: Ctx): string[] => {
       case 'text':
       case 'textarea': {
         if (ctx.inLink && name === 'label') break
+        // A prefix or suffix written onto its number (the number case below).
+        if (AFFIXES.has(name) && typeof data.value === 'number') break
+        const label = kbLabelOf(field)
         const values = Array.isArray(value) ? value : [value]
-        for (const v of values) if (typeof v === 'string' && v.trim()) out.push(clean(v))
+        for (const v of values) if (typeof v === 'string' && v.trim()) out.push(`${label}${clean(v)}`)
+        break
+      }
+      case 'number': {
+        // Only a figure's value ("80" with its "%"), never settings such as
+        // order, spans or columns.
+        if (name !== 'value' || typeof value !== 'number') break
+        const affix = (key: string) => (typeof data[key] === 'string' ? data[key].trim() : '')
+        out.push(`${affix('prefix')}${value.toLocaleString('en-IN')}${affix('suffix')}`)
         break
       }
       case 'richText': {
@@ -285,7 +310,7 @@ export const fieldText = (fields: Field[], data: any, ctx: Ctx): string[] => {
         break
       }
       default:
-        // select, radio, number, date, checkbox, upload, relationship, join,
+        // select, radio, date, checkbox, upload, relationship, join,
         // json, code, point, ui: settings or references, not words to answer from
         break
     }

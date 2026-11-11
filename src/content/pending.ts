@@ -1,4 +1,4 @@
-import type { CollectionAfterReadHook } from 'payload'
+import type { CollectionAfterReadHook, FieldHook, PayloadRequest } from 'payload'
 
 /**
  * Rows marked Pending (a `pending` checkbox, such as an episode point or a
@@ -8,15 +8,25 @@ import type { CollectionAfterReadHook } from 'payload'
 
 const isPending = (row: unknown) => Boolean(row && typeof row === 'object' && (row as { pending?: unknown }).pending === true)
 
-/** The document without its pending rows, in every top-level array. */
-export const withoutPendingRows = <T>(doc: T): T => {
-  if (!doc || typeof doc !== 'object') return doc
-  const out: Record<string, unknown> = { ...(doc as Record<string, unknown>) }
-  for (const [key, value] of Object.entries(out)) {
-    if (Array.isArray(value) && value.some(isPending)) out[key] = value.filter((row) => !isPending(row))
-  }
-  return out as T
+const isPlainObject = (v: unknown): v is Record<string, unknown> =>
+  Boolean(v) && typeof v === 'object' && Object.getPrototypeOf(v) === Object.prototype
+
+// Pending rows dropped from every array, however deep: a stat inside a layout
+// block (layout[].stats[]) as much as an episode point at the top level.
+const strip = (value: unknown): unknown => {
+  if (Array.isArray(value)) return value.filter((row) => !isPending(row)).map(strip)
+  if (!isPlainObject(value)) return value
+  const out: Record<string, unknown> = {}
+  for (const [key, v] of Object.entries(value)) out[key] = strip(v)
+  return out
 }
+
+/** The document without its pending rows, in every array at any depth. */
+export const withoutPendingRows = <T>(doc: T): T => strip(doc) as T
+
+// Who gets pending rows: signed-in readers (the website's draft preview) and
+// server code on the Local API, so a read and save never loses one.
+const seesPending = (req: PayloadRequest) => Boolean(req.user) || req.payloadAPI === 'local'
 
 /**
  * afterRead: visitors reading through the API (the website outside draft
@@ -25,4 +35,11 @@ export const withoutPendingRows = <T>(doc: T): T => {
  * all too, so a read and save never loses one.
  */
 export const hidePendingRowsFromVisitors: CollectionAfterReadHook = ({ doc, req }) =>
-  req.user || req.payloadAPI === 'local' ? doc : withoutPendingRows(doc)
+  seesPending(req) ? doc : withoutPendingRows(doc)
+
+/**
+ * The same, on one array field, for rows inside blocks: a block can sit in
+ * any collection's layout, and not every collection has the hook above.
+ */
+export const hidePendingFieldRowsFromVisitors: FieldHook = ({ value, req }) =>
+  seesPending(req) || !Array.isArray(value) ? value : withoutPendingRows(value)

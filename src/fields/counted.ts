@@ -10,6 +10,8 @@ type CountedOptions = {
   maxLength: number
   description?: string
   required?: boolean
+  /** Send the label with the text to the knowledge base ("Checks: ..."). */
+  kbLabel?: boolean
 }
 
 /**
@@ -25,9 +27,11 @@ export function countedText({
   description,
   required,
   textarea,
+  kbLabel,
 }: CountedOptions & { textarea?: boolean }): TextField | TextareaField {
   const admin = { description, components: { Description: COUNTER } }
+  const custom = kbLabel ? { custom: { kbLabel: true } } : {}
   return textarea
-    ? { name, label, type: 'textarea', maxLength, required, validate: plainText, admin }
-    : { name, label, type: 'text', maxLength, required, validate: plainText, admin }
+    ? { name, label, type: 'textarea', maxLength, required, validate: plainText, admin, ...custom }
+    : { name, label, type: 'text', maxLength, required, validate: plainText, admin, ...custom }
 }
