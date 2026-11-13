@@ -5,7 +5,7 @@ import { getPayload, type Payload } from 'payload'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import config from '@/payload.config'
-import { imageTypeOf, isSvg, KEY_UPLOAD_MESSAGE, UNSAFE_SVG_MESSAGE } from '@/collections/media/uploadChecks'
+import { imageTypeOf, isSvg, KEY_UPLOAD_MESSAGE, NO_URL_UPLOAD_MESSAGE, UNSAFE_SVG_MESSAGE } from '@/collections/media/uploadChecks'
 
 /**
  * Media uploads (src/collections/media/uploadChecks.ts): a key uploads images
@@ -78,6 +78,47 @@ describe('media uploads', () => {
     }
   })
 
+  it('refuses SVGs with a script that hide their root: a processing instruction, a long comment, a namespace prefix', async () => {
+    const hidden = [
+      `<?xml version="1.0"?><?xml-stylesheet href="a.css"?><svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)"/>`,
+      `<!--${'x'.repeat(5000)}--><svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>`,
+      `<svg:svg xmlns:svg="http://www.w3.org/2000/svg" onload="alert(1)"/>`,
+    ]
+    for (const body of hidden) {
+      await expect(upload(Buffer.from(body), 'zz-media-hidden.svg', 'image/svg+xml', as(author))).rejects.toMatchObject({
+        data: { errors: [expect.objectContaining({ message: UNSAFE_SVG_MESSAGE })] },
+      })
+    }
+  })
+
+  it('stores an SVG as exactly image/svg+xml, so it is served with scripts blocked', async () => {
+    const doc = await upload(Buffer.from(PLAIN_SVG), 'zz-media-typed.svg', 'image/svg+xml; charset=utf-8', as(author))
+    expect(doc.mimeType).toBe('image/svg+xml')
+  })
+
+  it('fetches nothing from a web address, and a change that keeps the file still saves', async () => {
+    const fromUrl = payload.create({
+      collection: 'media',
+      data: { alt: 'zz-media', url: 'https://example.com/zz-media.svg', filename: 'zz-media.svg' } as never,
+      user: as(author) as never,
+      overrideAccess: false,
+      context: { disableRevalidate: true },
+    })
+    await expect(fromUrl).rejects.toThrow(NO_URL_UPLOAD_MESSAGE)
+    const doc = await upload(PNG, 'zz-media-kept.png', 'image/png', as(author))
+    const elsewhere = payload.update({
+      collection: 'media',
+      id: doc.id,
+      data: { url: 'https://example.com/zz-media-other.svg', filename: 'zz-media-other.svg', focalX: 10 } as never,
+      user: as(author) as never,
+      overrideAccess: false,
+      context: { disableRevalidate: true },
+    })
+    await expect(elsewhere).rejects.toThrow(NO_URL_UPLOAD_MESSAGE)
+    const kept = await payload.update({ collection: 'media', id: doc.id, data: { alt: 'zz-media', url: doc.url } as never, user: as(author) as never, overrideAccess: false, context: { disableRevalidate: true } })
+    expect(kept.id).toBe(doc.id)
+  })
+
   it('takes a plain SVG with an XML declaration, from a person and from a key', async () => {
     expect((await upload(Buffer.from(PLAIN_SVG), 'zz-media-plain.svg', 'image/svg+xml', as(author))).id).toBeTruthy()
     expect((await upload(Buffer.from(PLAIN_SVG), 'zz-media-plain-key.svg', 'image/svg+xml', as(author, 'api-key'))).id).toBeTruthy()
@@ -95,5 +136,7 @@ describe('reading a file for its type', () => {
     expect(imageTypeOf(Buffer.from('%PDF-1.7'))).toBeNull()
     expect(isSvg(Buffer.from(PLAIN_SVG))).toBe(true)
     expect(isSvg(Buffer.from('<html><svg></svg></html>'))).toBe(false)
+    expect(isSvg(Buffer.from('<?xml version="1.0"?><?xml-stylesheet href="a.css"?><svg/>'))).toBe(true)
+    expect(isSvg(Buffer.from('<svg:svg xmlns:svg="http://www.w3.org/2000/svg"/>'))).toBe(true)
   })
 })

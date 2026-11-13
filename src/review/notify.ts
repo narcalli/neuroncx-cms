@@ -69,11 +69,18 @@ const reviewers = async (req: PayloadRequest): Promise<string[]> => {
   return [...new Set(users.docs.map((u) => String((u as { email?: string }).email || '')).filter(Boolean))]
 }
 
+/** One email per reviewer, so no reviewer sees the others' addresses. */
 export const notifyReviewers = async ({ req, collection, doc }: { req: PayloadRequest; collection: SanitizedCollectionConfig; doc: Doc }) => {
   const to = await reviewers(req)
+  if (!to.length) {
+    req.payload.logger.warn(`Review request for ${collection.slug} ${doc.id} saved, but no email was sent: no reviewers.`)
+    return { sent: false as const, reason: 'no recipients' }
+  }
   const email = await reviewEmail({ req, collection, doc })
-  const result = await sendSesEmail({ to, ...email })
-  if (result.sent) req.payload.logger.info(`Review request for ${collection.slug} ${doc.id} emailed to ${to.length} reviewer(s).`)
-  else req.payload.logger.warn(`Review request for ${collection.slug} ${doc.id} saved, but no email was sent: ${result.reason}.`)
-  return result
+  const results = await Promise.all(to.map((address) => sendSesEmail({ to: [address], ...email })))
+  const failed = results.flatMap((r) => (r.sent ? [] : [r.reason]))
+  const sent = results.length - failed.length
+  if (sent) req.payload.logger.info(`Review request for ${collection.slug} ${doc.id} emailed to ${sent} reviewer(s).`)
+  if (failed.length) req.payload.logger.warn(`Review request for ${collection.slug} ${doc.id}: ${failed.length} email(s) not sent: ${[...new Set(failed)].join('; ')}.`)
+  return sent ? ({ sent: true } as const) : ({ sent: false, reason: failed[0] } as const)
 }

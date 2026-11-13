@@ -109,8 +109,10 @@ const copy = async ({ always }) => {
     const db = target.db('neuroncx')
     const existing = await db.listCollections({}, { nameOnly: true }).toArray()
     if (existing.length && !always) return
+    // Checked before anything is dropped, so a bad .env leaves the copy as it was.
+    const fromUrl = sourceUrl()
     await db.dropDatabase()
-    const source = new MongoClient(sourceUrl())
+    const source = new MongoClient(fromUrl)
     await source.connect()
     try {
       const from = source.db()

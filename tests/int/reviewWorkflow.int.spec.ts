@@ -5,6 +5,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vites
 import config from '@/payload.config'
 import { contentHash } from '@/lifecycle/contentHash'
 import { REVIEW_PUBLISH_MESSAGE, REVIEW_SLUGS } from '@/review/scope'
+import { reviewFields } from '@/review/fields'
 import { pendingSchedules, reviewQueue } from '@/review/queue'
 import { REVIEW_UNPUBLISH_MESSAGE } from '@/review/unpublish'
 import { compareWithLivePath } from '@/history/compareLink'
@@ -117,22 +118,34 @@ describe('the review workflow', () => {
   })
 
   describe('Ready for review', () => {
-    it('records who asked and when, and emails every content owner and admin once', async () => {
+    it('records who asked and when, and emails every content owner and admin once, each on their own', async () => {
       const page = await newPage('ready', author)
       const ready = await save(page.id, { readyForReview: true, reviewNote: 'New hero copy, check the CTA.' }, author)
       expect(ready.reviewRequestedBy).toBe(author.id)
       expect(ready.reviewRequestedAt).toBeTruthy()
-      expect(sent).toHaveLength(1)
-      expect(sent[0].to).toEqual(expect.arrayContaining(['zz-rw-admin@example.test', 'zz-rw-owner@example.test']))
-      expect(sent[0].to).not.toContain('zz-rw-author@example.test')
-      expect(sent[0].subject).toBe('Ready for review: ZZ RW ready (Page)')
-      expect(sent[0].text).toContain('Marked by: ZZ RW Author, zz-rw-author@example.test')
-      expect(sent[0].text).toContain('Note: New hero copy, check the CTA.')
-      expect(sent[0].text).toContain('Benchmark: Not scored: the benchmark covers industries, topics and micro apps only.')
-      expect(sent[0].text).toContain('Compare with live: Not published yet')
+      const recipients = sent.flatMap((e) => e.to)
+      // One recipient per email, so no reviewer sees the others' addresses.
+      expect(sent.every((e) => e.to.length === 1)).toBe(true)
+      expect(new Set(recipients).size).toBe(recipients.length)
+      expect(recipients).toEqual(expect.arrayContaining(['zz-rw-admin@example.test', 'zz-rw-owner@example.test']))
+      expect(recipients).not.toContain('zz-rw-author@example.test')
+      const count = sent.length
+      const [email] = sent
+      expect(email.subject).toBe('Ready for review: ZZ RW ready (Page)')
+      expect(email.text).toContain('Marked by: ZZ RW Author, zz-rw-author@example.test')
+      expect(email.text).toContain('Note: New hero copy, check the CTA.')
+      expect(email.text).toContain('Benchmark: Not scored: the benchmark covers industries, topics and micro apps only.')
+      expect(email.text).toContain('Compare with live: Not published yet')
       // Saving again while ticked sends nothing more.
       await save(page.id, { title: 'ZZ RW ready, more edits' }, author)
-      expect(sent).toHaveLength(1)
+      expect(sent).toHaveLength(count)
+    })
+
+    it('shows the note above the box, always, so it is written before the email goes', () => {
+      const names = reviewFields().map((f) => ('name' in f ? f.name : ''))
+      expect(names.indexOf('reviewNote')).toBeLessThan(names.indexOf('readyForReview'))
+      const note = reviewFields().find((f) => 'name' in f && f.name === 'reviewNote')!
+      expect(note.admin?.condition).toBeUndefined()
     })
 
     it('sends no email while the workflow is off', async () => {

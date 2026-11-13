@@ -4,7 +4,7 @@ import { getPayload, type Payload, type PayloadRequest, type SelectField } from 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import config from '@/payload.config'
-import { adminOnly } from '@/access/adminOnly'
+import { adminInPerson } from '@/access/adminInPerson'
 import { isApiKeyRequest } from '@/access/apiKeyRequest'
 import { contentOwnerOrAdmin } from '@/access/contentOwnerOrAdmin'
 import { hasRole, type Role } from '@/access/roles'
@@ -45,8 +45,12 @@ describe('the role field', () => {
     expect(roleField().hasMany).toBeUndefined()
   })
 
-  it('lets only admins set or change it', () => {
-    expect(roleField().access).toEqual({ create: adminOnly, update: adminOnly })
+  it('lets only an admin in person set or change it, never a key', () => {
+    const { create, update } = roleField().access!
+    for (const fn of [create!, update!]) {
+      const may = (user: SignedIn | null) => fn({ req: reqFor(user) } as never)
+      expect([may(signedIn('admin')), may(signedIn('admin', 'api-key')), may(signedIn('contentOwner')), may(null)]).toEqual([true, false, false, false])
+    }
   })
 
   it('is on users, in the sidebar, with a description', async () => {
@@ -59,11 +63,12 @@ describe('the role field', () => {
 
 describe('the access helpers', () => {
   const each: (Role | undefined)[] = ['admin', 'contentOwner', 'author', undefined]
-  const check = (fn: typeof adminOnly) => each.map((role) => fn({ req: reqFor(signedIn(role)) }))
+  const check = (fn: (args: { req: PayloadRequest }) => unknown) => each.map((role) => fn({ req: reqFor(signedIn(role)) }))
 
-  it('adminOnly passes admins only', () => {
-    expect(check(adminOnly)).toEqual([true, false, false, false])
-    expect(adminOnly({ req: reqFor(null) })).toBe(false)
+  it('adminInPerson passes admins signed in as themselves only', () => {
+    expect(check(adminInPerson as never)).toEqual([true, false, false, false])
+    expect(adminInPerson({ req: reqFor(signedIn('admin', 'api-key')) } as never)).toBe(false)
+    expect(adminInPerson({ req: reqFor(null) } as never)).toBe(false)
   })
 
   it('contentOwnerOrAdmin passes content owners and admins', () => {

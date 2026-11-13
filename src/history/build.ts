@@ -136,7 +136,9 @@ export const buildHistory = async ({
           where: { id: { in: [...userIds] } },
           limit: userIds.size,
           depth: 0,
-          overrideAccess: false,
+          // Names only: a viewer may not read other users' records, which hold their API keys.
+          select: { name: true, email: true },
+          overrideAccess: true,
           req,
         })
       ).docs

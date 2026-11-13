@@ -1,7 +1,7 @@
 import type { ArrayFieldValidation, CollectionConfig } from 'payload'
 import { array } from 'payload/shared'
 
-import { adminOnly } from '../../access/adminOnly'
+import { adminInPerson } from '../../access/adminInPerson'
 import { authenticated } from '../../access/authenticated'
 import { lifecycleOptions } from '../../lifecycle/scope'
 import {
@@ -32,9 +32,10 @@ export const Rubrics: CollectionConfig = {
   labels: { singular: 'Rubric', plural: 'Rubrics' },
   access: {
     read: authenticated,
-    create: adminOnly,
-    update: adminOnly,
-    delete: adminOnly,
+    // An admin in person, never a key: the rubric decides what passes the gate.
+    create: adminInPerson,
+    update: adminInPerson,
+    delete: adminInPerson,
   },
   admin: {
     group: 'System',

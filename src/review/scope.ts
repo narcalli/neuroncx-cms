@@ -20,13 +20,21 @@ export const canPublish = (user: PayloadRequest['user'] | { role?: string | null
 
 const CACHE_KEY = 'reviewWorkflowOn'
 
-/** Whether the workflow is on (Content standards), read once per request. */
+/**
+ * Whether the workflow is on (Content standards), read once per request. A
+ * failed read counts as on and is not remembered: an author's publish is
+ * refused rather than let through because the switch could not be read.
+ */
 export const reviewWorkflowOn = async (req: PayloadRequest): Promise<boolean> => {
   if (typeof req.context?.[CACHE_KEY] === 'boolean') return req.context[CACHE_KEY] as boolean
-  const standards = await req.payload
-    .findGlobal({ slug: 'contentStandards', depth: 0, overrideAccess: true, req })
-    .catch(() => null)
-  const on = Boolean((standards as { reviewRequired?: boolean } | null)?.reviewRequired)
+  let on: boolean
+  try {
+    const standards = await req.payload.findGlobal({ slug: 'contentStandards', depth: 0, overrideAccess: true, req })
+    on = Boolean((standards as { reviewRequired?: boolean } | null)?.reviewRequired)
+  } catch (err) {
+    req.payload.logger.error(`Could not read the review switch, so it counts as on: ${String(err)}`)
+    return true
+  }
   if (req.context) req.context[CACHE_KEY] = on
   return on
 }

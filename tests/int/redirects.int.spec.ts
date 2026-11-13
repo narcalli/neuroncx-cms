@@ -54,6 +54,28 @@ describe('making redirects', () => {
     expect(temporary.type).toBe('307')
   })
 
+  it('refuses a path a browser reads as another website: a backslash, a second slash or a space', async () => {
+    for (const [i, url] of ['/\\evil.example', '//evil.example', '/\\/evil.example', '/a b'].entries()) {
+      await expect(redirect(`/zz-rd-path-${i}`, url, as(users.admin))).rejects.toMatchObject({
+        data: { errors: [expect.objectContaining({ path: 'to.url', message: PATH_OR_HTTPS_MESSAGE })] },
+      })
+    }
+  })
+
+  it('keeps only the destination its type uses, so a page redirect cannot carry an address', async () => {
+    const target = (await payload.find({ collection: 'pages', limit: 1, depth: 0, overrideAccess: true })).docs[0]
+    const made = await payload.create({
+      collection: 'redirects',
+      data: { from: '/zz-rd-reference', to: { type: 'reference', reference: { relationTo: 'pages', value: target.id }, url: 'https://evil.example' } } as never,
+      user: as(users.admin) as never,
+      overrideAccess: false,
+      depth: 0,
+      context: { disableRevalidate: true },
+    })
+    expect((made as Doc).to.url ?? null).toBeNull()
+    expect((made as Doc).to.reference).toMatchObject({ relationTo: 'pages' })
+  })
+
   it('refuses a custom address on another website that is not listed', async () => {
     await expect(redirect('/zz-rd-away', 'https://example.org/page', as(users.admin))).rejects.toMatchObject({
       data: { errors: [expect.objectContaining({ path: 'to.url', message: expect.stringMatching(/example\.org is not a listed redirect destination/) })] },

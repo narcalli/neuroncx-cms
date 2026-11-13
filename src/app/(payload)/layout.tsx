@@ -6,6 +6,8 @@ import type { ServerFunctionClient } from 'payload'
 import { handleServerFunctions, RootLayout } from '@payloadcms/next/layouts'
 import React from 'react'
 
+import { schedulePublish } from '@/review/schedulePublish'
+
 import { importMap } from './admin/importMap.js'
 import './custom.scss'
 
@@ -19,6 +21,8 @@ const serverFunction: ServerFunctionClient = async function (args) {
     ...args,
     config,
     importMap,
+    // Payload's own checks only that someone is signed in (src/review/schedulePublish.ts).
+    serverFunctions: { 'schedule-publish': schedulePublish },
   })
 }
 

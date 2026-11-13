@@ -26,6 +26,15 @@ const userName = (u: unknown): string => {
   return name || email || 'Not recorded'
 }
 
+/** A user's name and email only: a viewer may not read other users' records, which hold their API keys. */
+const nameOf = async (req: PayloadRequest, id: unknown): Promise<string> => {
+  if (!id || typeof id === 'object') return userName(id)
+  const user = await req.payload
+    .findByID({ collection: 'users', id: String(id), depth: 0, select: { name: true, email: true }, overrideAccess: true, req })
+    .catch(() => null)
+  return userName(user)
+}
+
 /** Everything marked Ready for review, oldest request first, read with the viewer's own access. */
 export const reviewQueue = async (req: PayloadRequest): Promise<ReviewRow[]> => {
   const rows: ReviewRow[] = []
@@ -36,7 +45,7 @@ export const reviewQueue = async (req: PayloadRequest): Promise<ReviewRow[]> => 
       collection: slug,
       draft: true,
       where: { readyForReview: { equals: true } },
-      depth: 1,
+      depth: 0,
       pagination: false,
       overrideAccess: false,
       req,
@@ -54,7 +63,7 @@ export const reviewQueue = async (req: PayloadRequest): Promise<ReviewRow[]> => 
         edit: `${req.payload.config.routes.admin}/collections/${slug}/${doc.id}`,
         compare: await compareWithLivePath(req, slug, String(doc.id)),
         note: String(doc.reviewNote || ''),
-        by: userName(doc.reviewRequestedBy),
+        by: await nameOf(req, doc.reviewRequestedBy),
         at: typeof doc.reviewRequestedAt === 'string' ? doc.reviewRequestedAt : null,
         benchmark,
       })
@@ -77,12 +86,15 @@ export type PendingSchedule = {
   refusedWhenOn: boolean
   /** No one is recorded: it runs with full access, whatever the workflow says. */
   noUser: boolean
+  /** It ran and failed, a schedule refused for an author included: it will not run again. */
+  failed: boolean
 }
 
 /**
- * Scheduled publishes and unpublishes that have not run yet, soonest first,
- * with who scheduled each. A schedule runs as that person, so an author's is
- * refused when it runs while the review workflow is on.
+ * Scheduled publishes and unpublishes that have not run yet or failed when
+ * they ran, soonest first, with who scheduled each. A schedule runs as that
+ * person, so an author's is refused when it runs while the review workflow
+ * is on; it then stays listed as failed, for an owner to publish instead.
  */
 export const pendingSchedules = async (req: PayloadRequest): Promise<PendingSchedule[]> => {
   const jobs = await req.payload.find({
@@ -96,7 +108,6 @@ export const pendingSchedules = async (req: PayloadRequest): Promise<PendingSche
   })
   const rows: PendingSchedule[] = []
   for (const job of jobs.docs as unknown as { id: string; hasError?: boolean; waitUntil?: string; input?: Record<string, any> }[]) {
-    if (job.hasError) continue
     const input = job.input ?? {}
     const doc = input.doc as { relationTo?: string; value?: string } | undefined
     if (!doc?.relationTo || !doc.value) continue
@@ -104,7 +115,7 @@ export const pendingSchedules = async (req: PayloadRequest): Promise<PendingSche
       .findByID({ collection: doc.relationTo as never, id: doc.value, draft: true, depth: 0, overrideAccess: true, req })
       .catch(() => null)) as Doc | null
     const user = input.user
-      ? ((await req.payload.findByID({ collection: 'users', id: input.user, depth: 0, overrideAccess: true, req }).catch(() => null)) as Doc | null)
+      ? ((await req.payload.findByID({ collection: 'users', id: input.user, depth: 0, select: { name: true, email: true, role: true }, overrideAccess: true, req }).catch(() => null)) as Doc | null)
       : null
     const inScope = inReviewScope(doc.relationTo)
     rows.push({
@@ -119,6 +130,7 @@ export const pendingSchedules = async (req: PayloadRequest): Promise<PendingSche
       inScope,
       refusedWhenOn: inScope && Boolean(user) && !canPublish(user as never),
       noUser: !user,
+      failed: Boolean(job.hasError),
     })
   }
   return rows

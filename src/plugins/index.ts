@@ -12,7 +12,7 @@ import { pagePath } from '@/collections/Pages/nesting'
 import { revalidateOnSite } from '@/hooks/revalidateOnSite'
 import { apiKeysDraftOnlyPlugin } from './apiKeysDraftOnly'
 import { adminInPerson, ownerOrAdminInPerson } from '@/access/adminInPerson'
-import { validateRedirectDestination } from '@/redirects/destination'
+import { keepOneDestination, validateRedirectDestination } from '@/redirects/destination'
 
 // The SEO title's Generate button. SEO titles carry the brand themselves (the
 // website adds nothing to them), so: "Title | NeuronCx", and "Title | Blog"
@@ -30,6 +30,22 @@ const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
 
   return doc?.slug ? `${url}/${doc.slug}` : url
 }
+
+/**
+ * PAYLOAD INTERNALS (payload 3.84.1, index.js init): Payload gives every
+ * collection with API keys its own key sign-in, so an MCP key also worked as
+ * an ordinary REST and GraphQL key, signed in as the key record itself, past
+ * every "anyone signed in" rule and the MCP switches. The MCP endpoint looks
+ * its keys up itself, so that sign-in is dropped once Payload has built it.
+ */
+export const MCP_KEYS_SIGN_IN = 'payload-mcp-api-keys-api-key'
+const mcpKeysOnlyForMcp: Plugin = (config) => ({
+  ...config,
+  onInit: async (payload) => {
+    payload.authStrategies = payload.authStrategies.filter((s) => s.name !== MCP_KEYS_SIGN_IN)
+    await config.onInit?.(payload)
+  },
+})
 
 export const plugins: Plugin[] = [
   // Pillar and cluster pages: each page's parent and stored breadcrumbs
@@ -88,6 +104,7 @@ export const plugins: Plugin[] = [
         })
       },
       hooks: {
+        beforeChange: [keepOneDestination],
         afterChange: [revalidateOnSite('redirects'), revalidateRedirects],
       },
     },
@@ -128,6 +145,7 @@ export const plugins: Plugin[] = [
       },
     },
   }),
+  mcpKeysOnlyForMcp,
   // Last, so it reaches every collection with drafts, including any a plugin
   // above adds: API keys save drafts but never publish.
   apiKeysDraftOnlyPlugin,

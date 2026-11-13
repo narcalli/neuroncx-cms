@@ -30,7 +30,8 @@ const EXPECTED: Record<string, Row> = {
   'categories': { nobody: 'nynn', author: 'yyyy', authorKey: 'yyyn', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyn' },
   'features': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyn', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyn' },
   // Wave 1: only an admin signed in as themselves creates users; a key never does.
-  'users': { nobody: 'nnnn', author: 'nywn', authorKey: 'nywn', owner: 'nywn', admin: 'yyyy', adminKey: 'nyyn' },
+  // Fixed 13 Nov: a user record holds its API key, so anyone but an admin in person reads and changes only their own.
+  'users': { nobody: 'nnnn', author: 'nwwn', authorKey: 'nwwn', owner: 'nwwn', admin: 'yyyy', adminKey: 'nwwn' },
   // Fixed (wave 2): personal data, an admin in person only; created by the website form (with its secret) or such an admin.
   'enquiries': { nobody: 'nnnn', author: 'nnnn', authorKey: 'nnnn', owner: 'nnnn', admin: 'yyyy', adminKey: 'nnnn' },
   'sectors': { nobody: 'nwnn', author: 'yyyy', authorKey: 'yyyn', owner: 'yyyy', admin: 'yyyy', adminKey: 'yyyn' },
@@ -49,7 +50,8 @@ const EXPECTED: Record<string, Row> = {
   'ncxPostContents': { nobody: 'nnnn', author: 'nynn', authorKey: 'nynn', owner: 'nynn', admin: 'nynn', adminKey: 'nynn' },
   // Wave 2: the enquiry read log; written by the server only, read by an admin in person.
   'enquiryReads': { nobody: 'nnnn', author: 'nnnn', authorKey: 'nnnn', owner: 'nnnn', admin: 'nynn', adminKey: 'nnnn' },
-  'rubrics': { nobody: 'nnnn', author: 'nynn', authorKey: 'nynn', owner: 'nynn', admin: 'yyyy', adminKey: 'yyyn' },
+  // Fixed 13 Nov: the rubric decides what passes the gate, so an admin in person, never a key.
+  'rubrics': { nobody: 'nnnn', author: 'nynn', authorKey: 'nynn', owner: 'nynn', admin: 'yyyy', adminKey: 'nynn' },
   // Fixed (wave 3): never through the API, an admin included: the scorer writes runs on the server.
   'benchmarkRuns': { nobody: 'nnnn', author: 'nynn', authorKey: 'nynn', owner: 'nynn', admin: 'nyny', adminKey: 'nynn' },
   'contentEvents': { nobody: 'nnnn', author: 'nynn', authorKey: 'nynn', owner: 'nynn', admin: 'nynn', adminKey: 'nynn' },
@@ -196,6 +198,46 @@ describe('keys and sign-in', () => {
     }
     const made = await key(as(admin, 'local-jwt'))
     await payload.delete({ collection: 'payload-mcp-api-keys', id: made.id, overrideAccess: true })
+  })
+
+  it("lets nobody but an admin in person read other users, so nobody reads another user's API key", async () => {
+    const keyed = await payload.update({ collection: 'users', id: admin.id, data: { enableAPIKey: true, apiKey: `zz-matrix-key-${Date.now()}` } as never, overrideAccess: true })
+    expect(keyed.id).toBe(admin.id)
+    const listFor = async (user: Record<string, any>) =>
+      (await payload.find({ collection: 'users', user: user as never, overrideAccess: false, pagination: false, depth: 0 })).docs.map((u) => String(u.id))
+    expect(await listFor(as(author, 'local-jwt'))).toEqual([String(author.id)])
+    expect(await listFor(as(author, 'api-key'))).toEqual([String(author.id)])
+    expect(await listFor(as(admin, 'api-key'))).toEqual([String(admin.id)])
+    expect((await listFor(as(admin, 'local-jwt'))).length).toBeGreaterThan(1)
+    await expect(payload.findByID({ collection: 'users', id: admin.id, user: as(author, 'local-jwt') as never, overrideAccess: false })).rejects.toMatchObject({ status: 404 })
+  })
+
+  it("lets no admin key change another user, their role included, or unlock an account", async () => {
+    await expect(
+      payload.update({ collection: 'users', id: author.id, data: { role: 'admin' } as never, user: as(admin, 'api-key') as never, overrideAccess: false }),
+    ).rejects.toMatchObject({ name: 'Forbidden' })
+    expect((await payload.findByID({ collection: 'users', id: author.id, overrideAccess: true })).role).toBe('author')
+    // Its own record: the role is dropped, not changed.
+    const own = await payload.update({ collection: 'users', id: admin.id, data: { role: 'author', name: 'ZZ Matrix Admin' } as never, user: as(admin, 'api-key') as never, overrideAccess: false })
+    expect(own).toMatchObject({ role: 'admin', name: 'ZZ Matrix Admin' })
+    const unlock = payload.collections.users.config.access.unlock
+    for (const [user, may] of [[as(author, 'local-jwt'), false], [as(admin, 'api-key'), false], [as(admin, 'local-jwt'), true]] as const) {
+      expect(Boolean(await unlock({ req: await createLocalReq({ user: user as never }, payload) } as never))).toBe(may)
+    }
+  })
+
+  it('takes an MCP key only at the MCP endpoint: it is no REST or GraphQL key; a user key still is', async () => {
+    const mcpSecret = `zz-matrix-mcp-${Date.now()}`
+    const mcp = await payload.create({ collection: 'payload-mcp-api-keys', data: { user: admin.id, label: 'zz-matrix MCP key', enableAPIKey: true, apiKey: mcpSecret } as never, overrideAccess: true })
+    try {
+      const signIn = (header: string) => payload.auth({ headers: new Headers({ Authorization: header }) })
+      expect((await signIn(`payload-mcp-api-keys API-Key ${mcpSecret}`)).user).toBeNull()
+      const userSecret = `zz-matrix-user-${Date.now()}`
+      await payload.update({ collection: 'users', id: author.id, data: { enableAPIKey: true, apiKey: userSecret } as never, overrideAccess: true })
+      expect((await signIn(`users API-Key ${userSecret}`)).user?.id).toBe(author.id)
+    } finally {
+      await payload.delete({ collection: 'payload-mcp-api-keys', id: mcp.id, overrideAccess: true })
+    }
   })
 
   it('gives a key no session token through refresh', async () => {

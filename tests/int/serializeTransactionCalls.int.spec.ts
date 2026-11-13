@@ -7,7 +7,8 @@ import { QUEUED, SERIALIZED, serializeTransactionCalls } from '@/db/serializeTra
 
 /**
  * The queue for one transaction's database calls (src/db/serializeTransactionCalls.ts):
- * one at a time inside a transaction, never stalled by a failed or stuck call.
+ * one at a time inside a transaction, never stalled by a failed or stuck call,
+ * and nothing run for a transaction once it has ended.
  */
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
@@ -78,16 +79,46 @@ describe('the queue for one transaction', () => {
     expect(found).toMatchObject({ status: 'fulfilled', value: 'find' })
   })
 
-  it('stops a call stuck behind one that never finishes, instead of hanging the save', async () => {
-    const { adapter } = fakeAdapter({ find: () => new Promise(() => undefined) })
+  it('stops a call stuck behind one that never finishes, instead of hanging the save, and lets none overlap it', async () => {
+    const { adapter, state } = fakeAdapter({ find: () => new Promise(() => undefined) })
     const db = serializeTransactionCalls(adapter, { waitMs: 100 }).init({} as never) as any
     void db.find(tx('t1'))
     const started = Date.now()
     await expect(db.count(tx('t1'))).rejects.toThrow(/count waited over 0.1s for an earlier call in transaction t1/)
     expect(Date.now() - started).toBeLessThan(1000)
-    // Nothing piles up behind it either: by now the save has failed and
-    // Payload aborts the transaction, and a later call runs at once.
-    await expect(db.findOne(tx('t1'))).resolves.toBe('findOne')
+    // The stuck call is still running, so a later call waits for it too
+    // rather than starting alongside it.
+    await expect(db.findOne(tx('t1'))).rejects.toThrow(/findOne waited over 0.1s/)
+    expect(state.most).toBe(1)
+  })
+
+  it('leaves calls with no transaction id unqueued, as when transactions are off', async () => {
+    const { adapter, state } = fakeAdapter()
+    const db = serializeTransactionCalls(adapter).init({} as never) as any
+    // Payload leaves a promise of null when the database has no transactions.
+    const none = Promise.resolve(null) as unknown as Promise<string>
+    await Promise.all([db.find(tx(none)), db.find(tx(none))])
+    expect(state.most).toBe(2)
+  })
+
+  it('commits or rolls back after the calls ahead, and runs nothing for the transaction afterwards', async () => {
+    const { adapter, state } = fakeAdapter()
+    const ends: string[] = []
+    const base = adapter.init({} as never) as unknown as Record<string, unknown>
+    base.commitTransaction = async (id: string) => void ends.push(`commit:${id}`)
+    base.rollbackTransaction = async (id: string) => {
+      ends.push(`rollback:${id}:after ${state.order.length} calls`)
+    }
+    const db = serializeTransactionCalls({ ...adapter, init: () => base } as unknown as DatabaseAdapterObj).init({} as never) as any
+    const found = db.find({ ...tx('t1'), tag: 'a' })
+    const counted = db.count({ ...tx('t1'), tag: 'b' })
+    await db.rollbackTransaction('t1')
+    await Promise.all([found, counted])
+    expect(ends).toEqual(['rollback:t1:after 2 calls'])
+    // A call still on its way would run with no session, outside the transaction.
+    await expect(db.findOne(tx('t1'))).rejects.toThrow(/arrived after transaction t1 was committed or rolled back/)
+    await db.commitTransaction('t2')
+    expect(ends).toContain('commit:t2')
   })
 
   it('warns at startup when the adapter no longer has a method it expects', () => {
@@ -102,7 +133,9 @@ describe('the real database adapter', () => {
   it(`still has every method the queue wraps, all of them queued (written against Payload 3.84.1)`, async () => {
     const payload = await getPayload({ config: await config })
     const db = payload.db as unknown as Record<string, unknown>
-    const notQueued = SERIALIZED.filter((n) => typeof db[n] !== 'function' || !(db[n] as unknown as Record<symbol, unknown>)[QUEUED])
+    const notQueued = [...SERIALIZED, 'commitTransaction', 'rollbackTransaction'].filter(
+      (n) => typeof db[n] !== 'function' || !(db[n] as unknown as Record<symbol, unknown>)[QUEUED],
+    )
     expect(notQueued).toEqual([])
   })
 })

@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
-import { adminOnly } from '../../access/adminOnly'
+import { adminInPerson } from '../../access/adminInPerson'
 import { adminOrSelf } from '../../access/adminOrSelf'
 import { authenticated } from '../../access/authenticated'
 import { roleField } from '../../fields/role'
@@ -12,12 +12,15 @@ export const Users: CollectionConfig = {
     admin: authenticated,
     // Only an admin signed in as themselves adds people; never a key (./signIn.ts).
     create: signedInAdmin,
-    // Admins manage every user. Anyone else can change only their own record
-    // (never their role, see src/fields/role.ts), so nobody can take over an
-    // admin by resetting the admin's password or API key. A key cannot change
-    // sign-in details at all, its owner's included (keysCannotChangeSignIn).
-    delete: adminOnly,
-    read: authenticated,
+    // An admin in person manages every user. Anyone else, an admin's key
+    // included, reads and changes only their own record (never their role, see
+    // src/fields/role.ts): a user record holds its API key, so nobody can read
+    // another user's key or take over an admin by resetting the admin's
+    // password. A key cannot change sign-in details at all, its owner's
+    // included (keysCannotChangeSignIn).
+    delete: adminInPerson,
+    read: adminOrSelf,
+    unlock: adminInPerson,
     update: adminOrSelf,
   },
   admin: {

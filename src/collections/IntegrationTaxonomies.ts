@@ -102,8 +102,10 @@ const refuseDeleteWhileUsed =
     // the delete's transaction.
     const usedIn = async (collection: 'integrations' | 'pages', where: Where) => {
       const found = await req.payload.find({ collection, where, draft: true, depth: 0, limit: 5, pagination: false, overrideAccess: true, req })
-      const { totalDocs } = found.docs.length < 5 ? { totalDocs: found.docs.length } : await req.payload.count({ collection, where, overrideAccess: true, req })
-      return { docs: found.docs, totalDocs }
+      if (found.docs.length < 5) return { docs: found.docs, totalDocs: found.docs.length }
+      // The count reads saved entries only, not drafts, so it can come out lower than the drafts found.
+      const counted = await req.payload.count({ collection, where, overrideAccess: true, req })
+      return { docs: found.docs, totalDocs: Math.max(found.docs.length, counted.totalDocs) }
     }
     const integrations = await usedIn('integrations', ref(usedBy.integrationField))
     const pages = usedBy.blockField ? await usedIn('pages', ref(`layout.${usedBy.blockField}`)) : null

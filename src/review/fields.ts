@@ -9,10 +9,23 @@ const signedIn: FieldAccess = ({ req }) => Boolean(req.user)
 export const REVIEW_FIELD_NAMES = ['readyForReview', 'reviewNote', 'reviewRequestedBy', 'reviewRequestedAt'] as const
 
 /**
- * Ready for review and its note, in the sidebar. Who asked and when are set by
+ * The note and Ready for review, in the sidebar. Who asked and when are set by
  * stampReview, never by hand. All four clear when the entry is published.
  */
 export const reviewFields = (): Field[] => [
+  {
+    name: 'reviewNote',
+    type: 'textarea',
+    label: 'Note for the reviewer (optional)',
+    maxLength: 300,
+    access: { read: signedIn },
+    admin: {
+      position: 'sidebar',
+      // Above the box and always shown: autosave saves the box as soon as it is
+      // ticked, which sends the email, so the note has to be written first.
+      description: 'What changed and what to check. Write it before ticking Ready for review: it goes in the email and the review queue.',
+    },
+  },
   {
     name: 'readyForReview',
     type: 'checkbox',
@@ -23,18 +36,6 @@ export const reviewFields = (): Field[] => [
       position: 'sidebar',
       description:
         'Asks a content owner or admin to review and publish this entry. They are emailed when this is ticked and saved, while the review workflow is on. Cleared on publish.',
-    },
-  },
-  {
-    name: 'reviewNote',
-    type: 'textarea',
-    label: 'Note for the reviewer (optional)',
-    maxLength: 300,
-    access: { read: signedIn },
-    admin: {
-      position: 'sidebar',
-      condition: (_data, siblingData) => Boolean(siblingData?.readyForReview),
-      description: 'What changed and what to check. Sent in the email and shown in the review queue.',
     },
   },
   {

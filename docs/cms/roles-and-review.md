@@ -9,21 +9,22 @@ Every user has one role, set on their record in Users. Only an admin can change 
 | | Admin | Content owner | Author |
 |---|---|---|---|
 | Edit content and save drafts | Yes | Yes | Yes |
-| Publish, schedule a publish, unpublish (Pages, Posts, Industries, Industry topics, Bot swarm), while the review workflow is on | Yes | Yes | No: ticks Ready for review |
+| Publish, schedule a publish, unpublish, delete a live entry (Pages, Posts, Industries, Industry topics, Bot swarm), while the review workflow is on | Yes | Yes | No: ticks Ready for review |
 | Override the benchmark gate on an entry, with a reason (logged in History) | Yes | Yes | No |
 | Edit Rubrics and Content standards (in person, never with a key) | Yes | No | No |
 | Edit the Header, Footer, Site settings and WhatsApp lists (in person, never with a key) | Yes | Yes | No |
-| Add users, manage users and roles (signed in as themselves, never with a key) | Yes | No | No |
+| Add users, manage users and roles, read other users' records, unlock accounts (signed in as themselves, never with a key) | Yes | No | No: own record only |
 
-API keys, including MCP keys, cannot publish or unpublish an entry, whatever their owner's role: a publish sent with a key is refused (src/fields/publishStatus.ts). That is not the same as "drafts only": see Known exceptions and open gaps below for what a key can still do.
+API keys, including MCP keys, cannot publish, unpublish or schedule either, whatever their owner's role: a publish sent with a key is refused (src/fields/publishStatus.ts), an unpublish too (src/plugins/apiKeysDraftOnly.ts), and so is Payload's Schedule publish (src/review/schedulePublish.ts). That is not the same as "drafts only": see Known exceptions and open gaps below for what a key can still do.
 
 ## The review workflow
 
 Switched on and off by an admin in Content standards: "Authors need review to publish". While it is on, on Pages, Posts, Industries, Industry topics and Bot swarm:
 
-- Authors see no Publish, Schedule or Unpublish button, and a publish or unpublish from an author is refused with the reason (src/fields/publishStatus.ts, src/review/unpublish.ts).
-- An author ticks Ready for review, with an optional note. Every content owner and admin is emailed through SES with the entry, who marked it, the note, the benchmark verdict and a link comparing the draft with the live version.
-- The Review queue (admin, /admin/review) lists everything marked ready, oldest first.
+- Authors see no Publish, Schedule or Unpublish button, and a publish, unpublish, schedule, or delete of a live entry from an author is refused with the reason (src/fields/publishStatus.ts, src/review/unpublish.ts, src/review/schedulePublish.ts).
+- An author writes an optional note, then ticks Ready for review: autosave saves the box at once, which sends the email, so the note sits above it. Every content owner and admin is emailed through SES, each on their own, with the entry, who marked it, the note, the benchmark verdict and a link comparing the draft with the live version.
+- The Review queue (admin, /admin/review) lists everything marked ready, oldest first, for people signed in (never a key). Content owners and admins also see the scheduled publishes, failed ones included.
+- If the switch cannot be read during a save, it counts as on.
 - Publishing clears Ready for review and its note.
 
 While it is off, anyone signed in can publish, and no review emails are sent. The code is in src/review.
@@ -70,11 +71,25 @@ Copies of the database on a developer's machine keep enquiries without the peopl
 - A key can upload images only, checked from the file's own bytes, not the type the uploader declares: PNG, JPEG, GIF, WebP, AVIF or SVG. promote-page.mjs uploads images this way. A key can never replace or delete media, since a live page shows the change at once. Reading stays open.
 - Every SVG upload, from anyone, is checked for scripts. Payload 3.84.1 has its own check but skips it for an SVG that starts with an XML declaration; such a file with a script was accepted, and opened from the CMS's address it would run there, where an admin's sign-in cookie is sent. The single SVG in production media (the favicon) was checked and is clean. src/collections/media/uploadChecks.ts; tested in tests/int/mediaUploads.int.spec.ts.
 
-### Open: what a signed-in author or an API key can still do (audit, 11 Nov 2026)
+### Fixed: the code review of 12 Nov 2026 (13 Nov 2026)
+
+An independent review of the 11 Nov work found routes the tests never took. Each fix has a test that goes through the route itself (tests/int/requestGuards.int.spec.ts and the media, redirects, review and access matrix tests).
+
+- **Publishing past every rule.** An update sent with `unpublishAllLocales` made Payload skip every field validation, and with no localization the status was not forced back to draft: an author or any key could publish, and save values other validators refuse. Such a request now carries only `{ _status: 'draft' }`, as Payload's own Unpublish button sends it, on every collection and global (src/access/unpublishOnly.ts).
+- **Users.** A user record holds its API key, and anyone signed in could read every user. Now only an admin in person reads or changes other users, unlocks accounts and sets roles; anyone else, an admin's key included, sees only their own record. History and the review queue look up names only (src/access/adminOrSelf.ts, src/fields/role.ts).
+- **Media from a web address.** Payload downloaded a url after the upload checks had run and stored the type the remote server claimed, which could get an SVG with a script past the S3 adapter's script block. Media is never fetched from a web address now (a new focal point still re-reads the entry's own file), more SVG layouts are recognised, and an SVG is always stored as exactly image/svg+xml (src/collections/media/uploadChecks.ts).
+- **Schedule publish.** Payload's server function checked only that someone was signed in, and the job then ran as the owner with a key's limits gone. Now no key schedules or cancels, an author does not schedule while the workflow is on, and only the person who scheduled it, or an owner, cancels (src/review/schedulePublish.ts, registered in src/app/(payload)/layout.tsx).
+- **Deleting and unpublishing.** An author could delete a live entry while unable to unpublish it, and a key could unpublish. Both are refused (src/review/unpublish.ts, src/plugins/apiKeysDraftOnly.ts).
+- **Redirects.** A "page" redirect kept any address it was sent, and the website follows the address first; a path like `/\host` reads as another site. Only the destination the type uses is kept, and a path has no second slash, backslash or space (src/redirects/destination.ts).
+- **Keys of admins.** An admin's key could change roles and edit Rubrics; both are for an admin in person now.
+- **MCP keys.** Payload gave the MCP keys collection its own REST and GraphQL key sign-in, so an MCP key worked as an ordinary key. That sign-in is dropped; the MCP endpoint looks its keys up itself (src/plugins/index.ts).
+- **The transaction queue.** After a call gave up waiting, the next one could start alongside the slow one; commit and rollback were not queued, so a call arriving after a rollback ran outside the transaction and kept its write; with transactions off every request shared one queue. All three fixed (src/db/serializeTransactionCalls.ts).
+
+### Open: what a signed-in author or an API key can still do (13 Nov 2026)
 
 Not fixed yet. An API key acts as its owner, so each of these is open to a key as well as to the person. tests/int/accessMatrix.int.spec.ts holds the full table and marks each one "Open", so closing a gap means changing it there.
 
-- None from the 11 Nov 2026 audit. The access matrix test lists every collection and global, so a new one has to be classified before it ships.
+- None found. Lower-priority leftovers from the 12 Nov review: the enquiry read log does not record bulk edits or deletes of enquiries (an admin in person only) and takes the client's first `x-forwarded-for` address; the review email is sent inside the save, so a save rolled back later may still have emailed; Payload's rich-text Compare XSS (GHSA-9wh8) stays until the Payload upgrade.
 
 
 ### promote-page.mjs saves drafts only, as promote@neuroncx.in

@@ -1,4 +1,4 @@
-import type { PayloadRequest, TextFieldSingleValidation } from 'payload'
+import type { CollectionBeforeChangeHook, PayloadRequest, TextFieldSingleValidation } from 'payload'
 
 /**
  * Where a custom redirect may send visitors: a path on this site, or a full
@@ -27,8 +27,9 @@ export const validateRedirectDestination: TextFieldSingleValidation = async (val
   if ((siblingData as { type?: string } | undefined)?.type !== 'custom') return true
   const url = typeof value === 'string' ? value.trim() : ''
   if (!url) return 'Add the address to send visitors to.'
-  // A path on this site; "//host" would go to another site.
-  if (url.startsWith('/') && !url.startsWith('//')) return true
+  // A path on this site. "//host" and "/\host" go to another site (browsers
+  // read a backslash as a slash), so no second slash, backslash or space.
+  if (url.startsWith('/')) return /^\/(?![/\\])[^\s\\]*$/.test(url) ? true : PATH_OR_HTTPS_MESSAGE
   let host: string
   try {
     const parsed = new URL(url)
@@ -40,4 +41,18 @@ export const validateRedirectDestination: TextFieldSingleValidation = async (val
   if (ownHosts().includes(host)) return true
   if (req?.payload && (await listedHosts(req)).includes(host)) return true
   return `${host} is not a listed redirect destination. Redirects to other websites need the host in Content standards (Redirect destinations), added by an admin.`
+}
+
+/**
+ * beforeChange on redirects: only the destination its type uses is kept. The
+ * address is checked only for a custom redirect, but was saved whatever the
+ * type, and the website follows an address before a page reference, so a
+ * "page" redirect carrying an address went wherever the address said.
+ */
+export const keepOneDestination: CollectionBeforeChangeHook = ({ data }) => {
+  const to = data?.to as { type?: string; url?: unknown; reference?: unknown } | undefined
+  if (!to) return data
+  if (to.type === 'custom') to.reference = null
+  else to.url = null
+  return data
 }
