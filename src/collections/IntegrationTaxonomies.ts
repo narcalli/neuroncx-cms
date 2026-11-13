@@ -5,7 +5,6 @@ import type {
   Validate,
   Where,
 } from 'payload'
-import { APIError } from 'payload'
 import { text as validateText } from 'payload/shared'
 
 import { anyone } from '../access/anyone'
@@ -17,6 +16,7 @@ import { plainText } from '../fields/validators/plainText'
 import { checklistFields } from './integrations/checklist'
 import { categoryAutoRowDescription } from './integrations/hooks'
 import { revalidateOnSite } from '../hooks/revalidateOnSite'
+import { publicError } from '@/utilities/publicError'
 
 /**
  * The editable lists an integration is tagged with: its category, its
@@ -124,12 +124,7 @@ const refuseDeleteWhileUsed =
       )
     }
     if (uses.length) {
-      throw new APIError(
-        `This ${noun} is still used by ${uses.join(' and ')}. Move them to another ${noun} first.`,
-        400,
-        null,
-        true,
-      )
+      throw publicError(`This ${noun} is still used by ${uses.join(' and ')}. Move them to another ${noun} first.`, 400)
     }
   }
 

@@ -1,8 +1,9 @@
 import fs from 'fs'
 import type { CollectionBeforeOperationHook, PayloadRequest } from 'payload'
-import { APIError, ValidationError } from 'payload'
+import { ValidationError } from 'payload'
 
 import { isApiKeyRequest } from '../../access/apiKeyRequest'
+import { publicError } from '@/utilities/publicError'
 
 /**
  * Checks on what is uploaded to Media, read from the file itself, not the
@@ -106,7 +107,7 @@ const refuseFetchFromUrl = async (req: PayloadRequest, operation: string, args: 
       .catch(() => null)) as { url?: string } | null
     if (stored?.url === url) return
   }
-  throw new APIError(NO_URL_UPLOAD_MESSAGE, 400, null, true)
+  throw publicError(NO_URL_UPLOAD_MESSAGE, 400)
 }
 
 /** beforeOperation on Media: runs before Payload reads, fetches or resizes the file. */
@@ -119,7 +120,7 @@ export const checkUpload: CollectionBeforeOperationHook = async ({ args, operati
   const file = req.file as UploadedFile
   const bytes = bytesOf(file)
   if (!bytes) return args
-  if (isApiKeyRequest(req) && !imageTypeOf(bytes)) throw new APIError(KEY_UPLOAD_MESSAGE, 403, null, true)
+  if (isApiKeyRequest(req) && !imageTypeOf(bytes)) throw publicError(KEY_UPLOAD_MESSAGE, 403)
   const svg = isSvg(bytes)
   if ((svg || mightBeSvg(bytes)) && !isSafeSvg(bytes)) {
     throw new ValidationError({ collection: 'media', errors: [{ path: 'file', message: UNSAFE_SVG_MESSAGE }] })

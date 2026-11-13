@@ -1,5 +1,5 @@
 import type { CollectionBeforeValidateHook } from 'payload'
-import { APIError } from 'payload'
+import { publicError } from '@/utilities/publicError'
 
 type LayoutBlock = { blockType?: string; blockName?: string | null; background?: string | null }
 
@@ -30,7 +30,7 @@ export const validateHighlight: CollectionBeforeValidateHook = ({ data }) => {
   if (navy.length > 1) {
     const named = navy.map(({ block, index }) => describe(block, index)).join(' and ')
     const fixed = navy.some(({ block }) => byDesign(block))
-    throw new APIError(
+    throw publicError(
       `Only one block per page can use Highlight (navy). This page has ${navy.length}: ${named}. ${
         fixed
           ? 'A block that is navy by design always counts, so set the others back to another background, or remove the extra navy block.'

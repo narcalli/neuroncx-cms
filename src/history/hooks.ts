@@ -1,5 +1,4 @@
 import {
-  APIError,
   type CollectionAfterChangeHook,
   type CollectionBeforeChangeHook,
   type CollectionBeforeOperationHook,
@@ -7,6 +6,7 @@ import {
 } from 'payload'
 
 import { CONTENT_EVENTS, type EventAction } from './ContentEvents'
+import { publicError } from '@/utilities/publicError'
 
 /** Set on req.context while a rollback runs: the version it came from. */
 export const ROLLBACK_FROM = 'historyRollbackFrom'
@@ -25,7 +25,7 @@ export const LIVE_ROLLBACK_REFUSED =
 export const draftRollbackOnly: CollectionBeforeOperationHook = ({ args, operation, req }) => {
   if (operation !== 'restoreVersion') return args
   const draft = (args as { draft?: unknown }).draft
-  if (draft !== true && draft !== 'true') throw new APIError(LIVE_ROLLBACK_REFUSED, 400, undefined, true)
+  if (draft !== true && draft !== 'true') throw publicError(LIVE_ROLLBACK_REFUSED, 400)
   req.context[ROLLBACK_FROM] = String((args as { id?: unknown }).id)
   req.context.disableRevalidate = true
   req.context.skipRag = true

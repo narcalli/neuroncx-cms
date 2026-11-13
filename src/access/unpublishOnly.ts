@@ -1,5 +1,5 @@
 import type { CollectionBeforeOperationHook, GlobalBeforeOperationHook } from 'payload'
-import { APIError } from 'payload'
+import { publicError } from '@/utilities/publicError'
 
 /**
  * PAYLOAD INTERNALS (payload 3.84.1, collections/operations/utilities/update.js
@@ -23,7 +23,7 @@ const onlyDraftStatus = (data: unknown): boolean => {
 }
 
 const refuse = (args: { unpublishAllLocales?: unknown; data?: unknown }) => {
-  if (isSet(args.unpublishAllLocales) && !onlyDraftStatus(args.data)) throw new APIError(UNPUBLISH_ONLY_MESSAGE, 400, null, true)
+  if (isSet(args.unpublishAllLocales) && !onlyDraftStatus(args.data)) throw publicError(UNPUBLISH_ONLY_MESSAGE, 400)
 }
 
 /** beforeOperation on every collection. */

@@ -1,10 +1,11 @@
 import type { CollectionBeforeChangeHook } from 'payload'
-import { APIError, ValidationError } from 'payload'
+import { ValidationError } from 'payload'
 
 import type { BenchmarkRun } from '@/payload-types'
 import { contentHash } from '@/lifecycle/contentHash'
 import { LIFECYCLE_COLLECTIONS } from '@/lifecycle/scope'
 import { scoreResults } from '@/lifecycle/score'
+import { publicError } from '@/utilities/publicError'
 
 /**
  * A run records what was scored, so it never changes once made: a new score
@@ -12,7 +13,7 @@ import { scoreResults } from '@/lifecycle/score'
  */
 export const refuseRunEdits: CollectionBeforeChangeHook<BenchmarkRun> = ({ data, operation }) => {
   if (operation === 'update') {
-    throw new APIError('Benchmark runs cannot be changed. Record a new run instead.', 403)
+    throw publicError('Benchmark runs cannot be changed. Record a new run instead.', 403)
   }
   return data
 }

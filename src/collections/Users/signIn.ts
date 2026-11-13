@@ -1,8 +1,8 @@
 import type { CollectionBeforeOperationHook } from 'payload'
-import { APIError } from 'payload'
 
 import { adminInPerson } from '../../access/adminInPerson'
 import { isApiKeyRequest } from '../../access/apiKeyRequest'
+import { publicError } from '@/utilities/publicError'
 
 /**
  * A key (an API key or an MCP key) is not a sign-in, and must not be able to
@@ -24,6 +24,6 @@ export const KEY_SIGN_IN_MESSAGE =
 export const keysCannotChangeSignIn: CollectionBeforeOperationHook = ({ args, operation, req }) => {
   if (operation !== 'update' || !isApiKeyRequest(req)) return args
   const data = (args as { data?: Record<string, unknown> }).data ?? {}
-  if (SIGN_IN_FIELDS.some((f) => f in data)) throw new APIError(KEY_SIGN_IN_MESSAGE, 403, null, true)
+  if (SIGN_IN_FIELDS.some((f) => f in data)) throw publicError(KEY_SIGN_IN_MESSAGE, 403)
   return args
 }

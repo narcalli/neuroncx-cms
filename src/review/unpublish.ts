@@ -1,7 +1,7 @@
 import type { CollectionBeforeOperationHook, PayloadRequest, Where } from 'payload'
-import { APIError } from 'payload'
 
 import { canPublish, inReviewScope, reviewWorkflowOn } from './scope'
+import { publicError } from '@/utilities/publicError'
 
 export const REVIEW_UNPUBLISH_MESSAGE =
   'Unpublishing needs a content owner or admin. Ask one to unpublish it, or tick Ready for review with a note saying it should come down.'
@@ -41,7 +41,7 @@ export const refuseAuthorUnpublish: CollectionBeforeOperationHook = async ({ arg
   if (!req.user || canPublish(req.user) || !inReviewScope(collection.slug)) return args
   if (!(await reviewWorkflowOn(req))) return args
   if (await targetsLiveEntry(req, collection.slug, a)) {
-    throw new APIError(operation === 'delete' ? REVIEW_DELETE_MESSAGE : REVIEW_UNPUBLISH_MESSAGE, 403, null, true)
+    throw publicError(operation === 'delete' ? REVIEW_DELETE_MESSAGE : REVIEW_UNPUBLISH_MESSAGE, 403)
   }
   return args
 }

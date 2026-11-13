@@ -1,10 +1,10 @@
 import type { Access, CollectionBeforeOperationHook, CollectionConfig, Plugin } from 'payload'
-import { APIError } from 'payload'
 
 import { isApiKeyRequest } from '@/access/apiKeyRequest'
 import { unpublishOnlyCollection, unpublishOnlyGlobal } from '@/access/unpublishOnly'
 import { publishStatusField } from '@/fields/publishStatus'
 import { isUnpublish, targetsLiveEntry } from '@/review/unpublish'
+import { publicError } from '@/utilities/publicError'
 
 export const API_KEY_UNPUBLISH_MESSAGE = 'An API key cannot unpublish. A content owner or admin unpublishes from the admin.'
 
@@ -25,7 +25,7 @@ const noDeleteWithKey =
 const noUnpublishWithKey: CollectionBeforeOperationHook = async ({ args, collection, operation, req }) => {
   const a = args as Parameters<typeof isUnpublish>[0]
   if (operation !== 'update' || !isApiKeyRequest(req) || !isUnpublish(a)) return args
-  if (await targetsLiveEntry(req, collection.slug, a)) throw new APIError(API_KEY_UNPUBLISH_MESSAGE, 403, null, true)
+  if (await targetsLiveEntry(req, collection.slug, a)) throw publicError(API_KEY_UNPUBLISH_MESSAGE, 403)
   return args
 }
 

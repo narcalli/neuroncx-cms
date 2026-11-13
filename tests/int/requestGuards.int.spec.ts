@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import { createLocalReq, getPayload, type Payload } from 'payload'
+import { createLocalReq, formatErrors, getPayload, type Payload } from 'payload'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import config from '@/payload.config'
@@ -7,6 +7,7 @@ import { UNPUBLISH_ONLY_MESSAGE } from '@/access/unpublishOnly'
 import { API_KEY_UNPUBLISH_MESSAGE } from '@/plugins/apiKeysDraftOnly'
 import { AUTHOR_SCHEDULE_MESSAGE, CANCEL_SCHEDULE_MESSAGE, KEY_SCHEDULE_MESSAGE, schedulePublish } from '@/review/schedulePublish'
 import { REVIEW_DELETE_MESSAGE } from '@/review/unpublish'
+import { publicError } from '@/utilities/publicError'
 
 /**
  * Requests that went round the publish rules (audit, 12 Nov 2026), each sent
@@ -147,6 +148,20 @@ describe('requests that went round the publish rules', () => {
       const authors = jobs.find((j) => String(j.input?.user) === String(author.id))!
       expect(await call(as(other), off, { doc, deleteID: authors.id })).toEqual({ error: CANCEL_SCHEDULE_MESSAGE })
       expect((await scheduledFor(entry.id)).map((j) => String(j.id))).toContain(String(authors.id))
+    })
+  })
+
+  describe('a refusal', () => {
+    it('reaches the person with its message, even with class names emptied as the production build does', () => {
+      const ErrorClass = publicError('', 400).constructor
+      const name = Object.getOwnPropertyDescriptor(ErrorClass, 'name')!
+      // What the minifier does to the class: its name comes out blank.
+      Object.defineProperty(ErrorClass, 'name', { value: '', configurable: true })
+      try {
+        expect(formatErrors(publicError(UNPUBLISH_ONLY_MESSAGE, 400)).errors[0].message).toBe(UNPUBLISH_ONLY_MESSAGE)
+      } finally {
+        Object.defineProperty(ErrorClass, 'name', name)
+      }
     })
   })
 })
