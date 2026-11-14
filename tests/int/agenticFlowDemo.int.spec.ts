@@ -32,6 +32,8 @@ describe('Agentic Flow Demo modes', () => {
   })
 
   it('shows the events and the note in Flow mode only, unset counting as Flow, not in the other two', () => {
+    // Required as well as minRows, or Payload lets an empty list through.
+    expect(field('events')).toMatchObject({ type: 'array', required: true, minRows: 1, maxRows: 4 })
     for (const name of ['events', 'footnote']) {
       expect(shown(name, undefined), name).toBe(true)
       expect(shown(name, 'flow'), name).toBe(true)
@@ -292,6 +294,13 @@ describe('blocks on a saved page', () => {
     expect((page.layout as any[])[0].events[0].routePoints.map((p: any) => p.line)).toEqual(lines(6).map((l) => l.line))
     await expect(publish('seven', [event({ routePoints: lines(7) })])).rejects.toMatchObject({ name: 'ValidationError' })
     await expect(publish('long', [event({ routePoints: [{ line: 'x'.repeat(81) }] })])).rejects.toMatchObject({ name: 'ValidationError' })
+  })
+
+  it('publishes a Flow block with four events, as the live ones have, and refuses one with none', async () => {
+    const four = ['One', 'Two', 'Three', 'Four'].map((label) => event({ label }))
+    const page = await publish('four', four)
+    expect((page.layout as any[])[0].events.map((e: any) => e.label)).toEqual(['One', 'Two', 'Three', 'Four'])
+    await expect(publish('no-events', [])).rejects.toMatchObject({ name: 'ValidationError' })
   })
 
   it('publishes a Groups block with no events', async () => {

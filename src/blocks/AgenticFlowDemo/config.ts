@@ -483,9 +483,12 @@ export const AgenticFlowDemo: Block = {
       ],
     },
     {
+      // Required as well as minRows: Payload checks minRows only on a required
+      // array. Hidden, so not checked, in Agent features and Groups modes.
       name: 'events',
       type: 'array',
       label: 'Events',
+      required: true,
       minRows: 1,
       maxRows: 4,
       admin: {
