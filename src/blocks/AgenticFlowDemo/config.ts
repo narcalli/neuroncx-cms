@@ -1,6 +1,7 @@
 import type { Block, Condition, Field, SelectField } from 'payload'
 import { VERTICAL_OPTIONS } from '../../fields/verticals'
 import { motionFields } from '../../fields/motion'
+import { plainText } from '../../fields/validators/plainText'
 
 const isFlow: Condition = (_data, siblingData) => siblingData?.mode !== 'agentFeatures'
 const isAgentFeatures: Condition = (_data, siblingData) => siblingData?.mode === 'agentFeatures'
@@ -412,6 +413,17 @@ export const AgenticFlowDemo: Block = {
         { name: 'triggerTitle', type: 'text', label: 'Trigger title', required: true, maxLength: 60 },
         { name: 'triggerText', type: 'text', label: 'Trigger text', required: true, maxLength: 140 },
         { name: 'routeText', type: 'text', label: 'Route text', required: true, maxLength: 180, admin: { components: { Description: WARN } } },
+        {
+          name: 'routePoints',
+          type: 'array',
+          label: 'Route points (optional)',
+          maxRows: 6,
+          admin: {
+            initCollapsed: true,
+            description: 'Named items listed under the route text, as ticks. Leave empty for a plain text card.',
+          },
+          fields: [{ name: 'line', type: 'text', required: true, maxLength: 80, validate: plainText }],
+        },
         {
           name: 'handlers',
           type: 'select',

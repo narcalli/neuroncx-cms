@@ -924,13 +924,13 @@ export interface Page {
   updatedBy?: (string | null) | User;
   rolledBackFrom?: string | null;
   /**
+   * What changed and what to check. Write it before ticking Ready for review: it goes in the email and the review queue.
+   */
+  reviewNote?: string | null;
+  /**
    * Asks a content owner or admin to review and publish this entry. They are emailed when this is ticked and saved, while the review workflow is on. Cleared on publish.
    */
   readyForReview?: boolean | null;
-  /**
-   * What changed and what to check. Sent in the email and shown in the review queue.
-   */
-  reviewNote?: string | null;
   reviewRequestedBy?: (string | null) | User;
   reviewRequestedAt?: string | null;
   updatedAt: string;
@@ -990,13 +990,13 @@ export interface Post {
   updatedBy?: (string | null) | User;
   rolledBackFrom?: string | null;
   /**
+   * What changed and what to check. Write it before ticking Ready for review: it goes in the email and the review queue.
+   */
+  reviewNote?: string | null;
+  /**
    * Asks a content owner or admin to review and publish this entry. They are emailed when this is ticked and saved, while the review workflow is on. Cleared on publish.
    */
   readyForReview?: boolean | null;
-  /**
-   * What changed and what to check. Sent in the email and shown in the review queue.
-   */
-  reviewNote?: string | null;
   reviewRequestedBy?: (string | null) | User;
   reviewRequestedAt?: string | null;
   updatedAt: string;
@@ -4276,13 +4276,13 @@ export interface Sector {
   updatedBy?: (string | null) | User;
   rolledBackFrom?: string | null;
   /**
+   * What changed and what to check. Write it before ticking Ready for review: it goes in the email and the review queue.
+   */
+  reviewNote?: string | null;
+  /**
    * Asks a content owner or admin to review and publish this entry. They are emailed when this is ticked and saved, while the review workflow is on. Cleared on publish.
    */
   readyForReview?: boolean | null;
-  /**
-   * What changed and what to check. Sent in the email and shown in the review queue.
-   */
-  reviewNote?: string | null;
   reviewRequestedBy?: (string | null) | User;
   reviewRequestedAt?: string | null;
   updatedAt: string;
@@ -5691,6 +5691,15 @@ export interface AgenticFlowDemoBlock {
         triggerTitle: string;
         triggerText: string;
         routeText: string;
+        /**
+         * Named items listed under the route text, as ticks. Leave empty for a plain text card.
+         */
+        routePoints?:
+          | {
+              line: string;
+              id?: string | null;
+            }[]
+          | null;
         handlers?: ('agent' | 'human')[] | null;
         resolveTitle: string;
         resolveText: string;
@@ -6461,13 +6470,13 @@ export interface MicroApp {
   updatedBy?: (string | null) | User;
   rolledBackFrom?: string | null;
   /**
+   * What changed and what to check. Write it before ticking Ready for review: it goes in the email and the review queue.
+   */
+  reviewNote?: string | null;
+  /**
    * Asks a content owner or admin to review and publish this entry. They are emailed when this is ticked and saved, while the review workflow is on. Cleared on publish.
    */
   readyForReview?: boolean | null;
-  /**
-   * What changed and what to check. Sent in the email and shown in the review queue.
-   */
-  reviewNote?: string | null;
   reviewRequestedBy?: (string | null) | User;
   reviewRequestedAt?: string | null;
   updatedAt: string;
@@ -10274,13 +10283,13 @@ export interface IndustryTopic {
   updatedBy?: (string | null) | User;
   rolledBackFrom?: string | null;
   /**
+   * What changed and what to check. Write it before ticking Ready for review: it goes in the email and the review queue.
+   */
+  reviewNote?: string | null;
+  /**
    * Asks a content owner or admin to review and publish this entry. They are emailed when this is ticked and saved, while the review workflow is on. Cleared on publish.
    */
   readyForReview?: boolean | null;
-  /**
-   * What changed and what to check. Sent in the email and shown in the review queue.
-   */
-  reviewNote?: string | null;
   reviewRequestedBy?: (string | null) | User;
   reviewRequestedAt?: string | null;
   updatedAt: string;
@@ -12086,8 +12095,8 @@ export interface PagesSelect<T extends boolean = true> {
   breadcrumbLabel?: T;
   updatedBy?: T;
   rolledBackFrom?: T;
-  readyForReview?: T;
   reviewNote?: T;
+  readyForReview?: T;
   reviewRequestedBy?: T;
   reviewRequestedAt?: T;
   updatedAt?: T;
@@ -12679,6 +12688,12 @@ export interface AgenticFlowDemoBlockSelect<T extends boolean = true> {
         triggerTitle?: T;
         triggerText?: T;
         routeText?: T;
+        routePoints?:
+          | T
+          | {
+              line?: T;
+              id?: T;
+            };
         handlers?: T;
         resolveTitle?: T;
         resolveText?: T;
@@ -13989,8 +14004,8 @@ export interface PostsSelect<T extends boolean = true> {
   slug?: T;
   updatedBy?: T;
   rolledBackFrom?: T;
-  readyForReview?: T;
   reviewNote?: T;
+  readyForReview?: T;
   reviewRequestedBy?: T;
   reviewRequestedAt?: T;
   updatedAt?: T;
@@ -14752,8 +14767,8 @@ export interface SectorsSelect<T extends boolean = true> {
   kbLastReviewed?: T;
   updatedBy?: T;
   rolledBackFrom?: T;
-  readyForReview?: T;
   reviewNote?: T;
+  readyForReview?: T;
   reviewRequestedBy?: T;
   reviewRequestedAt?: T;
   updatedAt?: T;
@@ -14978,8 +14993,8 @@ export interface IndustryTopicsSelect<T extends boolean = true> {
   kbLastReviewed?: T;
   updatedBy?: T;
   rolledBackFrom?: T;
-  readyForReview?: T;
   reviewNote?: T;
+  readyForReview?: T;
   reviewRequestedBy?: T;
   reviewRequestedAt?: T;
   updatedAt?: T;
@@ -15870,8 +15885,8 @@ export interface MicroAppsSelect<T extends boolean = true> {
       };
   updatedBy?: T;
   rolledBackFrom?: T;
-  readyForReview?: T;
   reviewNote?: T;
+  readyForReview?: T;
   reviewRequestedBy?: T;
   reviewRequestedAt?: T;
   updatedAt?: T;

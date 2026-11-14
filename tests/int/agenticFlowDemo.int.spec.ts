@@ -1,8 +1,11 @@
-import type { Field, SelectField } from 'payload'
-import { describe, expect, it } from 'vitest'
+import 'dotenv/config'
+import { getPayload, type Field, type Payload, type SelectField } from 'payload'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
+import config from '@/payload.config'
 import { AgenticFlowDemo } from '@/blocks/AgenticFlowDemo/config'
 import { pastedLabelProblem } from '@/blocks/AgenticFlowDemo/pastedLabel'
+import { plainText } from '@/fields/validators/plainText'
 
 /** The Agentic Flow Demo: Flow mode as before, and Agent features mode. */
 
@@ -156,6 +159,27 @@ describe('Agentic Flow Demo design', () => {
     expect(inner.url.admin.condition({}, { type: 'custom' })).toBe(true)
   })
 
+  it('gives each event optional route points, right after the route text: up to 6 plain lines of 80', () => {
+    const fields = field('events').fields as any[]
+    const names = fields.map((f) => f.name)
+    expect(names.indexOf('routePoints')).toBe(names.indexOf('routeText') + 1)
+    const points = fields.find((f) => f.name === 'routePoints')
+    expect(points).toMatchObject({
+      type: 'array',
+      label: 'Route points (optional)',
+      maxRows: 6,
+      admin: {
+        initCollapsed: true,
+        description: 'Named items listed under the route text, as ticks. Leave empty for a plain text card.',
+      },
+    })
+    expect(points.minRows).toBeUndefined()
+    expect(points.required).toBeFalsy()
+    // Payload adds its own row id once the config is loaded; the one field of ours is the line.
+    expect(points.fields.filter((f: any) => f.name !== 'id').map((f: any) => f.name)).toEqual(['line'])
+    expect(points.fields.find((f: any) => f.name === 'line')).toMatchObject({ type: 'text', required: true, maxLength: 80, validate: plainText })
+  })
+
   it('warns on route and resolve texts that end with a pasted "handlers:" label', () => {
     for (const name of ['routeText', 'resolveText']) {
       const f = field('events').fields.find((x: any) => x.name === name)
@@ -166,5 +190,57 @@ describe('Agentic Flow Demo design', () => {
     expect(pastedLabelProblem('The handlers: agent and human decide')).toBeNull()
     expect(pastedLabelProblem('Sends the link in the same chat.')).toBeNull()
     expect(pastedLabelProblem(null)).toBeNull()
+  })
+})
+
+/** Route points on a published page (temporary records: zz-afd-). Publishing, as drafts skip validation. */
+describe('route points on a saved page', () => {
+  let payload: Payload
+  const quiet = { disableRevalidate: true }
+  const event = (extra: Record<string, unknown> = {}) => ({
+    label: 'ZZ event',
+    triggerTitle: 'Trigger',
+    triggerText: 'Something happens.',
+    routeText: 'It is routed.',
+    handlers: ['agent'],
+    resolveTitle: 'Resolved',
+    resolveText: 'It is done.',
+    ...extra,
+  })
+  const publish = (slug: string, events: unknown[]) =>
+    payload.create({
+      collection: 'pages',
+      data: {
+        title: `ZZ AFD ${slug}`,
+        slug: `zz-afd-${slug}`,
+        hero: { type: 'none' },
+        layout: [{ blockType: 'agenticFlowDemo', heading: 'ZZ flow', mode: 'flow', events }],
+        _status: 'published',
+      } as never,
+      overrideAccess: true,
+      depth: 0,
+      context: quiet,
+    })
+  const sweep = async () => {
+    const found = await payload.find({ collection: 'pages', where: { slug: { like: 'zz-afd-' } }, draft: true, pagination: false, depth: 0, overrideAccess: true })
+    for (const d of found.docs) await payload.delete({ collection: 'pages', id: d.id, overrideAccess: true, context: quiet })
+  }
+  beforeAll(async () => {
+    payload = await getPayload({ config: await config })
+    await sweep()
+  })
+  afterAll(() => sweep())
+
+  it('publishes a Flow block saved without route points, as every existing one is', async () => {
+    const page = await publish('none', [event()])
+    expect((page.layout as any[])[0].events[0].routePoints ?? []).toEqual([])
+  })
+
+  it('keeps up to six lines, and refuses a seventh or a line over 80 characters', async () => {
+    const lines = (n: number) => Array.from({ length: n }, (_, i) => ({ line: `Customer 360, part ${i + 1}` }))
+    const page = await publish('six', [event({ routePoints: lines(6) })])
+    expect((page.layout as any[])[0].events[0].routePoints.map((p: any) => p.line)).toEqual(lines(6).map((l) => l.line))
+    await expect(publish('seven', [event({ routePoints: lines(7) })])).rejects.toMatchObject({ name: 'ValidationError' })
+    await expect(publish('long', [event({ routePoints: [{ line: 'x'.repeat(81) }] })])).rejects.toMatchObject({ name: 'ValidationError' })
   })
 })
