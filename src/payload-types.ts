@@ -5887,7 +5887,7 @@ export interface AgenticFlowDemoBlock {
    */
   promptLabel?: string | null;
   /**
-   * Empty uses Trigger, Route and Resolve, or in Agent features mode What it does, Features and Saves to your systems.
+   * Empty uses Trigger, Route and Resolve in Flow mode, or What it does, Features and Saves to your systems in Agent features and Groups modes.
    */
   stageLabels?: {
     trigger?: string | null;
@@ -5910,11 +5910,11 @@ export interface AgenticFlowDemoBlock {
   cardShadow?: boolean | null;
   equalHeights?: boolean | null;
   /**
-   * Empty: animated in Flow mode, still in Agent features mode.
+   * Empty: animated in Flow mode, still in Agent features and Groups modes.
    */
   lineStyle?: ('animated' | 'static' | 'none') | null;
   /**
-   * Empty: grey in Flow mode, crimson in Agent features mode.
+   * Empty: grey in Flow mode, crimson in Agent features and Groups modes.
    */
   lineColor?: ('grey' | 'crimson' | 'navy') | null;
   selectedStyle: 'solidCrimson' | 'solidNavy' | 'outline';

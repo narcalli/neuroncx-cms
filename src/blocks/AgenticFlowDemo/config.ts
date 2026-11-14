@@ -120,7 +120,7 @@ const designTab: Field = {
               label: 'Card eyebrows',
               admin: {
                 description:
-                  'Empty uses Trigger, Route and Resolve, or in Agent features mode What it does, Features and Saves to your systems.',
+                  'Empty uses Trigger, Route and Resolve in Flow mode, or What it does, Features and Saves to your systems in Agent features and Groups modes.',
               },
               fields: [
                 {
@@ -187,7 +187,7 @@ const designTab: Field = {
                     { label: 'Still', value: 'static' },
                     { label: 'None', value: 'none' },
                   ],
-                  admin: { width: '50%', description: 'Empty: animated in Flow mode, still in Agent features mode.' },
+                  admin: { width: '50%', description: 'Empty: animated in Flow mode, still in Agent features and Groups modes.' },
                 },
                 {
                   name: 'lineColor',
@@ -198,7 +198,7 @@ const designTab: Field = {
                     { label: 'Crimson', value: 'crimson' },
                     { label: 'Navy', value: 'navy' },
                   ],
-                  admin: { width: '50%', description: 'Empty: grey in Flow mode, crimson in Agent features mode.' },
+                  admin: { width: '50%', description: 'Empty: grey in Flow mode, crimson in Agent features and Groups modes.' },
                 },
               ],
             },
