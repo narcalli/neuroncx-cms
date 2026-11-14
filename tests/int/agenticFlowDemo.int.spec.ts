@@ -13,11 +13,12 @@ const field = (name: string): any => AgenticFlowDemo.fields.find((f: Field) => '
 const shown = (name: string, mode?: string) => field(name).admin?.condition?.({}, { mode }, {} as never) ?? true
 
 describe('Agentic Flow Demo modes', () => {
-  it('is Flow or Agent features, Flow by default, so saved blocks stay as they are', () => {
+  it('is Flow, Agent features or Groups, Flow by default, so saved blocks stay as they are', () => {
     const mode = field('mode') as SelectField
     expect(mode.options).toEqual([
       { label: 'Flow', value: 'flow' },
       { label: 'Agent features', value: 'agentFeatures' },
+      { label: 'Groups (typed on this block)', value: 'groups' },
     ])
     expect(mode.defaultValue).toBe('flow')
     expect(mode.required).toBe(true)
@@ -30,20 +31,65 @@ describe('Agentic Flow Demo modes', () => {
     }
   })
 
-  it('shows the events and the note in Flow mode only, unset counting as Flow', () => {
+  it('shows the events and the note in Flow mode only, unset counting as Flow, not in the other two', () => {
     for (const name of ['events', 'footnote']) {
       expect(shown(name, undefined), name).toBe(true)
       expect(shown(name, 'flow'), name).toBe(true)
       expect(shown(name, 'agentFeatures'), name).toBe(false)
+      expect(shown(name, 'groups'), name).toBe(false)
     }
   })
 
-  it('shows the families and the two button labels in Agent features mode only', () => {
-    for (const name of ['families', 'pickFamilyLabel', 'pickAgentLabel']) {
+  it('shows the families in Agent features mode only, and the button labels and "You set" label there and in Groups', () => {
+    expect(shown('families', 'agentFeatures')).toBe(true)
+    for (const mode of ['flow', undefined, 'groups']) expect(shown('families', mode), String(mode)).toBe(false)
+    for (const name of ['pickFamilyLabel', 'pickAgentLabel', 'youSetLabel']) {
       expect(shown(name, 'agentFeatures'), name).toBe(true)
+      expect(shown(name, 'groups'), name).toBe(true)
       expect(shown(name, 'flow'), name).toBe(false)
       expect(shown(name, undefined), name).toBe(false)
     }
+    expect(field('youSetLabel')).toMatchObject({ type: 'text', maxLength: 24, defaultValue: 'You set:' })
+  })
+
+  it('shows the groups in Groups mode only: 1 to 6, each a button over 1 to 8 items', () => {
+    for (const mode of ['flow', undefined, 'agentFeatures']) expect(shown('groups', mode), String(mode)).toBe(false)
+    expect(shown('groups', 'groups')).toBe(true)
+    const groups = field('groups')
+    // Required as well: Payload checks minRows only on a required array.
+    expect(groups).toMatchObject({ type: 'array', label: 'Groups', required: true, minRows: 1, maxRows: 6, admin: { initCollapsed: true } })
+    const own = (fields: any[]) => fields.filter((f) => f.name !== 'id')
+    expect(own(groups.fields).map((f: any) => f.name)).toEqual(['label', 'items'])
+    expect(groups.fields.find((f: any) => f.name === 'label')).toMatchObject({ type: 'text', required: true, maxLength: 40 })
+    expect(groups.fields.find((f: any) => f.name === 'items')).toMatchObject({ type: 'array', label: 'Items', required: true, minRows: 1, maxRows: 8, admin: { initCollapsed: true } })
+  })
+
+  it("gives each item the explorer's three cards, its button chip and a link", () => {
+    const items = field('groups').fields.find((f: any) => f.name === 'items')
+    const byName = Object.fromEntries(items.fields.map((f: any) => [f.name, f]))
+    expect(items.fields.map((f: any) => f.name).filter((n: string) => n !== 'id')).toEqual([
+      'name', 'chip', 'summary', 'tags', 'features', 'handlerTags', 'icon', 'lands', 'youSet', 'link',
+    ])
+    expect(byName.name).toMatchObject({ type: 'text', required: true, maxLength: 60 })
+    expect(byName.chip).toMatchObject({ type: 'text', maxLength: 24 })
+    expect(byName.chip.required).toBeFalsy()
+    expect(byName.summary).toMatchObject({ type: 'textarea', required: true, maxLength: 240 })
+    expect(byName.tags).toMatchObject({ type: 'array', maxRows: 2 })
+    expect(byName.tags.minRows).toBeUndefined()
+    expect(byName.tags.fields.find((f: any) => f.name === 'label')).toMatchObject({ type: 'text', required: true, maxLength: 32 })
+    expect(byName.features).toMatchObject({ type: 'array', required: true, minRows: 1, maxRows: 5 })
+    expect(byName.features.fields.find((f: any) => f.name === 'line')).toMatchObject({ type: 'text', required: true, maxLength: 80, validate: plainText })
+    expect(byName.handlerTags).toMatchObject({ type: 'select', hasMany: true })
+    expect(byName.handlerTags.options.map((o: any) => o.value)).toEqual(['agent', 'human'])
+    expect(byName.handlerTags.defaultValue).toBeUndefined()
+    expect(byName.icon).toMatchObject({ type: 'select', name: 'icon' })
+    expect(byName.icon.required).toBeFalsy()
+    expect(byName.lands).toMatchObject({ type: 'textarea', required: true, maxLength: 240 })
+    expect(byName.youSet).toMatchObject({ type: 'text', maxLength: 180 })
+    expect(byName.youSet.required).toBeFalsy()
+    // The same link as a Flow event's.
+    const eventLink = field('events').fields.find((f: any) => f.name === 'link')
+    expect(JSON.stringify(byName.link.fields)).toBe(JSON.stringify(eventLink.fields))
   })
 
   it('picks families from Lists (agent families only), several, in order, optional', () => {
@@ -65,7 +111,7 @@ describe('Agentic Flow Demo modes', () => {
     const names = AgenticFlowDemo.fields.map((f: Field) => ('name' in f ? f.name : f.type))
     // agentsFor and industries only choose which agents to show.
     expect(names).toEqual([
-      'heading', 'intro', 'mode', 'agentsFor', 'industries', 'families', 'pickFamilyLabel', 'pickAgentLabel', 'events', 'footnote', 'collapsible', 'tabs',
+      'heading', 'intro', 'mode', 'agentsFor', 'industries', 'families', 'pickFamilyLabel', 'pickAgentLabel', 'youSetLabel', 'groups', 'events', 'footnote', 'collapsible', 'tabs',
     ])
   })
 })
@@ -139,11 +185,13 @@ describe('Agentic Flow Demo design', () => {
     for (const name of ['promptLabel', 'showFootnote']) {
       expect(design[name].admin.condition({}, { mode: 'flow' }), name).toBe(true)
       expect(design[name].admin.condition({}, { mode: 'agentFeatures' }), name).toBe(false)
+      expect(design[name].admin.condition({}, { mode: 'groups' }), name).toBe(false)
     }
     const behaviour = tabs.tabs[0].fields.find((c: any) => c.label === 'Behaviour (Flow mode)')
     expect(Object.keys(flatten(behaviour.fields))).toEqual(['autoplay', 'startEvent'])
     expect(behaviour.admin.condition({}, { mode: 'flow' })).toBe(true)
     expect(behaviour.admin.condition({}, { mode: 'agentFeatures' })).toBe(false)
+    expect(behaviour.admin.condition({}, { mode: 'groups' })).toBe(false)
   })
 
   it('gives each event an optional link to a page, an agent or a URL', () => {
@@ -193,8 +241,8 @@ describe('Agentic Flow Demo design', () => {
   })
 })
 
-/** Route points on a published page (temporary records: zz-afd-). Publishing, as drafts skip validation. */
-describe('route points on a saved page', () => {
+/** Blocks on a published page (temporary records: zz-afd-). Publishing, as drafts skip validation. */
+describe('blocks on a saved page', () => {
   let payload: Payload
   const quiet = { disableRevalidate: true }
   const event = (extra: Record<string, unknown> = {}) => ({
@@ -207,20 +255,22 @@ describe('route points on a saved page', () => {
     resolveText: 'It is done.',
     ...extra,
   })
-  const publish = (slug: string, events: unknown[]) =>
+  const block = (extra: Record<string, unknown>) => ({ blockType: 'agenticFlowDemo', heading: 'ZZ flow', ...extra })
+  const publishLayout = (slug: string, layout: unknown[]) =>
     payload.create({
       collection: 'pages',
-      data: {
-        title: `ZZ AFD ${slug}`,
-        slug: `zz-afd-${slug}`,
-        hero: { type: 'none' },
-        layout: [{ blockType: 'agenticFlowDemo', heading: 'ZZ flow', mode: 'flow', events }],
-        _status: 'published',
-      } as never,
+      data: { title: `ZZ AFD ${slug}`, slug: `zz-afd-${slug}`, hero: { type: 'none' }, layout, _status: 'published' } as never,
       overrideAccess: true,
       depth: 0,
       context: quiet,
     })
+  const publish = (slug: string, events: unknown[]) => publishLayout(slug, [block({ mode: 'flow', events })])
+  const item = {
+    name: 'Customer 360',
+    summary: 'One record per customer.',
+    features: [{ line: 'Every visit on one record' }],
+    lands: 'On the customer record.',
+  }
   const sweep = async () => {
     const found = await payload.find({ collection: 'pages', where: { slug: { like: 'zz-afd-' } }, draft: true, pagination: false, depth: 0, overrideAccess: true })
     for (const d of found.docs) await payload.delete({ collection: 'pages', id: d.id, overrideAccess: true, context: quiet })
@@ -242,5 +292,27 @@ describe('route points on a saved page', () => {
     expect((page.layout as any[])[0].events[0].routePoints.map((p: any) => p.line)).toEqual(lines(6).map((l) => l.line))
     await expect(publish('seven', [event({ routePoints: lines(7) })])).rejects.toMatchObject({ name: 'ValidationError' })
     await expect(publish('long', [event({ routePoints: [{ line: 'x'.repeat(81) }] })])).rejects.toMatchObject({ name: 'ValidationError' })
+  })
+
+  it('publishes a Groups block with no events', async () => {
+    const page = await publishLayout('groups', [block({ mode: 'groups', groups: [{ label: 'CRM', items: [item] }] })])
+    expect((page.layout as any[])[0].groups[0].items[0]).toMatchObject({ name: 'Customer 360', lands: 'On the customer record.' })
+  })
+
+  it('refuses a Groups block with no groups, a group with no items, an item with no features, or one that does not say where it lands', async () => {
+    await expect(publishLayout('groups-empty', [block({ mode: 'groups', groups: [] })])).rejects.toMatchObject({ name: 'ValidationError' })
+    await expect(publishLayout('groups-no-items', [block({ mode: 'groups', groups: [{ label: 'CRM', items: [] }] })])).rejects.toMatchObject({ name: 'ValidationError' })
+    await expect(publishLayout('groups-no-features', [block({ mode: 'groups', groups: [{ label: 'CRM', items: [{ ...item, features: [] }] }] })])).rejects.toMatchObject({
+      name: 'ValidationError',
+    })
+    const { lands: _lands, ...noLands } = item
+    await expect(publishLayout('groups-no-lands', [block({ mode: 'groups', groups: [{ label: 'CRM', items: [noLands] }] })])).rejects.toMatchObject({
+      name: 'ValidationError',
+    })
+  })
+
+  it('publishes an Agent features block with no events and no groups', async () => {
+    const page = await publishLayout('features', [block({ mode: 'agentFeatures' })])
+    expect((page.layout as any[])[0].mode).toBe('agentFeatures')
   })
 })

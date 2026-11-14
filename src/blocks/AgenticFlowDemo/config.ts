@@ -1,10 +1,14 @@
 import type { Block, Condition, Field, SelectField } from 'payload'
 import { VERTICAL_OPTIONS } from '../../fields/verticals'
 import { motionFields } from '../../fields/motion'
+import { iconField } from '../../fields/icons'
 import { plainText } from '../../fields/validators/plainText'
 
-const isFlow: Condition = (_data, siblingData) => siblingData?.mode !== 'agentFeatures'
+// Unset counts as Flow: blocks saved before the mode existed are Flow blocks.
+const isFlow: Condition = (_data, siblingData) => siblingData?.mode === 'flow' || !siblingData?.mode
 const isAgentFeatures: Condition = (_data, siblingData) => siblingData?.mode === 'agentFeatures'
+const isGroups: Condition = (_data, siblingData) => siblingData?.mode === 'groups'
+const hasExplorer: Condition = (_data, siblingData) => siblingData?.mode === 'agentFeatures' || siblingData?.mode === 'groups'
 const showsIndustries: Condition = (_data, siblingData) =>
   siblingData?.mode === 'agentFeatures' && siblingData?.agentsFor === 'industries'
 
@@ -41,11 +45,15 @@ const shortLabel = (name: string, label: string, defaultValue?: string): Field =
   admin: { width: defaultValue ? '50%' : '33%' },
 })
 
-/** Flow mode: an optional link under the resolve card, to a page, an agent or a URL. */
-const eventLink: Field = {
+/**
+ * An optional link to a page, an agent or a URL: under the resolve card in Flow
+ * mode, under the third card in Groups mode. A function, so each place gets its
+ * own copy of the field.
+ */
+const linkGroup = (label: string): Field => ({
   name: 'link',
   type: 'group',
-  label: 'Link under the resolve card (optional)',
+  label,
   admin: { description: 'Shown only when it has both a text and somewhere to go.' },
   fields: [
     {
@@ -78,7 +86,7 @@ const eventLink: Field = {
     { name: 'url', type: 'text', label: 'URL', admin: { condition: (_, siblingData) => siblingData?.type === 'custom' } },
     { name: 'newTab', type: 'checkbox', label: 'Open in a new tab' },
   ],
-}
+})
 
 /**
  * The Design tab. Every option starts as the block looked before it existed,
@@ -333,10 +341,11 @@ export const AgenticFlowDemo: Block = {
       options: [
         { label: 'Flow', value: 'flow' },
         { label: 'Agent features', value: 'agentFeatures' },
+        { label: 'Groups (typed on this block)', value: 'groups' },
       ],
       admin: {
         description:
-          'Flow walks an event through trigger, route and resolve. Agent features shows what each bot swarm agent does, read from the agents.',
+          'Flow walks an event through trigger, route and resolve. Agent features shows what each bot swarm agent does, read from the agents. Groups shows the same explorer with groups and items typed on this block.',
       },
     },
     {
@@ -368,7 +377,7 @@ export const AgenticFlowDemo: Block = {
     },
     {
       // Only in Agent features mode. Hidden fields are not validated, so the
-      // Events list may stay empty there.
+      // Events and Groups lists may stay empty there.
       name: 'families',
       type: 'relationship',
       label: 'Families (optional)',
@@ -387,7 +396,7 @@ export const AgenticFlowDemo: Block = {
       label: 'Family buttons label',
       maxLength: 40,
       defaultValue: 'Pick a family',
-      admin: { condition: isAgentFeatures },
+      admin: { condition: hasExplorer, description: 'Agent features: above the family buttons. Groups: above the group buttons.' },
     },
     {
       name: 'pickAgentLabel',
@@ -395,7 +404,83 @@ export const AgenticFlowDemo: Block = {
       label: 'Agent buttons label',
       maxLength: 40,
       defaultValue: 'Agents',
-      admin: { condition: isAgentFeatures },
+      admin: { condition: hasExplorer, description: 'Agent features: above the agent buttons. Groups: above the item buttons.' },
+    },
+    {
+      name: 'youSetLabel',
+      type: 'text',
+      label: 'Label before the last line of the third card',
+      maxLength: 24,
+      defaultValue: 'You set:',
+      admin: { condition: hasExplorer, description: 'Shown in bold before what the team controls.' },
+    },
+    {
+      // Only in Groups mode; hidden elsewhere, so not validated there. Payload
+      // checks minRows only on a required array, so each list is required.
+      name: 'groups',
+      type: 'array',
+      label: 'Groups',
+      required: true,
+      minRows: 1,
+      maxRows: 6,
+      admin: { condition: isGroups, initCollapsed: true, description: 'Each group is one button; its items are the buttons under it.' },
+      fields: [
+        { name: 'label', type: 'text', label: 'Group button', required: true, maxLength: 40 },
+        {
+          name: 'items',
+          type: 'array',
+          label: 'Items',
+          required: true,
+          minRows: 1,
+          maxRows: 8,
+          admin: { initCollapsed: true },
+          fields: [
+            { name: 'name', type: 'text', label: 'Name', required: true, maxLength: 60, admin: { description: 'The item button, and the heading of the first card.' } },
+            { name: 'chip', type: 'text', label: 'Chip (optional)', maxLength: 24, admin: { description: 'A small label on the item button, such as New.' } },
+            { name: 'summary', type: 'textarea', label: 'Summary', required: true, maxLength: 240, admin: { description: 'The first card.' } },
+            {
+              name: 'tags',
+              type: 'array',
+              label: 'Tags (optional)',
+              maxRows: 2,
+              admin: { description: 'Small pills under the summary.' },
+              fields: [{ name: 'label', type: 'text', label: 'Tag', required: true, maxLength: 32 }],
+            },
+            {
+              name: 'features',
+              type: 'array',
+              label: 'Features',
+              required: true,
+              minRows: 1,
+              maxRows: 5,
+              admin: { description: 'The second card, as ticks.' },
+              fields: [{ name: 'line', type: 'text', required: true, maxLength: 80, validate: plainText }],
+            },
+            {
+              name: 'handlerTags',
+              type: 'select',
+              label: 'Handler tags (optional)',
+              hasMany: true,
+              options: [
+                { label: 'Virtual agent', value: 'agent' },
+                { label: 'Human team', value: 'human' },
+              ],
+              admin: { description: 'Pills in the second card. Empty draws none. Their words are set on the Design tab.' },
+            },
+            iconField(undefined, { description: 'The third card. Empty draws no icon.' }),
+            {
+              name: 'lands',
+              type: 'textarea',
+              label: 'Where it lands',
+              required: true,
+              maxLength: 240,
+              admin: { description: "The third card: where the item's work ends up, such as on the customer record. Every item needs one." },
+            },
+            { name: 'youSet', type: 'text', label: 'What the team controls', maxLength: 180, admin: { description: 'The last line of the third card, after the label above.' } },
+            linkGroup('Link under the third card (optional)'),
+          ],
+        },
+      ],
     },
     {
       name: 'events',
@@ -437,7 +522,7 @@ export const AgenticFlowDemo: Block = {
         },
         { name: 'resolveTitle', type: 'text', label: 'Resolve title', required: true, maxLength: 60 },
         { name: 'resolveText', type: 'text', label: 'Resolve text', required: true, maxLength: 180, admin: { components: { Description: WARN } } },
-        eventLink,
+        linkGroup('Link under the resolve card (optional)'),
       ],
     },
     {

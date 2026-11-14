@@ -5665,9 +5665,9 @@ export interface AgenticFlowDemoBlock {
   heading: string;
   intro?: string | null;
   /**
-   * Flow walks an event through trigger, route and resolve. Agent features shows what each bot swarm agent does, read from the agents.
+   * Flow walks an event through trigger, route and resolve. Agent features shows what each bot swarm agent does, read from the agents. Groups shows the same explorer with groups and items typed on this block.
    */
-  mode: 'flow' | 'agentFeatures';
+  mode: 'flow' | 'agentFeatures' | 'groups';
   /**
    * Chosen industries shows only the agents used in at least one of them.
    */
@@ -5680,8 +5680,158 @@ export interface AgenticFlowDemoBlock {
    * The families to offer, in this order. Leave empty for every family, by their order.
    */
   families?: (string | List)[] | null;
+  /**
+   * Agent features: above the family buttons. Groups: above the group buttons.
+   */
   pickFamilyLabel?: string | null;
+  /**
+   * Agent features: above the agent buttons. Groups: above the item buttons.
+   */
   pickAgentLabel?: string | null;
+  /**
+   * Shown in bold before what the team controls.
+   */
+  youSetLabel?: string | null;
+  /**
+   * Each group is one button; its items are the buttons under it.
+   */
+  groups?:
+    | {
+        label: string;
+        items: {
+          /**
+           * The item button, and the heading of the first card.
+           */
+          name: string;
+          /**
+           * A small label on the item button, such as New.
+           */
+          chip?: string | null;
+          /**
+           * The first card.
+           */
+          summary: string;
+          /**
+           * Small pills under the summary.
+           */
+          tags?:
+            | {
+                label: string;
+                id?: string | null;
+              }[]
+            | null;
+          /**
+           * The second card, as ticks.
+           */
+          features: {
+            line: string;
+            id?: string | null;
+          }[];
+          /**
+           * Pills in the second card. Empty draws none. Their words are set on the Design tab.
+           */
+          handlerTags?: ('agent' | 'human')[] | null;
+          /**
+           * The third card. Empty draws no icon.
+           */
+          icon?:
+            | (
+                | 'message'
+                | 'chat'
+                | 'check'
+                | 'calendar'
+                | 'card'
+                | 'document'
+                | 'refresh'
+                | 'bolt'
+                | 'layers'
+                | 'gauge'
+                | 'plug'
+                | 'shield'
+                | 'shieldCheck'
+                | 'lock'
+                | 'globe'
+                | 'server'
+                | 'eye'
+                | 'users'
+                | 'user'
+                | 'phone'
+                | 'smartphone'
+                | 'mail'
+                | 'messageCircle'
+                | 'send'
+                | 'inbox'
+                | 'headphones'
+                | 'mic'
+                | 'video'
+                | 'bell'
+                | 'handshake'
+                | 'stethoscope'
+                | 'heartPulse'
+                | 'hospital'
+                | 'activity'
+                | 'flask'
+                | 'pill'
+                | 'graduationCap'
+                | 'building'
+                | 'mapPin'
+                | 'database'
+                | 'cloud'
+                | 'workflow'
+                | 'bot'
+                | 'sparkles'
+                | 'search'
+                | 'chart'
+                | 'trendingUp'
+                | 'target'
+                | 'rocket'
+                | 'key'
+                | 'fileText'
+                | 'clipboardList'
+                | 'link'
+                | 'settings'
+                | 'puzzle'
+                | 'timer'
+                | 'clock'
+                | 'badgeCheck'
+                | 'star'
+                | 'briefcase'
+              )
+            | null;
+          /**
+           * The third card: where the item's work ends up, such as on the customer record. Every item needs one.
+           */
+          lands: string;
+          /**
+           * The last line of the third card, after the label above.
+           */
+          youSet?: string | null;
+          /**
+           * Shown only when it has both a text and somewhere to go.
+           */
+          link?: {
+            label?: string | null;
+            type?: ('reference' | 'custom') | null;
+            /**
+             * An agent links only once it has its own page.
+             */
+            reference?:
+              | ({
+                  relationTo: 'pages';
+                  value: string | Page;
+                } | null)
+              | ({
+                  relationTo: 'microApps';
+                  value: string | MicroApp;
+                } | null);
+            url?: string | null;
+            newTab?: boolean | null;
+          };
+          id?: string | null;
+        }[];
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Each event is one button a visitor can pick. The first one is shown on load.
    */
@@ -12681,6 +12831,46 @@ export interface AgenticFlowDemoBlockSelect<T extends boolean = true> {
   families?: T;
   pickFamilyLabel?: T;
   pickAgentLabel?: T;
+  youSetLabel?: T;
+  groups?:
+    | T
+    | {
+        label?: T;
+        items?:
+          | T
+          | {
+              name?: T;
+              chip?: T;
+              summary?: T;
+              tags?:
+                | T
+                | {
+                    label?: T;
+                    id?: T;
+                  };
+              features?:
+                | T
+                | {
+                    line?: T;
+                    id?: T;
+                  };
+              handlerTags?: T;
+              icon?: T;
+              lands?: T;
+              youSet?: T;
+              link?:
+                | T
+                | {
+                    label?: T;
+                    type?: T;
+                    reference?: T;
+                    url?: T;
+                    newTab?: T;
+                  };
+              id?: T;
+            };
+        id?: T;
+      };
   events?:
     | T
     | {
