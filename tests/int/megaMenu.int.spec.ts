@@ -36,6 +36,7 @@ describe('menu item fields', () => {
   it('explains the auto layout to editors', () => {
     expect(groups.admin?.description).toBe(MEGA_MENU_LAYOUT)
     expect(MEGA_MENU_LAYOUT).toMatch(/single group hides its label/)
+    expect(MEGA_MENU_LAYOUT).toMatch(/set 3 or 4 rows/)
   })
 
   it('keeps the old fields, hidden, so no saved menu loses anything', () => {
@@ -44,6 +45,15 @@ describe('menu item fields', () => {
 })
 
 describe('groups and items', () => {
+  it('lets each group set its rows per column: Auto, 3 or 4, Auto by default, right after its label', () => {
+    const rows = named(groups.fields, 'rows') as SelectField
+    expect(rows).toMatchObject({ type: 'select', label: 'Rows per column', defaultValue: 'auto' })
+    expect(rows.options.map((o) => (typeof o === 'string' ? o : o.value))).toEqual(['auto', '3', '4'])
+    expect(rows.required).toBeFalsy()
+    const names = groups.fields.map((f: Field) => ('name' in f ? f.name : f.type))
+    expect(names.indexOf('rows')).toBe(names.indexOf('label') + 1)
+  })
+
   it('has an optional group label up to 24 and at least one item', () => {
     expect(named(groups.fields, 'label')).toMatchObject({ maxLength: 24 })
     expect(named(groups.fields, 'label').required).toBeFalsy()

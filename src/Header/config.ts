@@ -15,7 +15,7 @@ const featuredOn = (_: unknown, siblingData: { enabled?: boolean } | undefined) 
 
 /** How a mega menu lays itself out, for editors (the website follows the same rules). */
 export const MEGA_MENU_LAYOUT =
-  'The menu panel sizes itself. A single group hides its label. Groups with 4 or more items wrap into 2 columns. The featured card only shows when the menu has 5 or more items in total.'
+  'The menu panel sizes itself. A single group hides its label. A group on Auto rows wraps into 2 columns once it has 4 or more items; set 3 or 4 rows to fill each column to that many before starting the next. The featured card only shows when the menu has 5 or more items in total.'
 
 /**
  * The icons a mega menu item may use: 30 of the shared library
@@ -159,6 +159,21 @@ export const Header: GlobalConfig = {
               label: 'Group label (optional)',
               maxLength: 24,
               admin: { description: 'Such as Modules or Agents. Hidden when the menu has a single group.' },
+            },
+            {
+              // Values are text, as a select's must be. Auto keeps the layout every saved group has today.
+              name: 'rows',
+              type: 'select',
+              label: 'Rows per column',
+              defaultValue: 'auto',
+              options: [
+                { label: 'Auto', value: 'auto' },
+                { label: '3 rows', value: '3' },
+                { label: '4 rows', value: '4' },
+              ],
+              admin: {
+                description: 'Auto: 4 or more items wrap into 2 columns. 3 or 4 rows: items fill each column to that many, then start the next.',
+              },
             },
             {
               name: 'items',

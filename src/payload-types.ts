@@ -16508,7 +16508,7 @@ export interface Header {
           url?: string | null;
         };
         /**
-         * The menu panel sizes itself. A single group hides its label. Groups with 4 or more items wrap into 2 columns. The featured card only shows when the menu has 5 or more items in total.
+         * The menu panel sizes itself. A single group hides its label. A group on Auto rows wraps into 2 columns once it has 4 or more items; set 3 or 4 rows to fill each column to that many before starting the next. The featured card only shows when the menu has 5 or more items in total.
          */
         groups?:
           | {
@@ -16516,6 +16516,10 @@ export interface Header {
                * Such as Modules or Agents. Hidden when the menu has a single group.
                */
               label?: string | null;
+              /**
+               * Auto: 4 or more items wrap into 2 columns. 3 or 4 rows: items fill each column to that many, then start the next.
+               */
+              rows?: ('auto' | '3' | '4') | null;
               items?:
                 | {
                     icon?:
@@ -16992,6 +16996,7 @@ export interface HeaderSelect<T extends boolean = true> {
           | T
           | {
               label?: T;
+              rows?: T;
               items?:
                 | T
                 | {
