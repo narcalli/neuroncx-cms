@@ -1,11 +1,15 @@
-import type { CollectionConfig, Field, GroupField, Validate } from 'payload'
+import type { BlocksField, CollectionConfig, Field, GroupField, Tab, Validate } from 'payload'
 
 import { authenticated } from '../access/authenticated'
 import { authenticatedOrPublished } from '../access/authenticatedOrPublished'
+import { sectionBlockSlug } from '../content/sections/defineSection'
+import { INTEGRATIONS_CLOSING_SLUG, INTEGRATIONS_LANDING_SECTION_KEYS } from '../content/sections/integrationsLanding'
+import { HUB_LAYOUT_BLOCK_SLUGS, LAYOUT_HERO_BLOCKS } from '../content/sections/siteBlocks'
 import { cardDesignFields } from '../fields/cardDesign'
 import { faqTab } from '../fields/faq'
 import { integrationSourceFields } from '../fields/integrationSource'
 import { kbaseTab } from '../fields/kbase'
+import { heroProblem, sectionBlocksField } from '../fields/layout'
 import { link } from '../fields/link'
 import { plainText } from '../fields/validators/plainText'
 import { masterOneMain, masterSlugRule, onlyNameToken } from './integrations/hooks'
@@ -68,6 +72,59 @@ const sectionHeading = (name: string, title: string, fallback: string, maxLength
   validate: plainText,
   admin: { placeholder: fallback, description: `Leave empty to show: ${fallback}` },
 })
+
+// A closing call to action block and the Closing panel row both end the page.
+const ENDS_PAGE = ['closingCta', 'expandingCardCta', INTEGRATIONS_CLOSING_SLUG]
+
+const layoutBase = sectionBlocksField({
+  name: 'layout',
+  label: 'Page sections',
+  references: [
+    ...INTEGRATIONS_LANDING_SECTION_KEYS.map(sectionBlockSlug),
+    ...LAYOUT_HERO_BLOCKS,
+    ...HUB_LAYOUT_BLOCK_SLUGS,
+  ],
+  description:
+    "The page, in order. The parts of this record (logo strip, integration sections, five things, when feeds go wrong, API card, FAQ, closing panel) and any page block. Drag to reorder, remove any row. A hero block may only be the first row, with Hero design set to Hero block from the layout. Left empty, the page shows this record's parts in their standard order.",
+  owner: 'integrationsMaster',
+  allow: LAYOUT_HERO_BLOCKS,
+})
+
+// The shared layout rules (navy, each part once), then one hero and one closing panel.
+const layoutRule: Validate = async (value, options) => {
+  const base = await (layoutBase.validate as Validate)(value, options)
+  if (base !== true) return base
+  const data = (options as { data?: { heroDesign?: unknown } }).data
+  const hero = heroProblem(value, { blockHero: data?.heroDesign === 'blockHero' })
+  if (hero) return hero
+  const rows = (Array.isArray(value) ? value : []) as { blockType?: string; hidden?: boolean | null }[]
+  const ends = rows.filter((r) => r && !r.hidden && ENDS_PAGE.includes(String(r.blockType)))
+  return ends.length > 1 ? 'A page has one closing panel. Keep the Closing panel row or one closing call to action block.' : true
+}
+
+const pageLayoutTab: Tab = {
+  label: 'Page layout',
+  description:
+    'How the page is put together. Empty layout: the standard page (hero, then each part of this record in order). With rows: exactly those rows, in that order.',
+  fields: [
+    {
+      name: 'heroDesign',
+      type: 'radio',
+      label: 'Hero design',
+      defaultValue: 'fields',
+      options: [
+        { label: 'Integrations hero (from the Hero tab)', value: 'fields' },
+        { label: 'Hero block from the layout', value: 'blockHero' },
+      ],
+      admin: {
+        layout: 'horizontal',
+        description:
+          'Hero block from the layout: the first row of the page sections is a hero block, such as Stat Hero, and the Hero tab draws nothing.',
+      },
+    },
+    { ...layoutBase, validate: layoutRule } as BlocksField,
+  ],
+}
 
 const sidebar: Field[] = [
   {
@@ -158,8 +215,11 @@ export const IntegrationsMaster: CollectionConfig = {
       type: 'tabs',
       tabs: [
         integrationSeoTab(),
+        pageLayoutTab,
         {
           label: 'Hero',
+          description:
+            "Drawn when Hero design (Page layout tab) is Integrations hero. The H1 stays required: it also names the page in search results when the SEO title is empty. The logo strip settings here are used wherever the Logo strip row sits.",
           fields: [
             {
               name: 'eyebrow',

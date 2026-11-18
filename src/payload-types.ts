@@ -86,6 +86,13 @@ export interface Config {
     hubTrustSection: HubTrustSection;
     hubArticlesSection: HubArticlesSection;
     hubGroupingsSection: HubGroupingsSection;
+    integrationsLogoStripSection: IntegrationsLogoStripSection;
+    integrationsCategoriesSection: IntegrationsCategoriesSection;
+    integrationsFiveThingsSection: IntegrationsFiveThingsSection;
+    integrationsFeedsSection: IntegrationsFeedsSection;
+    integrationsApiCardSection: IntegrationsApiCardSection;
+    integrationsFaqSection: IntegrationsFaqSection;
+    integrationsClosingSection: IntegrationsClosingSection;
     industryProblemsSection: IndustryProblemsSection;
     industryAudiencesSection: IndustryAudiencesSection;
     industryEpisodeSection: IndustryEpisodeSection;
@@ -9424,6 +9431,77 @@ export interface IntegrationsMaster {
     noIndex?: boolean | null;
   };
   /**
+   * Hero block from the layout: the first row of the page sections is a hero block, such as Stat Hero, and the Hero tab draws nothing.
+   */
+  heroDesign?: ('fields' | 'blockHero') | null;
+  /**
+   * The page, in order. The parts of this record (logo strip, integration sections, five things, when feeds go wrong, API card, FAQ, closing panel) and any page block. Drag to reorder, remove any row. A hero block may only be the first row, with Hero design set to Hero block from the layout. Left empty, the page shows this record's parts in their standard order.
+   */
+  layout?:
+    | (
+        | IntegrationsLogoStripSection
+        | IntegrationsCategoriesSection
+        | IntegrationsFiveThingsSection
+        | IntegrationsFeedsSection
+        | IntegrationsApiCardSection
+        | IntegrationsFaqSection
+        | IntegrationsClosingSection
+        | HeroCustomBlock
+        | ConversationHeroBlock
+        | StatHeroBlock
+        | HeroFullBackgroundBlock
+        | HeroRightPlacementBlock
+        | HeroWorkforceGridBlock
+        | AgenticHeroBlock
+        | TestimonialBlock
+        | MediaBlock
+        | ProductInActionBlock
+        | CaseStudyGridBlock
+        | BenefitsBlock
+        | CallToActionBlock
+        | ContentBlock
+        | LogoWallBlock
+        | HowItWorks2Block
+        | StatBandBlock
+        | TrustPanelBlock
+        | PartnerStripBlock
+        | ProblemStatementBlock
+        | JourneyEngineBlock
+        | ContextEngineBlock
+        | SolutionGridBlock
+        | ProductSuiteBlock
+        | ProductSuite2Block
+        | CustomVisualBlock
+        | CustomerDirectoryBlock
+        | BentoGridBlock
+        | DetailedProductSuiteBlock
+        | AgenticFlowDemoBlock
+        | AgenticStatsBlock
+        | AgenticCartsDemoBlock
+        | AgenticOrbitBlock
+        | AgenticEpisodeBlock
+        | SwarmDiagramBlock
+        | AgenticCasesBlock
+        | AgenticClosingBlock
+        | IntegrationsMarqueeBlock
+        | UseCasesBlock
+        | IntegrationsBlock
+        | ContactFormBlock
+        | HowItWorksBlock
+        | ComparisonTableBlock
+        | AudienceTabsBlock
+        | RecordAnatomyBlock
+        | ClosingCTABlock
+        | FeatureThreadBlock
+        | ArticleGridBlock
+        | ArchiveBlock
+        | PlatformLayersBlock
+        | ExpandingCardCtaBlock
+        | WhatsappWidgetBlock
+        | PlatformLayersTwoBlock
+      )[]
+    | null;
+  /**
    * The small line above the heading, for example Integrations.
    */
   eyebrow?: string | null;
@@ -9738,6 +9816,69 @@ export interface IntegrationsMaster {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IntegrationsLogoStripSection".
+ */
+export interface IntegrationsLogoStripSection {
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'integrationsLogoStripSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IntegrationsCategoriesSection".
+ */
+export interface IntegrationsCategoriesSection {
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'integrationsCategoriesSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IntegrationsFiveThingsSection".
+ */
+export interface IntegrationsFiveThingsSection {
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'integrationsFiveThingsSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IntegrationsFeedsSection".
+ */
+export interface IntegrationsFeedsSection {
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'integrationsFeedsSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IntegrationsApiCardSection".
+ */
+export interface IntegrationsApiCardSection {
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'integrationsApiCardSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IntegrationsFaqSection".
+ */
+export interface IntegrationsFaqSection {
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'integrationsFaqSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IntegrationsClosingSection".
+ */
+export interface IntegrationsClosingSection {
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'integrationsClosingSection';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -11419,6 +11560,13 @@ export interface Hub {
           | 'agentChain'
           | 'agentTeamControls'
           | 'agentResult'
+          | 'integrationsLogoStrip'
+          | 'integrationsCategories'
+          | 'integrationsFiveThings'
+          | 'integrationsFeeds'
+          | 'integrationsApiCard'
+          | 'integrationsFaq'
+          | 'integrationsClosing'
           | 'industryProblems'
           | 'industryAudiences'
           | 'industryEpisode'
@@ -15294,6 +15442,8 @@ export interface IntegrationsMasterSelect<T extends boolean = true> {
         description?: T;
         noIndex?: T;
       };
+  heroDesign?: T;
+  layout?: T | {};
   eyebrow?: T;
   h1?: T;
   subheading?: T;

@@ -3,6 +3,7 @@ import type { Block } from 'payload'
 import { contentCollections } from '../registry'
 import { allSections, buildSectionBlock } from './defineSection'
 import './hub'
+import './integrationsLanding'
 import './shared'
 import { ENTRY_EXTRA_BLOCKS, HUB_PAGE_BLOCKS, SITE_BLOCKS } from './siteBlocks'
 
