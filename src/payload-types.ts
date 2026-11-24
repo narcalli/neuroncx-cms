@@ -16842,6 +16842,28 @@ export interface Footer {
       }[]
     | null;
   /**
+   * Heading above the contact details. Left empty, it reads Contact.
+   */
+  contactHeading?: string | null;
+  /**
+   * Turns the heading itself into a link, usually to the Contact page. Off, it is plain text.
+   */
+  linkContactHeading?: boolean | null;
+  contactLink?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: string | Post;
+        } | null);
+    url?: string | null;
+  };
+  /**
    * Contact email shown in the footer.
    */
   email?: string | null;
@@ -17245,6 +17267,16 @@ export interface FooterSelect<T extends boolean = true> {
               id?: T;
             };
         id?: T;
+      };
+  contactHeading?: T;
+  linkContactHeading?: T;
+  contactLink?:
+    | T
+    | {
+        type?: T;
+        newTab?: T;
+        reference?: T;
+        url?: T;
       };
   email?: T;
   phone?: T;

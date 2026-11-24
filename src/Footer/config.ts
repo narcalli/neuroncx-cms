@@ -5,6 +5,10 @@ import { link } from '@/fields/link'
 import { revalidateFooter } from './hooks/revalidateFooter'
 import { revalidateGlobalOnSite } from '@/hooks/revalidateOnSite'
 
+/** The contact heading's destination is asked for only once it is set to link somewhere. */
+const linksContactHeading = (data: { linkContactHeading?: boolean } | undefined) =>
+  Boolean(data?.linkContactHeading)
+
 export const Footer: GlobalConfig = {
   slug: 'footer',
   access: {
@@ -50,6 +54,33 @@ export const Footer: GlobalConfig = {
         },
       ],
     },
+    {
+      name: 'contactHeading',
+      type: 'text',
+      defaultValue: 'Contact',
+      maxLength: 30,
+      admin: {
+        description: 'Heading above the contact details. Left empty, it reads Contact.',
+      },
+    },
+    {
+      name: 'linkContactHeading',
+      type: 'checkbox',
+      label: 'Link the contact heading',
+      defaultValue: false,
+      admin: {
+        description: 'Turns the heading itself into a link, usually to the Contact page. Off, it is plain text.',
+      },
+    },
+    link({
+      appearances: false,
+      disableLabel: true,
+      overrides: {
+        name: 'contactLink',
+        label: 'Contact heading goes to',
+        admin: { condition: linksContactHeading },
+      },
+    }),
     {
       name: 'email',
       type: 'text',
