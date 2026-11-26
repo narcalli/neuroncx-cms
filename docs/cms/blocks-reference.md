@@ -1,6 +1,6 @@
 # NeuronCx CMS: page block reference
 
-Generated 2026-11-03 from the block configs by `neuroncx-cms/scripts/block-reference.ts`. Re-run it after any field change rather than editing this file by hand.
+Generated 2026-11-26 from the block configs by `neuroncx-cms/scripts/block-reference.ts`. Re-run it after any field change rather than editing this file by hand.
 
 Read this with `ncx-content-notes.md`, which holds the writing rules and the publishing workflow. This file says what each block is for and exactly what it accepts.
 
@@ -136,16 +136,19 @@ A hero whose visual is your own HTML and CSS. Everything else is fixed and built
 blockType: `heroHarness` · appearance: **minimal** · renders the page H1
 
 - `textLayout` (select, **required**) "Text layout": one of: `centred` (Centred: title and intro centred above the cards and drawing), `stack` (Stacked: title, then the intro, left aligned), `grid` (Grid: the intro lines up with the drawing), `stackWithLabel` (Stacked, with a small label above the title); default `centred`. How the title and intro sit above the cards and drawing. Centred is the approved home page layout. Grid starts the intro where the drawing starts and runs it to the drawing's right edge.
-- `eyebrow` (text) "Small label above the title": max 40 characters; default `Agentic CRM and CX platform`; only when `textLayout` is `stackWithLabel`. The short line above the title, with a red dot. Shown only with the "Stacked, with a small label" layout.
+- `textBlock` (select, **required**) "Text block": one of: `centred` (Centred), `leftCentred` (Left, block centred), `leftStage` (Left, on the stage edge); default `centred`; only when `textLayout` is `centred`. Centred centres every line. Left, block centred starts every line on one left edge with the block itself centred on the page. Left, on the stage edge lines the text up with the left edge of the cards and drawing below.
+- `eyebrow` (text) "Small label above the title": max 40 characters. A short line in a pill above the title, with a red dot. Shown in every text layout. Leave empty to show none.
 - `headline` (textarea, **required**) "Title": max 100 characters; default `An agentic rethink of CRM,
 marketing automation and omnichannel CX.`. The page's main heading (the H1), so use this hero once per page. Press Enter where the line should break on laptops and desktops; phones ignore the break and wrap on their own.
 - `intro` (textarea, **required**): max 420 characters; default `NeuronCx is a captive AI harness that goes beyond SaaS silos, built for customer acquisition, engagement and retention. It is grounded in your enterprise ontology, so agents act on your own locations, services and rules, and hand over to your team when a person is needed. Your data layer and custom workflows run in your own cloud and change at your own pace.`. One paragraph under the title. Line breaks are joined into one paragraph on the page.
-- `buttons` (list): up to 2 items. Optional, up to 2, shown under the intro. The first is the main red button, the second a plain one. Empty shows no buttons.
-  - `type` (radio): one of: `reference` (Internal link), `custom` (Custom URL); default `custom`. Link to a page or post on this site, or type any address.
-  - `newTab` (checkbox) "Open in new tab": Opens the link in a new browser tab.
+- `buttons` (list): up to 2 items. Optional, up to 2, shown under the intro. Empty shows no buttons.
+  - `type` (radio): one of: `reference` (Internal link), `custom` (Custom URL), `section` (Section on this page); default `custom`. Link to a page or post on this site, type any address, or jump to a section further down this page.
+  - `newTab` (checkbox) "Open in new tab": shown only in some states. Opens the link in a new browser tab.
   - `reference` (relationship to `pages` or `posts`) "Document to link to": only when `type` is `reference`. The page or post the button opens.
-  - `url` (text) "Custom URL": only when `type` is not `reference`. The address the button opens, such as /contact.
+  - `url` (text) "Custom URL": shown only in some states. The address the button opens, such as /contact.
+  - `section` (text) "Section to jump to": only when `type` is `section`. The block further down this page that the button scrolls to. Lists the blocks that have an Anchor ID, set in each block's Appearance panel.
   - `label` (text) "Button text": The words on the button. Empty hides the button.
+  - `appearance` (select) "Style": one of: `primary` (Primary), `secondary` (Secondary). Primary is the solid red button; Secondary is the plain grey one. Left empty, the first button is Primary and the second Secondary.
 - `cardsPosition` (select, **required**) "Cards position": one of: `left` (Left of the drawing), `above` (Above the drawing); default `left`. Where the cards sit on laptops and desktops. On phones they always sit below the drawing, in a row that scrolls sideways.
 - `cards` (list, **required**): 3 to 6 items. 3 to 6 cards beside the drawing. Each one works like a tab: selecting it lights up its parts of the drawing and shows its explanation under the drawing.
   - `title` (text, **required**): max 60 characters. The only text on the card. 60 characters keeps it to two lines.
@@ -172,11 +175,13 @@ marketing automation and omnichannel CX.`. The page's main heading (the H1), so 
 - `loopLabel` (text, **required**) "Loop label": max 34 characters; default `Learns from every outcome`. The label on the loop back into the box. On wide screens it splits into two lines beside the drawing, so each half must stay short.
 - `actionsName` (text, **required**) "Name for the actions": max 24 characters; default `Agent actions`. How the caption names the action boxes when a card lights them. 24 characters keeps the tag on one line.
 - `loopName` (text, **required**) "Name for the loop": max 24 characters; default `Learning loop`. How the caption names the loop back into the box when a card lights it. 24 characters keeps the tag on one line.
-- `headingSize` (number, **required**) "Title size (px)": min 32; max 56; default `44`. The title size on large screens. It shrinks with the screen; phones and small tablets use a set size.
+- `headingSize` (number, **required**) "Title size (px)": min 32; max 56; default `44`. The title size on screens 1440px wide and up. It shrinks with the screen below that; phones and small tablets use a set size.
 - `spacing` (select, **required**): one of: `roomy` (Roomy), `compact` (Compact); default `roomy`. The space above the title, between the title and intro, and above the cards and drawing. Compact brings more of the drawing above the fold.
-- `introWidth` (number, **required**) "Intro width (px)": min 560; max 900; default `720`; only when `textLayout` is `stack` or `stackWithLabel`. The widest the intro gets in the two stacked layouts. Centred stops at 860px; grid fills its column.
+- `introWidth` (number, **required**) "Intro width (px)": min 560; max 900; default `720`; only when `textLayout` is `stack` or `stackWithLabel`. The widest the intro gets in the two stacked layouts. Centred has its own width setting; grid fills its column.
+- `introMaxWidth` (select, **required**) "Intro width (px)": one of: `620` (620px), `720` (720px), `860` (860px), `1020` (1020px); default `620`; only when `textLayout` is `centred`. Controls how many characters fit on a line. 620 lands near 69 characters, which is the comfortable range. Wider means fewer lines but a harder read. 1020 puts the live home passage on three lines at about 119 characters, and is the widest setting offered on purpose.
 - `background` (select, **required**): one of: `cloud` (Pale grey), `white` (White); default `cloud`. The colour behind the whole hero.
 - `blockWidth` (select, **required**) "Width": one of: `site` (Site column, like the blocks below it), `header` (Match the header: from under the logo to under the last header button); default `site`. How wide the title, cards and drawing run on laptops and desktops. Below 760px both use the normal phone margins.
+- `frame` (select, **required**): one of: `plain` (Plain), `framed` (Framed); default `plain`. Framed wraps the cards and the drawing in one bordered panel instead of two separate pieces.
 - `motion` (select) "Animation": one of: `follow` (Follow the page), `on` (On), `reduced` (Reduced (a simple fade)), `off` (Off (no animation)); default `follow`. How much this hero moves. Reduced keeps the card highlights but stops the dots. Off shows a still drawing.
 - `autoplay` (checkbox) "Play on its own": default `true`. Moves through the cards on its own, one after another. It pauses while a visitor points at or tabs into the hero, and stops once they click a card.
 - `loop` (checkbox): default `true`. Keeps the dots running around the drawing while it is on screen. Off runs the loop once.
@@ -282,41 +287,60 @@ An interactive trigger -> route -> resolve walkthrough. Editors define a handful
 
 - `heading` (text, **required**): max 140 characters
 - `intro` (textarea): max 600 characters
-- `mode` (select, **required**): one of: `flow` (Flow), `agentFeatures` (Agent features); default `flow`. Flow walks an event through trigger, route and resolve. Agent features shows what each bot swarm agent does, read from the agents.
+- `mode` (select, **required**): one of: `flow` (Flow), `agentFeatures` (Agent features), `groups` (Groups (typed on this block)); default `flow`. Flow walks an event through trigger, route and resolve. Agent features shows what each bot swarm agent does, read from the agents. Groups shows the same explorer with groups and items typed on this block.
 - `agentsFor` (select) "Show agents for": one of: `all` (All agents), `industries` (Chosen industries); default `all`; only when `mode` is `agentFeatures`. Chosen industries shows only the agents used in at least one of them.
 - `industries` (select, several allowed, **required**): one of: `healthcare` (Healthcare), `diagnostics` (Diagnostics), `education` (Education), `hospitality` (Hospitality); only when `mode` is `agentFeatures`. An agent shows when its Verticals include at least one of these. Families with no such agent are left out.
 - `families` (relationship to `lists`, several allowed) "Families (optional)": only when `mode` is `agentFeatures`. The families to offer, in this order. Leave empty for every family, by their order.
-- `pickFamilyLabel` (text) "Family buttons label": max 40 characters; default `Pick a family`; only when `mode` is `agentFeatures`
-- `pickAgentLabel` (text) "Agent buttons label": max 40 characters; default `Agents`; only when `mode` is `agentFeatures`
-- `events` (list): 1 to 4 items; only when `mode` is not `agentFeatures`. Each event is one button a visitor can pick. The first one is shown on load.
+- `pickFamilyLabel` (text) "Family buttons label": max 40 characters; default `Pick a family`; only when `mode` is `agentFeatures`. Agent features: above the family buttons. Groups: above the group buttons.
+- `pickAgentLabel` (text) "Agent buttons label": max 40 characters; default `Agents`; only when `mode` is `agentFeatures`. Agent features: above the agent buttons. Groups: above the item buttons.
+- `youSetLabel` (text) "Label before the last line of the third card": max 24 characters; default `You set:`; only when `mode` is `agentFeatures`. Shown in bold before what the team controls.
+- `groups` (list, **required**): 1 to 6 items; only when `mode` is `groups`. Each group is one button; its items are the buttons under it.
+  - `label` (text, **required**) "Group button": max 40 characters
+  - `items` (list, **required**): 1 to 8 items
+    - `name` (text, **required**): max 60 characters. The item button, and the heading of the first card.
+    - `chip` (text) "Chip (optional)": max 24 characters. A small label on the item button, such as New.
+    - `summary` (textarea, **required**): max 240 characters. The first card.
+    - `tags` (list) "Tags (optional)": up to 2 items. Small pills under the summary.
+      - `label` (text, **required**) "Tag": max 32 characters
+    - `features` (list, **required**): 1 to 5 items. The second card, as ticks.
+      - `line` (text, **required**): max 80 characters
+    - `handlerTags` (select, several allowed) "Handler tags (optional)": one of: `agent` (Virtual agent), `human` (Human team). Pills in the second card. Empty draws none. Their words are set on the Design tab.
+    - `icon` (icon name from the icon library): The third card. Empty draws no icon.
+    - `lands` (textarea, **required**) "Where it lands": max 240 characters. The third card: where the item's work ends up, such as on the customer record. Every item needs one.
+    - `youSet` (text) "What the team controls": max 180 characters. The last line of the third card, after the label above.
+    - `link` (link) "Link under the third card (optional)": Shown only when it has both a text and somewhere to go.
+      - `type`: `reference` (an internal page or post, set in `reference`) or `custom` (a URL or site path in `url`); `label`: the visible text; `newTab`: open in a new tab
+- `events` (list, **required**): 1 to 4 items; only when `mode` is `flow`. Each event is one button a visitor can pick. The first one is shown on load.
   - `label` (text, **required**) "Button label": max 40 characters
   - `triggerTitle` (text, **required**) "Trigger title": max 60 characters
   - `triggerText` (text, **required**) "Trigger text": max 140 characters
   - `routeText` (text, **required**) "Route text": max 180 characters
+  - `routePoints` (list) "Route points (optional)": up to 6 items. Named items listed under the route text, as ticks. Leave empty for a plain text card.
+    - `line` (text, **required**): max 80 characters
   - `handlers` (select, several allowed) "Who handles it": one of: `agent` (Virtual agent), `human` (Human team); default `["agent"]`
   - `resolveTitle` (text, **required**) "Resolve title": max 60 characters
   - `resolveText` (text, **required**) "Resolve text": max 180 characters
   - `link` (link) "Link under the resolve card (optional)": Shown only when it has both a text and somewhere to go.
     - `type`: `reference` (an internal page or post, set in `reference`) or `custom` (a URL or site path in `url`); `label`: the visible text; `newTab`: open in a new tab
-- `footnote` (text) "Note under the demo": max 120 characters; default `Illustrative run, not live data.`; only when `mode` is not `agentFeatures`
+- `footnote` (text) "Note under the demo": max 120 characters; default `Illustrative run, not live data.`; only when `mode` is `flow`
 - `motion` (select) "Animation": one of: `follow` (Follow the page), `on` (On), `reduced` (Reduced (a simple fade)), `off` (Off (no animation)); default `follow`. Reduced keeps a simple fade. Off shows the block with no animation.
-- `promptLabel` (text) "Line above the buttons": max 80 characters; default `Pick an event and watch it travel through.`; only when `mode` is not `agentFeatures`. Empty hides it.
-- `stageLabels` (group) "Card eyebrows": Empty uses Trigger, Route and Resolve, or in Agent features mode What it does, Features and Saves to your systems.
+- `promptLabel` (text) "Line above the buttons": max 80 characters; default `Pick an event and watch it travel through.`; only when `mode` is `flow`. Empty hides it.
+- `stageLabels` (group) "Card eyebrows": Empty uses Trigger, Route and Resolve in Flow mode, or What it does, Features and Saves to your systems in Agent features and Groups modes.
   - `trigger` (text) "First card": max 20 characters
   - `route` (text) "Second card": max 20 characters
   - `resolve` (text) "Third card": max 20 characters
 - `handlerLabels` (group) "Handler tags"
   - `agent` (text) "Virtual agent tag": max 20 characters; default `Virtual agent`
   - `human` (text) "Human team tag": max 20 characters; default `Human team`
-- `showFootnote` (checkbox) "Show the note under the demo": default `true`; only when `mode` is not `agentFeatures`
+- `showFootnote` (checkbox) "Show the note under the demo": default `true`; only when `mode` is `flow`
 - `accents` (group) "Card colours": Each card's border, eyebrow and shadow.
   - `card1` (select, **required**) "First card": one of: `crimson` (Crimson), `navy` (Navy), `teal` (Teal), `grey` (Grey); default `crimson`
   - `card2` (select, **required**) "Second card": one of: `crimson` (Crimson), `navy` (Navy), `teal` (Teal), `grey` (Grey); default `crimson`
   - `card3` (select, **required**) "Third card": one of: `crimson` (Crimson), `navy` (Navy), `teal` (Teal), `grey` (Grey); default `teal`
 - `cardShadow` (checkbox) "Coloured shadow under the cards": default `true`
 - `equalHeights` (checkbox) "Cards the same height": default `true`
-- `lineStyle` (select) "Line between the cards": one of: `animated` (Animated), `static` (Still), `none` (None). Empty: animated in Flow mode, still in Agent features mode.
-- `lineColor` (select) "Line colour": one of: `grey` (Grey), `crimson` (Crimson), `navy` (Navy). Empty: grey in Flow mode, crimson in Agent features mode.
+- `lineStyle` (select) "Line between the cards": one of: `animated` (Animated), `static` (Still), `none` (None). Empty: animated in Flow mode, still in Agent features and Groups modes.
+- `lineColor` (select) "Line colour": one of: `grey` (Grey), `crimson` (Crimson), `navy` (Navy). Empty: grey in Flow mode, crimson in Agent features and Groups modes.
 - `selectedStyle` (select, **required**) "Selected button": one of: `solidCrimson` (Solid crimson), `solidNavy` (Solid navy), `outline` (Outline); default `solidCrimson`
 - `buttonSize` (select, **required**) "Button size": one of: `regular` (Regular), `compact` (Compact); default `regular`
 - `panelBackground` (select, **required**) "Panel background": one of: `cloud` (Pale grey), `white` (White), `none` (None); default `cloud`
@@ -328,7 +352,7 @@ An interactive trigger -> route -> resolve walkthrough. Editors define a handful
 
 blockType: `agenticStats` · appearance: **full**
 
-A row of headline numbers. Any number can be a count-up (animates from 0 to its value on view). Leave "Pending" ticked for a figure not yet confirmed — it shows a shimmer placeholder and a "figure to confirm" tag.
+A row of headline numbers. Any number can be a count-up (animates from 0 to its value on view). Tick "Pending" for a figure not yet confirmed: it is left out for visitors (src/content/pending.ts), so a band whose figures are all pending does not appear, and draft preview shows it with a "figure to confirm" tag.
 
 - `eyebrow` (text): max 80 characters
 - `heading` (text): max 140 characters
@@ -816,7 +840,7 @@ blockType: `contactForm` · appearance: **full**
 - `heading` (text)
 - `intro` (textarea) "Intro line"
 - `buttonLabel` (text) "Button text": default `Submit enquiry`
-- `successMessage` (textarea) "Message shown after submitting": default `Thanks — we've got your enquiry and will be in touch shortly.`
+- `successMessage` (textarea) "Message shown after submitting": default `Thanks, we've got your enquiry and will be in touch shortly.`
 - `showMessageField` (checkbox) "Include a free-text message field": default `true`
 
 ### How it works
@@ -860,7 +884,7 @@ Comparison table: NeuronCx beside other types of system, on one page. A real tab
 - `columns` (list, **required**): 2 to 4 items. The systems being compared, left to right. Highlight one column at most, usually NeuronCx.
   - `label` (text, **required**) "Column label": max 40 characters
   - `highlight` (checkbox) "Highlight this column": default `false`
-- `rows` (list, **required**): 2 to 10 items. Describe what each system typically covers, in plain words. No ticks or crosses, and no claims about a named product.
+- `rows` (list, **required**): 2 to 12 items. Describe what each system typically covers, in plain words. No ticks or crosses, and no claims about a named product.
   - `label` (text, **required**) "Row label": max 60 characters
   - `cells` (list): up to 4 items. One cell per column, in the same order as the columns.
     - `text` (text) "Cell": max 140 characters
@@ -1036,6 +1060,20 @@ blockType: `statBand` · appearance: **minimal**
   - `label` (text, **required**): What the number means.
 - `note` (text) "Footnote": Optional. Use it to say how the figures are measured or over what period, not to disclaim them.
 
+### Expanding Card CTA
+
+blockType: `expandingCardCta` · appearance: **minimal**
+
+Closing call to action as a navy card that starts small on the light page and opens out to full bleed, revealing a centred heading (one or two lines), a description and one button. Navy by design: it counts as the page's one Highlight (navy) block (collections/Pages/hooks/validateHighlight.ts, fields/layout.ts navyProblem).
+
+- `headingLine1` (text, **required**) "Heading (first line)": max 48 characters. First line of the heading. It is revealed on its own line, so break the sentence where it reads well.
+- `headingLine2` (text) "Heading (second line)": max 48 characters. Second line. Leave empty for a one line heading.
+- `description` (textarea): max 260 characters. Optional. One short paragraph under the heading. Leave empty to go straight from the heading to the button.
+- `ctaLabel` (text, **required**) "Button text": max 28 characters. The words on the button, such as Book a demo.
+- `ctaUrl` (text, **required**) "Button address": A page on this site such as /contact, a section on this page such as #pricing, or an address starting https://.
+- `startShape` (select, **required**) "Start shape": one of: `square` (Square), `portrait` (Tall square), `wide` (Wide card); default `square`. The shape of the closed card before it opens out. Ignored when motion is off.
+- `motion` (select) "Animation": one of: `follow` (Follow the page), `on` (On), `reduced` (Reduced (a simple fade)), `off` (Off (no animation)); default `follow`. Reduced keeps a simple fade. Off shows the block with no animation.
+
 ### WhatsApp widget
 
 blockType: `whatsappWidget` · appearance: **minimal**
@@ -1108,8 +1146,9 @@ slug: `header`
   - `type` (select, **required**) "What this item does": one of: `link` (Link (goes straight to a page)), `megaMenu` (Mega menu (opens a panel of links)); default `link`
   - `link` (link, **required**)
     - `type`: `reference` (an internal page or post, set in `reference`) or `custom` (a URL or site path in `url`); `label`: the visible text; `newTab`: open in a new tab
-  - `groups` (list): only when `type` is `megaMenu`. The menu panel sizes itself. A single group hides its label. Groups with 4 or more items wrap into 2 columns. The featured card only shows when the menu has 5 or more items in total.
+  - `groups` (list): only when `type` is `megaMenu`. The menu panel sizes itself. A single group hides its label. A group on Auto rows wraps into 2 columns once it has 4 or more items; set 3 or 4 rows to fill each column to that many before starting the next. The featured card only shows when the menu has 5 or more items in total.
     - `label` (text) "Group label (optional)": max 24 characters. Such as Modules or Agents. Hidden when the menu has a single group.
+    - `rows` (select) "Rows per column": one of: `auto` (Auto), `3` (3 rows), `4` (4 rows); default `auto`. Auto: 4 or more items wrap into 2 columns. 3 or 4 rows: items fill each column to that many, then start the next.
     - `items` (list): at least 1 items
       - `icon` (select): one of: `message` (Message (conversational, enquiry)), `chat` (Chat (follow-up, replies)), `bolt` (Bolt (workflows, automation)), `layers` (Layers (context, knowledge)), `gauge` (Gauge (quality, analytics)), `plug` (Plug (integrations)), `shield` (Shield (private cloud, isolation)), `shieldCheck` (Shield check (governance, oversight)), `lock` (Lock (data ownership)), `globe` (Globe (standards, interoperability)), `users` (Users (team, patients, customers)), `headphones` (Headphones (support, agent handover)), `stethoscope` (Stethoscope (doctor, consultation)), `hospital` (Hospital (hospitals, facilities)), `graduationCap` (Graduation cap (education, admissions)), `building` (Building (organisation, campus)), `database` (Database (records, data store)), `workflow` (Workflow (process, orchestration)), `bot` (Bot (AI agent)), `sparkles` (Sparkles (AI, generated)), `search` (Search (retrieval, lookup)), `chart` (Chart (reporting, dashboards)), `target` (Target (goals, targeting)), `rocket` (Rocket (go-live, launch)), `fileText` (File text (documents, notes)), `clipboardList` (Clipboard list (tasks, checklist)), `link` (Link (connection)), `settings` (Settings (configuration)), `puzzle` (Puzzle (modules, extensions)), `briefcase` (Briefcase (business, enterprise))
       - `label` (text, **required**): max 30 characters
@@ -1142,6 +1181,10 @@ slug: `footer`
   - `navItems` (list): up to 8 items
     - `link` (link, **required**)
       - `type`: `reference` (an internal page or post, set in `reference`) or `custom` (a URL or site path in `url`); `label` (required): the visible text; `newTab`: open in a new tab
+- `contactHeading` (text): max 30 characters; default `Contact`. Heading above the contact details. Left empty, it reads Contact.
+- `linkContactHeading` (checkbox) "Link the contact heading": default `false`. Turns the heading itself into a link, usually to the Contact page. Off, it is plain text.
+- `contactLink` (link, **required**) "Contact heading goes to"
+  - `type`: `reference` (an internal page or post, set in `reference`) or `custom` (a URL or site path in `url`); `label`: the visible text; `newTab`: open in a new tab
 - `email` (text): Contact email shown in the footer.
 - `phone` (text): Contact phone number shown in the footer.
 - `legalItems` (list): up to 4 items. Small links on the bottom line, e.g. Terms and Privacy.
@@ -1173,6 +1216,11 @@ slug: `siteSettings`
 - `defaultDescription` (textarea) "Default description": max 160 characters. Used when a page has no meta description of its own. Keep it under 160 characters.
 - `defaultShareImage` (upload from `media`) "Default share image": Shown when a link is shared on LinkedIn, WhatsApp and similar. 1200×630 works best.
 - `twitterCardType` (select) "Social card type": one of: `summary_large_image` (Large image), `summary` (Small image); default `summary_large_image`
+- `organisation` (group): Describes the company to search engines (schema.org Organization) on every page. Leave a field empty to leave it out.
+  - `legalName` (text) "Legal name (as registered)": max 120 characters
+  - `logo` (upload from `media`) "Logo for search results (PNG, at least 112×112)": Empty uses the logo the website ships with.
+  - `profiles` (list) "Social profiles": up to 10 items. The company pages on LinkedIn, YouTube, X and similar.
+    - `url` (text, **required**) "Profile link (full address)"
 - `manifestShortName` (text) "Short name": max 12 characters. Up to 12 characters, shown under the home screen icon.
 - `manifestDisplay` (select) "Display mode": one of: `browser` (Browser (normal tab)), `standalone` (Standalone (opens like an app)); default `browser`
 - `manifestBackground` (text) "Splash background colour": max 9 characters. Hex colour, e.g. #FFFFFF.
