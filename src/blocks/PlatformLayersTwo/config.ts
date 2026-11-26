@@ -44,6 +44,7 @@ export const PlatformLayersTwo: Block = {
       name: 'anchorId',
       type: 'text',
       label: 'Anchor ID',
+      maxLength: 60,
       admin: { description: 'Optional. Lets a link such as #platform-stack jump to this block.' },
     },
     {
@@ -115,6 +116,7 @@ export const PlatformLayersTwo: Block = {
               name: 'url',
               type: 'text',
               label: 'URL',
+              maxLength: 300,
               admin: {
                 condition: (_, siblingData) => siblingData?.type === 'external',
               },

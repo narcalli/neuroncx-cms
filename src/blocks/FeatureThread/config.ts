@@ -9,6 +9,7 @@ export const FeatureThread: Block = {
       name: 'heading',
       type: 'text',
       label: 'Heading',
+      maxLength: 140,
       admin: { description: 'Optional. Leave empty to show the features with no heading.' },
     },
     {

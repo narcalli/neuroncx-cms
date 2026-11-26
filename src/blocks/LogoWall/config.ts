@@ -12,6 +12,7 @@ export const LogoWall: Block = {
       name: 'label',
       type: 'text',
       label: 'Small label above the heading',
+      maxLength: 40,
       admin: {
         description: 'Short and plain, e.g. "Trusted by". Leave empty to hide.',
       },
@@ -20,11 +21,13 @@ export const LogoWall: Block = {
       name: 'heading',
       type: 'text',
       label: 'Heading',
+      maxLength: 140,
     },
     {
       name: 'intro',
       type: 'textarea',
       label: 'Intro line',
+      maxLength: 200,
       admin: {
         description: 'One or two sentences. Leave empty to hide.',
       },
@@ -61,6 +64,7 @@ export const LogoWall: Block = {
           type: 'text',
           required: true,
           label: 'Client name',
+          maxLength: 40,
           admin: {
             description:
               'Shown as text in wordmark mode, and used as the image alt text in logo mode. Keep it short; long names crowd the row.',

@@ -60,6 +60,7 @@ import { SolutionGrid } from './SolutionGrid/config'
 import { TrustPanel } from './TrustPanel/config'
 import { StatBand } from './StatBand/config'
 import { IntegrationsLanding } from './IntegrationsLanding/config'
+import { StackComparisonWithAppearance } from './StackComparison/config'
 
 /**
  * Every block a Page's layout offers, each wrapped with its Appearance
@@ -154,4 +155,8 @@ export const PAGE_LAYOUT_BLOCKS: Block[] = [
   // Has its own theme and anchorId fields, so it is not wrapped with
   // withPresentation either. Same reason as FAQ above.
   PlatformLayersTwo,
+  // Already carries the full Appearance set minus Highlight (navy) — see
+  // withPresentationExceptNavy in fields/presentation.ts — so it is not
+  // wrapped with withPresentation either.
+  StackComparisonWithAppearance,
 ]

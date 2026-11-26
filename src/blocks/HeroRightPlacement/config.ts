@@ -22,6 +22,7 @@ export const HeroRightPlacement: Block = {
       name: 'eyebrow',
       type: 'text',
       label: 'Small label above the headline',
+      maxLength: 60,
       admin: { description: 'Optional. Short, e.g. "Bot swarm".' },
     },
     {
@@ -29,6 +30,7 @@ export const HeroRightPlacement: Block = {
       type: 'text',
       required: true,
       label: 'Headline',
+      maxLength: 120,
       admin: {
         description:
           'This becomes the page’s main heading (the H1), so use it only once per page. Set the page hero above to "None" when this block is on the page.',
@@ -38,6 +40,7 @@ export const HeroRightPlacement: Block = {
       name: 'subhead',
       type: 'textarea',
       label: 'Subhead',
+      maxLength: 300,
       admin: { description: 'One or two sentences under the headline. Optional.' },
     },
     optionalCta('primaryCta', 'Primary button'),
@@ -57,6 +60,7 @@ export const HeroRightPlacement: Block = {
       name: 'mediaAlt',
       type: 'text',
       label: 'What the picture shows (optional)',
+      maxLength: 200,
       admin: {
         description:
           'Leave empty when the picture is purely illustrative. Fill this in when it carries meaning a screen reader user needs to know.',

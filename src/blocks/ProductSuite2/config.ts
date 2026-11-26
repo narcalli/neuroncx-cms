@@ -27,10 +27,11 @@ export const ProductSuite2: Block = {
       name: 'eyebrow',
       type: 'text',
       label: 'Small label above the heading',
+      maxLength: 60,
       admin: { description: 'Optional. Short, e.g. "Reports and prescriptions".' },
     },
-    { name: 'heading', type: 'text', label: 'Heading' },
-    { name: 'intro', type: 'textarea', label: 'Intro line' },
+    { name: 'heading', type: 'text', label: 'Heading', maxLength: 140 },
+    { name: 'intro', type: 'textarea', label: 'Intro line', maxLength: 300 },
     {
       name: 'cards',
       type: 'array',
@@ -44,8 +45,8 @@ export const ProductSuite2: Block = {
         cardSwitchFields(),
         cardNumberTextField(),
         cardEyebrowField(),
-        { name: 'title', type: 'text', required: true, label: 'Title' },
-        { name: 'description', type: 'textarea', label: 'Description' },
+        { name: 'title', type: 'text', required: true, label: 'Title', maxLength: 90 },
+        { name: 'description', type: 'textarea', label: 'Description', maxLength: 200 },
         ...cardPointsFields(),
         {
           name: 'link',
@@ -59,8 +60,8 @@ export const ProductSuite2: Block = {
             {
               type: 'row',
               fields: [
-                { name: 'label', type: 'text', label: 'Link text', admin: { width: '50%' } },
-                { name: 'url', type: 'text', label: 'Link address', admin: { width: '50%' } },
+                { name: 'label', type: 'text', label: 'Link text', maxLength: 40, admin: { width: '50%' } },
+                { name: 'url', type: 'text', label: 'Link address', maxLength: 300, admin: { width: '50%' } },
               ],
             },
             {

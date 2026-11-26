@@ -17,14 +17,15 @@ export const StatBand: Block = {
           'Use figures you could defend if a prospect asked how you measured them. Three or four works best.',
       },
       fields: [
-        { name: 'value', type: 'text', required: true, admin: { description: 'e.g. 4 industries, 1,300+' } },
-        { name: 'label', type: 'text', required: true, admin: { description: 'What the number means.' } },
+        { name: 'value', type: 'text', required: true, maxLength: 20, admin: { description: 'e.g. 4 industries, 1,300+' } },
+        { name: 'label', type: 'text', required: true, maxLength: 40, admin: { description: 'What the number means.' } },
       ],
     },
     {
       name: 'note',
       type: 'text',
       label: 'Footnote',
+      maxLength: 160,
       admin: {
         description:
           'Optional. Use it to say how the figures are measured or over what period, not to disclaim them.',

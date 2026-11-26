@@ -10,6 +10,7 @@ export const ConversationHero: Block = {
       name: 'eyebrow',
       type: 'text',
       label: 'Small label above the headline',
+      maxLength: 60,
       admin: { description: 'Optional. Short, e.g. "Omnichannel automation and reasoning".' },
     },
     {
@@ -17,6 +18,7 @@ export const ConversationHero: Block = {
       type: 'text',
       required: true,
       label: 'Headline',
+      maxLength: 120,
       admin: { description: 'Short and direct works best: around six to eight words.' },
     },
     {
@@ -24,6 +26,7 @@ export const ConversationHero: Block = {
       type: 'textarea',
       required: true,
       label: 'Subhead',
+      maxLength: 300,
       admin: { description: 'One or two sentences explaining what the product does, in plain language.' },
     },
     {
@@ -39,10 +42,10 @@ export const ConversationHero: Block = {
           "Sets the hero heading's font size in pixels. Keep it under about 48px for longer headlines so they don't wrap awkwardly.",
       },
     },
-    { name: 'primaryButtonLabel', type: 'text', label: 'Primary button text' },
-    { name: 'primaryButtonLink', type: 'text', label: 'Primary button address' },
-    { name: 'secondaryButtonLabel', type: 'text', label: 'Secondary button text' },
-    { name: 'secondaryButtonLink', type: 'text', label: 'Secondary button address' },
+    { name: 'primaryButtonLabel', type: 'text', label: 'Primary button text', maxLength: 40 },
+    { name: 'primaryButtonLink', type: 'text', label: 'Primary button address', maxLength: 300 },
+    { name: 'secondaryButtonLabel', type: 'text', label: 'Secondary button text', maxLength: 40 },
+    { name: 'secondaryButtonLink', type: 'text', label: 'Secondary button address', maxLength: 300 },
     {
       name: 'chips',
       type: 'array',
@@ -52,18 +55,20 @@ export const ConversationHero: Block = {
         initCollapsed: true,
         description: 'Short capability labels, e.g. "WhatsApp · Voice · Web". Two or three works best.',
       },
-      fields: [{ name: 'label', type: 'text', required: true }],
+      fields: [{ name: 'label', type: 'text', required: true, maxLength: 24 }],
     },
     {
       name: 'conversationLabel',
       type: 'text',
       label: 'Label above the conversation',
+      maxLength: 60,
       admin: { description: 'For example "WhatsApp · Ayurvaid Hospitals · 11:42".' },
     },
     {
       name: 'conversation',
       type: 'textarea',
       label: 'The conversation',
+      maxLength: 600,
       admin: {
         description:
           'One message per line. Start a line with "them:" for the customer, "us:" for the agent, and "tag:" for a system note at the end.',
@@ -79,7 +84,7 @@ export const ConversationHero: Block = {
         description: 'Optional. What fires behind the scenes, e.g. Booked, Paid, Reminder sent.',
       },
       fields: [
-        { name: 'label', type: 'text', required: true },
+        { name: 'label', type: 'text', required: true, maxLength: 40 },
         iconField('calendar'),
       ],
     },
@@ -93,8 +98,8 @@ export const ConversationHero: Block = {
         description: 'Optional. These sit directly under the hero, so use real, defensible figures only.',
       },
       fields: [
-        { name: 'value', type: 'text', required: true, admin: { description: 'e.g. 40%, 2.5x, 14+' } },
-        { name: 'label', type: 'text', required: true, admin: { description: 'What the number means, in three or four words.' } },
+        { name: 'value', type: 'text', required: true, maxLength: 20, admin: { description: 'e.g. 40%, 2.5x, 14+' } },
+        { name: 'label', type: 'text', required: true, maxLength: 40, admin: { description: 'What the number means, in three or four words.' } },
       ],
     },
   ],

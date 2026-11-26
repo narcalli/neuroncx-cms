@@ -81,6 +81,7 @@ export const AudienceTabs: Block = {
                   type: 'text',
                   label: 'Link address (/page, #section or https://)',
                   required: true,
+                  maxLength: 300,
                   validate: validateLinkUrl,
                   admin: { width: '60%' },
                 },

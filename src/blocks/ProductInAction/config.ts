@@ -49,6 +49,7 @@ export const ProductInAction: Block = {
       name: 'anchorId',
       type: 'text',
       label: 'Anchor ID',
+      maxLength: 60,
       admin: { description: 'Optional. Lets a link such as #product-in-action jump to this block.' },
     },
     {
@@ -123,8 +124,8 @@ export const ProductInAction: Block = {
             {
               type: 'row',
               fields: [
-                { name: 'label', type: 'text', label: 'Link text', admin: { width: '50%' } },
-                { name: 'url', type: 'text', label: 'Link address', admin: { width: '50%' } },
+                { name: 'label', type: 'text', label: 'Link text', maxLength: 40, admin: { width: '50%' } },
+                { name: 'url', type: 'text', label: 'Link address', maxLength: 300, admin: { width: '50%' } },
               ],
             },
             {

@@ -13,8 +13,8 @@ export const AgenticClosing: Block = {
     {
       type: 'row',
       fields: [
-        { name: 'ctaLabel', type: 'text', label: 'Button text', required: true, admin: { width: '50%' } },
-        { name: 'ctaUrl', type: 'text', label: 'Button address', required: true, admin: { width: '50%' } },
+        { name: 'ctaLabel', type: 'text', label: 'Button text', required: true, maxLength: 40, admin: { width: '50%' } },
+        { name: 'ctaUrl', type: 'text', label: 'Button address', required: true, maxLength: 300, admin: { width: '50%' } },
       ],
     },
   ],

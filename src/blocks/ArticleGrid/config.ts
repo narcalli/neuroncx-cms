@@ -12,6 +12,7 @@ export const ArticleGrid: Block = {
       name: 'heading',
       type: 'text',
       defaultValue: 'From the team',
+      maxLength: 140,
       admin: {
         description: 'Heading above the articles.',
       },

@@ -66,7 +66,7 @@ export const BentoGrid: Block = {
           name: 'framed',
           type: 'checkbox',
           label: 'Show outer frame',
-          defaultValue: true,
+          defaultValue: false,
           admin: { width: '25%' },
         },
       ],
@@ -158,7 +158,7 @@ export const BentoGrid: Block = {
         cardSwitchFields(),
         cardNumberTextField(),
         cardEyebrowField(),
-        { name: 'title', type: 'text', label: 'Title', required: true },
+        { name: 'title', type: 'text', label: 'Title', required: true, maxLength: 90 },
         {
           name: 'titleSize',
           type: 'select',
@@ -201,11 +201,12 @@ export const BentoGrid: Block = {
             {
               type: 'row',
               fields: [
-                { name: 'label', type: 'text', label: 'Link text', admin: { width: '50%' } },
+                { name: 'label', type: 'text', label: 'Link text', maxLength: 40, admin: { width: '50%' } },
                 {
                   name: 'url',
                   type: 'text',
                   label: 'Link address',
+                  maxLength: 300,
                   admin: { width: '50%' },
                   validate: ((value, { siblingData }) => {
                     const label = (siblingData as { label?: string } | undefined)?.label

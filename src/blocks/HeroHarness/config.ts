@@ -69,6 +69,7 @@ const sectionField: Field = {
   name: 'section',
   type: 'text',
   label: 'Section to jump to',
+  maxLength: 60,
   validate: validateSection,
   admin: {
     width: '50%',

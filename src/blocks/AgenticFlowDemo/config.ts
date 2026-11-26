@@ -83,7 +83,7 @@ const linkGroup = (label: string): Field => ({
         description: 'An agent links only once it has its own page.',
       },
     },
-    { name: 'url', type: 'text', label: 'URL', admin: { condition: (_, siblingData) => siblingData?.type === 'custom' } },
+    { name: 'url', type: 'text', label: 'URL', maxLength: 300, admin: { condition: (_, siblingData) => siblingData?.type === 'custom' } },
     { name: 'newTab', type: 'checkbox', label: 'Open in a new tab' },
   ],
 })

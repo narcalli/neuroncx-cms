@@ -37,8 +37,8 @@ export const AgenticHero: Block = {
     {
       type: 'row',
       fields: [
-        { name: 'ctaLabel', type: 'text', label: 'Button text', admin: { width: '50%' } },
-        { name: 'ctaUrl', type: 'text', label: 'Button address', admin: { width: '50%' } },
+        { name: 'ctaLabel', type: 'text', label: 'Button text', maxLength: 40, admin: { width: '50%' } },
+        { name: 'ctaUrl', type: 'text', label: 'Button address', maxLength: 300, admin: { width: '50%' } },
       ],
     },
     {

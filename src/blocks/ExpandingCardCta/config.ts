@@ -55,6 +55,7 @@ export const ExpandingCardCta: Block = {
           type: 'text',
           label: 'Button address',
           required: true,
+          maxLength: 300,
           validate: validateLinkUrl,
           admin: {
             width: '50%',

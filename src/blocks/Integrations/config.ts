@@ -22,13 +22,14 @@ export const Integrations: Block = {
         {
           label: 'Content',
           fields: [
-            { name: 'label', type: 'text', label: 'Small label above the heading' },
-            { name: 'heading', type: 'text', label: 'Heading' },
-            { name: 'intro', type: 'textarea', label: 'Intro line' },
+            { name: 'label', type: 'text', label: 'Small label above the heading', maxLength: 40 },
+            { name: 'heading', type: 'text', label: 'Heading', maxLength: 140 },
+            { name: 'intro', type: 'textarea', label: 'Intro line', maxLength: 300 },
             {
               name: 'footnote',
               type: 'text',
               label: 'Footnote',
+              maxLength: 160,
               admin: { description: 'For example: anything else connects over the NeuronCx REST API and webhooks.' },
             },
           ],
@@ -45,11 +46,12 @@ export const Integrations: Block = {
               maxRows: 24,
               admin: { initCollapsed: true, condition: showWhenManual },
               fields: [
-                { name: 'name', type: 'text', required: true, label: 'Name' },
+                { name: 'name', type: 'text', required: true, label: 'Name', maxLength: 60 },
                 {
                   name: 'summary',
                   type: 'text',
                   label: 'One line',
+                  maxLength: 120,
                   admin: { description: 'What flows between the two systems, in plain words.' },
                 },
                 {
