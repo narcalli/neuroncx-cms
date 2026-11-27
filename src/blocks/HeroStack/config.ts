@@ -5,11 +5,12 @@ const cta = (name: string, label: string) => ({
   type: 'group' as const,
   label,
   fields: [
-    { name: 'label', type: 'text' as const, label: 'Button text' },
+    { name: 'label', type: 'text' as const, label: 'Button text', maxLength: 40 },
     {
       name: 'href',
       type: 'text' as const,
       label: 'Button address',
+      maxLength: 300,
       admin: { description: 'A full address, a page path such as /contact, or #section-id for a section on this page.' },
     },
   ],
@@ -24,6 +25,7 @@ export const HeroStack: Block = {
       name: 'eyebrow',
       type: 'text',
       label: 'Small label above the heading',
+      maxLength: 60,
       admin: { description: 'Optional. For example "Acquire · Engage · Retain".' },
     },
     {
@@ -31,11 +33,13 @@ export const HeroStack: Block = {
       type: 'text',
       required: true,
       label: 'Heading',
+      maxLength: 140,
     },
     {
       name: 'intro',
       type: 'textarea',
       label: 'Intro',
+      maxLength: 300,
       admin: { description: 'Optional. One or two sentences under the heading. Hidden on phones to keep the hero short.' },
     },
     cta('primaryCta', 'Primary button'),

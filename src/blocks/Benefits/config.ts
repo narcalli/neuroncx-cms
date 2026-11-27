@@ -5,8 +5,8 @@ export const Benefits: Block = {
   interfaceName: 'BenefitsBlock',
   labels: { singular: 'Benefits', plural: 'Benefits' },
   fields: [
-    { name: 'label', type: 'text', label: 'Small label above the heading' },
-    { name: 'heading', type: 'text', label: 'Heading' },
+    { name: 'label', type: 'text', label: 'Small label above the heading', maxLength: 40 },
+    { name: 'heading', type: 'text', label: 'Heading', maxLength: 140 },
     {
       name: 'items',
       type: 'array',
@@ -18,8 +18,8 @@ export const Benefits: Block = {
         initCollapsed: true,
       },
       fields: [
-        { name: 'title', type: 'text', required: true, label: 'Benefit' },
-        { name: 'description', type: 'textarea', label: 'Description' },
+        { name: 'title', type: 'text', required: true, label: 'Benefit', maxLength: 60 },
+        { name: 'description', type: 'textarea', label: 'Description', maxLength: 140 },
       ],
     },
   ],

@@ -13,6 +13,7 @@ export const PartnerStrip: Block = {
       name: 'intro',
       type: 'text',
       label: 'Opening line',
+      maxLength: 160,
       admin: { description: 'For example: Powering conversational commerce across industries.' },
     },
     ...integrationSourceFields({ min: 1, max: 8 }),
@@ -26,7 +27,7 @@ export const PartnerStrip: Block = {
         description:
           'Systems you connect to, such as DocPulse, LeadSquared and WhatsApp Business API, set as text rather than logos. This is not the client logo wall.',
       },
-      fields: [{ name: 'name', type: 'text', required: true }],
+      fields: [{ name: 'name', type: 'text', required: true, maxLength: 40 }],
     },
     {
       name: 'badges',
@@ -38,8 +39,8 @@ export const PartnerStrip: Block = {
         description: 'Only claim a standard you actually meet. Hospital IT teams read these closely.',
       },
       fields: [
-        { name: 'name', type: 'text', required: true, admin: { description: 'e.g. ABDM' } },
-        { name: 'suffix', type: 'text', defaultValue: 'ready', admin: { description: 'e.g. ready' } },
+        { name: 'name', type: 'text', required: true, maxLength: 24, admin: { description: 'e.g. ABDM' } },
+        { name: 'suffix', type: 'text', defaultValue: 'ready', maxLength: 24, admin: { description: 'e.g. ready' } },
       ],
     },
   ],

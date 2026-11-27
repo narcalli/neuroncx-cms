@@ -5,9 +5,9 @@ export const SolutionGrid: Block = {
   interfaceName: 'SolutionGridBlock',
   labels: { singular: 'Solution Grid', plural: 'Solution Grids' },
   fields: [
-    { name: 'eyebrow', type: 'text', label: 'Small label', admin: { description: 'e.g. Solutions' } },
-    { name: 'heading', type: 'text', required: true, label: 'Heading' },
-    { name: 'intro', type: 'textarea', label: 'Intro line' },
+    { name: 'eyebrow', type: 'text', label: 'Small label', maxLength: 60, admin: { description: 'e.g. Solutions' } },
+    { name: 'heading', type: 'text', required: true, label: 'Heading', maxLength: 140 },
+    { name: 'intro', type: 'textarea', label: 'Intro line', maxLength: 300 },
     {
       name: 'groups',
       type: 'array',
@@ -19,7 +19,7 @@ export const SolutionGrid: Block = {
         description: 'Each group is a row of cards under its own small heading, e.g. By journey.',
       },
       fields: [
-        { name: 'title', type: 'text', required: true, admin: { description: 'e.g. By journey' } },
+        { name: 'title', type: 'text', required: true, maxLength: 40, admin: { description: 'e.g. By journey' } },
         {
           name: 'items',
           type: 'array',
@@ -27,11 +27,12 @@ export const SolutionGrid: Block = {
           minRows: 1,
           maxRows: 8,
           fields: [
-            { name: 'label', type: 'text', required: true },
+            { name: 'label', type: 'text', required: true, maxLength: 60 },
             {
               name: 'href',
               type: 'text',
               label: 'Link address',
+              maxLength: 300,
               admin: {
                 description:
                   'Optional. Leave empty and the card is plain text rather than a link, which is better than linking to a page that does not exist yet.',

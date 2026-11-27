@@ -11,6 +11,7 @@ export const HeroFullBackground: Block = {
       name: 'eyebrow',
       type: 'text',
       label: 'Small label above the headline',
+      maxLength: 60,
       admin: { description: 'Optional. Short, e.g. "AI automation for patient journeys".' },
     },
     {
@@ -18,6 +19,7 @@ export const HeroFullBackground: Block = {
       type: 'text',
       required: true,
       label: 'Headline',
+      maxLength: 120,
       admin: {
         description:
           'This becomes the page’s main heading (the H1), so use it only once per page. Set the page hero above to "None" when this block is on the page.',
@@ -27,6 +29,7 @@ export const HeroFullBackground: Block = {
       name: 'subhead',
       type: 'textarea',
       label: 'Subhead',
+      maxLength: 300,
       admin: { description: 'One or two sentences under the headline. Optional.' },
     },
     optionalCta('primaryCta', 'Primary button'),
@@ -41,7 +44,7 @@ export const HeroFullBackground: Block = {
         description:
           'Optional. Up to three short lines, e.g. "New guide every two weeks". Shown with a small dot between them.',
       },
-      fields: [{ name: 'text', type: 'text', required: true }],
+      fields: [{ name: 'text', type: 'text', required: true, maxLength: 60 }],
     },
     {
       name: 'media',
@@ -93,6 +96,7 @@ export const HeroFullBackground: Block = {
       name: 'mediaAlt',
       type: 'text',
       label: 'What the picture shows (optional)',
+      maxLength: 200,
       admin: {
         description:
           'Leave empty for a purely decorative background, the usual choice for a full-bleed hero. Fill this in only when the picture itself carries meaning a screen reader user needs to know.',

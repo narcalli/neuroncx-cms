@@ -28,6 +28,7 @@ export const WhatsappWidget: Block = {
       name: 'phone',
       type: 'text',
       label: 'WhatsApp number',
+      maxLength: 20,
       admin: {
         description:
           'In E.164 form, e.g. +919876543210. Used to build the chat link; the number itself is not shown on the page.',
@@ -40,6 +41,7 @@ export const WhatsappWidget: Block = {
       type: 'text',
       label: 'Button text',
       defaultValue: 'Chat with us',
+      maxLength: 40,
       admin: { condition: (_, siblingData) => Boolean(siblingData?.enabled) },
     },
     {
@@ -47,6 +49,7 @@ export const WhatsappWidget: Block = {
       type: 'text',
       label: 'Prefilled message',
       defaultValue: 'Hi NeuronCx, I would like to know more.',
+      maxLength: 160,
       admin: {
         description: 'What the visitor sends. The page reference is appended to it.',
         condition: (_, siblingData) => Boolean(siblingData?.enabled),
@@ -66,6 +69,7 @@ export const WhatsappWidget: Block = {
       name: 'hoursNote',
       type: 'text',
       label: 'Hours note (optional)',
+      maxLength: 60,
       admin: {
         description: 'For example "Mon–Sat, 9am–7pm IST". Not shown yet; reserved for a panel.',
         condition: (_, siblingData) => Boolean(siblingData?.enabled),

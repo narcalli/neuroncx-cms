@@ -17,6 +17,7 @@ export const HeroWorkforceGrid: Block = {
       name: 'eyebrow',
       type: 'text',
       label: 'Small label above the headline',
+      maxLength: 60,
       admin: { description: 'Optional. Short, e.g. "The workforce".' },
     },
     {
@@ -24,6 +25,7 @@ export const HeroWorkforceGrid: Block = {
       type: 'text',
       required: true,
       label: 'Headline',
+      maxLength: 120,
       admin: {
         description:
           'This becomes the page’s main heading (the H1), so use it only once per page. Set the page hero above to "None" when this block is on the page.',
@@ -33,6 +35,7 @@ export const HeroWorkforceGrid: Block = {
       name: 'subhead',
       type: 'textarea',
       label: 'Subhead',
+      maxLength: 300,
       admin: { description: 'One or two sentences under the headline. Optional.' },
     },
     link({
@@ -88,13 +91,15 @@ export const HeroWorkforceGrid: Block = {
           type: 'text',
           label: 'Small label on the card',
           defaultValue: 'AI agent',
+          maxLength: 24,
           admin: { description: 'Short, e.g. "AI agent".' },
         },
-        { name: 'title', type: 'text', required: true, label: 'Title' },
+        { name: 'title', type: 'text', required: true, label: 'Title', maxLength: 90 },
         {
           name: 'description',
           type: 'textarea',
           label: 'Description',
+          maxLength: 160,
           admin: { description: 'One or two short lines.' },
         },
       ],

@@ -1,4 +1,5 @@
-import type { Block, Field } from 'payload'
+import type { Block, Field, SelectFieldSingleValidation } from 'payload'
+import { select } from 'payload/shared'
 
 /**
  * Presentation options available on every block.
@@ -103,6 +104,7 @@ export const presentationFields: Field[] = [
         name: 'htmlId',
         type: 'text',
         label: 'Anchor ID (advanced)',
+        maxLength: 60,
         admin: {
           description:
             'Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.',
@@ -167,6 +169,7 @@ export const minimalPresentationFields: Field[] = [
         name: 'htmlId',
         type: 'text',
         label: 'Anchor ID (advanced)',
+        maxLength: 60,
         admin: {
           description:
             'Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.',
@@ -220,3 +223,42 @@ export const withBackgroundAndId = (block: Block): Block => ({
   ...block,
   fields: [...(block.fields || []), ...backgroundAndIdFields],
 })
+
+/** Runs Payload's own select check, then refuses the one value a block forbids. */
+const rejectValue = (forbidden: string, message: string): SelectFieldSingleValidation => (value, options) => {
+  const base = select(value, options)
+  if (base !== true) return base
+  return value === forbidden ? message : true
+}
+
+/**
+ * The full presentation set, minus Highlight (navy) on the background
+ * choice. For a block whose own design already uses navy — a highlighted
+ * card, a navy stage — so a second navy section right beside it would
+ * read as two highlights fighting each other. The option itself cannot be
+ * removed from the shared `background` select without a copy of
+ * presentationFields per block, so this clones just that one field and
+ * replaces its validate instead (see `presentationField` above, which
+ * clones the same field for `backgroundAndIdFields`).
+ */
+export const withPresentationExceptNavy = (block: Block, message: string): Block => {
+  const wrapped = withPresentation(block)
+  return {
+    ...wrapped,
+    fields: wrapped.fields.map((f): Field => {
+      if (f.type !== 'collapsible' || f.label !== 'Appearance') return f
+      return {
+        ...f,
+        fields: f.fields.map((row): Field => {
+          if (row.type !== 'row') return row
+          return {
+            ...row,
+            fields: row.fields.map((rf): Field =>
+              'name' in rf && rf.name === 'background' ? ({ ...rf, validate: rejectValue('navy', message) } as Field) : rf,
+            ),
+          } as Field
+        }),
+      } as Field
+    }),
+  }
+}

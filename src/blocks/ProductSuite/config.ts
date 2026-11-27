@@ -5,9 +5,9 @@ export const ProductSuite: Block = {
   interfaceName: 'ProductSuiteBlock',
   labels: { singular: 'Product Suite', plural: 'Product Suites' },
   fields: [
-    { name: 'label', type: 'text', label: 'Small label above the heading' },
-    { name: 'heading', type: 'text', label: 'Heading' },
-    { name: 'intro', type: 'textarea', label: 'Intro line' },
+    { name: 'label', type: 'text', label: 'Small label above the heading', maxLength: 40 },
+    { name: 'heading', type: 'text', label: 'Heading', maxLength: 140 },
+    { name: 'intro', type: 'textarea', label: 'Intro line', maxLength: 300 },
     {
       name: 'products',
       type: 'array',
@@ -19,7 +19,7 @@ export const ProductSuite: Block = {
         initCollapsed: true,
       },
       fields: [
-        { name: 'name', type: 'text', required: true, label: 'Product name' },
+        { name: 'name', type: 'text', required: true, label: 'Product name', maxLength: 60 },
         {
           name: 'cardStyle',
           type: 'select',
@@ -37,6 +37,7 @@ export const ProductSuite: Block = {
           name: 'summary',
           type: 'textarea',
           label: 'What it does',
+          maxLength: 200,
           admin: { description: 'One or two plain sentences. Say what it does, not why it is good.' },
         },
         {
@@ -48,7 +49,7 @@ export const ProductSuite: Block = {
             description:
               'Tags style: short labels. Steps style: 3 to 5 steps, one line each, about 80 characters.',
           },
-          fields: [{ name: 'text', type: 'text', required: true }],
+          fields: [{ name: 'text', type: 'text', required: true, maxLength: 120 }],
         },
         {
           name: 'image',
@@ -94,6 +95,7 @@ export const ProductSuite: Block = {
           name: 'teamControls',
           type: 'textarea',
           label: 'What your team controls',
+          maxLength: 160,
           admin: {
             description: 'Shown in a small box under the steps.',
             condition: (_, siblingData) => siblingData?.cardStyle === 'steps',
@@ -103,15 +105,17 @@ export const ProductSuite: Block = {
           name: 'note',
           type: 'text',
           label: 'Small note under the card',
+          maxLength: 120,
           admin: {
             condition: (_, siblingData) => siblingData?.cardStyle === 'steps',
           },
         },
-        { name: 'linkLabel', type: 'text', label: 'Link text', defaultValue: 'Read more' },
+        { name: 'linkLabel', type: 'text', label: 'Link text', defaultValue: 'Read more', maxLength: 40 },
         {
           name: 'linkHref',
           type: 'text',
           label: 'Link address',
+          maxLength: 300,
           admin: { description: 'For example /omnichannel-cx' },
         },
       ],

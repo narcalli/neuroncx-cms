@@ -14,8 +14,8 @@ export const AgenticCartsDemo: Block = {
     {
       type: 'row',
       fields: [
-        { name: 'modelALabel', type: 'text', label: 'Left toggle label', defaultValue: 'Leads-and-opportunities model', admin: { width: '50%' } },
-        { name: 'modelBLabel', type: 'text', label: 'Right toggle label', defaultValue: 'NeuronCx', admin: { width: '50%' } },
+        { name: 'modelALabel', type: 'text', label: 'Left toggle label', defaultValue: 'Leads-and-opportunities model', maxLength: 40, admin: { width: '50%' } },
+        { name: 'modelBLabel', type: 'text', label: 'Right toggle label', defaultValue: 'NeuronCx', maxLength: 40, admin: { width: '50%' } },
       ],
     },
     {

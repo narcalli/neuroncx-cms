@@ -163,6 +163,7 @@ export interface Config {
     expandingCardCta: ExpandingCardCtaBlock;
     whatsappWidget: WhatsappWidgetBlock;
     platformLayersTwo: PlatformLayersTwoBlock;
+    stackComparison: StackComparisonBlock;
     statHero: StatHeroBlock;
     clusterLinks: ClusterLinksBlock;
     heroFullBackground: HeroFullBackgroundBlock;
@@ -865,6 +866,7 @@ export interface Page {
     | WhatsappWidgetBlock
     | FAQBlock
     | PlatformLayersTwoBlock
+    | StackComparisonBlock
   )[];
   meta?: {
     title?: string | null;
@@ -3168,6 +3170,7 @@ export interface Sector {
         | ExpandingCardCtaBlock
         | WhatsappWidgetBlock
         | PlatformLayersTwoBlock
+        | StackComparisonBlock
         | StatHeroBlock
         | ClusterLinksBlock
         | HeroFullBackgroundBlock
@@ -8313,6 +8316,127 @@ export interface PlatformLayersTwoBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StackComparisonBlock".
+ */
+export interface StackComparisonBlock {
+  eyebrow?: string | null;
+  heading: string;
+  intro?: string | null;
+  /**
+   * One card per system being compared. Highlight one at most — usually NeuronCx.
+   */
+  cards?:
+    | {
+        title: string;
+        tagline?: string | null;
+        /**
+         * Shown as a pill on the card, e.g. "Used by: sales team".
+         */
+        audienceLabel?: string | null;
+        /**
+         * Shows the card in navy with white text. At most one card can be highlighted.
+         */
+        highlighted?: boolean | null;
+        /**
+         * Small label on the card corner, e.g. "Recommended".
+         */
+        badge?: string | null;
+        cta?: {
+          label?: string | null;
+          url?: string | null;
+        };
+        /**
+         * The card's own capability list, split into up to two groups (for example "Includes" and "Does not include").
+         */
+        groups?:
+          | {
+              heading?: string | null;
+              /**
+               * The icon shown beside every item in this group.
+               */
+              tone?: ('included' | 'missing' | 'plus') | null;
+              items?:
+                | {
+                    text: string;
+                    id?: string | null;
+                  }[]
+                | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * An optional table under the cards that opens and closes. Leave it off to show just the cards.
+   */
+  table?: {
+    enabled?: boolean | null;
+    startOpen?: boolean | null;
+    openLabel?: string | null;
+    closeLabel?: string | null;
+    cellStyle?: ('tint' | 'dot' | 'compact') | null;
+    showLegend?: boolean | null;
+    /**
+     * The systems across the top of the table, left to right. Highlight one at most, usually NeuronCx.
+     */
+    columns?:
+      | {
+          label: string;
+          highlighted?: boolean | null;
+          /**
+           * Used by any cell in this column left on Inherit, below.
+           */
+          defaultRating?: ('strong' | 'partial' | 'missing' | 'roadmap' | 'none') | null;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * One row per capability. Give each row exactly one cell per column above, in the same order.
+     */
+    rows?:
+      | {
+          capability: string;
+          /**
+           * One cell per column, in the same order as the columns above.
+           */
+          cells?:
+            | {
+                text?: string | null;
+                /**
+                 * Rating sets the cell colour. Inherit uses the column's default.
+                 */
+                rating?: ('inherit' | 'strong' | 'partial' | 'missing' | 'roadmap' | 'none') | null;
+                id?: string | null;
+              }[]
+            | null;
+          id?: string | null;
+        }[]
+      | null;
+    footnote?: string | null;
+  };
+  /**
+   * Highlight (navy) marks the one section the page most wants read. Only one block per page may use it; a second one will stop the page saving. There is no crimson option: crimson is the single accent, and a full-bleed crimson section contradicts that.
+   */
+  background?: ('default' | 'white' | 'cloud' | 'navy') | null;
+  width?: ('default' | 'narrow' | 'wide' | 'full') | null;
+  spacingTop?: ('default' | 'none' | 'sm' | 'lg') | null;
+  spacingBottom?: ('default' | 'none' | 'sm' | 'lg') | null;
+  align?: ('default' | 'left' | 'center') | null;
+  /**
+   * Keeps the block and its content but removes it from the page.
+   */
+  hidden?: boolean | null;
+  /**
+   * Optional. Lets a link on this page jump straight to this block, for example a button linking to #how-it-works. Use lowercase words and dashes only, and no spaces or the # sign.
+   */
+  htmlId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'stackComparison';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "ClusterLinksBlock".
  */
 export interface ClusterLinksBlock {
@@ -9499,6 +9623,7 @@ export interface IntegrationsMaster {
         | ExpandingCardCtaBlock
         | WhatsappWidgetBlock
         | PlatformLayersTwoBlock
+        | StackComparisonBlock
       )[]
     | null;
   /**
@@ -10259,6 +10384,7 @@ export interface IndustryTopic {
         | ExpandingCardCtaBlock
         | WhatsappWidgetBlock
         | PlatformLayersTwoBlock
+        | StackComparisonBlock
         | StatHeroBlock
         | ClusterLinksBlock
         | HeroFullBackgroundBlock
@@ -11499,6 +11625,7 @@ export interface Hub {
         | ExpandingCardCtaBlock
         | WhatsappWidgetBlock
         | PlatformLayersTwoBlock
+        | StackComparisonBlock
       )[]
     | null;
   /**
@@ -12357,6 +12484,7 @@ export interface PagesSelect<T extends boolean = true> {
         whatsappWidget?: T | WhatsappWidgetBlockSelect<T>;
         faq?: T | FAQBlockSelect<T>;
         platformLayersTwo?: T | PlatformLayersTwoBlockSelect<T>;
+        stackComparison?: T | StackComparisonBlockSelect<T>;
       };
   meta?:
     | T
@@ -14309,6 +14437,85 @@ export interface PlatformLayersTwoBlockSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StackComparisonBlock_select".
+ */
+export interface StackComparisonBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  intro?: T;
+  cards?:
+    | T
+    | {
+        title?: T;
+        tagline?: T;
+        audienceLabel?: T;
+        highlighted?: T;
+        badge?: T;
+        cta?:
+          | T
+          | {
+              label?: T;
+              url?: T;
+            };
+        groups?:
+          | T
+          | {
+              heading?: T;
+              tone?: T;
+              items?:
+                | T
+                | {
+                    text?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
+        id?: T;
+      };
+  table?:
+    | T
+    | {
+        enabled?: T;
+        startOpen?: T;
+        openLabel?: T;
+        closeLabel?: T;
+        cellStyle?: T;
+        showLegend?: T;
+        columns?:
+          | T
+          | {
+              label?: T;
+              highlighted?: T;
+              defaultRating?: T;
+              id?: T;
+            };
+        rows?:
+          | T
+          | {
+              capability?: T;
+              cells?:
+                | T
+                | {
+                    text?: T;
+                    rating?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
+        footnote?: T;
+      };
+  background?: T;
+  width?: T;
+  spacingTop?: T;
+  spacingBottom?: T;
+  align?: T;
+  hidden?: T;
+  htmlId?: T;
   id?: T;
   blockName?: T;
 }

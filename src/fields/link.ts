@@ -81,6 +81,7 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
     {
       name: 'url',
       type: 'text',
+      maxLength: 300,
       admin: {
         condition: (_, siblingData) => siblingData?.type === 'custom',
       },
@@ -105,6 +106,7 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
         {
           name: 'label',
           type: 'text',
+          maxLength: 40,
           admin: {
             width: '50%',
           },

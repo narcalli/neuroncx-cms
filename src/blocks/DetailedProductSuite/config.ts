@@ -120,9 +120,10 @@ export const DetailedProductSuite: Block = {
                   type: 'text',
                   label: 'Button text',
                   defaultValue: 'Explore the workflow',
+                  maxLength: 40,
                   admin: { width: '50%' },
                 },
-                { name: 'url', type: 'text', label: 'Link address', admin: { width: '50%' } },
+                { name: 'url', type: 'text', label: 'Link address', maxLength: 300, admin: { width: '50%' } },
               ],
             },
             {

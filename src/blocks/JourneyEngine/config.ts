@@ -6,9 +6,9 @@ export const JourneyEngine: Block = {
   interfaceName: 'JourneyEngineBlock',
   labels: { singular: 'Journey Engine', plural: 'Journey Engines' },
   fields: [
-    { name: 'eyebrow', type: 'text', label: 'Small label', admin: { description: 'e.g. A live journey' } },
-    { name: 'heading', type: 'text', required: true, label: 'Heading' },
-    { name: 'intro', type: 'textarea', label: 'Intro line' },
+    { name: 'eyebrow', type: 'text', label: 'Small label', maxLength: 60, admin: { description: 'e.g. A live journey' } },
+    { name: 'heading', type: 'text', required: true, label: 'Heading', maxLength: 140 },
+    { name: 'intro', type: 'textarea', label: 'Intro line', maxLength: 300 },
     {
       name: 'stages',
       type: 'array',
@@ -21,7 +21,7 @@ export const JourneyEngine: Block = {
           'The stages of the journey, defined once. Every industry below uses these same stages in this same order.',
       },
       fields: [
-        { name: 'label', type: 'text', required: true, admin: { description: 'e.g. Enquiry' } },
+        { name: 'label', type: 'text', required: true, maxLength: 24, admin: { description: 'e.g. Enquiry' } },
         iconField('message'),
       ],
     },
@@ -37,15 +37,15 @@ export const JourneyEngine: Block = {
           'One tab per industry. Add one detail per stage, in the same order as the stages above: the first detail belongs to the first stage.',
       },
       fields: [
-        { name: 'name', type: 'text', required: true, admin: { description: 'Tab label, e.g. Diagnostics' } },
+        { name: 'name', type: 'text', required: true, maxLength: 30, admin: { description: 'Tab label, e.g. Diagnostics' } },
         {
           name: 'details',
           type: 'array',
           label: 'What happens at each stage',
           maxRows: 8,
           fields: [
-            { name: 'title', type: 'text', required: true, admin: { description: 'e.g. Recovery' } },
-            { name: 'description', type: 'textarea', required: true },
+            { name: 'title', type: 'text', required: true, maxLength: 60, admin: { description: 'e.g. Recovery' } },
+            { name: 'description', type: 'textarea', required: true, maxLength: 200 },
           ],
         },
       ],

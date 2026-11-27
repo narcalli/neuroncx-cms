@@ -38,11 +38,13 @@ export const FAQ: Block = {
       label: 'Heading',
       required: true,
       defaultValue: 'Frequently asked questions',
+      maxLength: 140,
     },
     {
       name: 'intro',
       type: 'textarea',
       label: 'Intro',
+      maxLength: 300,
       admin: { description: 'Optional. One short paragraph above the list.' },
     },
     {
@@ -61,7 +63,7 @@ export const FAQ: Block = {
         },
       },
       fields: [
-        { name: 'question', type: 'text', label: 'Question', required: true },
+        { name: 'question', type: 'text', label: 'Question', required: true, maxLength: 140 },
         {
           name: 'answer',
           type: 'richText',
@@ -124,6 +126,7 @@ export const FAQ: Block = {
       name: 'anchorId',
       type: 'text',
       label: 'Anchor ID',
+      maxLength: 60,
       admin: { description: 'Optional id for deep linking, e.g. faq' },
     },
     {
