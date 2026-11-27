@@ -24,7 +24,7 @@ export const TrustPanel: Block = {
       },
       fields: [
         { name: 'title', type: 'text', required: true, maxLength: 60 },
-        { name: 'description', type: 'textarea', required: true, maxLength: 200 },
+        { name: 'description', type: 'textarea', required: true, maxLength: 260 },
         iconField('shield'),
       ],
     },

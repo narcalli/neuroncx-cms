@@ -64,7 +64,7 @@ export const ProblemStatement: Block = {
       name: 'resolutionLine',
       type: 'text',
       label: 'The resolution line',
-      maxLength: 70,
+      maxLength: 100,
       admin: { description: 'e.g. NeuronCx unifies them into' },
     },
     {

@@ -19,7 +19,7 @@ export const Benefits: Block = {
       },
       fields: [
         { name: 'title', type: 'text', required: true, label: 'Benefit', maxLength: 60 },
-        { name: 'description', type: 'textarea', label: 'Description', maxLength: 140 },
+        { name: 'description', type: 'textarea', label: 'Description', maxLength: 300 },
       ],
     },
   ],

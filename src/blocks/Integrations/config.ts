@@ -51,7 +51,7 @@ export const Integrations: Block = {
                   name: 'summary',
                   type: 'text',
                   label: 'One line',
-                  maxLength: 120,
+                  maxLength: 200,
                   admin: { description: 'What flows between the two systems, in plain words.' },
                 },
                 {
