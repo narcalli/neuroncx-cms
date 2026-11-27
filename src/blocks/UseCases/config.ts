@@ -31,7 +31,7 @@ export const UseCases: Block = {
           maxLength: 80,
           admin: { description: 'Name the job, e.g. "Appointment booking and rescheduling".' },
         },
-        { name: 'description', type: 'textarea', label: 'Description', maxLength: 160 },
+        { name: 'description', type: 'textarea', label: 'Description', maxLength: 240 },
         {
           name: 'outcome',
           type: 'text',

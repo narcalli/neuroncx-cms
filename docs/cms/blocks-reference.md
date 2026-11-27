@@ -528,7 +528,7 @@ Used on: `/patient-360`, `/call-quality-assurance`, `/omnichannel-cx`
   - `name` (text, **required**): max 40 characters
   - `detail` (text): max 40 characters. e.g. Orders · status
 - `gapLine` (text) "What is wrong, under the systems": max 80 characters. e.g. records unlinked · context lost between steps
-- `resolutionLine` (text) "The resolution line": max 70 characters. e.g. NeuronCx unifies them into
+- `resolutionLine` (text) "The resolution line": max 100 characters. e.g. NeuronCx unifies them into
 - `resolutionHighlight` (text) "Highlighted phrase at the end": max 40 characters. Shown in green, e.g. one customer context
 
 ### Journey Engine
@@ -857,7 +857,7 @@ Used on: `/patient-360`, `/user-intelligence`, `/omnichannel-cx`
 - `cases` (list) "Use cases": 1 to 8 items
   - `sector` (text): max 30 characters. For example Hospitals, Diagnostics, Universities.
   - `title` (text, **required**) "What the agent handles": max 80 characters. Name the job, e.g. "Appointment booking and rescheduling".
-  - `description` (textarea): max 160 characters
+  - `description` (textarea): max 240 characters
   - `outcome` (text): max 80 characters. A result, ideally measured. Leave empty rather than inventing one.
 
 ### Benefits
@@ -870,7 +870,7 @@ Used on: `/episodic-engagements`, `/call-quality-assurance`, `/user-intelligence
 - `heading` (text): max 140 characters
 - `items` (list) "Benefits": 2 to 6 items. Say what changes for the customer, not what the software contains.
   - `title` (text, **required**) "Benefit": max 60 characters
-  - `description` (textarea): max 140 characters
+  - `description` (textarea): max 300 characters
 
 ### Integrations
 
@@ -892,7 +892,7 @@ Used on: `/patient-360`, `/integrations`, `/omnichannel-cx`, `/home`
 - `limit` (number) "How many": min 1; max 24; default `24`; shown only in some states
 - `items` (list) "Manual list (being retired)": 1 to 24 items; shown only in some states
   - `name` (text, **required**): max 60 characters
-  - `summary` (text) "One line": max 120 characters. What flows between the two systems, in plain words.
+  - `summary` (text) "One line": max 200 characters. What flows between the two systems, in plain words.
   - `logo` (upload from `media`) "Logo (optional)": Transparent PNG or SVG. Leave empty to show the name only.
 - `cardDesign` (group) "Card design"
   - `design` (select, **required**): one of: `grid` (Grid), `logoCard` (Logo card), `directory` (Directory with filters), `feature` (Feature card), `story` (Story card), `pill` (Pill); default `grid`
@@ -960,7 +960,7 @@ blockType: `comparisonTable` · appearance: **full**
 
 Comparison table: NeuronCx beside other types of system, on one page. A real table: column labels across the top (one column can be highlighted, usually NeuronCx), a row label down the side, and plain-word cells. On phones the table scrolls sideways with the row labels pinned on the left.
 
-Used on: `/comparisons`
+Used on: `/healthcare-comparison`, `/comparisons`
 
 - `eyebrow` (text): max 60 characters. Optional. The small line above the heading.
 - `heading` (text, **required**): max 140 characters
@@ -1157,7 +1157,7 @@ Used on: `/patient-360`, `/omnichannel-cx`
 - `buttonHref` (text) "Button address": max 300 characters; default `/contact`
 - `cards` (list): 2 to 6 items. Claims here are read closely during procurement, so only state what you can evidence.
   - `title` (text, **required**): max 60 characters
-  - `description` (textarea, **required**): max 200 characters
+  - `description` (textarea, **required**): max 260 characters
   - `icon` (icon name from the icon library): default `shield`
 
 ### Stat Band
