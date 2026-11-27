@@ -1,5 +1,7 @@
-import type { ArrayFieldValidation, Block } from 'payload'
+import type { ArrayFieldValidation, Block, Field } from 'payload'
 import { array } from 'payload/shared'
+
+import { optionalCta } from '@/fields/optionalCta'
 
 type Column = { label?: string | null; highlight?: boolean | null }
 type Row = { label?: string | null; cells?: unknown[] | null }
@@ -51,6 +53,40 @@ export const validateRows: ArrayFieldValidation = (value, options) => {
 }
 
 /**
+ * The button under the intro: the hero blocks' own button field, so an
+ * internal link is a real reference to the page rather than an address
+ * typed out, and a renamed page keeps working. Leaving the button text
+ * empty shows no button at all.
+ *
+ * Its look is the editor's, since this button sits above the table as a
+ * way out to a sister comparison rather than as the page's main action.
+ */
+const ctaBase = optionalCta('cta', 'Button under the intro (optional)')
+const ctaField: Field = {
+  ...ctaBase,
+  admin: {
+    ...ctaBase.admin,
+    description: 'Optional. Sends the reader to another comparison. Leave the button text empty to show no button.',
+  },
+  fields: [
+    ...ctaBase.fields,
+    {
+      name: 'appearance',
+      type: 'select',
+      label: 'Look',
+      defaultValue: 'outline',
+      options: [
+        { label: 'Outline (quieter, sits beside the main call to action)', value: 'outline' },
+        { label: 'Solid crimson (the same weight as Book a demo)', value: 'solid' },
+      ],
+      admin: {
+        description: 'Outline keeps the page\'s main call to action the loudest thing on it.',
+      },
+    },
+  ],
+}
+
+/**
  * Comparison table: NeuronCx beside other types of system, on one page. A
  * real table: column labels across the top (one column can be highlighted,
  * usually NeuronCx), a row label down the side, and plain-word cells. On
@@ -64,6 +100,7 @@ export const ComparisonTable: Block = {
     { name: 'eyebrow', type: 'text', label: 'Eyebrow', maxLength: 60, admin: { description: 'Optional. The small line above the heading.' } },
     { name: 'heading', type: 'text', label: 'Heading', required: true, maxLength: 140 },
     { name: 'intro', type: 'textarea', label: 'Intro', maxLength: 300, admin: { description: 'Optional. One or two sentences under the heading.' } },
+    ctaField,
     {
       name: 'columns',
       type: 'array',

@@ -7663,6 +7663,28 @@ export interface ComparisonTableBlock {
    */
   intro?: string | null;
   /**
+   * Optional. Sends the reader to another comparison. Leave the button text empty to show no button.
+   */
+  cta?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: string | Post;
+        } | null);
+    url?: string | null;
+    label?: string | null;
+    /**
+     * Outline keeps the page's main call to action the loudest thing on it.
+     */
+    appearance?: ('outline' | 'solid') | null;
+  };
+  /**
    * The systems being compared, left to right. Highlight one column at most, usually NeuronCx.
    */
   columns: {
@@ -10440,6 +10462,28 @@ export interface IndustryTopic {
      * Optional. One or two sentences under the heading.
      */
     intro?: string | null;
+    /**
+     * Optional. Sends the reader to another comparison. Leave the button text empty to show no button.
+     */
+    cta?: {
+      type?: ('reference' | 'custom') | null;
+      newTab?: boolean | null;
+      reference?:
+        | ({
+            relationTo: 'pages';
+            value: string | Page;
+          } | null)
+        | ({
+            relationTo: 'posts';
+            value: string | Post;
+          } | null);
+      url?: string | null;
+      label?: string | null;
+      /**
+       * Outline keeps the page's main call to action the loudest thing on it.
+       */
+      appearance?: ('outline' | 'solid') | null;
+    };
     /**
      * The systems being compared, left to right. Highlight one column at most, usually NeuronCx.
      */
@@ -13636,6 +13680,16 @@ export interface ComparisonTableBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   intro?: T;
+  cta?:
+    | T
+    | {
+        type?: T;
+        newTab?: T;
+        reference?: T;
+        url?: T;
+        label?: T;
+        appearance?: T;
+      };
   columns?:
     | T
     | {
@@ -15458,6 +15512,16 @@ export interface IndustryTopicsSelect<T extends boolean = true> {
         eyebrow?: T;
         heading?: T;
         intro?: T;
+        cta?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+              appearance?: T;
+            };
         columns?:
           | T
           | {
