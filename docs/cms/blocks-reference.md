@@ -965,6 +965,8 @@ Used on: `/healthcare-comparison`, `/comparisons`
 - `eyebrow` (text): max 60 characters. Optional. The small line above the heading.
 - `heading` (text, **required**): max 140 characters
 - `intro` (textarea): max 300 characters. Optional. One or two sentences under the heading.
+- `cta` (link) "Button under the intro (optional)": Optional. Sends the reader to another comparison. Leave the button text empty to show no button.
+  - `type`: `reference` (an internal page or post, set in `reference`) or `custom` (a URL or site path in `url`); `label`: the visible text; `newTab`: open in a new tab; `appearance`: `outline` or `solid`
 - `columns` (list, **required**): 2 to 4 items. The systems being compared, left to right. Highlight one column at most, usually NeuronCx.
   - `label` (text, **required**) "Column label": max 40 characters
   - `highlight` (checkbox) "Highlight this column": default `false`
