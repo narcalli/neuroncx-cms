@@ -969,7 +969,7 @@ Used on: `/comparisons`
   - `label` (text, **required**) "Column label": max 40 characters
   - `highlight` (checkbox) "Highlight this column": default `false`
 - `rowHeading` (text) "Heading above the row names (optional)": max 40 characters. Shown in the empty top-left corner of the table, above the row names, e.g. "Capability". Leave empty to show nothing there.
-- `rows` (list, **required**): 2 to 12 items. Describe what each system typically covers, in plain words. No ticks or crosses, and no claims about a named product.
+- `rows` (list, **required**): 2 to 24 items. Describe what each system typically covers, in plain words. No ticks or crosses, and no claims about a named product.
   - `label` (text, **required**) "Row label": max 60 characters
   - `cells` (list): up to 4 items. One cell per column, in the same order as the columns.
     - `text` (text) "Cell": max 140 characters

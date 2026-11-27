@@ -103,7 +103,7 @@ export const ComparisonTable: Block = {
       labels: { singular: 'Row', plural: 'Rows' },
       required: true,
       minRows: 2,
-      maxRows: 12,
+      maxRows: 24,
       validate: validateRows,
       admin: {
         description: 'Describe what each system typically covers, in plain words. No ticks or crosses, and no claims about a named product.',
