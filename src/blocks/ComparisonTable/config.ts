@@ -87,6 +87,16 @@ export const ComparisonTable: Block = {
       ],
     },
     {
+      name: 'rowHeading',
+      type: 'text',
+      label: 'Heading above the row names (optional)',
+      maxLength: 40,
+      admin: {
+        description:
+          'Shown in the empty top-left corner of the table, above the row names, e.g. "Capability". Leave empty to show nothing there.',
+      },
+    },
+    {
       name: 'rows',
       type: 'array',
       label: 'Rows',

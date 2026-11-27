@@ -7668,6 +7668,10 @@ export interface ComparisonTableBlock {
     id?: string | null;
   }[];
   /**
+   * Shown in the empty top-left corner of the table, above the row names, e.g. "Capability". Leave empty to show nothing there.
+   */
+  rowHeading?: string | null;
+  /**
    * Describe what each system typically covers, in plain words. No ticks or crosses, and no claims about a named product.
    */
   rows: {
@@ -10320,6 +10324,10 @@ export interface IndustryTopic {
           id?: string | null;
         }[]
       | null;
+    /**
+     * Shown in the empty top-left corner of the table, above the row names, e.g. "Capability". Leave empty to show nothing there.
+     */
+    rowHeading?: string | null;
     /**
      * Describe what each system typically covers, in plain words. No ticks or crosses, and no claims about a named product.
      */
@@ -13507,6 +13515,7 @@ export interface ComparisonTableBlockSelect<T extends boolean = true> {
         highlight?: T;
         id?: T;
       };
+  rowHeading?: T;
   rows?:
     | T
     | {
@@ -15249,6 +15258,7 @@ export interface IndustryTopicsSelect<T extends boolean = true> {
               highlight?: T;
               id?: T;
             };
+        rowHeading?: T;
         rows?:
           | T
           | {
