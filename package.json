@@ -20,6 +20,7 @@
     "test": "pnpm run test:int && pnpm run test:e2e",
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts",
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
+    "limits:check": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" node scripts/check-limits-against-live.ts",
     "rag:sheet": "tsx scripts/build-rag-sheet.ts",
     "rag:sheet:reset": "node -e \"require('fs').rmSync('rag-debug',{recursive:true,force:true})\""
   },
